@@ -1,0 +1,6 @@
+#ignore data folders for containers
+grafana/
+nodered/
+influxdb/
+
+
