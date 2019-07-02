@@ -2,13 +2,15 @@
 docker stack for getting started on IOT on the Raspberry PI
 
 This Docker stack consists of:
-  *norered
-  *Grafana
-  *influxDB
+  * nodered
+  * Grafana
+  * influxDB
 
 ## Before you start
-I followed these instructions to setup docker on my pi
-https://howchoo.com/g/nmrlzmq1ymn/how-to-install-docker-on-your-raspberry-pi
+Installing docker
+```
+curl -sSL https://get.docker.com | sh
+```
 
 to install docker-compose
 ```
@@ -19,8 +21,8 @@ Note: when I installed docker-compose it is not the latest version.
 It only supports Version '2' of the compose instructions and therefore some of the more advanced instructions have been omitted
 
 ## Folder permissions
-when docker starts the compose for the first time it creates the folders for linking the volumes
-there is an issue with Grafana where a different user and group is used run the `folderfix.sh'
+when docker starts the compose for the first time it creates the folders for linking the volumes.
+There is an issue with Grafana where a different user and group is used run the `folderfix.sh'
 
 ```
 sudo chmod +x ./folderfix.sh
@@ -36,7 +38,7 @@ run the following
 to stop
 `docker-compose down`
 
-docker deletes the containers with the docker-compose down command. However because the compose file specifies volumes the data is stored in persistent folders on the host system
+docker deletes the containers with the docker-compose down command. However because the compose file specifies volumes the data is stored in persistent folders on the host system. This is good because it allows you to update the image and retain your data
 
 ## Updating the images
 if a new version of a container it is simple to update it.
