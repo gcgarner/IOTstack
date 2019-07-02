@@ -1,0 +1,30 @@
+version: '2'
+services:
+  influxdb:
+    image: "influxdb:latest"
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+      - "8083:8083"
+      - "2003:2003"
+    env_file:
+      - influxdb.env
+    volumes:
+      - $PWD/influxdb/data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - $PWD/grafana/data:/var/lib/grafana
+
+  nodered:
+    image: nodered/node-red-docker:rpi
+    container_name: nodered
+    ports:
+      - "1880:1880"
+    volumes:
+      - $PWD/nodered/data:/data
+
