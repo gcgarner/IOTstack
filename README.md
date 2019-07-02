@@ -5,6 +5,9 @@ This Docker stack consists of:
   * nodered
   * Grafana
   * influxDB
+  
+# Youtube reference
+this repo was inspired by Andreas Spiess's video on using these tools https://www.youtube.com/watch?v=JdV4x925au0 . This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
 
 ## Before you start
 Installing docker
@@ -56,4 +59,4 @@ docker pull nodered/node-red-docker:rpi
 The compose instruction creates a internal network for the containers to communicate in.
 It also creates a "DNS" the name being the container name.
 When you need to specify the address of your influxdb it will not be 127.0.0.1:8086 ! It will be influxdb:8086
-Similarly inside the containers the containers talk by name however if you need to interact with it you do if via your pi's ip e.g. 192.168.0.n:3000
+Similarly inside the containers the containers talk by name. However if you need to interact with it (from outside) you do if via your pi's ip e.g. 192.168.0.n:3000 (or 1270.0.0.1:3000 if you are using the pi itself)
