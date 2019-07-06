@@ -6,6 +6,9 @@ This Docker stack consists of:
   * Grafana
   * influxDB
   
+# Tested platform
+Raspberry Pi 3B running Rasbian (Stretch)
+  
 # Youtube reference
 this repo was inspired by Andreas Spiess's video on using these tools https://www.youtube.com/watch?v=JdV4x925au0 . This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
 
