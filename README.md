@@ -81,3 +81,10 @@ The compose instruction creates a internal network for the containers to communi
 It also creates a "DNS" the name being the container name.
 When you need to specify the address of your influxdb it will not be 127.0.0.1:8086 ! It will be influxdb:8086
 Similarly inside the containers the containers talk by name. However if you need to interact with it (from outside) you do if via your pi's ip e.g. 192.168.0.n:3000 (or 1270.0.0.1:3000 if you are using the pi itself)
+
+## Passwords
+### Grafana
+Grafana's default credentials are username "admin" passord "admin" it will ask you to choose a new password on boot
+
+### influxdb
+there is a file called influx.env inside it is the username and password. The default I set is "nodered" for both it is HIGHLY recommended that you change that
