@@ -6,7 +6,7 @@ if [ ! -d $PWD/grafana ]; then
    mkdir grafana/data
 fi
 
-chown -R 472:472 ./grafana
+chown -R 472:472 $PWD/grafana
 
 if [ ! -d $PWD/nodered ]; then
    #rm -r nodered
@@ -14,4 +14,4 @@ if [ ! -d $PWD/nodered ]; then
    mkdir nodered/data
 fi
 
-chown -R 1000:1000 ./nodered
+chown -R 1000:1000 $PWD/nodered
