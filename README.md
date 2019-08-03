@@ -12,6 +12,20 @@ Raspberry Pi 3B running Raspbian (Stretch)
 # Youtube reference
 this repo was inspired by Andreas Spiess's video on using these tools https://www.youtube.com/watch?v=JdV4x925au0 . This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
 
+## Download the project
+
+```
+git clone https://github.com/gcgarner/raspIOTstackd.git
+```
+
+For those not familar with git or not CLI savy, the clone command downloads the repository and creates a folder with the repository name.
+
+To enter the direcory run:
+```
+cd raspIOTstackd
+```
+Personally I like to create a specific folder in my home directory for git repos so they are grouped together in `~/git`
+
 ## Before you start
 Installing docker
 ```
@@ -26,14 +40,18 @@ sudo apt update && sudo apt install -y docker-compose
 Note: when I installed docker-compose it is not the latest version.
 It only supports Version '2' of the compose instructions and therefore some of the more advanced instructions have been omitted
 
+# Running Docker commands
+From this point on make sure you are executing the commands from inside the repo folder. If you need to at any point start or stop navigate back to the repo folder first
+
 ## Folder permissions
 when docker starts the compose for the first time it creates the folders for linking the volumes.
-There is an issue with Grafana where a different user and group is used run the `folderfix.sh'
+There is an issue with Grafana where a different user and group is used run the `folderfix.sh`
 
 ```
 sudo chmod +x ./folderfix.sh
 sudo ./folderfix.sh
 ```
+you only need to run this once.
 
 ## Starting and Stopping containers
 to start the stack navigate to the folder containing the docker-compose.yml file
