@@ -44,8 +44,7 @@ It only supports Version '2' of the compose instructions and therefore some of t
 From this point on make sure you are executing the commands from inside the repo folder. If you need to at any point start or stop navigate back to the repo folder first
 
 ## Folder permissions
-when docker starts the compose for the first time it creates the folders for linking the volumes.
-There is an issue with Grafana where a different user and group is used run the `folderfix.sh`
+The containers are set to store persistent data in folder. There is an issue with Grafana where a different user and group is used, run the `folderfix.sh`
 
 ```
 sudo chmod +x ./folderfix.sh
@@ -62,10 +61,10 @@ run the following
 to stop
 `docker-compose down`
 
-docker deletes the containers with the docker-compose down command. However because the compose file specifies volumes the data is stored in persistent folders on the host system. This is good because it allows you to update the image and retain your data
+Docker deletes the containers with the docker-compose down command. However because the compose file specifies volumes the data is stored in persistent folders on the host system. This is good because it allows you to update the image and retain your data
 
 ## Updating the images
-if a new version of a container it is simple to update it.
+If a new version of a container it is simple to update it.
 use the  `docker-compose down` command to stop the stack
 
 pull the latest version from docker hub with one of the following commands
@@ -73,8 +72,11 @@ pull the latest version from docker hub with one of the following commands
 ```
 docker pull grafana/grafana:latest
 docker pull influxdb:latest
-docker pull nodered/node-red-docker:rpi
+docker pull nodered/node-red:latest
 ```
+
+## Current issue with Grafana
+As of the date of this publish the team at Grafana are working on an issue in the 6.4.X version for the ARM image. The compose file hard codes to version 6.3.6, when the issue is resolved the ":latest" tag can be used again in stead of ":6.3.6"
 
 ## Networking
 The compose instruction creates a internal network for the containers to communicate in.
@@ -88,3 +90,5 @@ Grafana's default credentials are username "admin" passord "admin" it will ask y
 
 ### influxdb
 there is a file called influx.env inside it is the username and password. The default I set is "nodered" for both it is HIGHLY recommended that you change that
+
+## Node-red GPIO
