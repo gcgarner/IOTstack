@@ -3,7 +3,7 @@ services:
   influxdb:
     image: "influxdb:latest"
     container_name: influxdb
-    restart: always
+    restart: unless-stopped
     ports:
       - "8086:8086"
       - "8083:8083"
@@ -14,18 +14,22 @@ services:
       - $PWD/influxdb/data:/var/lib/influxdb
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:6.3.6
     container_name: grafana
-    restart: always
+    restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - grafana.env
     volumes:
       - $PWD/grafana/data:/var/lib/grafana
+      - $PWD/grafana/logs:/var/log/grafana
+
 
   nodered:
-    image: nodered/node-red-docker:rpi
+    image: nodered/node-red:latest
     container_name: nodered
-    restart: always
+    restart: unless-stopped
     ports:
       - "1880:1880"
     volumes:
