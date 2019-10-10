@@ -3,11 +3,14 @@ docker stack for getting started on IOT on the Raspberry PI
 
 This Docker stack consists of:
   * nodered
-  * Grafana
+  * grafana
   * influxDB
   * postgres
+  * mosquitto mqtt
   * portainer
   * adminer
+  
+The idea here is you delete what you dont need. Only need nodered and mosquitto, open up the docker-compose.yml and delete services you dont need. Running all these services is very taxing on my poor 3B, the more you run its a good idea to get some cooling (and it makes my wifi fall over). Ideally if you want to run these services a PI4 with 2GB RAM is a good option. And if you can run it over a lan cable.
   
 # Tested platform
 Raspberry Pi 3B running Raspbian (Stretch)
@@ -86,10 +89,19 @@ docker pull nodered/node-red:latest
 As of the date of this publish the team at Grafana are working on an issue in the 6.4.X version for the ARM image. The compose file hard codes to version 6.3.6, when the issue is resolved the ":latest" tag can be used again in stead of ":6.3.6"
 
 ## Networking
-The compose instruction creates a internal network for the containers to communicate in.
-It also creates a "DNS" the name being the container name.
-When you need to specify the address of your influxdb it will not be 127.0.0.1:8086 ! It will be INFLUXDB:8086
-Similarly inside the containers the containers talk by name. However if you need to interact with it (from outside) you do if via your pi's ip e.g. 192.168.0.n:3000 (or 127.0.0.1:3000 if you are using the pi itself)
+An easy way to find out your ip is by typing `ifconfig` in the terminal and look next to eth0 or wlan0 for your ip. It is hightly recommended that you set a static IP for your PI or at least reserve a IP on your router so that you know it
+
+The docker-compose instruction creates a internal network for the containers to communicate in, the ports get exposed to the pi's IP address when you want to connect from outside. It also creates a "DNS" the name being the container name. So it is important to note that when one container talks to another they talk by name. I gave all the containers names in allcaps like NODERED,INFLUXDB...
+
+### Examples
+You want to connect your nodered to your mqtt server.
+In nodered drop an mqtt node, when you need to specify the address type `MQTT`
+
+You want to connect your influxdb to grafana.
+The address you specif in the grafana is INFLUXDB
+
+You want to connect to the web interface of portainer from you laptop.
+Now you are outside the container environmnet you type IPADDRESS:9000
 
 An easy way to find out your ip is by typing `ifconfig` in the terminal and look next to eth0 or wlan0 for your ip
 
@@ -117,10 +129,17 @@ Step 1
 To add the password run `./terminal_mosquitto.sh`, i put some helper text in the script. Basically you use the `mosquitto_passwd -c /etc/mosquitto/passwd MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
 
 Step 2
-edit the file called ./mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
+edit the file called mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
 
+### Postgres
+in the file postgres/postgres.env. change the user, password and default database
 
 ## Node-red GPIO
+To communicate to your pi's GPIO you need to install `node-red-node-pi-gpiod` from the palette. The nice thing is that you can now connect to multiple pis from the same nodered.
 
+You need to make sure the pigpdiod is running. The recommented method is listed here https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod
+Basically you run the following command `sudo nano /etc/rc.local` and add the line '/usr/bin/pigpiod' above 'exit 0' and reboot the pi. there is an option to secure the service see the writeup
+
+drop the gpio node and use your pi's IP:8888 (127.0.0.1 wont work)
 
 
