@@ -92,3 +92,7 @@ Grafana's default credentials are username "admin" passord "admin" it will ask y
 there is a file called influx.env inside it is the username and password. The default I set is "nodered" for both it is HIGHLY recommended that you change that
 
 ## Node-red GPIO
+
+## MQTT
+reference https://www.youtube.com/watch?v=1msiFQT_flo
+

@@ -1,6 +1,9 @@
 #ignore data folders for containers
-grafana/
-nodered/
-influxdb/
+grafana/data
+grafana/log
+nodered/data
+influxdb/data
+postgres/data
+mosquitto/data
 
 

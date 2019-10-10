@@ -9,4 +9,4 @@ echo ""
 echo "to exit type: EXIT"
 echo ""
 
-docker exec -it influxdb influx
+docker exec -it INFLUXDB influx

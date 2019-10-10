@@ -1,37 +1,82 @@
 version: '2'
 services:
   influxdb:
+    container_name: INFLUXDB
     image: "influxdb:latest"
-    container_name: influxdb
     restart: unless-stopped
     ports:
-      - "8086:8086"
-      - "8083:8083"
-      - "2003:2003"
+      - 8086:8086
+      - 8083:8083
+      - 2003:2003
     env_file:
-      - influxdb.env
+      - ./influxdb/influxdb.env
     volumes:
-      - $PWD/influxdb/data:/var/lib/influxdb
+      - ./influxdb/data:/var/lib/influxdb
 
   grafana:
+    container_name: GRAFANA
     image: grafana/grafana:6.3.6
-    container_name: grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - 3000:3000
     env_file:
-      - grafana.env
+      - ./grafana/grafana.env
     volumes:
-      - $PWD/grafana/data:/var/lib/grafana
-      - $PWD/grafana/logs:/var/log/grafana
+      - ./grafana/data:/var/lib/grafana
+      - grafana_log:/var/log/grafana
 
 
   nodered:
+    container_name: NODERED
     image: nodered/node-red:latest
-    container_name: nodered
     restart: unless-stopped
     ports:
-      - "1880:1880"
+      - 1880:1880
     volumes:
-      - $PWD/nodered/data:/data
+      - ./nodered/data:/data
 
+  postgres:
+    container_name: POSTGRES
+    image: postgres
+    restart: unless-stopped
+    env_file:
+      - ./postgres/postgres.env
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres/data:/var/lib/postgresql/data
+
+  adminer:
+    container_name: ADMINER
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+
+  mqtt:
+    container_name: MQTT
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+
+  portainer:
+    container_name: PORTAINER
+    image: portainer/portainer
+    restart: unless-stopped
+    ports:
+      - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+volumes:
+  portainer_data:
+  mosquitto_data:
+  mosquitto_log:
+  grafana_log:
