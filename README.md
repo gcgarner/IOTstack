@@ -44,7 +44,7 @@ sudo apt update && sudo apt install -y docker-compose
 ```
 
 Note: when I installed docker-compose it is not the latest version it did not support version 3.
-I devided to leave the yml file on version 2 for backwards compatibility.
+I decided to leave the yml file on version 2 for backwards compatibility.
 
 # Running Docker commands
 From this point on make sure you are executing the commands from inside the repo folder. If you need to at any point start or stop navigate back to the repo folder first
