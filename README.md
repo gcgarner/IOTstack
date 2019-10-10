@@ -98,7 +98,7 @@ You want to connect your nodered to your mqtt server.
 In nodered drop an mqtt node, when you need to specify the address type `MQTT`
 
 You want to connect your influxdb to grafana.
-The address you specif in the grafana is INFLUXDB
+The address you specif in the grafana is https://INFLUXDB:8086
 
 You want to connect to the web interface of portainer from you laptop.
 Now you are outside the container environmnet you type IPADDRESS:9000
@@ -131,7 +131,10 @@ To add the password run `./terminal_mosquitto.sh`, i put some helper text in the
 Step 2
 edit the file called mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
 
-### Postgres
+## Influxdb
+I've added a script to access the influxdb shell `./terminal_influxdb.sh` from here you can and you database etc
+
+## Postgres
 in the file postgres/postgres.env. change the user, password and default database
 
 ## Node-red GPIO
