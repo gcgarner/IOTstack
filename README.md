@@ -127,7 +127,7 @@ Grafana's default credentials are username "admin" passord "admin" it will ask y
 ### influxdb
 there is a file called influx.env in the folder influxdb inside it is the username and password. The default I set is "nodered" for both it is HIGHLY recommended that you change that
 
-### Mosiquitto (MQTT)
+### Mosquitto (MQTT)
 reference https://www.youtube.com/watch?v=1msiFQT_flo
 By default the MQTT container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
