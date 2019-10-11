@@ -143,13 +143,21 @@ I've added a script to access the influxdb shell `./terminal_influxdb.sh` from h
 ## Postgres
 in the file postgres/postgres.env. change the user, password and default database
 
-## Node-red GPIO
+## Node-red
+### GPIO
 To communicate to your pi's GPIO you need to install `node-red-node-pi-gpiod` from the palette. The nice thing is that you can now connect to multiple pis from the same nodered.
 
 You need to make sure the pigpdiod is running. The recommented method is listed here https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod
 Basically you run the following command `sudo nano /etc/rc.local` and add the line '/usr/bin/pigpiod' above 'exit 0' and reboot the pi. there is an option to secure the service see the writeup
 
 drop the gpio node and use your pi's IP:8888 (127.0.0.1 wont work)
+
+### Securing Node-RED
+To secure Node-RED you need a password hash. There is a terminal script `./terminal_nodered.sh` execute it to get into the termina.
+Copy the helper text `node -e ..... PASSWORD`, paste it and change your password to get a hash.
+
+Open the file `./nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instrucitons
+ 
 
 ## DuckDNS
 If you want to have a DynamicDNS point to your Public IP I added a helper script.
