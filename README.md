@@ -151,4 +151,17 @@ Basically you run the following command `sudo nano /etc/rc.local` and add the li
 
 drop the gpio node and use your pi's IP:8888 (127.0.0.1 wont work)
 
+## DuckDNS
+If you want to have a DynamicDNS point to your Public IP I added a helper script.
+Register with DuckDNS then edit the `duck.sh` file and add your dns and token to the 
+Either run the `./make_duck.sh` form its folder or copy it to your folder of choice (my script just makes the folder and copies the file there.
+
+first test the script to make sure it works `./duck.sh` then `cat duck.log`. If you get an OK then you can do the next step
+
+Create a cron job by running the follow cmd `crontab -e`
+You will be asked to use an editor option 1 for nano should be fine
+paste the following in the editor `*/5 * * * * ~/duckdns/duck.sh >/dev/null 2>&1` then ctrl+o and ctrl+x to save
+(if you chose your own folder specify it in stead, just remember to change the curl statement to point to your desired log file logation)
+Your Public IP should be updated every five minutes
+
 
