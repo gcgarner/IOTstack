@@ -95,17 +95,21 @@ An easy way to find out your ip is by typing `ifconfig` in the terminal and look
 
 The docker-compose instruction creates a internal network for the containers to communicate in, the ports get exposed to the pi's IP address when you want to connect from outside. It also creates a "DNS" the name being the container name. So it is important to note that when one container talks to another they talk by name. I gave all the containers names in allcaps like NODERED,INFLUXDB...
 
+check the docker-compose.yml to see which ports have been used
+
+![net](https://user-images.githubusercontent.com/46672225/66629049-dfc69780-ec00-11e9-998d-c4a5d50a46e4.png)
+
 ### Examples
 You want to connect your nodered to your mqtt server.
 In nodered drop an mqtt node, when you need to specify the address type `MQTT`
 
-You want to connect your influxdb to grafana.
-The address you specif in the grafana is https://INFLUXDB:8086
+You want to connect to your influxdb from grafana. 
+You are in the Docker network and you need to use the name of the Container.
+The address you specify in the grafana is https://INFLUXDB:8086
 
-You want to connect to the web interface of portainer from you laptop.
-Now you are outside the container environmnet you type IPADDRESS:9000
+You want to connect to the web interface of Grafana from you laptop.
+Now you are outside the container environmnet you type PI's IP eg 192.168.n.m:9000
 
-An easy way to find out your ip is by typing `ifconfig` in the terminal and look next to eth0 or wlan0 for your ip
 
 ## Portainer
 Portainer is a great application for managing Docker. In your web browser navigate to `#yourip:9000`. You will be asked to choose a password. In the next window select 'Local' and connect, it shouldn't ask you this again. From here you can play around, click local, and take a look around. This can help you find unused images/containers. On the Containers section there are 'Quick actions' to view logs and other stats. Note: This can all be done from the CLI but portainer just makes it much much easier
