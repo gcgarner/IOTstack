@@ -53,17 +53,6 @@ I decided to leave the yml file on version 2 for backwards compatibility.
 # Running Docker commands
 From this point on make sure you are executing the commands from inside the repo folder. If you need to at any point start or stop navigate back to the repo folder first
 
-## Folder permissions
-The containers are set to store persistent data in folder. Grafana runs with a different userid than the standard pi user. This workaround changes the permission of the folder so that data can be stored locally, run  `sudo ./folderfix.sh`
-
-if the script wont execute then run the following first (this applies to the other scripts as well)
-
-```
-sudo chmod +x ./folderfix.sh
-sudo ./folderfix.sh
-```
-you only need to run this once.
-
 ## Starting and Stopping containers
 to start the stack navigate to the folder containing the docker-compose.yml file
 
