@@ -96,7 +96,7 @@ The docker-compose instruction creates a internal network for the containers to 
 
 check the docker-compose.yml to see which ports have been used
 
-![net](https://user-images.githubusercontent.com/46672225/66629049-dfc69780-ec00-11e9-998d-c4a5d50a46e4.png)
+![net](https://user-images.githubusercontent.com/46672225/66702353-0bcc4080-ed07-11e9-994b-62219f50b096.png)
 
 ### Examples
 You want to connect your nodered to your mqtt server.
