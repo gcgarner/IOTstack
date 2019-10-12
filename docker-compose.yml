@@ -1,7 +1,7 @@
 version: '2'
 services:
   influxdb:
-    container_name: INFLUXDB
+    container_name: influxdb
     image: "influxdb:latest"
     restart: unless-stopped
     ports:
@@ -14,7 +14,7 @@ services:
       - ./influxdb/data:/var/lib/influxdb
 
   grafana:
-    container_name: GRAFANA
+    container_name: grafana
     image: grafana/grafana:6.3.6
     restart: unless-stopped
     ports:
@@ -27,8 +27,8 @@ services:
 
 
   nodered:
-    container_name: NODERED
-    image: nodered/node-red:latest
+    container_name: nodered
+    build: ./nodered/.
     restart: unless-stopped
     ports:
       - 1880:1880
@@ -36,7 +36,7 @@ services:
       - ./nodered/data:/data
 
   postgres:
-    container_name: POSTGRES
+    container_name: postgres
     image: postgres
     restart: unless-stopped
     env_file:
@@ -47,14 +47,14 @@ services:
       - ./postgres/data:/var/lib/postgresql/data
 
   adminer:
-    container_name: ADMINER
+    container_name: adminer
     image: adminer
     restart: unless-stopped
     ports:
       - 8080:8080
 
   mqtt:
-    container_name: MQTT
+    container_name: mqtt
     image: eclipse-mosquitto
     restart: unless-stopped
     ports:
@@ -66,7 +66,7 @@ services:
       - mosquitto_log:/mosquitto/log
 
   portainer:
-    container_name: PORTAINER
+    container_name: portainer
     image: portainer/portainer
     restart: unless-stopped
     ports:

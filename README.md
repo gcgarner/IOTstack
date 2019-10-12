@@ -79,13 +79,12 @@ side note: Docker deletes the containers with the docker-compose down command. H
 If a new version of a container it is simple to update it.
 use the  `docker-compose down` command to stop the stack
 
-pull the latest version from docker hub with one of the following commands
+pull the latest version from docker hub with one of the following command
 
 ```
-docker pull grafana/grafana:latest
-docker pull influxdb:latest
-docker pull nodered/node-red:latest
+docker-compose pull
 ```
+
 
 ## Current issue with Grafana
 As of the date of this publish the team at Grafana are working on an issue in the 6.4.X version for the ARM image. The compose file hard codes to version 6.3.6, when the issue is resolved the ":latest" tag can be used again in stead of ":6.3.6"
@@ -93,7 +92,7 @@ As of the date of this publish the team at Grafana are working on an issue in th
 ## Networking
 An easy way to find out your ip is by typing `ifconfig` in the terminal and look next to eth0 or wlan0 for your ip. It is hightly recommended that you set a static IP for your PI or at least reserve a IP on your router so that you know it
 
-The docker-compose instruction creates a internal network for the containers to communicate in, the ports get exposed to the pi's IP address when you want to connect from outside. It also creates a "DNS" the name being the container name. So it is important to note that when one container talks to another they talk by name. I gave all the containers names in allcaps like NODERED,INFLUXDB...
+The docker-compose instruction creates a internal network for the containers to communicate in, the ports get exposed to the PI's IP address when you want to connect from outside. It also creates a "DNS" the name being the container name. So it is important to note that when one container talks to another they talk by name. All the containers names are lowercase like nodered,influxdb...
 
 check the docker-compose.yml to see which ports have been used
 
@@ -101,11 +100,11 @@ check the docker-compose.yml to see which ports have been used
 
 ### Examples
 You want to connect your nodered to your mqtt server.
-In nodered drop an mqtt node, when you need to specify the address type `MQTT`
+In nodered drop an mqtt node, when you need to specify the address type `mqtt`
 
 You want to connect to your influxdb from grafana. 
 You are in the Docker network and you need to use the name of the Container.
-The address you specify in the grafana is https://INFLUXDB:8086
+The address you specify in the grafana is https://influx:8086
 
 You want to connect to the web interface of grafana from you laptop.
 Now you are outside the container environmnet you type PI's IP eg 192.168.n.m:3000
@@ -122,12 +121,12 @@ This is a nice tool for managing databases. Web interface on port 8080
 
 ## Passwords
 ### Grafana
-Grafana's default credentials are username "admin" passord "admin" it will ask you to choose a new password on boot
+Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot
 
 ### influxdb
 there is a file called influx.env in the folder influxdb inside it is the username and password. The default I set is "nodered" for both it is HIGHLY recommended that you change that
 
-### Mosquitto (MQTT)
+### Mosquitto (mqtt)
 reference https://www.youtube.com/watch?v=1msiFQT_flo
 By default the MQTT container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
@@ -145,7 +144,7 @@ in the file postgres/postgres.env. change the user, password and default databas
 
 ## Node-red
 ### GPIO
-To communicate to your pi's GPIO you need to install `node-red-node-pi-gpiod` from the palette. The nice thing is that you can now connect to multiple pis from the same nodered.
+To communicate to your pi's GPIO you need to use the new `node-red-node-pi-gpiod`. The nice thing is that you can now connect to multiple PIs from the same nodered.
 
 You need to make sure the pigpdiod is running. The recommented method is listed here https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod
 Basically you run the following command `sudo nano /etc/rc.local` and add the line '/usr/bin/pigpiod' above 'exit 0' and reboot the pi. there is an option to secure the service see the writeup
