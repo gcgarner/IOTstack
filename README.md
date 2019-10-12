@@ -36,12 +36,16 @@ Personally I like to create a specific folder in my home directory for git repos
 Installing docker
 ```
 curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+
 ```
 
 to install docker-compose
 ```
 sudo apt update && sudo apt install -y docker-compose
 ```
+
+you should reboot before going ahead.
 
 Note: when I installed docker-compose it is not the latest version it did not support version 3.
 I decided to leave the yml file on version 2 for backwards compatibility.

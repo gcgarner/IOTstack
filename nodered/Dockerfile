@@ -1,5 +1,9 @@
 FROM nodered/node-red:latest
-RUN npm install \
+
+#node red install script instpired from
+#https://tech.scargill.net/the-script/
+
+RUN for addonnodes in \
 node-red-node-pi-gpiod \
 node-red-contrib-config \
 node-red-contrib-grove \
@@ -27,4 +31,7 @@ node-red-dashboard \
 node-red-node-darksky \
 node-red-contrib-owntracks \
 node-red-contrib-alexa-local \
-node-red-contrib-heater-controller  
+node-red-contrib-heater-controller \
+; do \
+npm install ${addonnodes} ;\
+done;
