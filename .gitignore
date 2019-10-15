@@ -5,5 +5,5 @@ nodered/data
 influxdb/data
 postgres/data
 mosquitto/data
-
+pihole/data
 

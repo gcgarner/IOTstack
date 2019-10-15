@@ -1,5 +1,5 @@
 # IOTstack
-docker stack for getting started on IOT on the Raspberry PI
+Docker stack for getting started on IOT on the Raspberry PI
 
 This Docker stack consists of:
   * nodered
@@ -9,14 +9,24 @@ This Docker stack consists of:
   * mosquitto mqtt
   * portainer
   * adminer
-  
-The idea here is you delete what you dont need. Only need nodered and mosquitto, open up the docker-compose.yml and delete services you dont need. Running all these services is very taxing on my poor 3B, the more you run its a good idea to get some cooling (and it makes my wifi fall over). Ideally if you want to run these services a PI4 with 2GB RAM is a good option. And if you can run it over a lan cable.
+
+Firstly what is docker. The corrent question is what are containers. Docker is just one of the utilities to run container.
+
+Container can be thought of as ultra minimal virtual machines. You download a base image and create a new container and only the differences between the base and your "VM" are stored.
+Containers dont have GUIs so generally the way you interact with them are via web services or you can launch into a terminal.
+One of the major advantages is that the image comes mostly preconfigured.  
   
 # Tested platform
-Raspberry Pi 3B running Raspbian (Stretch)
+Raspberry Pi 3B running Raspbian (Buster)
   
 # Youtube reference
-this repo was inspired by Andreas Spiess's video on using these tools https://www.youtube.com/watch?v=JdV4x925au0 . This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
+This repo was originally inspired by Andreas Spiess's video on using some of these tools. Some containers have been added to extend its functionality
+
+https://www.youtube.com/watch?v=JdV4x925au0 
+This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
+
+For those looking for a script that installs native applications check out Peter Scargill's script
+https://tech.scargill.net/the-script/
 
 ## Download the project
 
@@ -32,29 +42,26 @@ cd IOTstack
 ```
 Personally I like to create a specific folder in my home directory for git repos so they are grouped together in `~/git`
 
-## Before you start
-Installing docker
-```
-curl -sSL https://get.docker.com | sh
-sudo usermod -aG docker $USER
+# The Menu
+I've added a menu to make things easier. It is good however to familiarise yourself with how things are installed.
+The menu can be used to install docker and then build the docker-compose.yml file necessary for starting the stack and it runs a few common commands. I do recommend you start to learn the docker and docker-compose commands if you plan using docker in the long run. I've added several helper scripts, have a look inside.
 
-```
+Navigate to the project folder and run `./menu.sh`
 
-to install docker-compose
-```
-sudo apt update && sudo apt install -y docker-compose
-```
+## Installing from the menu
+Select the first option and follow the prompts
 
-you should reboot before going ahead.
+## Build the docker-compose file
+docker-compose uses the `docker-compose.yml` file to configure all the services. Run through the menu to select the options you want to install.
 
-Note: when I installed docker-compose it is not the latest version it did not support version 3.
-I decided to leave the yml file on version 2 for backwards compatibility.
+### Node-RED
+There is an additional menu for Node-RED to pre-install some commonly used nodes. Warning the output spits out a lot of warning message. They can be ignored.
 
 # Running Docker commands
-From this point on make sure you are executing the commands from inside the repo folder. If you need to at any point start or stop navigate back to the repo folder first
+From this point on make sure you are executing the commands from inside the project folder. Docker-compose commands need to be run from the folder where the docker-compose.yml is. If you want to move the folder make sure you move the whole project folder.
 
 ## Starting and Stopping containers
-to start the stack navigate to the folder containing the docker-compose.yml file
+to start the stack navigate to the project folder containing the docker-compose.yml file
 
 run the following
 `docker-compose up -d`
@@ -65,6 +72,8 @@ to stop
 I've added two scripts for startin and stopping if you forget the commands
 `./start.sh` starts the containers
 `./stop.sh` stops the containers
+
+The first time you run start the stack docker will download all the images for the web. Depending on how many containers you selected and your internet speed this can take a long while.
 
 side note: Docker deletes the containers with the docker-compose down command. However because the compose file specifies volumes the data is stored in persistent folders on the host system. This is good because it allows you to update the image and retain your data
 
