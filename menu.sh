@@ -107,7 +107,7 @@ case $mainmenu_selection in
             echo "docker-compose already installed"
         else
             echo "Install docker-compose"
-            sudo apt install docker-compose
+            sudo apt install -y docker-compose
         fi
 
         if ( whiptail --title "Restart Required" --yesno "It is recommended that you restart you device now. Select yes to do so now" 20 78); then
