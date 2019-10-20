@@ -21,14 +21,19 @@ function command_exists() {
 function yaml_builder(){
     service="./$1/docker.yml"
     volume="./$1/volume.yml"
+
+    cp -r .templates/$1 $1
+
     cat $service >> docker-compose.yml
     if [ -f $volume ]
     then
         cat $volume >> volumes.yml
         #echo $volume
         vol_flag=1
+        rm $volume
     fi
 
+    rm $service
 
 }
 
@@ -70,7 +75,7 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 
     touch ./nodered/Dockerfile
     echo "FROM nodered/node-red:latest" > ./nodered/Dockerfile
-    echo "#node red install script instpired from https://tech.scargill.net/the-script/" >> ./nodered/Dockerfile
+    #node red install script instpired from https://tech.scargill.net/the-script/
     echo "RUN for addonnodes in \\" >> ./nodered/Dockerfile
     for checked in "${checked_nodes[@]}"; do
             echo "$checked \\"  >> ./nodered/Dockerfile
@@ -147,8 +152,8 @@ case $mainmenu_selection in
                 ;;
             "nodered")
                 echo "Adding Node-RED container"
-                build_nodered
                 yaml_builder "nodered"
+                build_nodered
                 ;;
             "influxdb")
                 echo "Adding influxdb container"
