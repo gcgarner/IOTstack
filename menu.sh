@@ -19,8 +19,8 @@ function command_exists() {
 }
 
 function yaml_builder(){
-    service="./$1/docker.yml"
-    volume="./$1/volume.yml"
+    service="$1/docker.yml"
+    volume="$1/volume.yml"
 
     cp -r .templates/$1 $1
 
@@ -28,7 +28,6 @@ function yaml_builder(){
     if [ -f $volume ]
     then
         cat $volume >> volumes.yml
-        #echo $volume
         vol_flag=1
         rm $volume
     fi
