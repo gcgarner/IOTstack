@@ -100,6 +100,12 @@ The script `./prune-volumes.sh` delets all stopped container, networks, docker v
 
 `./prune-images.sh` will remove all images not assosiated with a container. If you run this while you stack is down you will have to redownload all images from scratch. This command can be helful to reclaim diskspace after updating your images, just make sure to run it while your stack is running as not to delete the images in use
 
+## Deleting folder volumes
+If you want to delete the influxdb data folder run the following command `sudo rm -r influxdb/data`. Only the data folder is deleted leaving the env file intact. review the docker-compose.yml file to see where the file volumes are stored.
+
+You can use git to delete all files and folders to return your folder to the freshly cloned state.
+`sudo git clean -d -x -f` will return the working tree to its clean state. USE WITH CAUTION!
+
 ## Networking
 
 The docker-compose instruction creates a internal network for the containers to communicate in, the ports get exposed to the PI's IP address when you want to connect from outside. It also creates a "DNS" the name being the container name. So it is important to note that when one container talks to another they talk by name. All the containers names are lowercase like nodered,influxdb...
