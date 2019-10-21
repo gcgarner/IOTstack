@@ -5,4 +5,5 @@ influxdb/
 postgres/
 mosquitto/
 pihole/
+portainer/
 docker-compose.yml

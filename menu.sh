@@ -19,20 +19,22 @@ function command_exists() {
 }
 
 function yaml_builder(){
-    service="$1/docker.yml"
+    service="$1/service.yml"
     volume="$1/volume.yml"
 
-    cp -r .templates/$1 $1
+    [ -d $1 ] || mkdir $1
+
+    cp -n -R .templates/$1/. ./$1/
 
     cat $service >> docker-compose.yml
     if [ -f $volume ]
     then
         cat $volume >> volumes.yml
         vol_flag=1
-        rm $volume
+        #rm $volume
     fi
 
-    rm $service
+    #rm $service
 
 }
 
@@ -202,14 +204,20 @@ case $mainmenu_selection in
             "start" "Start stack" \
             "restart" "Restart stack" \
             "stop" "Stop stack" \
+            "stop_all" "Stop any running container regardless of stack" \
             "pull" "Update all containers" \
+            "prune_volumes" "Delete all stopped containers and docker volumes" \
+            "prune_images" "Delete all images not associated with container" \
              3>&1 1>&2 2>&3)
 
         case $docker_selection in
         "start") ./start.sh ;;
         "stop") ./stop.sh ;;
+        "stop_all") ./stop-all.sh ;;
         "restart") ./restart.sh ;;
         "pull") ./update.sh ;;
+        "prune_volumes") ./prune-volumes.sh ;;
+        "prune_images") ./prune-images.sh ;;
         esac
     ;;
 
@@ -224,6 +232,7 @@ case $mainmenu_selection in
 		sudo dphys-swapfile swapoff
 		sudo dphys-swapfile uninstall
 		sudo update-rc.d dphys-swapfile remove
+                echo "Swap file has been removed"
 	;;
 	esac
     ;;
