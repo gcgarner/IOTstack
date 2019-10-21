@@ -1,9 +1,9 @@
 #ignore data folders for containers
-grafana/
-nodered/
-influxdb/
-postgres/
-mosquitto/
-pihole/
-portainer/
+/grafana/
+/nodered/
+/influxdb/
+/postgres/
+/mosquitto/
+/pihole/
+/portainer/
 docker-compose.yml
