@@ -133,16 +133,16 @@ Portainer is a great application for managing Docker. In your web browser naviga
 # Postgres
 I added a SQL server, for those that need an SQL database. The database credentials can be found in the file postgres/postgres.env. It is highly recommended to change the user, password and default database
 
-## Adminer
+# Adminer
 This is a nice tool for managing databases. Web interface on port 8080
 
-## Grafana
+# Grafana
 Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot. Go to yourIP:3000 in you web browser.
 
-## influxdb
+# influxdb
 The credentials for influxdb are stored in the file called influxdb/influx.env . The default I set is "nodered" for both it is HIGHLY recommended that you change that
 
-### Mosquitto (mqtt)
+# Mosquitto (mqtt)
 reference https://www.youtube.com/watch?v=1msiFQT_flo
 By default the MQTT container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
@@ -152,8 +152,8 @@ To add the password run `./terminal_mosquitto.sh`, i put some helper text in the
 Step 2
 edit the file called mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
 
-## Node-RED
-### GPIO
+# Node-RED
+## GPIO
 To communicate to your pi's GPIO you need to use the new `node-red-node-pi-gpiod`. The nice thing is that you can now connect to multiple PIs from the same nodered.
 
 You need to make sure the pigpdiod is running. The recommented method is listed here https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod
@@ -161,14 +161,14 @@ Basically you run the following command `sudo nano /etc/rc.local` and add the li
 
 drop the gpio node and use your pi's IP:8888 (127.0.0.1 wont work)
 
-### Securing Node-RED
+## Securing Node-RED
 To secure Node-RED you need a password hash. There is a terminal script `./terminal_nodered.sh` execute it to get into the termina.
 Copy the helper text `node -e ..... PASSWORD`, paste it and change your password to get a hash.
 
 Open the file `./nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instrucitons
  
 
-## DuckDNS
+# DuckDNS
 If you want to have a DynamicDNS point to your Public IP I added a helper script.
 Register with DuckDNS then edit the `duck.sh` file and add your dns and token to your values.
 
