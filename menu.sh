@@ -38,7 +38,7 @@ function yaml_builder(){
 
 build_nodered() {
 node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output\
-    "select the nodes you want preinstalled" 20 78 12 -- \
+    "Use the [SPACEBAR] to select the nodes you want preinstalled" 20 78 12 -- \
     "node-red-node-pi-gpiod" " " "ON" \
     "node-red-dashboard" " " "ON" \
     "node-red-node-openweathermap" " " "OFF" \
@@ -89,10 +89,11 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 # Menu system starts here
 #display main menu
 mainmenu_selection=$(whiptail --title "Main Menu" --menu --notags \
-    "This is a menu" 20 78 12 -- \
+    "" 20 78 12 -- \
     "install" "Install Docker" \
     "build" "Build Stack" \
     "commands" "Docker commands" \
+    "misc" "Miscellaneous commands" \
     3>&1 1>&2 2>&3)
 
 case $mainmenu_selection in
@@ -120,9 +121,9 @@ case $mainmenu_selection in
         ;;
     "build")
         container_selection=$(whiptail --title "Container Selection"  --notags --separate-output --checklist \
-            "select select which containers you would like to install" 20 78 12 \
+            "Use the [SPACEBAR] to select which containers you would like to install" 20 78 12 \
             "portainer" "Portainer" "ON" \
-            "nodered" "NodeRED" "ON" \
+            "nodered" "Node-RED" "ON" \
             "influxdb" "InfluxDB" "ON" \
             "grafana" "Grafana" "ON" \
             "mqtt" "Eclipse-Mosquitto" "ON" \
@@ -197,7 +198,7 @@ case $mainmenu_selection in
     "commands")
 
         docker_selection=$(whiptail --title "Docker commands"  --menu --notags \
-            "This is a menu" 20 78 12 -- \
+            "Shortcut to common docker commands" 20 78 12 -- \
             "start" "Start stack" \
             "restart" "Restart stack" \
             "stop" "Stop stack" \
@@ -211,6 +212,22 @@ case $mainmenu_selection in
         "pull") ./update.sh ;;
         esac
     ;;
+
+    "misc")
+        misc_sellection=$(whiptail --title "Miscellaneous Commands" --menu --notags \
+            "Some helpful commands" 20 78 12 -- \
+            "swap" "Disable swap" \
+            3>&1 1>&2 2>&3)
+
+        case $misc_sellection in
+	"swap")
+		sudo dphys-swapfile swapoff
+		sudo dphys-swapfile uninstall
+		sudo update-rc.d dphys-swapfile remove
+	;;
+	esac
+    ;;
+
     *) ;;
 esac
 
