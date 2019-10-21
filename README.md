@@ -17,7 +17,7 @@ Containers dont have GUIs so generally the way you interact with them are via we
 One of the major advantages is that the image comes mostly preconfigured.  
   
 # Tested platform
-Raspberry Pi 3B running Raspbian (Buster)
+Raspberry Pi 3B and 4B Raspbian (Buster)
   
 # Youtube reference
 This repo was originally inspired by Andreas Spiess's video on using some of these tools. Some containers have been added to extend its functionality
@@ -54,28 +54,36 @@ Select the first option and follow the prompts
 ## Build the docker-compose file
 docker-compose uses the `docker-compose.yml` file to configure all the services. Run through the menu to select the options you want to install.
 
-### Node-RED
-There is an additional menu for Node-RED to pre-install some commonly used nodes. Warning the output spits out a lot of warning message. They can be ignored.
+## Docker commands
+This menu executes shell scripts in the root of the project. It is not necessary to run them from the menu. Open up the shell script files to see what is inside and what they do
+
+## Miscellaneous commands
+Some helpful commands have been added like disabling swap
 
 # Running Docker commands
-From this point on make sure you are executing the commands from inside the project folder. Docker-compose commands need to be run from the folder where the docker-compose.yml is. If you want to move the folder make sure you move the whole project folder.
+From this point on make sure you are executing the commands from inside the project folder. Docker-compose commands need to be run from the folder where the docker-compose.yml is located. If you want to move the folder make sure you move the whole project folder.
 
 ## Starting and Stopping containers
 to start the stack navigate to the project folder containing the docker-compose.yml file
 
-run the following
-`docker-compose up -d`
+to start the stack run:
+`docker-compose up -d` or `./start.sh`
 
-to stop
-`docker-compose down`
-
-I've added two scripts for startin and stopping if you forget the commands
-`./start.sh` starts the containers
-`./stop.sh` stops the containers
+to stop:
+`docker-compose down` or `./stop.sh`
 
 The first time you run start the stack docker will download all the images for the web. Depending on how many containers you selected and your internet speed this can take a long while.
 
-side note: Docker deletes the containers with the docker-compose down command. However because the compose file specifies volumes the data is stored in persistent folders on the host system. This is good because it allows you to update the image and retain your data
+The "docker-compose down" command stops the containers then deletes them. The alternative is to run "docker-compose stop" which does not delete the containers.
+
+## Persistent data
+Docker allowes you to map folders inside your containers to folders on the disk. This is done with "volume" key. There are two types of volumes. Any modification to the container reflects in the volume.
+
+### Folder based volumes
+Docker links a specified folder from your disk into the container. This allows you to easily access and backup your data. Folder permission can be an issue so be sure to use sudo to copy files where necessary.
+
+### Docker volumes
+Docker creates is own managed folder in its resource folder. These are a little harder to get to and get your info out of. 
 
 ## Updating the images
 If a new version of a container it is simple to update it.
@@ -83,18 +91,20 @@ use the  `docker-compose down` command to stop the stack
 
 pull the latest version from docker hub with one of the following command
 
-```
-docker-compose pull
-```
+`docker-compose pull` or the script `./update.sh`
 
+## Deleting containers, volumes and images
+Should you want to remove the containers, volumes or images from disk two scripts have been provided.
 
-## Current issue with Grafana
-As of the date of this publish the team at Grafana are working on an issue in the 6.4.X version for the ARM image. The compose file hard codes to version 6.3.6, when the issue is resolved the ":latest" tag can be used again in stead of ":6.3.6"
+The script `./prune-volumes.sh` delets all stopped container, networks, docker volumes and hanging images. I does not delete the folder based link, these you will have to delete manually.
+
+`./prune-images.sh` will remove all images not assosiated with a container. If you run this while you stack is down you will have to redownload all images from scratch. This command can be helful to reclaim diskspace after updating your images, just make sure to run it while your stack is running as not to delete the images in use
 
 ## Networking
-An easy way to find out your ip is by typing `ifconfig` in the terminal and look next to eth0 or wlan0 for your ip. It is hightly recommended that you set a static IP for your PI or at least reserve a IP on your router so that you know it
 
 The docker-compose instruction creates a internal network for the containers to communicate in, the ports get exposed to the PI's IP address when you want to connect from outside. It also creates a "DNS" the name being the container name. So it is important to note that when one container talks to another they talk by name. All the containers names are lowercase like nodered,influxdb...
+
+An easy way to find out your ip is by typing `ifconfig` in the terminal and look next to eth0 or wlan0 for your ip. It is hightly recommended that you set a static IP for your PI or at least reserve a IP on your router so that you know it
 
 check the docker-compose.yml to see which ports have been used
 
@@ -111,22 +121,20 @@ The address you specify in the grafana is https://influx:8086
 You want to connect to the web interface of grafana from you laptop.
 Now you are outside the container environmnet you type PI's IP eg 192.168.n.m:3000
 
+# Portainer
+Portainer is a great application for managing Docker. In your web browser navigate to `#yourip:9000`. You will be asked to choose a password. In the next window select 'Local' and connect, it shouldn't ask you this again. From here you can play around, click local, and take a look around. This can help you find unused images/containers. On the Containers section there are 'Quick actions' to view logs and other stats. Note: This can all be done from the CLI but portainer just makes it much much easier. The portainer password is stored in a docker volume, so if you forget it you will need to delete the volume the prune-volumes.sh can be used for that.
 
-## Portainer
-Portainer is a great application for managing Docker. In your web browser navigate to `#yourip:9000`. You will be asked to choose a password. In the next window select 'Local' and connect, it shouldn't ask you this again. From here you can play around, click local, and take a look around. This can help you find unused images/containers. On the Containers section there are 'Quick actions' to view logs and other stats. Note: This can all be done from the CLI but portainer just makes it much much easier
-
-## Postgres
-I added a SQL server, for those that need it see password section for login details
+# Postgres
+I added a SQL server, for those that need an SQL database. The database credentials can be found in the file postgres/postgres.env. It is highly recommended to change the user, password and default database
 
 ## Adminer
 This is a nice tool for managing databases. Web interface on port 8080
 
-## Passwords
-### Grafana
-Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot
+## Grafana
+Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot. Go to yourIP:3000 in you web browser.
 
-### influxdb
-there is a file called influx.env in the folder influxdb inside it is the username and password. The default I set is "nodered" for both it is HIGHLY recommended that you change that
+## influxdb
+The credentials for influxdb are stored in the file called influxdb/influx.env . The default I set is "nodered" for both it is HIGHLY recommended that you change that
 
 ### Mosquitto (mqtt)
 reference https://www.youtube.com/watch?v=1msiFQT_flo
@@ -138,13 +146,7 @@ To add the password run `./terminal_mosquitto.sh`, i put some helper text in the
 Step 2
 edit the file called mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
 
-## Influxdb
-I've added a script to access the influxdb shell `./terminal_influxdb.sh` from here you can and you database etc
-
-## Postgres
-in the file postgres/postgres.env. change the user, password and default database
-
-## Node-red
+## Node-RED
 ### GPIO
 To communicate to your pi's GPIO you need to use the new `node-red-node-pi-gpiod`. The nice thing is that you can now connect to multiple PIs from the same nodered.
 
@@ -174,5 +176,3 @@ You will be asked to use an editor option 1 for nano should be fine
 paste the following in the editor `*/5 * * * * ~/duckdns/duck.sh >/dev/null 2>&1` then ctrl+o and ctrl+x to save
 (if you chose your own folder specify it in stead, just remember to change the curl statement to point to your desired log file logation)
 Your Public IP should be updated every five minutes
-
-
