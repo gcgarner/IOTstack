@@ -6,7 +6,7 @@
     ports:
       - 3000:3000
     env_file:
-      - ./grafana/grafana.env
+      - ./services/grafana/grafana.env
     volumes:
-      - ./grafana/data:/var/lib/grafana
-      - grafana_log:/var/log/grafana
+      - ./volumes/grafana/data:/var/lib/grafana
+      - ./volumes/grafana/log:/var/log/grafana

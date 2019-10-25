@@ -3,8 +3,8 @@
     image: postgres
     restart: unless-stopped
     env_file:
-      - ./postgres/postgres.env
+      - ./services/postgres/postgres.env
     ports:
       - 5432:5432
     volumes:
-      - ./postgres/data:/var/lib/postgresql/data
+      - ./volumes/postgres/data:/var/lib/postgresql/data

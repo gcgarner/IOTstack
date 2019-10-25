@@ -10,6 +10,8 @@ This Docker stack consists of:
   * portainer
   * adminer
 
+In addition there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
+
 Firstly what is docker. The corrent question is what are containers. Docker is just one of the utilities to run container.
 
 Container can be thought of as ultra minimal virtual machines. You download a base image and create a new container and only the differences between the base and your "VM" are stored.
@@ -140,14 +142,15 @@ This is a nice tool for managing databases. Web interface on port 8080
 Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot. Go to yourIP:3000 in you web browser.
 
 # influxdb
-The credentials for influxdb are stored in the file called influxdb/influx.env . The default I set is "nodered" for both it is HIGHLY recommended that you change that
+The credentials and default database name for influxdb are stored in the file called influxdb/influx.env . The default username and password is set to "nodered" for both it is HIGHLY recommended that you change that, the default db is "measurements".
+To access the terminal for influxdb execute `./influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
 
 # Mosquitto (mqtt)
 reference https://www.youtube.com/watch?v=1msiFQT_flo
 By default the MQTT container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
 Step 1
-To add the password run `./terminal_mosquitto.sh`, i put some helper text in the script. Basically you use the `mosquitto_passwd -c /etc/mosquitto/passwd MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
+To add the password run `./mosquitto/terminal.sh`, i put some helper text in the script. Basically you use the `mosquitto_passwd -c /etc/mosquitto/passwd MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
 
 Step 2
 edit the file called mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
@@ -162,7 +165,7 @@ Basically you run the following command `sudo nano /etc/rc.local` and add the li
 drop the gpio node and use your pi's IP:8888 (127.0.0.1 wont work)
 
 ## Securing Node-RED
-To secure Node-RED you need a password hash. There is a terminal script `./terminal_nodered.sh` execute it to get into the termina.
+To secure Node-RED you need a password hash. There is a terminal script `./nodered/terminal.sh` execute it to get into the terminal.
 Copy the helper text `node -e ..... PASSWORD`, paste it and change your password to get a hash.
 
 Open the file `./nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instrucitons

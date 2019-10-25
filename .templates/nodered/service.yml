@@ -1,9 +1,9 @@
   nodered:
     container_name: nodered
-    build: ./nodered/.
+    build: ./services/nodered/.
     restart: unless-stopped
     user: "0"
     ports:
       - 1880:1880
     volumes:
-      - ./nodered/data:/data
+      - ./volumes/nodered/data:/data

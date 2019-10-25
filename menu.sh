@@ -18,21 +18,15 @@ function command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
 
-function yaml_builder(){
-    service="$1/service.yml"
-    volume="$1/volume.yml"
+function yml_builder(){
+    service="services/$1/service.yml"
 
-    [ -d $1 ] || mkdir $1
+    [ -d ./services/ ] || mkdir ./services/
+    [ -d ./services/$1 ] || mkdir ./services/$1
 
-    cp -n -R .templates/$1/. ./$1/
+    cp -n -RT .templates/$1/ ./services/$1/
 
     cat $service >> docker-compose.yml
-    if [ -f $volume ]
-    then
-        cat $volume >> volumes.yml
-        vol_flag=1
-        #rm $volume
-    fi
 
     #rm $service
 
@@ -51,6 +45,7 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
     "node-red-node-random" " " "OFF" \
     "node-red-node-smooth" " " "OFF" \
     "node-red-node-darksky" " " "OFF" \
+    "node-red-contrib-influxdb" " " "ON" \
     "node-red-contrib-config" " " "OFF" \
     "node-red-contrib-grove" " " "OFF" \
     "node-red-contrib-diode" " " "OFF" \
@@ -74,16 +69,18 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
     ##echo "$check_selection"
     mapfile -t checked_nodes <<< "$node_selection"
 
-    touch ./nodered/Dockerfile
-    echo "FROM nodered/node-red:latest" > ./nodered/Dockerfile
+    nr_dfile=./services/nodered/Dockerfile
+
+    touch $nr_dfile
+    echo "FROM nodered/node-red:latest" > $nr_dfile
     #node red install script instpired from https://tech.scargill.net/the-script/
-    echo "RUN for addonnodes in \\" >> ./nodered/Dockerfile
+    echo "RUN for addonnodes in \\" >> $nr_dfile
     for checked in "${checked_nodes[@]}"; do
-            echo "$checked \\"  >> ./nodered/Dockerfile
+            echo "$checked \\"  >> $nr_dfile
     done
-    echo "; do \\"  >> ./nodered/Dockerfile
-    echo "npm install \${addonnodes} ;\\"  >> ./nodered/Dockerfile
-    echo "done;" >> ./nodered/Dockerfile
+    echo "; do \\"  >> $nr_dfile
+    echo "npm install \${addonnodes} ;\\"  >> $nr_dfile
+    echo "done;" >> $nr_dfile
 
 }
 
@@ -128,8 +125,7 @@ case $mainmenu_selection in
             "nodered" "Node-RED" "ON" \
             "influxdb" "InfluxDB" "ON" \
             "grafana" "Grafana" "ON" \
-            "mqtt" "Eclipse-Mosquitto" "ON" \
-            "pihole" "Pi-hole" "OFF" \
+            "mosquitto" "Eclipse-Mosquitto" "ON" \
             "postgres" "Postgres" "OFF" \
             "adminer" "Adminer" "OFF" \
             3>&1 1>&2 2>&3)
@@ -140,58 +136,44 @@ case $mainmenu_selection in
         echo "version: '2'" > docker-compose.yml
         echo "services:" >> docker-compose.yml
 
-        touch volumes.yml
-        echo "volumes:" > volumes.yml
-        vol_flag=0
-
         for container in "${containers[@]}"; do
 
             case $container in
 
             "portainer")
                 echo "Adding portainer container"
-                yaml_builder "portainer"
+                yml_builder "portainer"
                 ;;
             "nodered")
                 echo "Adding Node-RED container"
-                yaml_builder "nodered"
+                yml_builder "nodered"
                 build_nodered
                 ;;
             "influxdb")
                 echo "Adding influxdb container"
-                yaml_builder "influxdb"
+                yml_builder "influxdb"
                 ;;
             "grafana")
                 echo "Adding Grafana"
-                yaml_builder "grafana"
+                yml_builder "grafana"
                 ;;
-            "mqtt")
+            "mosquitto")
                 echo "Adding Mosquitto"
-                yaml_builder "mosquitto"
-                ;;
-            "pihole")
-                echo "Adding Pi-Hole container"
-                yaml_builder "pihole"
+                yml_builder "mosquitto"
                 ;;
             "postgres")
                 echo "Adding Postgres Container"
-                yaml_builder "postgres"
+                yml_builder "postgres"
                 ;;
             "adminer")
                 echo "Adding Adminer container"
-                yaml_builder "adminer"
+                yml_builder "adminer"
                 ;;
             *)
                 echo "Failed to add $container container"
                 ;;
             esac
         done
-
-        if [ $vol_flag -gt 0 ]
-        then
-            cat volumes.yml >> docker-compose.yml
-        fi
-        rm volumes.yml
 
         echo "docker-compose successfully created"
         echo "run \'docker-compose up -d\' to start the stack"
@@ -211,13 +193,13 @@ case $mainmenu_selection in
              3>&1 1>&2 2>&3)
 
         case $docker_selection in
-        "start") ./start.sh ;;
-        "stop") ./stop.sh ;;
-        "stop_all") ./stop-all.sh ;;
-        "restart") ./restart.sh ;;
-        "pull") ./update.sh ;;
-        "prune_volumes") ./prune-volumes.sh ;;
-        "prune_images") ./prune-images.sh ;;
+        "start") ./scripts/start.sh ;;
+        "stop") ./scripts/stop.sh ;;
+        "stop_all") ./scripts/stop-all.sh ;;
+        "restart") ./scripts/restart.sh ;;
+        "pull") ./scripts/update.sh ;;
+        "prune_volumes") ./scripts/prune-volumes.sh ;;
+        "prune_images") ./scripts/prune-images.sh ;;
         esac
     ;;
 
@@ -225,6 +207,8 @@ case $mainmenu_selection in
         misc_sellection=$(whiptail --title "Miscellaneous Commands" --menu --notags \
             "Some helpful commands" 20 78 12 -- \
             "swap" "Disable swap" \
+            "dropbox-uploader" "Dropbox-Uploader" \
+            "log2ram" "install log2ram to decrease load on sd card, moves /var/log into ram" \
             3>&1 1>&2 2>&3)
 
         case $misc_sellection in
@@ -234,6 +218,26 @@ case $mainmenu_selection in
 		sudo update-rc.d dphys-swapfile remove
                 echo "Swap file has been removed"
 	;;
+        "dropbox-uploader")
+            if [ -d ~/Dropbox-Uploader ]
+            then
+                git clone https://github.com/andreafabrizi/Dropbox-Uploader.git ~/Dropbox-Uploader
+                chmod +x ~/Dropbox-Uploader/dropbox_uploader.sh
+                sudo ~/Dropbox-Uploader/dropbox_uploader.sh
+            else
+                echo "Dropbox uploader already installed"
+            fi
+        ;;
+        "log2ram")
+            if [ -d ~/log2ram ]
+            then
+                git clone clone https://github.com/azlux/log2ram.git ~/log2ram
+                chmod +x ~/log2ram/install.sh
+                ~/log2ram/install.sh
+            else
+                echo "log2ram already installed"
+            fi
+        ;;
 	esac
     ;;
 
