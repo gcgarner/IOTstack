@@ -33,7 +33,7 @@ https://tech.scargill.net/the-script/
 ## Download the project
 
 ```
-git clone https://github.com/gcgarner/IOTstack.git
+git clone https://github.com/gcgarner/IOTstack.git ~/IOTstack
 ```
 
 For those not familar with git or not CLI savy, the clone command downloads the repository and creates a folder with the repository name.
@@ -42,8 +42,6 @@ To enter the direcory run:
 ```
 cd IOTstack
 ```
-Personally I like to create a specific folder in my home directory for git repos so they are grouped together in `~/git`
-
 # The Menu
 I've added a menu to make things easier. It is good however to familiarise yourself with how things are installed.
 The menu can be used to install docker and then build the docker-compose.yml file necessary for starting the stack and it runs a few common commands. I do recommend you start to learn the docker and docker-compose commands if you plan using docker in the long run. I've added several helper scripts, have a look inside.
@@ -120,7 +118,7 @@ check the docker-compose.yml to see which ports have been used
 
 ### Examples
 You want to connect your nodered to your mqtt server.
-In nodered drop an mqtt node, when you need to specify the address type `mqtt`
+In nodered drop an mqtt node, when you need to specify the address type `mosquitto`
 
 You want to connect to your influxdb from grafana. 
 You are in the Docker network and you need to use the name of the Container.
@@ -145,9 +143,9 @@ Grafana's default credentials are username "admin" password "admin" it will ask 
 The credentials and default database name for influxdb are stored in the file called influxdb/influx.env . The default username and password is set to "nodered" for both it is HIGHLY recommended that you change that, the default db is "measurements".
 To access the terminal for influxdb execute `./influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
 
-# Mosquitto (mqtt)
+# Mosquitto
 reference https://www.youtube.com/watch?v=1msiFQT_flo
-By default the MQTT container has no password. You can leave it that way if you like but its always a good idea to secure your services.
+By default the Mosquitto container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
 Step 1
 To add the password run `./mosquitto/terminal.sh`, i put some helper text in the script. Basically you use the `mosquitto_passwd -c /etc/mosquitto/passwd MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
@@ -173,15 +171,13 @@ Open the file `./nodered/data/settings.js` and follow the writeup on https://nod
 
 # DuckDNS
 If you want to have a DynamicDNS point to your Public IP I added a helper script.
-Register with DuckDNS then edit the `duck.sh` file and add your dns and token to your values.
+Register with DuckDNS then edit the `nano ~/IOTstack/duck.sh` file and add your `domain=` and `token=` to your values.
 
-Either run the `./make_duck.sh` from its folder or copy it to your folder of choice (my script just makes the folder and copies the file there)
-
-first test the script to make sure it works `~/duckdns/duck.sh` then `cat ~duck/duck.log`. If you get an OK then you can do the next step.
+first test the script to make sure it works `sudo ~/IOTstack/duck/duck.sh` then `cat /var/log/duck.log`. If you get an OK then you can do the next step.
 
 Create a cron job by running the follow cmd `crontab -e`
 
 You will be asked to use an editor option 1 for nano should be fine
-paste the following in the editor `*/5 * * * * ~/duckdns/duck.sh >/dev/null 2>&1` then ctrl+o and ctrl+x to save
-(if you chose your own folder specify it in stead, just remember to change the curl statement to point to your desired log file logation)
+paste the following in the editor `*/5 * * * * sudo ~/IOTstack/duck/duck.sh >/dev/null 2>&1` then ctrl+s and ctrl+x to save
+
 Your Public IP should be updated every five minutes
