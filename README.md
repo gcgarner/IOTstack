@@ -12,9 +12,9 @@ This Docker stack consists of:
 
 In addition there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 
-Firstly what is docker. The corrent question is what are containers. Docker is just one of the utilities to run container.
+Firstly what is docker? The corrent question is "what are containers?". Docker is just one of the utilities to run container.
 
-Container can be thought of as ultra minimal virtual machines. You download a base image and create a new container and only the differences between the base and your "VM" are stored.
+Container can be thought of as ultra minimal virtual machines. You download a preconfigured base image and create a new container and only the differences between the base and your "VM" are stored.
 Containers dont have GUIs so generally the way you interact with them are via web services or you can launch into a terminal.
 One of the major advantages is that the image comes mostly preconfigured.  
   
@@ -30,13 +30,16 @@ This is an alternative approach to the setup. Be sure to watch the video for the
 For those looking for a script that installs native applications check out Peter Scargill's script
 https://tech.scargill.net/the-script/
 
+There are pro's and con's for using native installs vs containers. For me one of the best part of containers is that it doesnt "clutter" your device, dont need Postgres anymore then just stop the container and delete it and its like it was never there.
+
+Its not advided to run the native version of an app and the docker version, the contianer will fail. It would be best to install this on a fresh system
+
 ## Download the project
 
 ```
 git clone https://github.com/gcgarner/IOTstack.git ~/IOTstack
 ```
-
-For those not familar with git or not CLI savy, the clone command downloads the repository and creates a folder with the repository name.
+Due to some script restraints this project needs to ve stored in ~/IOTstack
 
 To enter the direcory run:
 ```
@@ -79,12 +82,6 @@ The "docker-compose down" command stops the containers then deletes them. The al
 ## Persistent data
 Docker allowes you to map folders inside your containers to folders on the disk. This is done with "volume" key. There are two types of volumes. Any modification to the container reflects in the volume.
 
-### Folder based volumes
-Docker links a specified folder from your disk into the container. This allows you to easily access and backup your data. Folder permission can be an issue so be sure to use sudo to copy files where necessary.
-
-### Docker volumes
-Docker creates is own managed folder in its resource folder. These are a little harder to get to and get your info out of. 
-
 ## Updating the images
 If a new version of a container it is simple to update it.
 use the  `docker-compose down` command to stop the stack
@@ -93,17 +90,17 @@ pull the latest version from docker hub with one of the following command
 
 `docker-compose pull` or the script `./update.sh`
 
+## Node-RED error after modifications to setup files
+The Node-RED image differs from the rest of the images in this project. It uses the "build" key. It uses a dockerfile for the setup to inject the nodes for preinstallation. If you get an error for Node-RED run `docker-compose build` then `docker-compose up -d`
+
 ## Deleting containers, volumes and images
-Should you want to remove the containers, volumes or images from disk two scripts have been provided.
 
-The script `./prune-volumes.sh` delets all stopped container, networks, docker volumes and hanging images. I does not delete the folder based link, these you will have to delete manually.
-
-`./prune-images.sh` will remove all images not assosiated with a container. If you run this while you stack is down you will have to redownload all images from scratch. This command can be helful to reclaim diskspace after updating your images, just make sure to run it while your stack is running as not to delete the images in use
+`./prune-images.sh` will remove all images not assosiated with a container. IF you run it while the stack is up it will ignore any in use image. If you run this while you stack is down it will delete all images and you will have to redownload all images from scratch. This command can be helful to reclaim diskspace after updating your images, just make sure to run it while your stack is running as not to delete the images in use. (your data will still be safe in your volume mapping)
 
 ## Deleting folder volumes
-If you want to delete the influxdb data folder run the following command `sudo rm -r influxdb/data`. Only the data folder is deleted leaving the env file intact. review the docker-compose.yml file to see where the file volumes are stored.
+If you want to delete the influxdb data folder run the following command `sudo rm -r volumes/influxdb/`. Only the data folder is deleted leaving the env file intact. review the docker-compose.yml file to see where the file volumes are stored.
 
-You can use git to delete all files and folders to return your folder to the freshly cloned state.
+You can use git to delete all files and folders to return your folder to the freshly cloned state, AS IN YOU WILL LOSE ALL YOUR DATA.
 `sudo git clean -d -x -f` will return the working tree to its clean state. USE WITH CAUTION!
 
 ## Networking
@@ -141,17 +138,17 @@ Grafana's default credentials are username "admin" password "admin" it will ask 
 
 # influxdb
 The credentials and default database name for influxdb are stored in the file called influxdb/influx.env . The default username and password is set to "nodered" for both it is HIGHLY recommended that you change that, the default db is "measurements".
-To access the terminal for influxdb execute `./influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
+To access the terminal for influxdb execute `./services/influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
 
 # Mosquitto
 reference https://www.youtube.com/watch?v=1msiFQT_flo
 By default the Mosquitto container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
 Step 1
-To add the password run `./mosquitto/terminal.sh`, i put some helper text in the script. Basically you use the `mosquitto_passwd -c /etc/mosquitto/passwd MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
+To add the password run `./services/mosquitto/terminal.sh`, I put some helper text in the script. Basically you use the `mosquitto_passwd -c /mosquitto/config/passwd MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
 
 Step 2
-edit the file called mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
+edit the file called services/mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
 
 # Node-RED
 ## GPIO
@@ -163,17 +160,32 @@ Basically you run the following command `sudo nano /etc/rc.local` and add the li
 drop the gpio node and use your pi's IP:8888 (127.0.0.1 wont work)
 
 ## Securing Node-RED
-To secure Node-RED you need a password hash. There is a terminal script `./nodered/terminal.sh` execute it to get into the terminal.
+To secure Node-RED you need a password hash. There is a terminal script `./services/nodered/terminal.sh` execute it to get into the terminal.
 Copy the helper text `node -e ..... PASSWORD`, paste it and change your password to get a hash.
 
 Open the file `./nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instrucitons
- 
 
-# DuckDNS
+# Backups
+No system is complete without a disaster recovery plan. containers are easily backed up and I've added some scripts to automate the backups
+
+## Influxdb
+`~/IOTstack/scripts/backup_influxdb.sh` does a database snapshot and stores it in ~/IOTstack/backups/influxdb/db . This can be restored with the help a script (that i still need to write)
+
+## Docker backups
+`~/IOTstack/scripts/docker_backup.sh` 
+
+This script can be placed in a cron job to backup on a schedule and has dropbox via Dropbox-Uploader
+
+# Accessing your Device from the internet
+The challenge most of us face with remotely accessing your home network is that don't have a static IP. From time to time the IP that yopur ISP assigns to you changes and its difficult to keep up. Fortunatley there is a solution, a DynamicDNS. The section below shows you how to setup an easy to remember address that follows your public IP no matter when it changes.
+
+Secondly how do you get into your home network. Your router has a firewall that is designed to keep the rest of the internet out of your network to protect you. Here we install a VPN and configure the firewall to only allow very secure VPN traffic in. 
+
+## DuckDNS
 If you want to have a DynamicDNS point to your Public IP I added a helper script.
-Register with DuckDNS then edit the `nano ~/IOTstack/duck.sh` file and add your `domain=` and `token=` to your values.
+Register with duckdns.org and create a subdomain name. Then edit the `nano ~/IOTstack/duck.sh` file and add your `domain=` and `token=`.
 
-first test the script to make sure it works `sudo ~/IOTstack/duck/duck.sh` then `cat /var/log/duck.log`. If you get an OK then you can do the next step.
+first test the script to make sure it works `sudo ~/IOTstack/duck/duck.sh` then `cat /var/log/duck.log`. If you get KO then something has gone wrong and you should checkout your settings in the script. If you get an OK then you can do the next step. 
 
 Create a cron job by running the follow cmd `crontab -e`
 
@@ -181,3 +193,22 @@ You will be asked to use an editor option 1 for nano should be fine
 paste the following in the editor `*/5 * * * * sudo ~/IOTstack/duck/duck.sh >/dev/null 2>&1` then ctrl+s and ctrl+x to save
 
 Your Public IP should be updated every five minutes
+
+## PiVPN
+pimylifeup.com has an excellent tutorial on how to install PiVPN https://pimylifeup.com/raspberry-pi-vpn-server/
+
+In point 17 and 18 they mention using noip for their dynamicDNS. Here you can use the DuckDNS address if you created one.
+
+Dont forget you need to open the port 1194 on your firewall. For most people you wont be able to VPN from inside your own network so download OpenVPN client for your mobile phone and try to connect over mobile data.
+
+Once you activate your vpn (from you phone/laptop/work computer) you will effectlivley be on your home network and you can access your devices as if you were on the wifi at home.
+
+Personally I use the VPN any time Im on public wifi, all your traffic is secure.
+
+# Miscellaneous
+
+## log2ram
+one of the drawbacks of an sd card is that it has limited lifespan. One way to solve this it to move you log files to RAM. log2ram is a convient tool to simply set this up. It can be installed from the miscellaneous menu.
+
+## Drobox-Uploader
+This a great utility to easily upload data from your PI to the cloud. Further info in the next README update.
