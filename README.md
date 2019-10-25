@@ -30,9 +30,9 @@ This is an alternative approach to the setup. Be sure to watch the video for the
 For those looking for a script that installs native applications check out Peter Scargill's script
 https://tech.scargill.net/the-script/
 
-There are pro's and con's for using native installs vs containers. For me one of the best part of containers is that it doesnt "clutter" your device, dont need Postgres anymore then just stop the container and delete it and its like it was never there.
+There are pro's and con's for using native installs vs containers. For me one of the best part of containers is that it doesnt "clutter" your device, and if you don't need Postgres anymore then just stop the container and delete it and its like it was never there.
 
-Its not advided to run the native version of an app and the docker version, the contianer will fail. It would be best to install this on a fresh system
+It's not advided to try run the native version of an app and the docker version, the contianer will fail. It would be best to install this on a fresh system. 
 
 ## Download the project
 
@@ -41,9 +41,9 @@ git clone https://github.com/gcgarner/IOTstack.git ~/IOTstack
 ```
 Due to some script restraints this project needs to ve stored in ~/IOTstack
 
-To enter the direcory run:
+To enter the directory run:
 ```
-cd IOTstack
+cd ~/IOTstack
 ```
 # The Menu
 I've added a menu to make things easier. It is good however to familiarise yourself with how things are installed.
@@ -69,10 +69,10 @@ From this point on make sure you are executing the commands from inside the proj
 ## Starting and Stopping containers
 to start the stack navigate to the project folder containing the docker-compose.yml file
 
-to start the stack run:
+To start the stack run:
 `docker-compose up -d` or `./start.sh`
 
-to stop:
+To stop:
 `docker-compose down` or `./stop.sh`
 
 The first time you run start the stack docker will download all the images for the web. Depending on how many containers you selected and your internet speed this can take a long while.
@@ -83,12 +83,13 @@ The "docker-compose down" command stops the containers then deletes them. The al
 Docker allowes you to map folders inside your containers to folders on the disk. This is done with "volume" key. There are two types of volumes. Any modification to the container reflects in the volume.
 
 ## Updating the images
-If a new version of a container it is simple to update it.
-use the  `docker-compose down` command to stop the stack
+If a new version of a container image is available on docker hub it can be updated by a pull command.
 
-pull the latest version from docker hub with one of the following command
+Use the `docker-compose down` command to stop the stack
 
-`docker-compose pull` or the script `./update.sh`
+Pull the latest version from docker hub with one of the following command
+
+`docker-compose pull` or the script `./scritps/update.sh`
 
 ## Node-RED error after modifications to setup files
 The Node-RED image differs from the rest of the images in this project. It uses the "build" key. It uses a dockerfile for the setup to inject the nodes for preinstallation. If you get an error for Node-RED run `docker-compose build` then `docker-compose up -d`
@@ -107,9 +108,9 @@ You can use git to delete all files and folders to return your folder to the fre
 
 The docker-compose instruction creates a internal network for the containers to communicate in, the ports get exposed to the PI's IP address when you want to connect from outside. It also creates a "DNS" the name being the container name. So it is important to note that when one container talks to another they talk by name. All the containers names are lowercase like nodered,influxdb...
 
-An easy way to find out your ip is by typing `ifconfig` in the terminal and look next to eth0 or wlan0 for your ip. It is hightly recommended that you set a static IP for your PI or at least reserve a IP on your router so that you know it
+An easy way to find out your IP is by typing `ifconfig` in the terminal and look next to eth0 or wlan0 for your IP. It is hightly recommended that you set a static IP for your PI or at least reserve a IP on your router so that you know it
 
-check the docker-compose.yml to see which ports have been used
+Check the docker-compose.yml to see which ports have been used
 
 ![net](https://user-images.githubusercontent.com/46672225/66702353-0bcc4080-ed07-11e9-994b-62219f50b096.png)
 
@@ -136,7 +137,7 @@ This is a nice tool for managing databases. Web interface on port 8080
 # Grafana
 Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot. Go to yourIP:3000 in you web browser.
 
-# influxdb
+# Influxdb
 The credentials and default database name for influxdb are stored in the file called influxdb/influx.env . The default username and password is set to "nodered" for both it is HIGHLY recommended that you change that, the default db is "measurements".
 To access the terminal for influxdb execute `./services/influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
 
@@ -148,7 +149,7 @@ Step 1
 To add the password run `./services/mosquitto/terminal.sh`, I put some helper text in the script. Basically you use the `mosquitto_passwd -c /mosquitto/config/passwd MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
 
 Step 2
-edit the file called services/mosquitto/mosquitto.conf and remove the comment in front of password_file. Stop and Start and you should be good to go. Type those credentials into Nodered etc
+Edit the file called services/mosquitto/mosquitto.conf and remove the comment in front of password_file. Restart the container with `docker-compose restart mosquitto`. Type those credentials into Nodered etc
 
 # Node-RED
 ## GPIO
@@ -166,15 +167,20 @@ Copy the helper text `node -e ..... PASSWORD`, paste it and change your password
 Open the file `./nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instrucitons
 
 # Backups
-No system is complete without a disaster recovery plan. containers are easily backed up and I've added some scripts to automate the backups
+Because container can easily be rebuilt from dockerhub we only have to backup the data in the "volumes" directory.
 
 ## Influxdb
 `~/IOTstack/scripts/backup_influxdb.sh` does a database snapshot and stores it in ~/IOTstack/backups/influxdb/db . This can be restored with the help a script (that i still need to write)
 
 ## Docker backups
-`~/IOTstack/scripts/docker_backup.sh` 
+The script `~/IOTstack/scripts/docker_backup.sh` performs the master backup for the stack. Edit the script with nano to enable the backups you need. Drobox-Updater can be used inside the script to upload the backups to the cloud.
 
-This script can be placed in a cron job to backup on a schedule and has dropbox via Dropbox-Uploader
+This script can be placed in a cron job to backup on a schedule.
+Edit the crontab with`crontab -e`
+Then add `0 0 * * * sudo ~/IOTstack/scripts/docker_backup.sh >/dev/null 2>&1` to have a backup everynight at midnight
+
+## Restoring a backup
+The "volumes" directory contains all the persistent data necessary to recreate the container.The docker-compose.yml and the environment files are optional as they can be regenerated with the menu. Simply copy the volumes directory into the IOTstack directory, Rebuild the stack and start. 
 
 # Accessing your Device from the internet
 The challenge most of us face with remotely accessing your home network is that don't have a static IP. From time to time the IP that yopur ISP assigns to you changes and its difficult to keep up. Fortunatley there is a solution, a DynamicDNS. The section below shows you how to setup an easy to remember address that follows your public IP no matter when it changes.
@@ -208,7 +214,12 @@ Personally I use the VPN any time Im on public wifi, all your traffic is secure.
 # Miscellaneous
 
 ## log2ram
-one of the drawbacks of an sd card is that it has limited lifespan. One way to solve this it to move you log files to RAM. log2ram is a convient tool to simply set this up. It can be installed from the miscellaneous menu.
+https://github.com/azlux/log2ram
+One of the drawbacks of an sd card is that it has limited lifespan. One way to reduce the load on the sd card is move you log files to RAM. log2ram is a convient tool to simply set this up. It can be installed from the miscellaneous menu.
 
 ## Drobox-Uploader
-This a great utility to easily upload data from your PI to the cloud. Further info in the next README update.
+This a great utility to easily upload data from your PI to the cloud. https://magpi.raspberrypi.org/articles/dropbox-raspberry-pi
+The MagPi has an excellent explanation of the process of setting up the Dropbox API. Dropbox-Uploader is used in the backup script.
+
+# Add to the project
+Feel free to add your comments on features or images that you think should be added. 
