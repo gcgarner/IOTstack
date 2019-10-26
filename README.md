@@ -126,23 +126,37 @@ You want to connect to the web interface of grafana from you laptop.
 Now you are outside the container environmnet you type PI's IP eg 192.168.n.m:3000
 
 # Portainer
+https://hub.docker.com/r/portainer/portainer/
+
 Portainer is a great application for managing Docker. In your web browser navigate to `#yourip:9000`. You will be asked to choose a password. In the next window select 'Local' and connect, it shouldn't ask you this again. From here you can play around, click local, and take a look around. This can help you find unused images/containers. On the Containers section there are 'Quick actions' to view logs and other stats. Note: This can all be done from the CLI but portainer just makes it much much easier. The portainer password is stored in a docker volume, so if you forget it you will need to delete the volume the prune-volumes.sh can be used for that.
 
 # Postgres
+https://hub.docker.com/_/postgres
+
 I added a SQL server, for those that need an SQL database. The database credentials can be found in the file postgres/postgres.env. It is highly recommended to change the user, password and default database
 
 # Adminer
+https://hub.docker.com/_/adminer
+
 This is a nice tool for managing databases. Web interface on port 8080
 
 # Grafana
+https://hub.docker.com/r/grafana/grafana
+
 Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot. Go to yourIP:3000 in you web browser.
 
 # Influxdb
+https://hub.docker.com/_/influxdb
+
 The credentials and default database name for influxdb are stored in the file called influxdb/influx.env . The default username and password is set to "nodered" for both it is HIGHLY recommended that you change that, the default db is "measurements".
 To access the terminal for influxdb execute `./services/influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
 
 # Mosquitto
-reference https://www.youtube.com/watch?v=1msiFQT_flo
+https://hub.docker.com/_/eclipse-mosquitto
+
+Extra reference https://www.youtube.com/watch?v=1msiFQT_flo
+
+
 By default the Mosquitto container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
 Step 1
@@ -152,6 +166,8 @@ Step 2
 Edit the file called services/mosquitto/mosquitto.conf and remove the comment in front of password_file. Restart the container with `docker-compose restart mosquitto`. Type those credentials into Nodered etc
 
 # Node-RED
+https://hub.docker.com/r/nodered/node-red
+
 ## GPIO
 To communicate to your pi's GPIO you need to use the new `node-red-node-pi-gpiod`. The nice thing is that you can now connect to multiple PIs from the same nodered.
 
