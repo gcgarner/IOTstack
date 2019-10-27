@@ -39,7 +39,7 @@ It's not advided to try run the native version of an app and the docker version,
 ```
 git clone https://github.com/gcgarner/IOTstack.git ~/IOTstack
 ```
-Due to some script restraints this project needs to ve stored in ~/IOTstack
+Due to some script restraints this project needs to be stored in ~/IOTstack
 
 To enter the directory run:
 ```
