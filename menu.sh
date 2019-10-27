@@ -225,7 +225,7 @@ case $mainmenu_selection in
                 echo "Swap file has been removed"
 	;;
         "dropbox-uploader")
-            if [ -d ~/Dropbox-Uploader ]
+            if [ ! -d ~/Dropbox-Uploader ]
             then
                 git clone https://github.com/andreafabrizi/Dropbox-Uploader.git ~/Dropbox-Uploader
                 chmod +x ~/Dropbox-Uploader/dropbox_uploader.sh
@@ -236,7 +236,7 @@ case $mainmenu_selection in
             fi
         ;;
         "log2ram")
-            if [ -d ~/log2ram ]
+            if [ ! -d ~/log2ram ]
             then
                 git clone https://github.com/azlux/log2ram.git ~/log2ram
                 chmod +x ~/log2ram/install.sh
