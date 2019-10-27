@@ -2,6 +2,7 @@
 
 #whiptail guide https://saveriomiroddi.github.io/Shell-scripting-adventures-part-3/
 
+#future function add password in build phase
 password_dialog() {
     while [[ "$passphrase" != "$passphrase_repeat" || ${#passphrase} -lt 8 ]]; do
 
@@ -18,6 +19,7 @@ function command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
 
+#function copies the template yml file to the local service folder and appends to the docker-compose.yml file
 function yml_builder(){
     service="services/$1/service.yml"
 
@@ -32,6 +34,7 @@ function yml_builder(){
 
 }
 
+# build Dockerfile for nodered
 build_nodered() {
 node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output\
     "Use the [SPACEBAR] to select the nodes you want preinstalled" 20 78 12 -- \
@@ -73,7 +76,7 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 
     touch $nr_dfile
     echo "FROM nodered/node-red:latest" > $nr_dfile
-    #node red install script instpired from https://tech.scargill.net/the-script/
+    #node red install script inspired from https://tech.scargill.net/the-script/
     echo "RUN for addonnodes in \\" >> $nr_dfile
     for checked in "${checked_nodes[@]}"; do
             echo "$checked \\"  >> $nr_dfile
@@ -96,6 +99,7 @@ mainmenu_selection=$(whiptail --title "Main Menu" --menu --notags \
     3>&1 1>&2 2>&3)
 
 case $mainmenu_selection in
+    #MAINMENU Install docker  ------------------------------------------------------------	
     "install")
         #sudo apt update && sudo apt upgrade -y ;;
 
@@ -118,6 +122,7 @@ case $mainmenu_selection in
             sudo reboot
         fi
         ;;
+    #MAINMENU Build stack ------------------------------------------------------------	
     "build")
         container_selection=$(whiptail --title "Container Selection"  --notags --separate-output --checklist \
             "Use the [SPACEBAR] to select which containers you would like to install" 20 78 12 \
@@ -179,6 +184,7 @@ case $mainmenu_selection in
         echo "run \'docker-compose up -d\' to start the stack"
 
     ;;
+    #MAINMENU Docker commands ------------------------------------------------------------	
     "commands")
 
         docker_selection=$(whiptail --title "Docker commands"  --menu --notags \
@@ -202,7 +208,7 @@ case $mainmenu_selection in
         "prune_images") ./scripts/prune-images.sh ;;
         esac
     ;;
-
+    #MAINMENU Misc commands------------------------------------------------------------	
     "misc")
         misc_sellection=$(whiptail --title "Miscellaneous Commands" --menu --notags \
             "Some helpful commands" 20 78 12 -- \
@@ -223,7 +229,8 @@ case $mainmenu_selection in
             then
                 git clone https://github.com/andreafabrizi/Dropbox-Uploader.git ~/Dropbox-Uploader
                 chmod +x ~/Dropbox-Uploader/dropbox_uploader.sh
-                sudo ~/Dropbox-Uploader/dropbox_uploader.sh
+                pushd ~/Dropbox-Uploader && sudo ./dropbox_uploader.sh
+		popd
             else
                 echo "Dropbox uploader already installed"
             fi
