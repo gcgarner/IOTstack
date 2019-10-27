@@ -231,9 +231,10 @@ case $mainmenu_selection in
         "log2ram")
             if [ -d ~/log2ram ]
             then
-                git clone clone https://github.com/azlux/log2ram.git ~/log2ram
+                git clone https://github.com/azlux/log2ram.git ~/log2ram
                 chmod +x ~/log2ram/install.sh
-                ~/log2ram/install.sh
+                pushd ~/log2ram && sudo ./install.sh
+		popd
             else
                 echo "log2ram already installed"
             fi
