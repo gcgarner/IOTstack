@@ -195,7 +195,7 @@ The script `~/IOTstack/scripts/docker_backup.sh` performs the master backup for 
 
 This script can be placed in a cron job to backup on a schedule.
 Edit the crontab with`crontab -e`
-Then add `0 0 * * * ~/IOTstack/scripts/docker_backup.sh >/dev/null 2>&1` to have a backup everynight at midnight
+Then add `0 23 * * * ~/IOTstack/scripts/docker_backup.sh >/dev/null 2>&1` to have a backup everynight at 23:00.
 
 This script cheats by copying the volume folder live. The correct way would be to stop the stack first then copy the volumes and restart. The cheat method shouldn't be a problem unless you have fast changing data like in influxdb. This is why the script makes a database export of influxdb and ignores it's volume. 
 
