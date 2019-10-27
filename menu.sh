@@ -137,52 +137,58 @@ case $mainmenu_selection in
 
         mapfile -t containers <<< "$container_selection"
 
-        touch docker-compose.yml
-        echo "version: '2'" > docker-compose.yml
-        echo "services:" >> docker-compose.yml
+        #if no container is selected then dont overwrite the docker-compose.yml file
+        if [ -n "$container_selection" ];
+        then
+            touch docker-compose.yml
+            echo "version: '2'" > docker-compose.yml
+            echo "services:" >> docker-compose.yml
 
-        for container in "${containers[@]}"; do
+            for container in "${containers[@]}"; do
 
-            case $container in
+                case $container in
 
-            "portainer")
-                echo "Adding portainer container"
-                yml_builder "portainer"
-                ;;
-            "nodered")
-                echo "Adding Node-RED container"
-                yml_builder "nodered"
-                build_nodered
-                ;;
-            "influxdb")
-                echo "Adding influxdb container"
-                yml_builder "influxdb"
-                ;;
-            "grafana")
-                echo "Adding Grafana"
-                yml_builder "grafana"
-                ;;
-            "mosquitto")
-                echo "Adding Mosquitto"
-                yml_builder "mosquitto"
-                ;;
-            "postgres")
-                echo "Adding Postgres Container"
-                yml_builder "postgres"
-                ;;
-            "adminer")
-                echo "Adding Adminer container"
-                yml_builder "adminer"
-                ;;
-            *)
-                echo "Failed to add $container container"
-                ;;
-            esac
-        done
+                "portainer")
+                    echo "Adding portainer container"
+                    yml_builder "portainer"
+                    ;;
+                "nodered")
+                    echo "Adding Node-RED container"
+                    yml_builder "nodered"
+                    build_nodered
+                    ;;
+                "influxdb")
+                    echo "Adding influxdb container"
+                    yml_builder "influxdb"
+                    ;;
+                "grafana")
+                    echo "Adding Grafana"
+                    yml_builder "grafana"
+                    ;;
+                "mosquitto")
+                    echo "Adding Mosquitto"
+                    yml_builder "mosquitto"
+                    ;;
+                "postgres")
+                    echo "Adding Postgres Container"
+                    yml_builder "postgres"
+                    ;;
+                "adminer")
+                    echo "Adding Adminer container"
+                    yml_builder "adminer"
+                    ;;
+                *)
+                    echo "Failed to add $container container"
+                    ;;
+                esac
+            done
 
-        echo "docker-compose successfully created"
-        echo "run \'docker-compose up -d\' to start the stack"
+            echo "docker-compose successfully created"
+            echo "run \'docker-compose up -d\' to start the stack"
+        else
+            echo "Build cancelled"
 
+        fi
     ;;
     #MAINMENU Docker commands ------------------------------------------------------------	
     "commands")
