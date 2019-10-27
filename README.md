@@ -191,11 +191,16 @@ Because container can easily be rebuilt from dockerhub we only have to backup th
 `~/IOTstack/scripts/backup_influxdb.sh` does a database snapshot and stores it in ~/IOTstack/backups/influxdb/db . This can be restored with the help a script (that i still need to write)
 
 ## Docker backups
-The script `~/IOTstack/scripts/docker_backup.sh` performs the master backup for the stack. Edit the script with nano to enable the backups you need. Drobox-Updater can be used inside the script to upload the backups to the cloud.
+The script `~/IOTstack/docker_backup.sh` performs the master backup for the stack. 
 
 This script can be placed in a cron job to backup on a schedule.
 Edit the crontab with`crontab -e`
-Then add `0 0 * * * sudo ~/IOTstack/scripts/docker_backup.sh >/dev/null 2>&1` to have a backup everynight at midnight
+Then add `0 0 * * * ~/IOTstack/docker_backup.sh >/dev/null 2>&1` to have a backup everynight at midnight
+
+This script cheats by copying the volume folder live. The correct way would be to stop the stack first then copy the volumes and restart. The cheat method shouldn't be a problem unless you have fast changing data like in influxdb. This is why the script makes a database export of influxdb and ignores it's volume. 
+
+### Dropbox integration
+To enable the the docker_backups.sh file and uncomment the lines in front of the Dropbox-Uploader command.
 
 ## Restoring a backup
 The "volumes" directory contains all the persistent data necessary to recreate the container.The docker-compose.yml and the environment files are optional as they can be regenerated with the menu. Simply copy the volumes directory into the IOTstack directory, Rebuild the stack and start. 
