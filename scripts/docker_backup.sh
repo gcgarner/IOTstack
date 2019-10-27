@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pushd ~/IOTstack
+
 [ -d ./backups ] || mkdir ./backups
 
 ./scripts/backup_influxdb.sh
@@ -16,3 +18,5 @@ echo "backup saved to ./backups/docker.tar.gz"
 
 #echo "uploading to dropbox
 #sudo ~/Dropbox-Uploader/dropbox_uploader.sh upload ~/IOTstack/backups/docker.tar.gz /IOTstackBU/
+
+popd

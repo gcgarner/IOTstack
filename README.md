@@ -70,10 +70,10 @@ From this point on make sure you are executing the commands from inside the proj
 to start the stack navigate to the project folder containing the docker-compose.yml file
 
 To start the stack run:
-`docker-compose up -d` or `./start.sh`
+`docker-compose up -d` or `./scripts/start.sh`
 
 To stop:
-`docker-compose down` or `./stop.sh`
+`docker-compose down` or `./scripts/stop.sh`
 
 The first time you run start the stack docker will download all the images for the web. Depending on how many containers you selected and your internet speed this can take a long while.
 
@@ -191,11 +191,11 @@ Because container can easily be rebuilt from dockerhub we only have to backup th
 `~/IOTstack/scripts/backup_influxdb.sh` does a database snapshot and stores it in ~/IOTstack/backups/influxdb/db . This can be restored with the help a script (that i still need to write)
 
 ## Docker backups
-The script `~/IOTstack/docker_backup.sh` performs the master backup for the stack. 
+The script `~/IOTstack/scripts/docker_backup.sh` performs the master backup for the stack. 
 
 This script can be placed in a cron job to backup on a schedule.
 Edit the crontab with`crontab -e`
-Then add `0 0 * * * ~/IOTstack/docker_backup.sh >/dev/null 2>&1` to have a backup everynight at midnight
+Then add `0 0 * * * ~/IOTstack/scripts/docker_backup.sh >/dev/null 2>&1` to have a backup everynight at midnight
 
 This script cheats by copying the volume folder live. The correct way would be to stop the stack first then copy the volumes and restart. The cheat method shouldn't be a problem unless you have fast changing data like in influxdb. This is why the script makes a database export of influxdb and ignores it's volume. 
 
@@ -212,7 +212,7 @@ Secondly how do you get into your home network. Your router has a firewall that 
 
 ## DuckDNS
 If you want to have a DynamicDNS point to your Public IP I added a helper script.
-Register with duckdns.org and create a subdomain name. Then edit the `nano ~/IOTstack/duck.sh` file and add your `domain=` and `token=`.
+Register with duckdns.org and create a subdomain name. Then edit the `nano ~/IOTstack/duck/duck.sh` file and add your `domain=` and `token=`.
 
 first test the script to make sure it works `sudo ~/IOTstack/duck/duck.sh` then `cat /var/log/duck.log`. If you get KO then something has gone wrong and you should checkout your settings in the script. If you get an OK then you can do the next step. 
 
