@@ -1,0 +1,21 @@
+  openhab:
+    image: "openhab/openhab:2.4.0"
+    container_name: openhab
+    restart: unless-stopped
+    network_mode: host
+#    cap_add:
+#      - NET_ADMIN
+#      - NET_RAW
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "./volumes/openhab/addons:/openhab/addons"
+      - "./volumes/openhab/conf:/openhab/conf"
+      - "./volumes/openhab/userdata:/openhab/userdata"
+    environment:
+      OPENHAB_HTTP_PORT: "8080"
+      OPENHAB_HTTPS_PORT: "8443"
+      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
+#    # The command node is very important. It overrides
+#    # the "gosu openhab tini -s ./start.sh" command from Dockerfile and runs as root!
+#    command: "tini -s ./start.sh server"

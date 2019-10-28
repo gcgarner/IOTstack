@@ -9,6 +9,7 @@ This Docker stack consists of:
   * mosquitto mqtt
   * portainer
   * adminer
+  * openHAB
 
 In addition, there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 
@@ -124,6 +125,11 @@ The address you specify in the grafana is http://influxdb:8086
 You want to connect to the web interface of grafana from your laptop.
 Now you are outside the container environment you type PI's IP eg 192.168.n.m:3000
 
+## How the script works
+The build script creates the ./services directory and populates it from the template file in .templates . The script then appends the text withing each service.yml file to the docker-compose.yml . When the stack is rebuild the menu doesn not overwrite the service folder if it already exists. Make sure to sync any alterations you have made to the docker-compose.yml file with the respective service.yml so that on your next build your changes pull through.
+
+The .gitignore file is setup such that if you do a `git pull origin master` it does not overwrite the files you have already created. Because the build script does not overwite your service directory any changes in the .templates directory will have no affect on the services you have already made. You will need to move your service folder out to get the latest version of the template.
+
 # Portainer
 https://hub.docker.com/r/portainer/portainer/
 
@@ -149,7 +155,8 @@ Grafana's default credentials are username "admin" password "admin" it will ask 
 # Influxdb
 https://hub.docker.com/_/influxdb
 
-The credentials and default database name for influxdb are stored in the file called influxdb/influx.env . The default username and password is set to "nodered" for both it is HIGHLY recommended that you change that, the default db is "measurements".
+The credentials and default database name for influxdb are stored in the file called influxdb/influx.env . The default username and password is set to "nodered" for both it is HIGHLY recommended that you change them. The environment file contains several commented out options allowing you to set several access options such as default admin user credentials as well as the default database name. Any change to the environment file will require a restart of the service.
+
 To access the terminal for influxdb execute `./services/influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
 
 # Mosquitto
@@ -170,18 +177,23 @@ Edit the file called services/mosquitto/mosquitto.conf and remove the comment in
 https://hub.docker.com/r/nodered/node-red
 
 ## GPIO
-To communicate to your pi's GPIO you need to use the new `node-red-node-pi-gpiod`. The nice thing is that you can now connect to multiple PIs from the same nodered.
+To communicate to your Pi's GPIO you need to use the `node-red-node-pi-gpiod` node. It allowes you to connect to multiple Pis from the same nodered service.
 
-You need to make sure the pigpdiod is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod)
-You run the following command `sudo nano /etc/rc.local` and add the line `/usr/bin/pigpiod` above `exit 0` and reboot the pi. there is an option to secure the service see the writeup.
+You need to make sure that pigpdiod is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod)
+You run the following command `sudo nano /etc/rc.local` and add the line `/usr/bin/pigpiod` above `exit 0` and reboot the Pi. there is an option to secure the service see the writeup.
 
-Drop the gpio node and use your pi's IP. Example: 192.168.1.123 (127.0.0.1 won't work because this is the local address of every computer'.)
+Drop the gpio node and use your Pi's IP. Example: 192.168.1.123 (127.0.0.1 won't work because this is the local address of every computer'.)
 
 ## Securing Node-RED
 To secure Node-RED you need a password hash. There is a terminal script `./services/nodered/terminal.sh` execute it to get into the terminal.
 Copy the helper text `node -e ..... PASSWORD`, paste it and change your password to get a hash.
 
 Open the file `./nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instructions
+
+# openHAB
+https://hub.docker.com/r/openhab/openhab/
+
+openHAB has been added without Amazon Dashbutton binding. Port binding is `8080` for http and `8443` for https. 
 
 # Backups
 Because containers can easily be rebuilt from docker hub we only have to back up the data in the "volumes" directory.

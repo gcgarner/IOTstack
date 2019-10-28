@@ -133,6 +133,7 @@ case $mainmenu_selection in
             "mosquitto" "Eclipse-Mosquitto" "ON" \
             "postgres" "Postgres" "OFF" \
             "adminer" "Adminer" "OFF" \
+            "openhab" "openHAB" "OFF" \
             3>&1 1>&2 2>&3)
 
         mapfile -t containers <<< "$container_selection"
@@ -176,6 +177,10 @@ case $mainmenu_selection in
                 "adminer")
                     echo "Adding Adminer container"
                     yml_builder "adminer"
+                    ;;
+                "openhab")
+                    echo "Adding openHAB container"
+                    yml_builder "openhab"
                     ;;
                 *)
                     echo "Failed to add $container container"
