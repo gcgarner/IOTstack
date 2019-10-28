@@ -119,7 +119,7 @@ In nodered drop an mqtt node, when you need to specify the address type `mosquit
 
 You want to connect to your influxdb from grafana. 
 You are in the Docker network and you need to use the name of the Container.
-The address you specify in the grafana is http://influx:8086
+The address you specify in the grafana is http://influxdb:8086
 
 You want to connect to the web interface of grafana from your laptop.
 Now you are outside the container environment you type PI's IP eg 192.168.n.m:3000
