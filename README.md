@@ -99,7 +99,7 @@ The Node-RED image differs from the rest of the images in this project. It uses 
 
 ## Deleting containers, volumes and images
 
-`./prune-images.sh` will remove all images not associated with a container. IF you run it while the stack is up it will ignore any in-use image. If you run this while you stack is down it will delete all images and you will have to redownload all images from scratch. This command can be helpful to reclaim disk space after updating your images, just make sure to run it while your stack is running as not to delete the images in use. (your data will still be safe in your volume mapping)
+`./prune-images.sh` will remove all images not associated with a container. If you run it while the stack is up it will ignore any in-use images. If you run this while you stack is down it will delete all images and you will have to redownload all images from scratch. This command can be helpful to reclaim disk space after updating your images, just make sure to run it while your stack is running as not to delete the images in use. (your data will still be safe in your volume mapping)
 
 ## Deleting folder volumes
 If you want to delete the influxdb data folder run the following command `sudo rm -r volumes/influxdb/`. Only the data folder is deleted leaving the env file intact. review the docker-compose.yml file to see where the file volumes are stored.
@@ -133,6 +133,21 @@ The build script creates the ./services directory and populates it from the temp
 
 The .gitignore file is setup such that if you do a `git pull origin master` it does not overwrite the files you have already created. Because the build script does not overwite your service directory any changes in the .templates directory will have no affect on the services you have already made. You will need to move your service folder out to get the latest version of the template.
 
+# Ports
+Many containers try to use popular ports such as 80,443,8080. For example openHAB and Adminer both want to use port 8080 for their web interface. Adminer's port has been moved 9080 to accommodate this. Please check the description of the container in the README to see if there are any changes as they may not be the same as the port you are used to.
+
+Port mapping is done in the docker-compose.yml file. Each service should have a section that reads like this:
+```
+    ports:
+      - HOST_PORT:CONTAINER_PORT
+```
+For adminer:
+```
+    ports:
+      - 9080:8080
+```
+Port 9080 on Host Pi is mapped to port 8080 of the container. Therefore 127.0.0.1:8080 will take you to openHAB, where 127.0.0.1:9080 will take you to adminer
+
 # Portainer
 https://hub.docker.com/r/portainer/portainer/
 
@@ -148,7 +163,11 @@ I added a SQL server, for those that need an SQL database. The database credenti
 # Adminer
 https://hub.docker.com/_/adminer
 
-This is a nice tool for managing databases. Web interface on port 8080
+This is a nice tool for managing databases. Web interface has moved to port 9080. There was an issue where openHAB and Adminer were using the same ports. If you have an port conflict edit the docker-compose.yml and under the adminer service change the line to read:
+```
+    ports:
+      - 9080:8080
+```
 
 # Grafana
 https://hub.docker.com/r/grafana/grafana
