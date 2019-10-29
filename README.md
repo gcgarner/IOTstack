@@ -21,6 +21,9 @@ One of the major advantages is that the image comes mostly preconfigured.
   
 # Tested platform
 Raspberry Pi 3B and 4B Raspbian (Buster)
+
+# Feature Requests
+Please direct all feature requests to [Discord](https://discord.gg/W45tD83)
   
 # Youtube reference
 This repo was originally inspired by Andreas Spiess's video on using some of these tools. Some containers have been added to extend its functionality.
