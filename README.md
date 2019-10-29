@@ -2,22 +2,28 @@
 Docker stack for getting started on IoT on the Raspberry Pi.
 
 This Docker stack consists of:
-  * nodered
-  * grafana
-  * influxDB
-  * postgres
-  * mosquitto mqtt
-  * portainer
-  * adminer
+  * Node-RED
+  * Grafana
+  * InfluxDB
+  * Postgres
+  * Mosquitto mqtt
+  * Portainer
+  * Adminer
   * openHAB
 
 In addition, there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 
 Firstly what is docker? The correct question is "what are containers?". Docker is just one of the utilities to run container.
 
-Container can be thought of as ultra-minimal virtual machines. You download a preconfigured base image and create a new container and only the differences between the base and your "VM" are stored.
+Container can be thought of as ultra-minimal virtual machines, they are a collection of binaries that run in a sandbox environment. You download a preconfigured base image and create a new container and only the differences between the base and your "VM" are stored.
 Containers don't have [GUI](https://en.wikipedia.org/wiki/Graphical_user_interface)s so generally the way you interact with them is via web services or you can launch into a terminal.
 One of the major advantages is that the image comes mostly preconfigured.  
+
+There are pro's and cons for using native installs vs containers. For me, one of the best parts of containers is that it doesn't "clutter" your device, and if you don't need Postgres anymore then just stop the container and delete it and it's like it was never there.
+
+It's not advised to try to run the native version of an app and the docker version, the container will fail. It would be best to install this on a fresh system.
+
+For those looking for a script that installs native applications check out Peter Scargill's [script](https://tech.scargill.net/the-script/)
   
 # Tested platform
 Raspberry Pi 3B and 4B Raspbian (Buster)
@@ -28,16 +34,9 @@ Please direct all feature requests to [Discord](https://discord.gg/W45tD83)
 # Youtube reference
 This repo was originally inspired by Andreas Spiess's video on using some of these tools. Some containers have been added to extend its functionality.
 
-[Yolutube video](https://www.youtube.com/watch?v=JdV4x925au0): This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
+[YouTube video](https://www.youtube.com/watch?v=JdV4x925au0): This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
 
-For those looking for a script that installs native applications check out Peter Scargill's script
-https://tech.scargill.net/the-script/
-
-There are pro's and cons for using native installs vs containers. For me, one of the best parts of containers is that it doesn't "clutter" your device, and if you don't need Postgres anymore then just stop the container and delete it and it's like it was never there.
-
-It's not advised to try to run the native version of an app and the docker version, the container will fail. It would be best to install this on a fresh system. 
-
-## Download the project
+# Download the project
 
 ```
 git clone https://github.com/gcgarner/IOTstack.git ~/IOTstack
@@ -198,11 +197,17 @@ Edit the file called services/mosquitto/mosquitto.conf and remove the comment in
 # Node-RED
 https://hub.docker.com/r/nodered/node-red
 
+## Build warning
+The Node-RED build will complain about several issues. This is completely normal behaviour.
+
+## SQLite
+Thanks to @fragolinux the SQLite node will install now. WARNING it will output many error and will look as if it has gotten stuck. Just give it time and it will continue.  
+
 ## GPIO
 To communicate to your Pi's GPIO you need to use the `node-red-node-pi-gpiod` node. It allowes you to connect to multiple Pis from the same nodered service.
 
 You need to make sure that pigpdiod is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod)
-You run the following command `sudo nano /etc/rc.local` and add the line `/usr/bin/pigpiod` above `exit 0` and reboot the Pi. there is an option to secure the service see the writeup.
+You run the following command `sudo nano /etc/rc.local` and add the line `/usr/bin/pigpiod` above `exit 0` and reboot the Pi. There is an option to secure the service see the writeup for further instuctions.
 
 Drop the gpio node and use your Pi's IP. Example: 192.168.1.123 (127.0.0.1 won't work because this is the local address of every computer'.)
 
