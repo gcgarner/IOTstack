@@ -64,6 +64,7 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
     "node-red-contrib-npm" " " "OFF" \
     "node-red-contrib-file-function" " " "OFF" \
     "node-red-contrib-boolean-logic" " " "OFF" \
+    "node-red-contrib-home-assistant-websocket" " " "OFF" \
     "node-red-contrib-blynk-ws" " " "OFF" \
     "node-red-contrib-owntracks" " " "OFF" \
     "node-red-contrib-alexa-local" " " "OFF" \
