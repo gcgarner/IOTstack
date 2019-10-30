@@ -48,6 +48,7 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
     "node-red-node-random" " " "OFF" \
     "node-red-node-smooth" " " "OFF" \
     "node-red-node-darksky" " " "OFF" \
+    "node-red-node-sqlite" " " "OFF" \
     "node-red-contrib-influxdb" " " "ON" \
     "node-red-contrib-config" " " "OFF" \
     "node-red-contrib-grove" " " "OFF" \
@@ -74,17 +75,26 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 
     nr_dfile=./services/nodered/Dockerfile
 
+    sqliteflag=0
+
     touch $nr_dfile
     echo "FROM nodered/node-red:latest" > $nr_dfile
     #node red install script inspired from https://tech.scargill.net/the-script/
     echo "RUN for addonnodes in \\" >> $nr_dfile
     for checked in "${checked_nodes[@]}"; do
+        #test to see if sqlite is selected and set flag, sqlite require additional flags
+        if [ "$checked" = "node-red-node-sqlite" ];
+        then
+            sqliteflag=1
+        else
             echo "$checked \\"  >> $nr_dfile
+        fi
     done
     echo "; do \\"  >> $nr_dfile
     echo "npm install \${addonnodes} ;\\"  >> $nr_dfile
     echo "done;" >> $nr_dfile
 
+    [ $sqliteflag = 1 ] && echo "RUN npm install --unsafe-perm node-red-node-sqlite" >> $nr_dfile
 }
 
 #---------------------------------------------------------------------------------------------------

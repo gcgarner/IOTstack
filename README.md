@@ -2,22 +2,28 @@
 Docker stack for getting started on IoT on the Raspberry Pi.
 
 This Docker stack consists of:
-  * nodered
-  * grafana
-  * influxDB
-  * postgres
-  * mosquitto mqtt
-  * portainer
-  * adminer
+  * Node-RED
+  * Grafana
+  * InfluxDB
+  * Postgres
+  * Mosquitto mqtt
+  * Portainer
+  * Adminer
   * openHAB
 
 In addition, there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 
 Firstly what is docker? The correct question is "what are containers?". Docker is just one of the utilities to run container.
 
-Container can be thought of as ultra-minimal virtual machines. You download a preconfigured base image and create a new container and only the differences between the base and your "VM" are stored.
+Container can be thought of as ultra-minimal virtual machines, they are a collection of binaries that run in a sandbox environment. You download a preconfigured base image and create a new container and only the differences between the base and your "VM" are stored.
 Containers don't have [GUI](https://en.wikipedia.org/wiki/Graphical_user_interface)s so generally the way you interact with them is via web services or you can launch into a terminal.
 One of the major advantages is that the image comes mostly preconfigured.  
+
+There are pro's and cons for using native installs vs containers. For me, one of the best parts of containers is that it doesn't "clutter" your device, and if you don't need Postgres anymore then just stop the container and delete it and it's like it was never there.
+
+It's not advised to try to run the native version of an app and the docker version, the container will fail. It would be best to install this on a fresh system.
+
+For those looking for a script that installs native applications check out Peter Scargill's [script](https://tech.scargill.net/the-script/)
   
 # Tested platform
 Raspberry Pi 3B and 4B Raspbian (Buster)
@@ -28,16 +34,9 @@ Please direct all feature requests to [Discord](https://discord.gg/W45tD83)
 # Youtube reference
 This repo was originally inspired by Andreas Spiess's video on using some of these tools. Some containers have been added to extend its functionality.
 
-[Yolutube video](https://www.youtube.com/watch?v=JdV4x925au0): This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
+[YouTube video](https://www.youtube.com/watch?v=JdV4x925au0): This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
 
-For those looking for a script that installs native applications check out Peter Scargill's script
-https://tech.scargill.net/the-script/
-
-There are pro's and cons for using native installs vs containers. For me, one of the best parts of containers is that it doesn't "clutter" your device, and if you don't need Postgres anymore then just stop the container and delete it and it's like it was never there.
-
-It's not advised to try to run the native version of an app and the docker version, the container will fail. It would be best to install this on a fresh system. 
-
-## Download the project
+# Download the project
 
 ```
 git clone https://github.com/gcgarner/IOTstack.git ~/IOTstack
@@ -99,7 +98,7 @@ The Node-RED image differs from the rest of the images in this project. It uses 
 
 ## Deleting containers, volumes and images
 
-`./prune-images.sh` will remove all images not associated with a container. IF you run it while the stack is up it will ignore any in-use image. If you run this while you stack is down it will delete all images and you will have to redownload all images from scratch. This command can be helpful to reclaim disk space after updating your images, just make sure to run it while your stack is running as not to delete the images in use. (your data will still be safe in your volume mapping)
+`./prune-images.sh` will remove all images not associated with a container. If you run it while the stack is up it will ignore any in-use images. If you run this while you stack is down it will delete all images and you will have to redownload all images from scratch. This command can be helpful to reclaim disk space after updating your images, just make sure to run it while your stack is running as not to delete the images in use. (your data will still be safe in your volume mapping)
 
 ## Deleting folder volumes
 If you want to delete the influxdb data folder run the following command `sudo rm -r volumes/influxdb/`. Only the data folder is deleted leaving the env file intact. review the docker-compose.yml file to see where the file volumes are stored.
@@ -133,6 +132,21 @@ The build script creates the ./services directory and populates it from the temp
 
 The .gitignore file is setup such that if you do a `git pull origin master` it does not overwrite the files you have already created. Because the build script does not overwite your service directory any changes in the .templates directory will have no affect on the services you have already made. You will need to move your service folder out to get the latest version of the template.
 
+# Ports
+Many containers try to use popular ports such as 80,443,8080. For example openHAB and Adminer both want to use port 8080 for their web interface. Adminer's port has been moved 9080 to accommodate this. Please check the description of the container in the README to see if there are any changes as they may not be the same as the port you are used to.
+
+Port mapping is done in the docker-compose.yml file. Each service should have a section that reads like this:
+```
+    ports:
+      - HOST_PORT:CONTAINER_PORT
+```
+For adminer:
+```
+    ports:
+      - 9080:8080
+```
+Port 9080 on Host Pi is mapped to port 8080 of the container. Therefore 127.0.0.1:8080 will take you to openHAB, where 127.0.0.1:9080 will take you to adminer
+
 # Portainer
 https://hub.docker.com/r/portainer/portainer/
 
@@ -148,7 +162,11 @@ I added a SQL server, for those that need an SQL database. The database credenti
 # Adminer
 https://hub.docker.com/_/adminer
 
-This is a nice tool for managing databases. Web interface on port 8080
+This is a nice tool for managing databases. Web interface has moved to port 9080. There was an issue where openHAB and Adminer were using the same ports. If you have an port conflict edit the docker-compose.yml and under the adminer service change the line to read:
+```
+    ports:
+      - 9080:8080
+```
 
 # Grafana
 https://hub.docker.com/r/grafana/grafana
@@ -179,11 +197,17 @@ Edit the file called services/mosquitto/mosquitto.conf and remove the comment in
 # Node-RED
 https://hub.docker.com/r/nodered/node-red
 
+## Build warning
+The Node-RED build will complain about several issues. This is completely normal behaviour.
+
+## SQLite
+Thanks to @fragolinux the SQLite node will install now. WARNING it will output many error and will look as if it has gotten stuck. Just give it time and it will continue.  
+
 ## GPIO
 To communicate to your Pi's GPIO you need to use the `node-red-node-pi-gpiod` node. It allowes you to connect to multiple Pis from the same nodered service.
 
 You need to make sure that pigpdiod is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod)
-You run the following command `sudo nano /etc/rc.local` and add the line `/usr/bin/pigpiod` above `exit 0` and reboot the Pi. there is an option to secure the service see the writeup.
+You run the following command `sudo nano /etc/rc.local` and add the line `/usr/bin/pigpiod` above `exit 0` and reboot the Pi. There is an option to secure the service see the writeup for further instuctions.
 
 Drop the gpio node and use your Pi's IP. Example: 192.168.1.123 (127.0.0.1 won't work because this is the local address of every computer'.)
 
