@@ -1,0 +1,14 @@
+  hassio:
+    image: "homeassistant/home-assistant:latest"
+    container_name: "hassio"
+    restart: unless-stopped
+    depends_on:
+      - influxdb
+      - mosquitto
+    ports:
+      - 8123:8123
+    volumes:
+      - ./volumes/hassio/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    #environment:
+    #  - TZ=${HOST_TZ}

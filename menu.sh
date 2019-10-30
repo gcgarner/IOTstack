@@ -131,6 +131,7 @@ case $mainmenu_selection in
             "influxdb" "InfluxDB" "ON" \
             "grafana" "Grafana" "ON" \
             "mosquitto" "Eclipse-Mosquitto" "ON" \
+            "hassio" "Home Assistant (Hass.io)" "OFF" \
             "postgres" "Postgres" "OFF" \
             "adminer" "Adminer" "OFF" \
             "openhab" "openHAB" "OFF" \
@@ -169,6 +170,10 @@ case $mainmenu_selection in
                 "mosquitto")
                     echo "Adding Mosquitto"
                     yml_builder "mosquitto"
+                    ;;
+                "hassio")
+                    echo "Adding Home Asstant Container"
+                    yml_builder "hassio"
                     ;;
                 "postgres")
                     echo "Adding Postgres Container"
