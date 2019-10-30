@@ -28,6 +28,9 @@ For those looking for a script that installs native applications check out Peter
 # Tested platform
 Raspberry Pi 3B and 4B Raspbian (Buster)
 
+## Running under a virtual machine
+For those wanting to test out the script in a Virtual Machine before installing on their Pi there are some limitations. The script is designed to work with Debian based distos. Not all the container have x86_64 images. For example Portainer does not and will give an error when you try and start the stack. Please see the pinned issue #29, there is more info there.
+
 # Feature Requests
 Please direct all feature requests to [Discord](https://discord.gg/W45tD83)
   
