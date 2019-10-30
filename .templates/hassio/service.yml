@@ -2,7 +2,7 @@
     image: "homeassistant/home-assistant:latest"
     container_name: "hassio"
     restart: unless-stopped
-    network_mode: host
+    network_mode: "host"
     depends_on:
       - influxdb
       - mosquitto

@@ -228,6 +228,7 @@ https://hub.docker.com/r/homeassistant/home-assistant/
 Extra reference: http://hass.io
 
 Home Assistant is a home automation platform running on Python 3. It is able to track and control all devices at home and offer a platform for automating control. Port binding is `8123`.
+Home Assistant is exposed to your hosts' network in order to discover devices on your LAN. That means that it does not sit inside docker's network.
 
 # Backups
 Because containers can easily be rebuilt from docker hub we only have to back up the data in the "volumes" directory.
