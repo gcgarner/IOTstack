@@ -141,10 +141,10 @@ case $mainmenu_selection in
             "influxdb" "InfluxDB" "ON" \
             "grafana" "Grafana" "ON" \
             "mosquitto" "Eclipse-Mosquitto" "ON" \
-            "hassio" "Home Assistant (Hass.io)" "OFF" \
             "postgres" "Postgres" "OFF" \
             "adminer" "Adminer" "OFF" \
             "openhab" "openHAB" "OFF" \
+            "hassio" "Home Assistant (Hass.io)" "OFF" \
             3>&1 1>&2 2>&3)
 
         mapfile -t containers <<< "$container_selection"
@@ -181,10 +181,6 @@ case $mainmenu_selection in
                     echo "Adding Mosquitto"
                     yml_builder "mosquitto"
                     ;;
-                "hassio")
-                    echo "Adding Home Asstant Container"
-                    yml_builder "hassio"
-                    ;;
                 "postgres")
                     echo "Adding Postgres Container"
                     yml_builder "postgres"
@@ -196,6 +192,10 @@ case $mainmenu_selection in
                 "openhab")
                     echo "Adding openHAB container"
                     yml_builder "openhab"
+                    ;;
+                "hassio")
+                    echo "Adding Home Asstant Container"
+                    yml_builder "hassio"
                     ;;
                 *)
                     echo "Failed to add $container container"
@@ -277,4 +277,3 @@ case $mainmenu_selection in
 
     *) ;;
 esac
-
