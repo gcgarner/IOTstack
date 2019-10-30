@@ -222,6 +222,13 @@ https://hub.docker.com/r/openhab/openhab/
 
 openHAB has been added without Amazon Dashbutton binding. Port binding is `8080` for http and `8443` for https. 
 
+# Home-Assistant
+https://hub.docker.com/r/homeassistant/home-assistant/
+
+Extra reference: http://hass.io
+
+Home Assistant is a home automation platform running on Python 3. It is able to track and control all devices at home and offer a platform for automating control. Port binding is `8123`.
+
 # Backups
 Because containers can easily be rebuilt from docker hub we only have to back up the data in the "volumes" directory.
 
@@ -283,4 +290,4 @@ This a great utility to easily upload data from your PI to the cloud. https://ma
 The MagPi has an excellent explanation of the process of setting up the Dropbox API. Dropbox-Uploader is used in the backup script.
 
 # Add to the project
-Feel free to add your comments on features or images that you think should be added. 
+Feel free to add your comments on features or images that you think should be added.
