@@ -185,15 +185,17 @@ The credentials and default database name for influxdb are stored in the file ca
 To access the terminal for influxdb execute `./services/influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
 
 # Mosquitto
+
 https://hub.docker.com/_/eclipse-mosquitto
 
 Extra reference https://www.youtube.com/watch?v=1msiFQT_flo
 
+NOTE: There was a typo in the instructions for adding a password to mosquitto, the insturctions below have been corrected.
 
 By default, the Mosquitto container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
 Step 1
-To add the password run `./services/mosquitto/terminal.sh`, I put some helper text in the script. Basically, you use the `mosquitto_passwd -c /mosquitto/config/passwd MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
+To add the password run `./services/mosquitto/terminal.sh`, I put some helper text in the script. Basically, you use the `mosquitto_passwd -c /mosquitto/config/pwfile MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
 
 Step 2
 Edit the file called services/mosquitto/mosquitto.conf and remove the comment in front of password_file. Restart the container with `docker-compose restart mosquitto`. Type those credentials into Node-red etc.
