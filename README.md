@@ -10,6 +10,7 @@ This Docker stack consists of:
   * Portainer
   * Adminer
   * openHAB
+  * Home Assistant (HASSIO)
 
 In addition, there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 
