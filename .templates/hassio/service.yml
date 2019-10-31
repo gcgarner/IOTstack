@@ -3,9 +3,9 @@
     container_name: "hassio"
     restart: unless-stopped
     network_mode: "host"
-    depends_on:
-      - influxdb
-      - mosquitto
+    #depends_on:
+    #  - influxdb
+    #  - mosquitto
     ports:
       - 8123:8123
     volumes:
