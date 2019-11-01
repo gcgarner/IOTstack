@@ -1,0 +1,24 @@
+  letsencrypt:
+    image: linuxserver/letsencrypt
+    container_name: letsencrypt
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      #- TZ=Europe/London
+      - URL=mydomain.duckdns.org
+      - SUBDOMAINS=
+      - VALIDATION=duckdns
+      - DUCKDNSTOKEN=<token>
+      #- EMAIL=<e-mail>
+      - DHLEVEL=2048
+      - ONLY_SUBDOMAINS=false
+      #- EXTRA_DOMAINS=<extradomains>
+      - STAGING=false
+    volumes:
+      - ./volumes/letsencrypt/config:/config
+    ports:
+      - 443:443
+      - 80:80
+    restart: unless-stopped

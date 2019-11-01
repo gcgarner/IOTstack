@@ -146,6 +146,7 @@ case $mainmenu_selection in
             "adminer" "Adminer" "OFF" \
             "openhab" "openHAB" "OFF" \
             "hassio" "Home Assistant (Hass.io)" "OFF" \
+            "letsencrypt" "Letsencrypt Nginx Reverse proxy" "OFF" \
             3>&1 1>&2 2>&3)
 
         mapfile -t containers <<< "$container_selection"
@@ -197,6 +198,10 @@ case $mainmenu_selection in
                 "hassio")
                     echo "Adding Home Asstant Container"
                     yml_builder "hassio"
+                    ;;
+                "letsencrypt")
+                    echo "Adding Letsencrypt"
+                    yml_builder "letsencrypt"
                     ;;
                 *)
                     echo "Failed to add $container container"
