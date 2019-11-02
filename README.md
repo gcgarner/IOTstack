@@ -42,6 +42,11 @@ This repo was originally inspired by Andreas Spiess's video on using some of the
 
 # Download the project
 
+On the lite image you will need to install git first 
+```
+sudo apt-get install git
+```
+Then download with
 ```
 git clone https://github.com/gcgarner/IOTstack.git ~/IOTstack
 ```
