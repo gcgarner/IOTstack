@@ -221,7 +221,7 @@ Drop the gpio node and use your Pi's IP. Example: 192.168.1.123 (127.0.0.1 won't
 To secure Node-RED you need a password hash. There is a terminal script `./services/nodered/terminal.sh` execute it to get into the terminal.
 Copy the helper text `node -e ..... PASSWORD`, paste it and change your password to get a hash.
 
-Open the file `./nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instructions
+Open the file `./volumes/nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instructions
 
 # openHAB
 https://hub.docker.com/r/openhab/openhab/
