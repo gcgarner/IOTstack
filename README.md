@@ -215,6 +215,13 @@ To communicate to your Pi's GPIO you need to use the `node-red-node-pi-gpiod` no
 You need to make sure that pigpdiod is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod)
 You run the following command `sudo nano /etc/rc.local` and add the line `/usr/bin/pigpiod` above `exit 0` and reboot the Pi. There is an option to secure the service see the writeup for further instuctions.
 
+Fot the Rpi Image you will also need to update to the most recent version 
+
+```
+sudo apt-get update
+sudo apt-get install pigpio python-pigpio python3-pigpio
+```
+
 Drop the gpio node and use your Pi's IP. Example: 192.168.1.123 (127.0.0.1 won't work because this is the local address of every computer'.)
 
 ## Securing Node-RED
