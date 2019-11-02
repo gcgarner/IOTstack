@@ -96,6 +96,9 @@ The 'docker-compose down' command stops the containers then deletes them. The al
 ## Persistent data
 Docker allows you to map folders inside your containers to folders on the disk. This is done with the "volume" key. There are two types of volumes. Any modification to the container reflects in the volume.
 
+### Sharing files between the Pi and containers
+Have a look a the wiki on how to share files between Node-RED and the Pi. [Wiki](https://github.com/gcgarner/IOTstack/wiki/Node-RED#sharing-files-between-node-red-and-the-host)
+
 ## Updating the images
 If a new version of a container image is available on docker hub it can be updated by a pull command.
 
