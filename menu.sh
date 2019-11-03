@@ -256,7 +256,7 @@ case $mainmenu_selection in
             then
                 git clone https://github.com/andreafabrizi/Dropbox-Uploader.git ~/Dropbox-Uploader
                 chmod +x ~/Dropbox-Uploader/dropbox_uploader.sh
-                pushd ~/Dropbox-Uploader && sudo ./dropbox_uploader.sh
+                pushd ~/Dropbox-Uploader && ./dropbox_uploader.sh
 		popd
             else
                 echo "Dropbox uploader already installed"

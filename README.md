@@ -308,7 +308,7 @@ I personally use the VPN any time I'm on public wifi, all your traffic is secure
 https://www.zerotier.com/
 Zerotier is an alternative to PiVPN that doesn't require port forwarding on your router. It does however require registering for their free tier service [here](https://my.zerotier.com/login). 
 
-Kevin Zhang has written a how to guide [here](https://iamkelv.in/blog/2017/06/zerotier.html). Just not that the install link is outdate and should be:
+Kevin Zhang has written a how to guide [here](https://iamkelv.in/blog/2017/06/zerotier.html). Just note that the install link is outdated and should be:
 ```
 curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && \
 if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | sudo bash; fi
