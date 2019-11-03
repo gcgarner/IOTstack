@@ -16,7 +16,10 @@ sudo tar -czf \
 ./backups/influxdb
 echo "backup saved to ./backups/docker.tar.gz"
 
-#echo "uploading to dropbox
-#sudo ~/Dropbox-Uploader/dropbox_uploader.sh upload ~/IOTstack/backups/docker.tar.gz /IOTstackBU/
+#cp ~/IOTstack/backups/docker.tar.gz ~
+#echo "uploading to dropbox"
+#~/Dropbox-Uploader/dropbox_uploader.sh upload /home/pi/docker.tar.gz /IOTstackBU/
+#rm /home/pi/docker.tar.gz
+
 
 popd
