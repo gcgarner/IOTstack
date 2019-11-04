@@ -1,3 +1,17 @@
+# Announcements 
+The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
+
+## Highlighted topics
+* [Bluetooth and Node-RED](https://github.com/gcgarner/IOTstack/wiki/Node-RED#using-bluetooth)
+* [Saving files to disk inside containers](https://github.com/gcgarner/IOTstack/wiki/Node-RED#sharing-files-between-node-red-and-the-host)
+
+ ***
+# Coming soon
+- [zigbee2mqtt](https://hub.docker.com/r/koenkk/zigbee2mqtt/)
+- [Pi-Hole](https://hub.docker.com/r/pihole/pihole/)
+- [EspurinoHub](https://hub.docker.com/r/humbertosales/espruinohub-docker-rpi)
+***
+
 # IOTstack
 Docker stack for getting started on IoT on the Raspberry Pi.
 
@@ -96,233 +110,9 @@ The 'docker-compose down' command stops the containers then deletes them. The al
 ## Persistent data
 Docker allows you to map folders inside your containers to folders on the disk. This is done with the "volume" key. There are two types of volumes. Any modification to the container reflects in the volume.
 
-### Sharing files between the Pi and containers
-Have a look a the wiki on how to share files between Node-RED and the Pi. [Wiki](https://github.com/gcgarner/IOTstack/wiki/Node-RED#sharing-files-between-node-red-and-the-host)
+# See Wiki for further info
+[Wiki](https://github.com/gcgarner/IOTstack/wiki)
 
-## Updating the images
-If a new version of a container image is available on docker hub it can be updated by a pull command.
-
-Use the `docker-compose down` command to stop the stack
-
-Pull the latest version from docker hub with one of the following command
-
-`docker-compose pull` or the script `./scripts/update.sh`
-
-## Node-RED error after modifications to setup files
-The Node-RED image differs from the rest of the images in this project. It uses the "build" key. It uses a dockerfile for the setup to inject the nodes for preinstallation. If you get an error for Node-RED run `docker-compose build` then `docker-compose up -d`
-
-## Deleting containers, volumes and images
-
-`./prune-images.sh` will remove all images not associated with a container. If you run it while the stack is up it will ignore any in-use images. If you run this while you stack is down it will delete all images and you will have to redownload all images from scratch. This command can be helpful to reclaim disk space after updating your images, just make sure to run it while your stack is running as not to delete the images in use. (your data will still be safe in your volume mapping)
-
-## Deleting folder volumes
-If you want to delete the influxdb data folder run the following command `sudo rm -r volumes/influxdb/`. Only the data folder is deleted leaving the env file intact. review the docker-compose.yml file to see where the file volumes are stored.
-
-You can use git to delete all files and folders to return your folder to the freshly cloned state, AS IN YOU WILL LOSE ALL YOUR DATA.
-`sudo git clean -d -x -f` will return the working tree to its clean state. USE WITH CAUTION!
-
-## Networking
-
-The docker-compose instruction creates an internal network for the containers to communicate in, the ports get exposed to the PI's IP address when you want to connect from outside. It also creates a "DNS" the name being the container name. So it is important to note that when one container talks to another they talk by name. All the containers names are lowercase like nodered, influxdb...
-
-An easy way to find out your IP is by typing `ip address` in the terminal and look next to eth0 or wlan0 for your IP. It is highly recommended that you set a static IP for your PI or at least reserve an IP on your router so that you know it
-
-Check the docker-compose.yml to see which ports have been used
-
-![net](https://user-images.githubusercontent.com/46672225/66702353-0bcc4080-ed07-11e9-994b-62219f50b096.png)
-
-### Examples
-You want to connect your nodered to your mqtt server.
-In nodered drop an mqtt node, when you need to specify the address type `mosquitto`
-
-You want to connect to your influxdb from grafana. 
-You are in the Docker network and you need to use the name of the Container.
-The address you specify in the grafana is http://influxdb:8086
-
-You want to connect to the web interface of grafana from your laptop.
-Now you are outside the container environment you type PI's IP eg 192.168.n.m:3000
-
-## How the script works
-The build script creates the ./services directory and populates it from the template file in .templates . The script then appends the text withing each service.yml file to the docker-compose.yml . When the stack is rebuild the menu doesn not overwrite the service folder if it already exists. Make sure to sync any alterations you have made to the docker-compose.yml file with the respective service.yml so that on your next build your changes pull through.
-
-The .gitignore file is setup such that if you do a `git pull origin master` it does not overwrite the files you have already created. Because the build script does not overwite your service directory any changes in the .templates directory will have no affect on the services you have already made. You will need to move your service folder out to get the latest version of the template.
-
-# Ports
-Many containers try to use popular ports such as 80,443,8080. For example openHAB and Adminer both want to use port 8080 for their web interface. Adminer's port has been moved 9080 to accommodate this. Please check the description of the container in the README to see if there are any changes as they may not be the same as the port you are used to.
-
-Port mapping is done in the docker-compose.yml file. Each service should have a section that reads like this:
-```
-    ports:
-      - HOST_PORT:CONTAINER_PORT
-```
-For adminer:
-```
-    ports:
-      - 9080:8080
-```
-Port 9080 on Host Pi is mapped to port 8080 of the container. Therefore 127.0.0.1:8080 will take you to openHAB, where 127.0.0.1:9080 will take you to adminer
-
-# Portainer
-https://hub.docker.com/r/portainer/portainer/
-
-Portainer is a great application for managing Docker. In your web browser navigate to `#yourip:9000`. You will be asked to choose a password. In the next window select 'Local' and connect, it shouldn't ask you this again. From here you can play around, click local, and take a look around. This can help you find unused images/containers. On the Containers section, there are 'Quick actions' to view logs and other stats. Note: This can all be done from the CLI but portainer just makes it much much easier. 
-
-If you have forgotten the password you created for the container, stop the stack remove portainers volume with `sudo rm -r ./volumes/portainer` and start the stack. Your browser may get a little confused when it restarts. Just navigate to "yourip:9000" (may require more than one attempt) and create your new login details. If it doesn't ask you to connect to the 'Local' docker or shows an empty endpoint just logout and log back in and it will give you the option. From now on it should just work fine.
-
-# Postgres
-https://hub.docker.com/_/postgres
-
-I added a SQL server, for those that need an SQL database. The database credentials can be found in the file postgres/postgres.env. It is highly recommended to change the user, password and default database
-
-# Adminer
-https://hub.docker.com/_/adminer
-
-This is a nice tool for managing databases. Web interface has moved to port 9080. There was an issue where openHAB and Adminer were using the same ports. If you have an port conflict edit the docker-compose.yml and under the adminer service change the line to read:
-```
-    ports:
-      - 9080:8080
-```
-
-# Grafana
-https://hub.docker.com/r/grafana/grafana
-
-Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot. Go to yourIP:3000 in your web browser.
-
-# Influxdb
-https://hub.docker.com/_/influxdb
-
-The credentials and default database name for influxdb are stored in the file called influxdb/influx.env . The default username and password is set to "nodered" for both it is HIGHLY recommended that you change them. The environment file contains several commented out options allowing you to set several access options such as default admin user credentials as well as the default database name. Any change to the environment file will require a restart of the service.
-
-To access the terminal for influxdb execute `./services/influxdb/terminal.sh`. Here you can set additional parameters or create other databases.
-
-# Mosquitto
-
-https://hub.docker.com/_/eclipse-mosquitto
-
-Extra reference https://www.youtube.com/watch?v=1msiFQT_flo
-
-NOTE: There was a typo in the instructions for adding a password to mosquitto, the insturctions below have been corrected.
-
-By default, the Mosquitto container has no password. You can leave it that way if you like but its always a good idea to secure your services.
-
-Step 1
-To add the password run `./services/mosquitto/terminal.sh`, I put some helper text in the script. Basically, you use the `mosquitto_passwd -c /mosquitto/config/pwfile MYUSER` command, replacing MYUSER with your username. it will then ask you to type your password and confirm it. exiting with `exit`. 
-
-Step 2
-Edit the file called services/mosquitto/mosquitto.conf and remove the comment in front of password_file. Restart the container with `docker-compose restart mosquitto`. Type those credentials into Node-red etc.
-
-# Node-RED
-https://hub.docker.com/r/nodered/node-red
-
-## Build warning
-The Node-RED build will complain about several issues. This is completely normal behaviour.
-
-## SQLite
-Thanks to @fragolinux the SQLite node will install now. WARNING it will output many error and will look as if it has gotten stuck. Just give it time and it will continue.  
-
-## GPIO
-To communicate to your Pi's GPIO you need to use the `node-red-node-pi-gpiod` node. It allowes you to connect to multiple Pis from the same nodered service.
-
-You need to make sure that pigpdiod is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod)
-You run the following command `sudo nano /etc/rc.local` and add the line `/usr/bin/pigpiod` above `exit 0` and reboot the Pi. There is an option to secure the service see the writeup for further instuctions.
-
-Fot the Rpi Image you will also need to update to the most recent version 
-
-```
-sudo apt-get update
-sudo apt-get install pigpio python-pigpio python3-pigpio
-```
-
-Drop the gpio node and use your Pi's IP. Example: 192.168.1.123 (127.0.0.1 won't work because this is the local address of every computer'.)
-
-## Securing Node-RED
-To secure Node-RED you need a password hash. There is a terminal script `./services/nodered/terminal.sh` execute it to get into the terminal.
-Copy the helper text `node -e ..... PASSWORD`, paste it and change your password to get a hash.
-
-Open the file `./volumes/nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instructions
-
-# openHAB
-https://hub.docker.com/r/openhab/openhab/
-
-openHAB has been added without Amazon Dashbutton binding. Port binding is `8080` for http and `8443` for https. 
-
-# Home-Assistant
-https://hub.docker.com/r/homeassistant/home-assistant/
-
-Extra reference: http://hass.io
-
-Home Assistant is a home automation platform running on Python 3. It is able to track and control all devices at home and offer a platform for automating control. Port binding is `8123`.
-Home Assistant is exposed to your hosts' network in order to discover devices on your LAN. That means that it does not sit inside docker's network.
-
-# Backups
-Because containers can easily be rebuilt from docker hub we only have to back up the data in the "volumes" directory.
-
-## Influxdb
-`~/IOTstack/scripts/backup_influxdb.sh` does a database snapshot and stores it in ~/IOTstack/backups/influxdb/db . This can be restored with the help a script (that I still need to write)
-
-## Docker backups
-The script `~/IOTstack/scripts/docker_backup.sh` performs the master backup for the stack. 
-
-This script can be placed in a cron job to backup on a schedule.
-Edit the crontab with`crontab -e`
-Then add `0 23 * * * ~/IOTstack/scripts/docker_backup.sh >/dev/null 2>&1` to have a backup everynight at 23:00.
-
-This script cheats by copying the volume folder live. The correct way would be to stop the stack first then copy the volumes and restart. The cheating method shouldn't be a problem unless you have fast changing data like in influxdb. This is why the script makes a database export of influxdb and ignores its volume. 
-
-### Dropbox integration
-To enable the the 'docker_backups.sh' file and uncomment the lines in front of the Dropbox-Uploader command.
-
-## Restoring a backup
-The "volumes" directory contains all the persistent data necessary to recreate the container. The docker-compose.yml and the environment files are optional as they can be regenerated with the menu. Simply copy the volumes directory into the IOTstack directory, Rebuild the stack and start. 
-
-# Accessing your Device from the internet
-The challenge most of us face with remotely accessing your home network is that you don't have a static IP. From time to time the IP that your ISP assigns to you changes and it's difficult to keep up. Fortunately, there is a solution, a DynamicDNS. The section below shows you how to set up an easy to remember address that follows your public IP no matter when it changes.
-
-Secondly, how do you get into your home network? Your router has a firewall that is designed to keep the rest of the internet out of your network to protect you. Here we install a VPN and configure the firewall to only allow very secure VPN traffic in. 
-
-## DuckDNS
-If you want to have a dynamic DNS point to your Public IP I added a helper script.
-Register with duckdns.org and create a subdomain name. Then edit the `nano ~/IOTstack/duck/duck.sh` file and add your `domain=` and `token=`.
-
-first test the script to make sure it works `sudo ~/IOTstack/duck/duck.sh` then `cat /var/log/duck.log`. If you get KO then something has gone wrong and you should check out your settings in the script. If you get an OK then you can do the next step. 
-
-Create a cron job by running the following command `crontab -e`
-
-You will be asked to use an editor option 1 for nano should be fine
-paste the following in the editor `*/5 * * * * sudo ~/IOTstack/duck/duck.sh >/dev/null 2>&1` then ctrl+s and ctrl+x to save
-
-Your Public IP should be updated every five minutes
-
-## PiVPN
-pimylifeup.com has an excellent tutorial on how to install [PiVPN](https://pimylifeup.com/raspberry-pi-vpn-server/)
-
-In point 17 and 18 they mention using noip for their dynamic DNS. Here you can use the DuckDNS address if you created one.
-
-Don't forget you need to open the port 1194 on your firewall. Most people won't be able to VPN from inside their network so download OpenVPN client for your mobile phone and try to connect over mobile data. ([More info.](https://en.wikipedia.org/wiki/Hairpinning))
-
-Once you activate your VPN (from your phone/laptop/work computer) you will effectively be on your home network and you can access your devices as if you were on the wifi at home.
-
-I personally use the VPN any time I'm on public wifi, all your traffic is secure.
-
-## Zerotier
-https://www.zerotier.com/
-Zerotier is an alternative to PiVPN that doesn't require port forwarding on your router. It does however require registering for their free tier service [here](https://my.zerotier.com/login). 
-
-Kevin Zhang has written a how to guide [here](https://iamkelv.in/blog/2017/06/zerotier.html). Just note that the install link is outdated and should be:
-```
-curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && \
-if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | sudo bash; fi
-```
-
-# Miscellaneous
-
-## log2ram
-https://github.com/azlux/log2ram
-One of the drawbacks of an sd card is that it has a limited lifespan. One way to reduce the load on the sd card is to move your log files to RAM. log2ram is a convenient tool to simply set this up. It can be installed from the miscellaneous menu.
-
-## Dropbox-Uploader
-This a great utility to easily upload data from your PI to the cloud. https://magpi.raspberrypi.org/articles/dropbox-raspberry-pi
-The MagPi has an excellent explanation of the process of setting up the Dropbox API. Dropbox-Uploader is used in the backup script.
 
 # Add to the project
 Feel free to add your comments on features or images that you think should be added.
