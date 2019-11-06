@@ -5,6 +5,7 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * [Bluetooth and Node-RED](https://github.com/gcgarner/IOTstack/wiki/Node-RED#using-bluetooth)
 * [Saving files to disk inside containers](https://github.com/gcgarner/IOTstack/wiki/Node-RED#sharing-files-between-node-red-and-the-host)
 * [Configurator in Home Assistant](https://github.com/gcgarner/IOTstack/wiki/Home-Assistant#configurator)
+* [Updating the Project](https://github.com/gcgarner/IOTstack/wiki/Updating-the-Project)
 
  ***
 # Coming soon
