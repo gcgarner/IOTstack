@@ -1,15 +1,16 @@
 # Announcements 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
+* Added Pi-Hole
+* Added zigbee2mqtt
+* Added rclone for Google Drive Backups
+* Fixed Hass.io (now has a seperate menu installation) 
 
 ## Highlighted topics
 * [Bluetooth and Node-RED](https://github.com/gcgarner/IOTstack/wiki/Node-RED#using-bluetooth)
 * [Saving files to disk inside containers](https://github.com/gcgarner/IOTstack/wiki/Node-RED#sharing-files-between-node-red-and-the-host)
-* [Configurator in Home Assistant](https://github.com/gcgarner/IOTstack/wiki/Home-Assistant#configurator)
 
  ***
 # Coming soon
-- [zigbee2mqtt](https://hub.docker.com/r/koenkk/zigbee2mqtt/)
-- [Pi-Hole](https://hub.docker.com/r/pihole/pihole/)
 - [EspurinoHub](https://hub.docker.com/r/humbertosales/espruinohub-docker-rpi)
 ***
 
@@ -26,6 +27,8 @@ This Docker stack consists of:
   * Adminer
   * openHAB
   * Home Assistant (HASSIO)
+  * zigbee2mqtt
+  * Pi-Hole
 
 In addition, there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 

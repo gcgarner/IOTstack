@@ -28,7 +28,16 @@ echo "backup saved to ./backups/docker.tar.gz"
 
 du -h ./backups/docker.tar.gz
 
-#echo "uploading to dropbox"
-#~/Dropbox-Uploader/dropbox_uploader.sh upload ~/IOTstack/backups/docker.tar.gz /IOTstackBU/
+if [ -f ./backups/dropbox ];
+then
+    echo "uploading to dropbox"
+    ~/Dropbox-Uploader/dropbox_uploader.sh upload ~/IOTstack/backups/docker.tar.gz /IOTstackBU/
+fi
+
+if [ -f ./backups/rclone ];
+then
+    echo "uploading to Google Drive"
+    rclone -P copy ./backups/docker.tar.gz gdrive:/IOTstackBU/
+fi
 
 popd
