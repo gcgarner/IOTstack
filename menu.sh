@@ -105,7 +105,7 @@ mainmenu_selection=$(whiptail --title "Main Menu" --menu --notags \
     "" 20 78 12 -- \
     "install" "Install Docker" \
     "build" "Build Stack" \
-    "hassio" "Install Hass.io" \
+    "hassio" "Install Hass.io (Requires Docker)" \
     "commands" "Docker commands" \
     "backup" "Backup options" \
     "misc" "Miscellaneous commands" \
