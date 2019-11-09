@@ -4,6 +4,6 @@
     volumes:
       - ./volumes/zigbee2mqtt/data:/app/data
     devices:
-      - /dev/ttyAMC0:/dev/ttyACM0
+      - /dev/ttyACM0:/dev/ttyACM0
     restart: unless-stopped
     network_mode: host
