@@ -1,10 +1,13 @@
 # Announcements 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 * Added Pi-Hole
-* Added zigbee2mqtt
+* Added zigbee2mqtt (needs wiki)
 * Added rclone for Google Drive Backups
 * Fixed Hass.io (now has a seperate menu installation) 
-
+* Added Telegraf (needs wiki)
+* Plex added
+* Tasmoadmin (needs wiki)
+***
 ## Highlighted topics
 * [Bluetooth and Node-RED](https://github.com/gcgarner/IOTstack/wiki/Node-RED#using-bluetooth)
 * [Saving files to disk inside containers](https://github.com/gcgarner/IOTstack/wiki/Node-RED#sharing-files-between-node-red-and-the-host)
@@ -30,6 +33,9 @@ This Docker stack consists of:
   * Home Assistant (HASSIO)
   * zigbee2mqtt
   * Pi-Hole
+  * TasmoAdmin (parial wiki)
+  * Plex media server
+  * Telegraf (wiki coming soon)
 
 In addition, there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 
@@ -43,7 +49,7 @@ There are pro's and cons for using native installs vs containers. For me, one of
 
 It's not advised to try to run the native version of an app and the docker version, the container will fail. It would be best to install this on a fresh system.
 
-For those looking for a script that installs native applications check out Peter Scargill's [script](https://tech.scargill.net/the-script/)
+For those looking for a script that installs native applications check out [Peter Scargill's script](https://tech.scargill.net/the-script/)
   
 # Tested platform
 Raspberry Pi 3B and 4B Raspbian (Buster)

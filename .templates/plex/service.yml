@@ -1,0 +1,15 @@
+  plex:
+    image: linuxserver/plex
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - VERSION=docker
+      #- UMASK_SET=022 #optional
+    volumes:
+      - ./volumes/plex/config:/config
+      #- ~/mnt/HDD/tvseries:/tv
+      #- ~/mnt/HDD/movies:/movies
+      - ./volumes/plex/transcode:/transcode
+    restart: unless-stopped
