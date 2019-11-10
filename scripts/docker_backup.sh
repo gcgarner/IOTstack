@@ -37,4 +37,7 @@ if [ -f ./backups/rclone ]; then
 	rclone -P copy ./backups/"backup-$(date +"%Y-%m-%d").tar.gz" gdrive:/IOTstackBU/
 fi
 
+ls -t1 ./backups/backup* | tail -n +6 | sudo xargs rm -f
+echo "last five backup files are saved in ~/IOTstack/backups"
+
 popd
