@@ -15,30 +15,39 @@ if [ -d ./volumes/influxdb ]; then
     echo "./backups/influxdb/" >> list.txt
 fi
 
-DATE=$(date +"%Y-%m-%d_%H%M")
+#setup variables 
+logfile=./backups/log.txt
+backupfile="backup-$(date +"%Y-%m-%d_%H%M").tar.gz"
 
+#compress the backups folders to archive
 echo "compressing stack folders"
 sudo tar -czf \
-./backups/"backup-$DATE.tar.gz" \
+./backups/$backupfile \
 --exclude=./volumes/influxdb/* \
 -T list.txt
 
 rm list.txt
 
-echo "backup saved to ./backups/backup-$DATE.tar.gz"
+#create log file and add the backup file to it
+echo "backup saved to ./backups/$backupfile"
+sudo touch $logfile
+echo $backupfile | sudo tee $logfile -a
 
-du -h ./backups/"backup-$DATE.tar.gz"
+#show size of archive file
+du -h ./backups/$backupfile
 
+#upload to cloud
 if [ -f ./backups/dropbox ]; then
     echo "uploading to dropbox"
-    ~/Dropbox-Uploader/dropbox_uploader.sh upload ./backups/"backup-$DATE.tar.gz" /IOTstackBU/
+    ~/Dropbox-Uploader/dropbox_uploader.sh upload ./backups/$backupfile /IOTstackBU/
 fi
 
 if [ -f ./backups/rclone ]; then
     echo "uploading to Google Drive"
-    rclone -P copy ./backups/"backup-$DATE.tar.gz" gdrive:/IOTstackBU/
+    rclone -P copy ./backups/$backupfile gdrive:/IOTstackBU/
 fi
 
+#remove older backup files
 ls -t1 ./backups/backup* | tail -n +6 | sudo xargs rm -f
 echo "last five backup files are saved in ~/IOTstack/backups"
 
