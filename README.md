@@ -7,6 +7,8 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * Added Telegraf (needs wiki)
 * Plex added
 * Tasmoadmin (needs wiki)
+* Fixed Tasmoadmin not starting after reboot
+
 ***
 ## Highlighted topics
 * [Bluetooth and Node-RED](https://github.com/gcgarner/IOTstack/wiki/Node-RED#using-bluetooth)
