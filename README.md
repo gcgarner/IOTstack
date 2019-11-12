@@ -1,5 +1,6 @@
 # Announcements 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
+* The project procedure has been rewritten, please check your duck.sh file because the old method reset it
 * Added Pi-Hole
 * Added zigbee2mqtt (needs wiki)
 * Added rclone for Google Drive Backups
