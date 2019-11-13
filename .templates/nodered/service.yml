@@ -3,6 +3,7 @@
     build: ./services/nodered/.
     restart: unless-stopped
     user: "0"
+    env_file: ./services/nodered/nodered.env
     ports:
       - 1880:1880
     volumes:

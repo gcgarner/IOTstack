@@ -1,5 +1,16 @@
 #!/bin/bash
 
+#timezones
+timezones() {
+
+	env_file=$1
+	TZ=$(cat /etc/timezone)
+
+	#test for TZ=
+	[ $(grep "TZ=" $env_file) ] && sed -i "/TZ=/c\TZ=$TZ" $env_file
+
+}
+
 #future function add password in build phase
 password_dialog() {
 	while [[ "$passphrase" != "$passphrase_repeat" || ${#passphrase} -lt 8 ]]; do
@@ -52,6 +63,9 @@ function yml_builder() {
 		echo "...pulled full $1 from template"
 		rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh'
 	fi
+
+	#if an env file exists check for timezone
+	[ -f "./services/$1/$1.env" ] && timezones ./services/$1/$1.env
 
 	cat $service >>docker-compose.yml
 
