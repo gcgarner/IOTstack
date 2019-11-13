@@ -38,7 +38,7 @@ function yml_builder() {
 		sevice_overwrite=$(whiptail --radiolist --title "Overwrite Option" --notags \
 			"$1 service directory has been detected, use [SPACEBAR] to select you overwrite option" 20 78 12 \
 			"none" "Do not overwrite" "ON" \
-			"env" "Preserve Environment adn Config file" "OFF" \
+			"env" "Preserve Environment and Config file" "OFF" \
 			"full" "Pull full service from template" "OFF" \
 			3>&1 1>&2 2>&3)
 
