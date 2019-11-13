@@ -32,7 +32,8 @@ sudo chown pi:pi ./backups/backup*
 
 #create log file and add the backup file to it
 echo "backup saved to ./backups/$backupfile"
-touch $logfile
+sudo touch $logfile
+sudo chown pi:pi $logfile
 echo $backupfile >>$logfile
 
 #show size of archive file
