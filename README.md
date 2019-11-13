@@ -1,13 +1,16 @@
 # Announcements 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
+* BUGFIX: incorrect permissions in docker_backup: PR @Paraphraser
+* BUGFIX: Timezone not correct on Node-RED and Pihole
+* docker_backup.sh now stores last 5 backups with timestamps : PR @877dev
 * The project procedure has been rewritten, please check your duck.sh file because the old method reset it
 * Added Pi-Hole
-* Added zigbee2mqtt (needs wiki)
+* Added zigbee2mqtt (needs wiki) BUG:does not start due to missing device
 * Added rclone for Google Drive Backups
 * Fixed Hass.io (now has a seperate menu installation) 
 * Added Telegraf (needs wiki)
 * Plex added
-* Tasmoadmin (needs wiki)
+* Tasmoadmin (needs wiki) 
 * Fixed Tasmoadmin not starting after reboot
 
 ***
@@ -130,3 +133,6 @@ Docker allows you to map folders inside your containers to folders on the disk. 
 
 # Add to the project
 Feel free to add your comments on features or images that you think should be added.
+
+# Contributions
+@mrmx, @oscrx, @brianimmel, @Slyke, @AugustasV, @Paulf007, @affankingkhan, @877dev, @Paraphraser 
