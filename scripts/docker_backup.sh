@@ -51,7 +51,7 @@ if [ -f ./backups/rclone ]; then
 fi
 
 #remove older backup files
-ls -t1 ./backups/backup* | tail -n +6 | xargs rm -f
+ls -t1 ./backups/backup* | tail -n +6 | sudo xargs rm -f
 echo "last five backup files are saved in ~/IOTstack/backups"
 
 popd
