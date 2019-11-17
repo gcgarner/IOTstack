@@ -7,7 +7,7 @@ timezones() {
 	TZ=$(cat /etc/timezone)
 
 	#test for TZ=
-	[ $(grep "TZ=" $env_file) ] && sed -i "/TZ=/c\TZ=$TZ" $env_file
+	[ $(grep -c "TZ=" $env_file) -ne 0 ] && sed -i "/TZ=/c\TZ=$TZ" $env_file
 
 }
 
@@ -85,9 +85,11 @@ mainmenu_selection=$(whiptail --title "Main Menu" --menu --notags \
 	"install" "Install Docker" \
 	"build" "Build Stack" \
 	"hassio" "Install Hass.io (Requires Docker)" \
+	"native" "Native Installs" \
 	"commands" "Docker commands" \
 	"backup" "Backup options" \
 	"misc" "Miscellaneous commands" \
+	"update" "Update IOTstack" \
 	3>&1 1>&2 2>&3)
 
 case $mainmenu_selection in
@@ -131,6 +133,7 @@ case $mainmenu_selection in
 		"pihole" "Pi-Hole" "OFF" \
 		"plex" "Plex media server" "OFF" \
 		"tasmoadmin" "TasmoAdmin" "OFF" \
+		"rtl_433" "RTL_433 to mqtt" "OFF" \
 		3>&1 1>&2 2>&3)
 
 	mapfile -t containers <<<"$container_selection"
@@ -157,16 +160,19 @@ case $mainmenu_selection in
 	#MAINMENU Docker commands -----------------------------------------------------------
 "commands")
 
-	docker_selection=$(whiptail --title "Docker commands" --menu --notags \
-		"Shortcut to common docker commands" 20 78 12 -- \
-		"start" "Start stack" \
-		"restart" "Restart stack" \
-		"stop" "Stop stack" \
-		"stop_all" "Stop any running container regardless of stack" \
-		"pull" "Update all containers" \
-		"prune_volumes" "Delete all stopped containers and docker volumes" \
-		"prune_images" "Delete all images not associated with container" \
-		3>&1 1>&2 2>&3)
+	docker_selection=$(
+		whiptail --title "Docker commands" --menu --notags \
+			"Shortcut to common docker commands" 20 78 12 -- \
+			"aliases" "Add iotstack_up and iotstack_down aliases" \
+			"start" "Start stack" \
+			"restart" "Restart stack" \
+			"stop" "Stop stack" \
+			"stop_all" "Stop any running container regardless of stack" \
+			"pull" "Update all containers" \
+			"prune_volumes" "Delete all stopped containers and docker volumes" \
+			"prune_images" "Delete all images not associated with container" \
+			3>&1 1>&2 2>&3
+	)
 
 	case $docker_selection in
 	"start") ./scripts/start.sh ;;
@@ -176,6 +182,16 @@ case $mainmenu_selection in
 	"pull") ./scripts/update.sh ;;
 	"prune_volumes") ./scripts/prune-volumes.sh ;;
 	"prune_images") ./scripts/prune-images.sh ;;
+	"aliases")
+		touch ~/.bash_aliases
+		if [ $(grep -c 'IOTstack' ~/.bash_aliases) -eq 0 ]; then
+			echo ". ~/IOTstack/.bash_aliases" >>~/.bash_aliases
+			echo "added aliases"
+		else
+			echo "aliases already added"
+		fi
+		source ~/.bashrc
+		;;
 	esac
 	;;
 	#Backup menu ---------------------------------------------------------------------
@@ -265,6 +281,25 @@ case $mainmenu_selection in
 		echo "no selection"
 		exit
 	fi
+	;;
+"update")
+	echo "Pulling latest project file from Github.com ---------------------------------------------"
+	git pull origin master
+	echo "git status ------------------------------------------------------------------------------"
+	git status
+	;;
+"native")
+
+	native_selections=$(whiptail --title "Native installs" --menu --notags \
+		"Install local applications" 20 78 12 -- \
+		"rtl_433" "RTL_433" \
+		3>&1 1>&2 2>&3)
+
+	case $native_selections in
+	"rtl_433")
+		bash ./.native/rtl_433.sh
+		;;
+	esac
 	;;
 *) ;;
 

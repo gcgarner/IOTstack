@@ -7,5 +7,6 @@
       - 1883:1883
       - 9001:9001
     volumes:
-      - ./volumes/mosquitto/:/mosquitto/
+      - ./volumes/mosquitto/data:/mosquitto/data
+      - ./volumes/mosquitto/log:/mosquitto/log
       - ./services/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
