@@ -2,6 +2,7 @@
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* BUGFIX: I incorrecly changed mosquittos volume mapping and it caused the container to restart. Reverted to the old volume mapping
 * Added RTL_433 native and docker installs
 * Added update project through the menu
 * Added bash aliases for easier docker stop and start commands
