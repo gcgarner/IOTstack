@@ -38,7 +38,7 @@ function yml_builder() {
 		sevice_overwrite=$(whiptail --radiolist --title "Overwrite Option" --notags \
 			"$1 service directory has been detected, use [SPACEBAR] to select you overwrite option" 20 78 12 \
 			"none" "Do not overwrite" "ON" \
-			"env" "Preserve Environment and Config file" "OFF" \
+			"env" "Preserve Environment and Config files" "OFF" \
 			"full" "Pull full service from template" "OFF" \
 			3>&1 1>&2 2>&3)
 
@@ -50,7 +50,7 @@ function yml_builder() {
 			;;
 		"env")
 			echo "...pulled $1 excluding env file"
-			rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh' --exclude '$1.env' --exclude $(*.conf)
+			rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh' --exclude '$1.env' --exclude '*.conf'
 			;;
 		"none")
 			echo "...$1 service not overwritten"
