@@ -2,6 +2,10 @@
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* Node-RED: serial port. New template adds privileged which allows acces to serial devices
+* EspurinoHub: is available for testing see wiki entry
+* Menu: Now remembers last stack selection, first build will be blank then the next will select your last containers
+* BUGFIX: fixed issue where rsync gave issue on 'Preserve Environment and Config files'
 * BUGFIX: I incorrecly changed mosquittos volume mapping and it caused the container to restart. Reverted to the old volume mapping
 * Added RTL_433 native and docker installs
 * Added update project through the menu
@@ -31,7 +35,15 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 
 # Coming soon
 
-* [EspurinoHub](https://hub.docker.com/r/humbertosales/espruinohub-docker-rpi)
+* Detection of arhcitecture for seperate stack options for amd64, armhf, i386
+* autocleanup of backups on cloud
+* motioneye
+* reverse proxy
+* python contaienr
+* webthings gateway
+* Gitea
+* NextCloud
+* OwnCloud
 
 ***
 
@@ -56,6 +68,7 @@ This Docker stack consists of:
 * Plex media server
 * Telegraf (wiki coming soon)
 * RTL_433
+* EspruinoHub (testing)
 
 In addition, there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 
