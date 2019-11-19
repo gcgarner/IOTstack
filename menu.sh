@@ -1,5 +1,27 @@
 #!/bin/bash
 
+declare -A cont_array=(
+	[portainer]="Portainer"
+	[nodered]="Node-RED"
+	[influxdb]="InfluxDB"
+	[telegraf]="Telegraf (Requires InfluxDB and Mosquitto)"
+	[grafana]="Grafana"
+	[mosquitto]="Eclipse-Mosquitto"
+	[postgres]="Postgres"
+	[adminer]="Adminer"
+	[openhab]="openHAB"
+	[zigbee2mqtt]="zigbee2mqtt"
+	[pihole]="Pi-Hole"
+	[plex]="Plex media server"
+	[tasmoadmin]="TasmoAdmin"
+	[rtl_433]="RTL_433 to mqtt"
+    [espruinohub]="EspruinoHub"
+
+)
+declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "postgres" "adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub" )
+
+sys_arch=$(uname -m)
+
 #timezones
 timezones() {
 
@@ -67,6 +89,8 @@ function yml_builder() {
 	#if an env file exists check for timezone
 	[ -f "./services/$1/$1.env" ] && timezones ./services/$1/$1.env
 
+	#add new line then append service
+	echo "">>docker-compose.yml
 	cat $service >>docker-compose.yml
 
 	#test for post build
@@ -118,23 +142,34 @@ case $mainmenu_selection in
 	;;
 	#MAINMENU Build stack ------------------------------------------------------------
 "build")
-	container_selection=$(whiptail --title "Container Selection" --notags --separate-output --checklist \
-		"Use the [SPACEBAR] to select which containers you would like to install" 20 78 12 \
-		"portainer" "Portainer" "ON" \
-		"nodered" "Node-RED" "ON" \
-		"influxdb" "InfluxDB" "ON" \
-		"telegraf" "Telegraf (Requires InfluxDB and Mosquitto)" "OFF" \
-		"grafana" "Grafana" "ON" \
-		"mosquitto" "Eclipse-Mosquitto" "ON" \
-		"postgres" "Postgres" "OFF" \
-		"adminer" "Adminer" "OFF" \
-		"openhab" "openHAB" "OFF" \
-		"zigbee2mqtt" "zigbee2mqtt" "OFF" \
-		"pihole" "Pi-Hole" "OFF" \
-		"plex" "Plex media server" "OFF" \
-		"tasmoadmin" "TasmoAdmin" "OFF" \
-		"rtl_433" "RTL_433 to mqtt" "OFF" \
-		3>&1 1>&2 2>&3)
+
+	title=$'Container Selection'
+	message=$'Use the [SPACEBAR] to select which containers you would like to install'
+	entry_options=()
+
+	#check architecture and display appropriate menu
+	if [ $(echo "$sys_arch" | grep -c "arm") ]; then
+		keylist=("${armhf_keys[@]}")
+	else
+		echo "your architecture is not supported yet"
+		exit
+	fi
+
+	#loop through the array of descriptions
+	for index in "${keylist[@]}"; do
+		entry_options+=("$index")
+		entry_options+=("${cont_array[$index]}")
+
+		#check selection
+		if [ -f ./services/selection.txt ]; then
+			[ $(grep "$index" ./services/selection.txt) ] && entry_options+=("ON") || entry_options+=("OFF")
+		else
+			entry_options+=("OFF")
+		fi
+	done
+
+	container_selection=$(whiptail --title "$title" --notags --separate-output --checklist \
+		"$message" 20 78 12 -- "${entry_options[@]}" 3>&1 1>&2 2>&3)
 
 	mapfile -t containers <<<"$container_selection"
 
@@ -144,10 +179,14 @@ case $mainmenu_selection in
 		echo "version: '2'" >docker-compose.yml
 		echo "services:" >>docker-compose.yml
 
+		# store last sellection
+		[ -f ./services/selection.txt ] && rm ./services/selection.txt
+		touch ./services/selection.txt
 		#Run yml_builder of all selected containers
 		for container in "${containers[@]}"; do
 			echo "Adding $container container"
 			yml_builder "$container"
+			echo "$container" >>./services/selection.txt
 		done
 
 		echo "docker-compose successfully created"
@@ -221,6 +260,7 @@ case $mainmenu_selection in
 	"rclone")
 		sudo apt install -y rclone
 		echo "Please run 'rclone config' to configure the rclone google drive backup"
+		
 		#add enable file for rclone
 		[ -d ~/IOTstack/backups ] || sudo mkdir -p ~/IOTstack/backups/
 		sudo touch ~/IOTstack/backups/rclone

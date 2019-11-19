@@ -1,0 +1,6 @@
+  espruinohub:
+    container_name: espruinohub
+    image: humbertosales/espruinohub-docker-rpi
+    network_mode: host
+    privileged: true
+    restart: unless-stopped
