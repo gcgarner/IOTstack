@@ -2,7 +2,8 @@
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
-* BUGFIX disable swap: swapfile recreation on reboot fixed. Re-run from menu to fix.
+* 2019-11-20 BUGFIX influxdb backup: Placing docker_backup in crontab caused influxdb backup not to execute correctly
+* 2019-11-20 BUGFIX disable swap: swapfile recreation on reboot fixed. Re-run from menu to fix.
 * Node-RED: serial port. New template adds privileged which allows acces to serial devices
 * EspurinoHub: is available for testing see wiki entry
 * Menu: Now remembers last stack selection, first build will be blank then the next will select your last containers
@@ -13,16 +14,7 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * Added bash aliases for easier docker stop and start commands
 * The project up procedure has been rewritten #73 (now git pull), please check your duck.sh file because the old method reset it
 * BUGFIX: incorrect permissions in docker_backup: PR @Paraphraser
-* BUGFIX: Timezone not correct on Node-RED and Pihole
-* docker_backup.sh now stores last 5 backups with timestamps : PR @877dev
-* Added Pi-Hole
-* Added zigbee2mqtt (needs wiki) BUG:does not start due to missing device
-* Added rclone for Google Drive Backups
-* Fixed Hass.io (now has a seperate menu installation)
-* Added Telegraf (needs wiki)
-* Plex added
-* Tasmoadmin (needs wiki)
-* Fixed Tasmoadmin not starting after reboot
+
 
 ***
 
