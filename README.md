@@ -2,6 +2,7 @@
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* BUGFIX disable swap: swapfile recreation on reboot fixed. Re-run from menu to fix.
 * Node-RED: serial port. New template adds privileged which allows acces to serial devices
 * EspurinoHub: is available for testing see wiki entry
 * Menu: Now remembers last stack selection, first build will be blank then the next will select your last containers
