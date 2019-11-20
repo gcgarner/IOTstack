@@ -108,7 +108,7 @@ This repo was originally inspired by Andreas Spiess's video on using some of the
 
 # Download the project
 
-1.On the lite image you will need to install git first 
+1.On the lite image you will need to install git first
 
 ```bash
 sudo apt-get install git
@@ -163,11 +163,11 @@ To start the stack run:
 `docker-compose up -d` or `./scripts/start.sh`
 
 To stop:
-`docker-compose down` or `./scripts/stop.sh`
+`docker-compose stop`
 
 The first time you run 'start' the stack docker will download all the images for the web. Depending on how many containers you selected and your internet speed this can take a long while.
 
-The 'docker-compose down' command stops the containers then deletes them. To stop the container but not delete it, run 'docker-compose stop'.
+The `docker-compose down` command stops the containers then deletes them.
 
 ## Persistent data
 
