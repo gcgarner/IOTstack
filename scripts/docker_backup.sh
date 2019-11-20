@@ -61,7 +61,7 @@ if [ -f ./backups/dropbox ]; then
 
 	#list older files to be deleted from cloud (exludes last 7)
 	#to change dropbox backups retained, change below -7 to whatever you want
-	echo "getting older filenames to be deleted from dropbox"
+	echo "checking for old backups on dropbox"
 	files=$($dropboxuploader list $dropboxfolder | awk {' print $3 '} | tail -n +2 | head -n -7)
 
 	#write files to be deleted to dropbox logfile
@@ -70,15 +70,18 @@ if [ -f ./backups/dropbox ]; then
 	echo $files | tr " " "\n" >$dropboxlog
 
 	#delete files from dropbox as per logfile
-	echo "deleting files from dropbox - last 7 files are kept"
-	echo "if less than 7 files are in dropbox you wil see FAILED message below"
-	input=$dropboxlog
-	while IFS= read -r file
-	do
-	    $dropboxuploader delete $dropboxfolder/$file
-	done < "$input"
+	echo "deleting old backups from dropbox if they exist - last 7 files are kept"
 
-	echo "deleted from dropbox" >>$dropboxlog
+	#check older files exist on dropbox, if yes then delete them
+	if [ $( echo "$files" | grep -c "backup") -ne 0 ] ; then	
+		input=$dropboxlog
+		while IFS= read -r file
+		do
+	    	$dropboxuploader delete $dropboxfolder/$file
+		done < "$input"
+	fi
+
+	echo "backups deleted from dropbox" >>$dropboxlog
 
 fi
 
@@ -91,7 +94,6 @@ if [ -f ./backups/rclone ]; then
 	rclone sync -P ./backups --include "/backup*"  gdrive:/IOTstackBU/
 	echo "synch with Google Drive complete"
 fi
-
 
 
 popd
