@@ -1,5 +1,8 @@
 #!/bin/bash
 
+#get path of menu correct
+pushd ~/IOTstack
+
 declare -A cont_array=(
 	[portainer]="Portainer"
 	[nodered]="Node-RED"
@@ -15,10 +18,10 @@ declare -A cont_array=(
 	[plex]="Plex media server"
 	[tasmoadmin]="TasmoAdmin"
 	[rtl_433]="RTL_433 to mqtt"
-    [espruinohub]="EspruinoHub"
+	[espruinohub]="EspruinoHub"
 
 )
-declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "postgres" "adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub" )
+declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "postgres" "adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub")
 
 sys_arch=$(uname -m)
 
@@ -90,7 +93,7 @@ function yml_builder() {
 	[ -f "./services/$1/$1.env" ] && timezones ./services/$1/$1.env
 
 	#add new line then append service
-	echo "">>docker-compose.yml
+	echo "" >>docker-compose.yml
 	cat $service >>docker-compose.yml
 
 	#test for post build
@@ -100,6 +103,21 @@ function yml_builder() {
 	fi
 
 }
+
+#---------------------------------------------------------------------------------------------------
+# Project updates
+echo "checking for project update"
+git fetch origin master
+
+if [ $(git status | grep -c "Your branch is up to date") ]; then
+	[ -f .outofdate ] && rm .outofdate
+
+else
+	if [ ! -f .outofdate ]; then
+		whiptail --title "Project update" --msgbox "An update is available for the project\nYou will not be reminded again until you next update" 8 78
+		touch .outofdate
+	fi
+fi
 
 #---------------------------------------------------------------------------------------------------
 # Menu system starts here
@@ -181,6 +199,8 @@ case $mainmenu_selection in
 
 		# store last sellection
 		[ -f ./services/selection.txt ] && rm ./services/selection.txt
+		#first run service directory wont exist
+		[ -d .services] || mkdir services
 		touch ./services/selection.txt
 		#Run yml_builder of all selected containers
 		for container in "${containers[@]}"; do
@@ -260,7 +280,7 @@ case $mainmenu_selection in
 	"rclone")
 		sudo apt install -y rclone
 		echo "Please run 'rclone config' to configure the rclone google drive backup"
-		
+
 		#add enable file for rclone
 		[ -d ~/IOTstack/backups ] || sudo mkdir -p ~/IOTstack/backups/
 		sudo touch ~/IOTstack/backups/rclone
@@ -346,3 +366,5 @@ case $mainmenu_selection in
 *) ;;
 
 esac
+
+popd

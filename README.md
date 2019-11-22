@@ -2,6 +2,8 @@
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* 2019-11-22 BUGFIX selection.txt failed on fresh install, added pushd IOTstack to menu to ensure correct path
+* 2019-11-22 Added notification into menu if project update is available
 * 2019-11-20 BUGFIX influxdb backup: Placing docker_backup in crontab caused influxdb backup not to execute correctly
 * 2019-11-20 BUGFIX disable swap: swapfile recreation on reboot fixed. Re-run from menu to fix.
 * Node-RED: serial port. New template adds privileged which allows acces to serial devices
