@@ -1,0 +1,8 @@
+  telegraf:
+    container_name: telegraf
+    image: telegraf
+    volumes:
+      - ./services/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
+      - mosquitto

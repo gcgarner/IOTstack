@@ -1,0 +1,22 @@
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "8089:80/tcp"
+      #- "443:443/tcp"
+    env_file:
+      - ./services/pihole/pihole.env
+    volumes:
+       - ./volumes/pihole/etc-pihole/:/etc/pihole/
+       - ./volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+    dns:
+      - 127.0.0.1
+      - 1.1.1.1
+    # Recommended but not required (DHCP needs NET_ADMIN)
+    #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped

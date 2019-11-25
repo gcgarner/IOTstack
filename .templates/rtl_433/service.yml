@@ -1,0 +1,9 @@
+  rtl_433:
+    container_name: rtl_433
+    build: ./services/rtl_433/.
+    env_file:
+      - ./services/rtl_433/rtl_433.env
+    devices:
+      - /dev/bus/usb
+    restart: unless-stopped
+    
