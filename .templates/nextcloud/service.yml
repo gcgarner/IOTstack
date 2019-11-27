@@ -1,0 +1,25 @@
+  nextcloud:
+    image: nextcloud
+    container_name: nextcloud
+    ports:
+      - 9321:80
+    volumes:
+      - ./volumes/nextcloud/html:/var/www/html
+    restart: unless-stopped
+    depends_on: 
+      - nextcloud_db
+    links:
+      - nextcloud_db
+
+  nextcloud_db:
+    image: linuxserver/mariadb
+    container_name: nextcloud_db
+    volumes:
+      - ./volumes/nextcloud/db:/config
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    restart: unless-stopped
+

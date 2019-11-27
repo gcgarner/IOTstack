@@ -1,0 +1,11 @@
+  mariadb:
+    image: linuxserver/mariadb
+    container_name: mariadb
+    env_file:
+      - ./services/mariadb/mariadb.env
+    volumes:
+      - ./volumes/mariadb/config:/config
+    ports:
+      - 3306:3306
+    restart: unless-stopped
+

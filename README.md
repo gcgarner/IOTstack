@@ -2,6 +2,7 @@
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* 2019-11-27 Additions: NextCloud, MariaDB, MotionEye, Mozilla Webthings, blynk-server (fixed issue with selection.txt)
 * 2019-11-22 BUGFIX selection.txt failed on fresh install, added pushd IOTstack to menu to ensure correct path
 * 2019-11-22 Added notification into menu if project update is available
 * 2019-11-20 BUGFIX influxdb backup: Placing docker_backup in crontab caused influxdb backup not to execute correctly
@@ -14,8 +15,6 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * Added RTL_433 native and docker installs
 * Added update project through the menu
 * Added bash aliases for easier docker stop and start commands
-* The project up procedure has been rewritten #73 (now git pull), please check your duck.sh file because the old method reset it
-* BUGFIX: incorrect permissions in docker_backup: PR @Paraphraser
 
 
 ***

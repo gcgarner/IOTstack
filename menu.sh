@@ -11,6 +11,7 @@ declare -A cont_array=(
 	[grafana]="Grafana"
 	[mosquitto]="Eclipse-Mosquitto"
 	[postgres]="Postgres"
+	[mariadb]="MariaDB (MySQL fork)"
 	[adminer]="Adminer"
 	[openhab]="openHAB"
 	[zigbee2mqtt]="zigbee2mqtt"
@@ -19,9 +20,16 @@ declare -A cont_array=(
 	[tasmoadmin]="TasmoAdmin"
 	[rtl_433]="RTL_433 to mqtt"
 	[espruinohub]="EspruinoHub"
+	[motioneye]="motionEye"
+	[webthings_gateway]="Mozilla webthings-gateway"
+	[blynk_server]="blynk-server"
+	[nextcloud]="Next-Cloud"
+	[nginx]="NGINX by linuxserver"
 
 )
-declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "postgres" "adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub")
+declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
+	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
+	"motioneye" "webthings_gateway" "blynk_server" "nextcloud")
 
 sys_arch=$(uname -m)
 
@@ -34,6 +42,17 @@ timezones() {
 	#test for TZ=
 	[ $(grep -c "TZ=" $env_file) -ne 0 ] && sed -i "/TZ=/c\TZ=$TZ" $env_file
 
+}
+
+# this function creates the volumes, services and backup directories. It then assisgns the current user to the ACL to give full read write access
+docker_setfacl() {
+	[ -d ./services ] || mkdir ./services
+	[ -d ./volumes ] || mkdir ./volumes
+	[ -d ./backups ] || mkdir ./backups
+
+	#give current user rwx on the volumes and backups
+	[ $(getfacl ./volumes | grep -c "default:user:$USER") -eq 0 ] && sudo setfacl -Rdm u:$USER:rwx ./volumes
+	[ $(getfacl ./backups | grep -c "default:user:$USER") -eq 0 ] && sudo setfacl -Rdm u:$USER:rwx ./backups
 }
 
 #future function add password in build phase
@@ -197,10 +216,13 @@ case $mainmenu_selection in
 		echo "version: '2'" >docker-compose.yml
 		echo "services:" >>docker-compose.yml
 
+		#set the ACL for the stack
+		docker_setfacl
+
 		# store last sellection
 		[ -f ./services/selection.txt ] && rm ./services/selection.txt
 		#first run service directory wont exist
-		[ -d .services] || mkdir services
+		[ -d ./services ] || mkdir services
 		touch ./services/selection.txt
 		#Run yml_builder of all selected containers
 		for container in "${containers[@]}"; do
