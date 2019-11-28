@@ -6,6 +6,7 @@ IOTstack is a builder for docker-compose to easily make and maintain IoT stacks 
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* 2019-11-28 PR @stfnhmplr added diyHue
 * 2019-11-28 Fixed update notification on menu
 * 2019-11-28 Fixed mosquitto logs and database not mapping correctly to volumes. Pull new template to fix
 * 2019-11-28 added the option to disable swapfile by setting swappiness to 0
@@ -37,11 +38,11 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 
 ## Coming soon
 
+* reverse proxy is now next on the list, I cant keep up with the ports
 * Detection of arhcitecture for seperate stack options for amd64, armhf, i386
 * autocleanup of backups on cloud
-* reverse proxy
-* python contaienr
-* Gitea
+* python container
+* Gitea (in testing branch)
 * OwnCloud
 
 ***
