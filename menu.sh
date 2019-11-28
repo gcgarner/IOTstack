@@ -135,10 +135,13 @@ function yml_builder() {
 echo "checking for project update"
 git fetch origin master
 
-if [ $(git status | grep -c "Your branch is up to date") ]; then
+if [ $(git status | grep -c "Your branch is up to date") -eq 1 ]; then
+	#delete .outofdate if it exisist
 	[ -f .outofdate ] && rm .outofdate
+	echo "Project is up to date"
 
 else
+	echo "An update is available for the project"
 	if [ ! -f .outofdate ]; then
 		whiptail --title "Project update" --msgbox "An update is available for the project\nYou will not be reminded again until you next update" 8 78
 		touch .outofdate

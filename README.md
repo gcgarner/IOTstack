@@ -6,6 +6,7 @@ IOTstack is a builder for docker-compose to easily make and maintain IoT stacks 
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* 2019-11-28 Fixed update notification on menu because
 * 2019-11-28 Fixed mosquitto logs and database not mapping correctly to volumes. Pull new template to fix
 * 2019-11-28 added the option to disable swapfile by setting swappiness to 0
 * 2019-11-28 PR @stfnhmplr fixed incorrect shegang on MariaDB terminal.sh
