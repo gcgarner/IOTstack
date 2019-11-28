@@ -105,7 +105,11 @@ Please direct all feature requests to [Discord](https://discord.gg/W45tD83)
 
 This repo was originally inspired by Andreas Spiess's video on using some of these tools. Some containers have been added to extend its functionality.
 
-[YouTube video](https://www.youtube.com/watch?v=JdV4x925au0): This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see note below
+[YouTube video](https://www.youtube.com/watch?v=JdV4x925au0): This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see the wiki under Docker Networks.
+
+### YouTube guide
+
+@peyanski (Kiril) made a YouTube video on getting started using the project, check it out [here](https://youtu.be/5JMNHuHv134)
 
 ## Download the project
 
@@ -188,4 +192,4 @@ If you use some of the tools in the project please consider donating or contribu
 
 ### Thanks
 
-@mrmx, @oscrx, @brianimmel, @Slyke, @AugustasV, @Paulf007, @affankingkhan, @877dev, @Paraphraser, @stfnhmplr
+@mrmx, @oscrx, @brianimmel, @Slyke, @AugustasV, @Paulf007, @affankingkhan, @877dev, @Paraphraser, @stfnhmplr, @peyanski
