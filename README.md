@@ -2,6 +2,7 @@
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* 2019-11-28 Added native install for RPIEasy
 * 2019-11-27 Additions: NextCloud, MariaDB, MotionEye, Mozilla Webthings, blynk-server (fixed issue with selection.txt)
 * 2019-11-22 BUGFIX selection.txt failed on fresh install, added pushd IOTstack to menu to ensure correct path
 * 2019-11-22 Added notification into menu if project update is available
@@ -15,7 +16,6 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * Added RTL_433 native and docker installs
 * Added update project through the menu
 * Added bash aliases for easier docker stop and start commands
-
 
 ***
 
@@ -31,12 +31,9 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 
 * Detection of arhcitecture for seperate stack options for amd64, armhf, i386
 * autocleanup of backups on cloud
-* motioneye
 * reverse proxy
 * python contaienr
-* webthings gateway
 * Gitea
-* NextCloud
 * OwnCloud
 
 ***

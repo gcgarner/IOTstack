@@ -272,6 +272,7 @@ case $mainmenu_selection in
 			echo "aliases already added"
 		fi
 		source ~/.bashrc
+		echo "aliases will be available after a reboot"
 		;;
 	esac
 	;;
@@ -377,11 +378,15 @@ case $mainmenu_selection in
 	native_selections=$(whiptail --title "Native installs" --menu --notags \
 		"Install local applications" 20 78 12 -- \
 		"rtl_433" "RTL_433" \
+		"rpieasy" "RPIEasy" \
 		3>&1 1>&2 2>&3)
 
 	case $native_selections in
 	"rtl_433")
 		bash ./.native/rtl_433.sh
+		;;
+	"rpieasy")
+		bash ./.native/rpieasy.sh
 		;;
 	esac
 	;;
