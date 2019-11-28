@@ -25,11 +25,12 @@ declare -A cont_array=(
 	[blynk_server]="blynk-server"
 	[nextcloud]="Next-Cloud"
 	[nginx]="NGINX by linuxserver"
+	[gitea]="Gitea Simple Git server"
 
 )
 declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
 	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud")
+	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "gitea")
 
 sys_arch=$(uname -m)
 

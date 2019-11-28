@@ -1,0 +1,33 @@
+  gitea:
+    build: ./services/gitea/.
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - DB_TYPE=postgres
+      - DB_HOST=gitea_db:5432
+      - DB_NAME=gitea
+      - DB_USER=gitea
+      - DB_PASSWD=gitea
+    restart: unless-stopped
+    volumes:
+      - ./volumes/gitea/data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+      - "222:22"
+    depends_on:
+      - gitea_db
+
+  gitea_db:
+    image: postgres:9.6
+    container_name: gitea_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    volumes:
+      - ./volumes/gitea/postgres:/var/lib/postgresql/data
+
