@@ -312,11 +312,14 @@ case $mainmenu_selection in
 	;;
 	#MAINMENU Misc commands------------------------------------------------------------
 "misc")
-	misc_sellection=$(whiptail --title "Miscellaneous Commands" --menu --notags \
-		"Some helpful commands" 20 78 12 -- \
-		"swap" "Disable swap" \
-		"log2ram" "install log2ram to decrease load on sd card, moves /var/log into ram" \
-		3>&1 1>&2 2>&3)
+	misc_sellection=$(
+		whiptail --title "Miscellaneous Commands" --menu --notags \
+			"Some helpful commands" 20 78 12 -- \
+			"swap" "Disable swap by uninstalling swapfile" \
+			"swappiness" "Disable swap by setting swappiness to 0" \
+			"log2ram" "install log2ram to decrease load on sd card, moves /var/log into ram" \
+			3>&1 1>&2 2>&3
+	)
 
 	case $misc_sellection in
 	"swap")
@@ -326,6 +329,18 @@ case $mainmenu_selection in
 		sudo systemctl disable dphys-swapfile
 		#sudo apt-get remove dphys-swapfile
 		echo "Swap file has been removed"
+		;;
+	"swappiness")
+		if [ $(grep -c swappiness /etc/sysctl.conf) -eq 0 ]; then
+			echo "vm.swappiness=0" | sudo tee -a /etc/sysctl.conf
+			echo "updated /etc/sysctl.conf with vm.swappiness=0"
+		else
+			sudo sed -i "/vm.swappiness/c\vm.swappiness=0" /etc/sysctl.conf
+			echo "vm.swappiness found in /etc/sysctl.conf update to 0"
+		fi
+
+		sudo sysctl vm.swappiness=0
+		echo "set swappiness to 0 for immediate effect"
 		;;
 	"log2ram")
 		if [ ! -d ~/log2ram ]; then
