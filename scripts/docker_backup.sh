@@ -9,8 +9,8 @@ echo "./docker-compose.yml" >list.txt
 echo "./services/" >>list.txt
 echo "./volumes/" >>list.txt
 
-#if influxdb folder exists then back it up
-if [ -d ./volumes/influxdb ]; then
+#if influxdb is running
+if [ $(docker ps | grep -c influxdb) -gt 0 ]; then
 	./scripts/backup_influxdb.sh
 	echo "./backups/influxdb/" >>list.txt
 fi
@@ -24,6 +24,7 @@ echo "compressing stack folders"
 sudo tar -czf \
 	./backups/$backupfile \
 	--exclude=./volumes/influxdb/* \
+	--exclude=./volumes/nextcloud/* \
 	-T list.txt
 
 rm list.txt

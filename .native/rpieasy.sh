@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 
 echo "Updating and installing requirements"
 sudo apt-get update && sudo apt-get install -y python3-pip screen alsa-utils wireless-tools wpasupplicant zip unzip git
