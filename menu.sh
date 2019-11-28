@@ -121,6 +121,13 @@ function yml_builder() {
 		bash ./.templates/$1/build.sh
 	fi
 
+	#test for directoryfix.sh
+	if [ -f ./.templates/$1/directoryfix.sh ]; then
+		chmod +x ./.templates/$1/directoryfix.sh
+		echo "...Running directoryfix.sh on $1"
+		bash ./.templates/$1/directoryfix.sh
+	fi
+
 }
 
 #---------------------------------------------------------------------------------------------------

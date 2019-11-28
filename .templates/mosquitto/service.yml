@@ -2,10 +2,12 @@
     container_name: mosquitto
     image: eclipse-mosquitto
     restart: unless-stopped
-    user: "0"
+    user: "1883"
     ports:
       - 1883:1883
       - 9001:9001
     volumes:
-      - ./volumes/mosquitto/:/mosquitto/
+      - ./volumes/mosquitto/data:/mosquitto/data
+      - ./volumes/mosquitto/log:/mosquitto/log
       - ./services/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
