@@ -6,6 +6,8 @@ IOTstack is a builder for docker-compose to easily make and maintain IoT stacks 
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* 2019-12-03 BUGFIX Mosquitto: Fixed issue where mosquitto failded to start as a result of 11-28 change
+* 2019-12-03 Added terminal for postgres, temporarily removed setfacl from menu
 * 2019-11-28 PR @stfnhmplr added diyHue
 * 2019-11-28 Fixed update notification on menu
 * 2019-11-28 Fixed mosquitto logs and database not mapping correctly to volumes. Pull new template to fix
@@ -22,9 +24,6 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * Menu: Now remembers last stack selection, first build will be blank then the next will select your last containers
 * BUGFIX: fixed issue where rsync gave issue on 'Preserve Environment and Config files'
 * BUGFIX: I incorrecly changed mosquittos volume mapping and it caused the container to restart. Reverted to the old volume mapping
-* Added RTL_433 native and docker installs
-* Added update project through the menu
-* Added bash aliases for easier docker stop and start commands
 
 ***
 

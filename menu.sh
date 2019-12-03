@@ -129,6 +129,9 @@ function yml_builder() {
 		bash ./.templates/$1/directoryfix.sh
 	fi
 
+	#make sure terminal.sh is executable
+	[ -f ./services/$1/terminal.sh ] && chmod +x ./services/$1/terminal.sh
+
 }
 
 #---------------------------------------------------------------------------------------------------
@@ -228,7 +231,7 @@ case $mainmenu_selection in
 		echo "services:" >>docker-compose.yml
 
 		#set the ACL for the stack
-		docker_setfacl
+		#docker_setfacl
 
 		# store last sellection
 		[ -f ./services/selection.txt ] && rm ./services/selection.txt
