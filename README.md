@@ -6,7 +6,11 @@ IOTstack is a builder for docker-compose to easily make and maintain IoT stacks 
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
-* 2019-12-03 BUGFIX Mosquitto: Fixed issue where mosquitto failded to start as a result of 11-28 change
+* 2019-12-12 modified zigbee2mqtt template file
+* 2019-12-12 Added Function to add custom containers to the stack
+* 2019-12-12 PR cmskedgell: Added Homebridge
+* 2019-12-12 PR 877dev: Added trimming of online backups
+* 2019-12-03 BUGFIX Mosquitto: Fixed issue where mosquitto failed to start as a result of 11-28 change
 * 2019-12-03 Added terminal for postgres, temporarily removed setfacl from menu
 * 2019-11-28 PR @stfnhmplr added diyHue
 * 2019-11-28 Fixed update notification on menu
@@ -21,9 +25,7 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * 2019-11-20 BUGFIX disable swap: swapfile recreation on reboot fixed. Re-run from menu to fix.
 * Node-RED: serial port. New template adds privileged which allows acces to serial devices
 * EspurinoHub: is available for testing see wiki entry
-* Menu: Now remembers last stack selection, first build will be blank then the next will select your last containers
-* BUGFIX: fixed issue where rsync gave issue on 'Preserve Environment and Config files'
-* BUGFIX: I incorrecly changed mosquittos volume mapping and it caused the container to restart. Reverted to the old volume mapping
+
 
 ***
 
@@ -71,6 +73,7 @@ This Docker stack consists of:
 * MotionEye
 * MariaDB
 * Plex
+* Homebridge
 
 In addition, there is a write-up and some scripts to get a dynamic DNS via duckdns and VPN up and running.
 
@@ -193,4 +196,4 @@ If you use some of the tools in the project please consider donating or contribu
 
 ### Thanks
 
-@mrmx, @oscrx, @brianimmel, @Slyke, @AugustasV, @Paulf007, @affankingkhan, @877dev, @Paraphraser, @stfnhmplr, @peyanski
+@mrmx, @oscrx, @brianimmel, @Slyke, @AugustasV, @Paulf007, @affankingkhan, @877dev, @Paraphraser, @stfnhmplr, @peyanski, @cmskedgell
