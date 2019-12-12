@@ -26,11 +26,12 @@ declare -A cont_array=(
 	[nextcloud]="Next-Cloud"
 	[nginx]="NGINX by linuxserver"
 	[diyhue]="diyHue"
+	[homebridge]="Homebridge"
 
 )
 declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
 	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue")
+	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge")
 
 sys_arch=$(uname -m)
 
