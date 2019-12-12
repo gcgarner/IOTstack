@@ -74,40 +74,42 @@ function command_exists() {
 
 #function copies the template yml file to the local service folder and appends to the docker-compose.yml file
 function yml_builder() {
+
 	service="services/$1/service.yml"
 
 	[ -d ./services/ ] || mkdir ./services/
 
-	if [ -d ./services/$1 ]; then
-		#directory already exists prompt user to overwrite
-		sevice_overwrite=$(whiptail --radiolist --title "Overwrite Option" --notags \
-			"$1 service directory has been detected, use [SPACEBAR] to select you overwrite option" 20 78 12 \
-			"none" "Do not overwrite" "ON" \
-			"env" "Preserve Environment and Config files" "OFF" \
-			"full" "Pull full service from template" "OFF" \
-			3>&1 1>&2 2>&3)
+		if [ -d ./services/$1 ]; then
+			#directory already exists prompt user to overwrite
+			sevice_overwrite=$(whiptail --radiolist --title "Overwrite Option" --notags \
+				"$1 service directory has been detected, use [SPACEBAR] to select you overwrite option" 20 78 12 \
+				"none" "Do not overwrite" "ON" \
+				"env" "Preserve Environment and Config files" "OFF" \
+				"full" "Pull full service from template" "OFF" \
+				3>&1 1>&2 2>&3)
 
-		case $sevice_overwrite in
+			case $sevice_overwrite in
 
-		"full")
+			"full")
+				echo "...pulled full $1 from template"
+				rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh'
+				;;
+			"env")
+				echo "...pulled $1 excluding env file"
+				rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh' --exclude '$1.env' --exclude '*.conf'
+				;;
+			"none")
+				echo "...$1 service not overwritten"
+				;;
+
+			esac
+
+		else
+			mkdir ./services/$1
 			echo "...pulled full $1 from template"
 			rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh'
-			;;
-		"env")
-			echo "...pulled $1 excluding env file"
-			rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh' --exclude '$1.env' --exclude '*.conf'
-			;;
-		"none")
-			echo "...$1 service not overwritten"
-			;;
+		fi
 
-		esac
-
-	else
-		mkdir ./services/$1
-		echo "...pulled full $1 from template"
-		rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh'
-	fi
 
 	#if an env file exists check for timezone
 	[ -f "./services/$1/$1.env" ] && timezones ./services/$1/$1.env
@@ -245,9 +247,21 @@ case $mainmenu_selection in
 			echo "$container" >>./services/selection.txt
 		done
 
+		# add custom containers
+		if [ -f ./services/custom.txt ]; then
+			if (whiptail --title "Custom Container detected" --yesno "custom.txt has been detected do you want to add these containers to the stack?" 20 78); then
+				mapfile -t containers <<<$(cat ./services/custom.txt)
+				for container in "${containers[@]}"; do
+					echo "Adding $container container"
+					yml_builder "$container"
+				done
+			fi
+		fi
+
 		echo "docker-compose successfully created"
 		echo "run 'docker-compose up -d' to start the stack"
 	else
+
 		echo "Build cancelled"
 
 	fi
