@@ -6,6 +6,7 @@ IOTstack is a builder for docker-compose to easily make and maintain IoT stacks 
 
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
+* 2019-12-19 Added python container, tweaked update script
 * 2019-12-12 modified zigbee2mqtt template file
 * 2019-12-12 Added Function to add custom containers to the stack
 * 2019-12-12 PR cmskedgell: Added Homebridge
@@ -26,7 +27,6 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * Node-RED: serial port. New template adds privileged which allows acces to serial devices
 * EspurinoHub: is available for testing see wiki entry
 
-
 ***
 
 ## Highlighted topics
@@ -42,7 +42,6 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * reverse proxy is now next on the list, I cant keep up with the ports
 * Detection of arhcitecture for seperate stack options for amd64, armhf, i386
 * autocleanup of backups on cloud
-* python container
 * Gitea (in testing branch)
 * OwnCloud
 

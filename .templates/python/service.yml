@@ -1,0 +1,7 @@
+  python:
+    container_name: python
+    build: ./services/python/.
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+      - ./volumes/python/app:/usr/src/app
