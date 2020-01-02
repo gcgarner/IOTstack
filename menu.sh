@@ -5,6 +5,7 @@ pushd ~/IOTstack
 
 declare -A cont_array=(
 	[portainer]="Portainer"
+	[portainer_agent]="Portainer agent"
 	[nodered]="Node-RED"
 	[influxdb]="InfluxDB"
 	[telegraf]="Telegraf (Requires InfluxDB and Mosquitto)"
@@ -32,7 +33,7 @@ declare -A cont_array=(
 )
 declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
 	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python")
+	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python" "portainer_agent")
 
 sys_arch=$(uname -m)
 
