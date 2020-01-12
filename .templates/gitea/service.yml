@@ -1,0 +1,14 @@
+  gitea:
+    container_name: gitea
+    image: kapdap/gitea-rpi
+    restart: unless-stopped
+    user: "0"
+    ports:
+      - "7920:3000/tcp"
+      - "2222:22/tcp"
+    env_file:
+      - ./services/gitea/gitea.env
+    volumes:
+      - ./volumes/gitea/data:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
