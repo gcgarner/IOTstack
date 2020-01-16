@@ -1,0 +1,14 @@
+  domoticz:
+    container_name: domoticz
+    image: linuxserver/domoticz:stable
+    ports:
+      - "8080:8080"
+      - "6144:6144"
+      - "1443:1443"
+    volumes:
+      - ./volumes/domoticz/data:/config
+    env_file:
+      - ./services/domoticz/domoticz.env      
+    restart: unless-stopped
+    network_mode: bridge
+    
