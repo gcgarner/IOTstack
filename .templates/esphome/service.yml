@@ -1,0 +1,14 @@
+  esphome:
+    container_name: esphome
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - HOME = "/"
+    image: esphome/esphome-armv7:latest
+    ports:
+      - "6052:6052"
+      - "6123:6123"
+    volumes:
+      - ./volumes/esphome:/config:rw
+    command: config/ dashboard
+
