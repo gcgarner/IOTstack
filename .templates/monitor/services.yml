@@ -1,0 +1,9 @@
+  monitor:
+    container_name: Monitor
+    network_mode: host
+    privileged: true
+    restart: unless-stopped
+    image: mashupmill/presence-monitor:latest
+    volumes:
+      - ./volumes/monitor:/config
+      - /etc/localtime:/etc/localtime:ro
