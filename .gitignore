@@ -1,4 +1,4 @@
-#ignore data folders for containers test sl
+#ignore data folders for containers
 /services/
 /volumes/
 /backups/
