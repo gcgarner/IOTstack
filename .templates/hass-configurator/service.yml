@@ -1,0 +1,11 @@
+  hassconfig:
+    container_name: HASS-Configurator
+    restart: unless-stopped
+    image: marthoc/hass-configurator:latest
+    volumes:
+      - ./volumes/hassio/homeassistant:/hass-config
+      - ./volumes/hass-configurator:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3218:3218"
+

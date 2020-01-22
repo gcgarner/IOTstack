@@ -1,0 +1,10 @@
+  duplicati:
+    container_name: Duplicati
+    restart: unless-stopped
+    image: lsioarmhf/duplicati
+    network_mode: host
+    volumes:
+      - /:/source
+      - ./volumes/duplicati:/config
+      - /etc/localtime:/etc/localtime:ro
+ 
