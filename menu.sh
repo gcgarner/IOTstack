@@ -231,7 +231,7 @@ case $mainmenu_selection in
 	#if no container is selected then dont overwrite the docker-compose.yml file
 	if [ -n "$container_selection" ]; then
 		touch docker-compose.yml
-		echo "version: '2'" >docker-compose.yml
+		echo "version: '3.7'" >docker-compose.yml
 		echo "services:" >>docker-compose.yml
 
 		#set the ACL for the stack
