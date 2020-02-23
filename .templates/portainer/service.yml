@@ -3,7 +3,13 @@
     image: portainer/portainer
     restart: unless-stopped
     ports:
-      - 9000:9000
+    #  - 9000:9000
+      - 9443:9000
     volumes:
+      - /etc/0_scripts:/certs
       - /var/run/docker.sock:/var/run/docker.sock
       - ./volumes/portainer/data:/data
+    command:
+      --ssl
+      --sslcert /certs/portainer.crt
+      --sslkey /certs/portainer.key
