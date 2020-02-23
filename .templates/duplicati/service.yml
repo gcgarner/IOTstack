@@ -1,11 +1,17 @@
   duplicati:
     container_name: Duplicati
     restart: unless-stopped
-    image: lsioarmhf/duplicati
+    image: linuxserver/duplicati
     network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
     #ports:
     #  - 8200:8200
     volumes:
+      - /etc:/etc_host
+      - /home/pi/Scripts:/pi_scripts
       - /:/source
       - ./volumes/duplicati:/config
       - /etc/localtime:/etc/localtime:ro
