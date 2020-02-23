@@ -3,6 +3,8 @@
     restart: unless-stopped
     image: lsioarmhf/duplicati
     network_mode: host
+    #ports:
+    #  - 8200:8200
     volumes:
       - /:/source
       - ./volumes/duplicati:/config
