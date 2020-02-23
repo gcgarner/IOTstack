@@ -6,7 +6,7 @@
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Europe/London
+      - TZ=Europe/Rome
     #ports:
     #  - 8200:8200
     volumes:
