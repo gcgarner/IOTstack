@@ -1,8 +1,5 @@
 #!/bin/bash
 
-echo "Stopping containers"
-docker-compose down
-
 echo "Downloading latest images from docker hub ... this can take a long time"
 docker-compose pull
 
