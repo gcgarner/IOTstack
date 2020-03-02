@@ -1,4 +1,4 @@
-deconz:
+  deconz:
     image: marthoc/deconz
     container_name: deconz
     restart: unless-stopped
