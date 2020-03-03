@@ -15,6 +15,7 @@ declare -A cont_array=(
 	[adminer]="Adminer"
 	[openhab]="openHAB"
 	[zigbee2mqtt]="zigbee2mqtt"
+	[deconz]="deCONZ"
 	[pihole]="Pi-Hole"
 	[plex]="Plex media server"
 	[tasmoadmin]="TasmoAdmin"
@@ -31,7 +32,7 @@ declare -A cont_array=(
 
 )
 declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
-	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
+	"adminer" "openhab" "zigbee2mqtt" "deconz" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
 	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python")
 
 sys_arch=$(uname -m)
