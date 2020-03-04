@@ -1,5 +1,5 @@
   duplicati:
-    container_name: Duplicati
+    container_name: duplicati
     restart: unless-stopped
     image: linuxserver/duplicati
     network_mode: host
@@ -7,8 +7,8 @@
       - PUID=1000
       - PGID=1000
       - TZ=Europe/Rome
-    #ports:
-    #  - 8200:8200
+    ports:
+      - 8200:8200
     volumes:
       - /etc:/etc_host
       - /home/pi/Scripts:/pi_scripts
