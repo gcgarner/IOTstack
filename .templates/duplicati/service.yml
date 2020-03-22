@@ -10,11 +10,7 @@
     ports:
       - 8200:8200
     volumes:
-      - /etc:/etc_host
-      - /home/pi/Scripts:/pi_scripts
-      - /home/pi/IOTstack/volumes:/iot_stack_volumes
-      - ./volumes/duplicati_source:/source
-      - ./volumes/duplicati_backups:/backups
+      - /:/source
       - ./volumes/duplicati:/config
       - /etc/localtime:/etc/localtime:ro
  
