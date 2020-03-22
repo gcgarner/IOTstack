@@ -1,0 +1,9 @@
+  homeassistant:
+    container_name: home-assistant
+    image: homeassistant/raspberrypi4-homeassistant
+    volumes:
+      - ./volumes/homeassistant:/config
+    environment:
+      - TZ=Europe/Rome
+    restart: always
+    network_mode: host

@@ -1,0 +1,9 @@
+  valetudomap:
+    container_name: ValetudoMap
+    restart: unless-stopped
+    image: dmkif/icantbelieveitsnotvaletudo:latest-arm
+    depends_on:
+      - "mosquitto"
+    volumes:
+      - ./volumes/valetudomap/config.json:/app/config.json
+

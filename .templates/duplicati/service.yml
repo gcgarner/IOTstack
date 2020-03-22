@@ -1,0 +1,16 @@
+  duplicati:
+    container_name: duplicati
+    restart: unless-stopped
+    image: linuxserver/duplicati
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Rome
+    ports:
+      - 8200:8200
+    volumes:
+      - /:/source
+      - ./volumes/duplicati:/config
+      - /etc/localtime:/etc/localtime:ro
+ 

@@ -4,8 +4,8 @@
     restart: unless-stopped
     user: "1883"
     ports:
-      - 1883:1883
-      - 9001:9001
+      - '1883:1883'
+      - '9001:9001'
     volumes:
       - ./volumes/mosquitto/data:/mosquitto/data
       - ./volumes/mosquitto/log:/mosquitto/log
