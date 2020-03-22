@@ -117,6 +117,9 @@ function yml_builder() {
 	#if an env file exists check for timezone
 	[ -f "./services/$1/$1.env" ] && timezones ./services/$1/$1.env
 
+    # if a volumes.yml exists, append to overall volumes.yml file
+    [ -f "./services/$1/volumes.yml" ] && cat "./services/$1/volumes.yml" >> docker-volumes.yml
+
 	#add new line then append service
 	echo "" >>docker-compose.yml
 	cat $service >>docker-compose.yml
@@ -259,6 +262,14 @@ case $mainmenu_selection in
 					yml_builder "$container"
 				done
 			fi
+		fi
+		
+		# if a container needs volume, put it at the end of docker-compose
+		if [ -f docker-volumes.yml ]; then
+			echo "" >> docker-compose.yml
+			echo "volumes:" >> docker-compose.yml
+			cat docker-volumes.yml >> docker-compose.yml
+			rm docker-volumes.yml
 		fi
 
 		echo "docker-compose successfully created"
