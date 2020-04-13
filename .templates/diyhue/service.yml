@@ -9,6 +9,9 @@
       # - "443:443/tcp"
     env_file:
       - ./services/diyhue/diyhue.env
+    environment:
+      - VIRTUAL_HOST=~^diyhue\..*\.xip\.io
+      - VIRTUAL_PORT=8070
     volumes:
        - ./volumes/diyhue/:/opt/hue-emulator/export/
     restart: unless-stopped

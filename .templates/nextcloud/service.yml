@@ -10,6 +10,9 @@
       - nextcloud_db
     links:
       - nextcloud_db
+    environment:
+      - VIRTUAL_HOST=~^nextcloud\..*\.xip\.io
+      - VIRTUAL_PORT=9321
 
   nextcloud_db:
     image: linuxserver/mariadb

@@ -7,6 +7,9 @@
       - 3000:3000
     env_file:
       - ./services/grafana/grafana.env
+    environment:
+      - VIRTUAL_HOST=~^grafana\..*\.xip\.io
+      - VIRTUAL_PORT=3000
     volumes:
       - ./volumes/grafana/data:/var/lib/grafana
       - ./volumes/grafana/log:/var/log/grafana
