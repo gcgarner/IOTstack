@@ -1,0 +1,49 @@
+ # As described in https://github.com/nginx-proxy/nginx-proxy. We use separate containers.
+ # The HTTPS implementation as documented here: https://medium.com/@francoisromain/host-multiple-websites-with-https-inside-docker-containers-on-a-single-server-18467484ab95
+ # We are using xip.io to be able make subdomains for IP address. So the nodered service can be accessed:
+ #   nodered.X.X.X.X.xip.org where X.X.X.X is the IP address of IOTstack. Any other domain can be used, on that case please
+ # replace VIRTUAL_HOST env variable of the given instance with the coresponding value.
+
+  nginx-proxy:
+    image: nginx
+    container_name: nginx-proxy
+    network_mode: host
+    restart: unless-stopped  # Always restart container
+    ports:
+      - "80:80"      # Port mappings in format host:container
+      - "443:443"
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"   # Label needed for Let's Encrypt companion container
+    volumes:   # Volumes needed for container to configure proixes and access certificates genereated by Let's Encrypt companion container
+      - "./volumes/nginx-proxy/nginx-conf:/etc/nginx/conf.d"
+      - "./volumes/nginx-proxy/nginx-vhost:/etc/nginx/vhost.d"
+      - "./volumes/nginx-proxy/html:/usr/share/nginx/html"
+      - "./volumes/nginx-proxy/certs:/etc/nginx/certs:ro"
+      - "./volumes/nginx-proxy/log:/var/log/nginx"
+
+  nginx-gen:
+    image: ajoubert/docker-gen-arm
+    command: -notify-sighup nginx-proxy -watch -wait 5s:30s /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf
+    container_name: nginx-gen
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - "./volumes/nginx-proxy/nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro"
+      - "./volumes/nginx-proxy/nginx-conf:/etc/nginx/conf.d"
+      - "./volumes/nginx-proxy/nginx-vhost:/etc/nginx/vhost.d"
+      - "./volumes/nginx-proxy/html:/usr/share/nginx/html"
+      - "./volumes/nginx-proxy/certs:/etc/nginx/certs:ro"
+
+  nginx-letsencrypt:
+    image: budry/jrcs-letsencrypt-nginx-proxy-companion-arm
+    container_name: nginx-letsencrypt
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - "./volumes/nginx-proxy/nginx-conf:/etc/nginx/conf.d"
+      - "./volumes/nginx-proxy/nginx-vhost:/etc/nginx/vhost.d"
+      - "./volumes/nginx-proxy/html:/usr/share/nginx/html"
+      - "./volumes/nginx-proxy/certs:/etc/nginx/certs:rw"
+    environment:
+      NGINX_DOCKER_GEN_CONTAINER: "nginx-gen"
+      NGINX_PROXY_CONTAINER: "nginx-proxy"

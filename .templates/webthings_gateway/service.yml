@@ -7,6 +7,9 @@
     # - 4443:4443
     #devices:
     # - /dev/ttyACM0:/dev/ttyACM0
+    #environment:
+    #  - VIRTUAL_HOST=~^webthings\..*\.xip\.io
+    #  - VIRTUAL_PORT=8080
     volumes:
       - ./volumes/webthings_gateway/share:/home/node/.mozilla-iot
 

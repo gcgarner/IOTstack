@@ -5,6 +5,9 @@
     user: "0"
     privileged: true
     env_file: ./services/nodered/nodered.env
+    environment:
+      - VIRTUAL_HOST=~^nodered\..*\.xip\.io
+      - VIRTUAL_PORT=1880
     ports:
       - 1880:1880
     volumes:

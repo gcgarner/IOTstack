@@ -8,6 +8,9 @@
       - 2003:2003
     env_file:
       - ./services/influxdb/influxdb.env
+    environment:
+      - VIRTUAL_HOST=~^influxdb\..*\.xip\.io
+      - VIRTUAL_PORT=8086
     volumes:
       - ./volumes/influxdb/data:/var/lib/influxdb
       - ./backups/influxdb/db:/var/lib/influxdb/backup

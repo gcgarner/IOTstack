@@ -9,6 +9,9 @@
       #- "443:443/tcp"
     env_file:
       - ./services/pihole/pihole.env
+    environment:
+      - VIRTUAL_HOST=~^pihole\..*\.xip\.io
+      - VIRTUAL_PORT=8089
     volumes:
        - ./volumes/pihole/etc-pihole/:/etc/pihole/
        - ./volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
