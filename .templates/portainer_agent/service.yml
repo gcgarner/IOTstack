@@ -1,6 +1,6 @@
   portainer_agent:
     image: portainer/agent
-    container_name: agent
+    container_name: portainer-agent
     ports:
       - 9002:9001
     volumes:

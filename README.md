@@ -59,6 +59,7 @@ This Docker stack consists of:
 * Postgres
 * Mosquitto mqtt
 * Portainer
+* Portainer agent
 * Adminer
 * openHAB
 * Home Assistant (HASSIO)
