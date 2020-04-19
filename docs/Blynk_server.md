@@ -1,3 +1,4 @@
+# Blynk server
 This is a custom implementation of Blynk Server
 
 ```yml
@@ -21,7 +22,7 @@ When setting up the application on your mobile be sure to select custom setup [h
 
 Writeup From @877dev
 
-**Getting started:**
+## Getting started
 Log into admin panel at https://youripaddress:9443/admin
 (Use your Pi's IP address, and ignore Chrome warning).
 
@@ -29,22 +30,22 @@ Default credentials:
 user:admin@blynk.cc
 pass:admin
 
-**Change username and password:**
+## Change username and password
 Click on Users > "email address" and edit email, name and password. 
 Save changes
 Restarting the container using Portainer may be required to take effect.
 
-**Setup gmail:**
+## Setup gmail
 Optional step, useful for getting the auth token emailed to you.
 (To be added once confirmed working....)
 
-**iOS/Android app setup:**
+## iOS/Android app setup
 Login the app as per the photos [HERE](https://github.com/blynkkk/blynk-server#app-and-sketch-changes)
 Press "New Project"
 Give it a name, choose device "Raspberry Pi 3 B" so you have plenty of [virtual pins](http://help.blynk.cc/en/articles/512061-what-is-virtual-pins) available, and lastly select WiFi.
 Create project and the [auth token](https://docs.blynk.cc/#getting-started-getting-started-with-the-blynk-app-4-auth-token) will be emailed to you (if emails configured). You can also find the token in app under the phone app settings, or in the admin web interface by clicking Users>"email address" and scroll down to token.
 
-**Quick usage guide for app:**
+## Quick usage guide for app
 Press on the empty page, the widgets will appear from the right.
 Select your widget, let's say a button.
 It appears on the page, press on it to configure.
@@ -55,7 +56,7 @@ To start the project running, press top right Play button.
 You will get an offline message, because no devices are connected to your project via the token.
 Enter node red.....
 
-**Node red:**
+## Node red
 Install node-red-contrib-blynk-ws from pallette manager
 Drag a "write event" node into your flow, and connect to a debug node
 Configure the Blynk node for the first time:
@@ -64,7 +65,7 @@ Enter your [auth token](https://docs.blynk.cc/#getting-started-getting-started-w
 When you deploy the flow, notice the app shows connected message, as does the Blynk node.
 Press the button on the app, you will notice the payload is sent to the debug node.
 
-**What next?**
+## What next?
 Further information and advanced setup:
 https://github.com/blynkkk/blynk-server
 

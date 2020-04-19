@@ -1,10 +1,11 @@
+# DIY hue
 * [website](https://diyhue.org/getting-started/)
 
-# About
+## About
 
 diyHue is a utility to contol the lights in your home
 
-# Setup
+## Setup
 
 Before you start diyHue you will need to get your IP and MAC addresses. Run `ip addr` in the terminal
 
@@ -14,6 +15,6 @@ Enter these values into the `./services/diyhue/diyhue.env` file
 
 The default username and password it `Hue` and `Hue` respectively 
 
-# Usage
+## Usage
 
 The web interface is available on port 8070

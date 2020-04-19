@@ -1,14 +1,15 @@
-# References
+# Node-RED
+## References
 - [Docker](https://hub.docker.com/r/nodered/node-red)
 - [website](https://nodered.org/)
 
-# Build warning
+## Build warning
 The Node-RED build will complain about several issues. This is completely normal behaviour.
 
-# SQLite
+## SQLite
 Thanks to @fragolinux the SQLite node will install now. **WARNING it will output many error and will look as if it has gotten stuck. Just give it time and it will continue.** 
 
-# GPIO
+## GPIO
 To communicate to your Pi's GPIO you need to use the `node-red-node-pi-gpiod` node. It allowes you to connect to multiple Pis from the same nodered service.
 
 You need to make sure that pigpdiod is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod)
@@ -23,14 +24,14 @@ sudo apt-get install pigpio python-pigpio python3-pigpio
 
 Drop the gpio node and use your Pi's IP. Example: 192.168.1.123 (127.0.0.1 won't work because this is the local address of every computer'.)
 
-# Securing Node-RED
+## Securing Node-RED
 To secure Node-RED you need a password hash. There is a terminal script `./services/nodered/terminal.sh` execute it to get into the terminal.
 Copy the helper text `node -e ..... PASSWORD`, paste it and change your password to get a hash.
 
 Open the file `./volumes/nodered/data/settings.js` and follow the writeup on https://nodered.org/docs/user-guide/runtime/securing-node-red for further instructions
 
 
-# Sharing files between Node-RED and the host
+## Sharing files between Node-RED and the host
 Containers run in a sandboxed environment they can't see the host (the Pi itself) file system. This presents a problem if you want to read a file directly to the host from inside the container. Fortunately there is a method, the containers have been set up with volume mapping. The volume maps a specific directory or file from the host file system into the container. Therefore if you write to that directory both the host and the container can see the files.
 
 Consider the following:
@@ -48,7 +49,7 @@ The flow writes the file `/data/test.txt` and it is visible in the host as `~/IO
 
 Remember, files and directories in the volume are persistent between restarts. If you save your data elsewhere it will be destroyed should you restart. Creating a subdirectory in volume i.e. `/data/storage/` would be advised
 
-# Using Bluetooth
+## Using Bluetooth
 In order to allow Node-RED to access the Pi's Bluetooth module the docker-comose.yml file needs to be modified to allow it access. `network_mode: "host"` needs to be added (make sure the indentation is correct, us spaces not tabs):
 
 ```
@@ -64,13 +65,13 @@ By activating host mode the Node-RED container can no longer access containers b
 * GPIO `127.0.0.1` port `8888`
 * MQTT `127.0.0.1`
 
-# Unused node in Protainer
+## Unused node in Protainer
 
 Portainer will report that the nodered image is unsed, this is normal due to the method used build the image. This is normal behavior. It is not advised to remove it as it is used as the base for the iotstack_nodered image, you will need to redownload it should you rebuild the nodered image.
 
 <img width="1444" alt="UnusedImage" src="https://user-images.githubusercontent.com/34226495/69213978-cd555b80-0bb9-11ea-8734-1c42ff52bf7d.png">
 
-# Running the exec node against the host Pi
+## Running the exec node against the host Pi
 
 Due to the isolation between containers and the host the exec node will run against the container.
 

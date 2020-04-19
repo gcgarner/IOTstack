@@ -1,9 +1,10 @@
+# Backups
 Because containers can easily be rebuilt from docker hub we only have to back up the data in the "volumes" directory.
 
-# Cloud Backups
-## Dropbox-Uploader
+## Cloud Backups
+### Dropbox-Uploader
 This a great utility to easily upload data from your Pi to the cloud. https://magpi.raspberrypi.org/articles/dropbox-raspberry-pi. It can be installed from the Menu under Backups.
-## rclone (Google Drive)
+### rclone (Google Drive)
 This is a service to upload to Google Drive. The config is described [here]( https://medium.com/@artur.klauser/mounting-google-drive-on-raspberry-pi-f5002c7095c2). Install it from the menu then follow the link for these sections:
 * Getting a Google Drive Client ID
 * Setting up the Rclone Configuration
@@ -15,10 +16,10 @@ When naming the service in `rclone config` ensure to call it "gdrive"
 If you want your Google Drive to mount on every boot then follow the instructions at the bottom of the wiki page
 
 
-# Influxdb
+## Influxdb
 `~/IOTstack/scripts/backup_influxdb.sh` does a database snapshot and stores it in ~/IOTstack/backups/influxdb/db . This can be restored with the help a script (that I still need to write)
 
-# Docker backups
+## Docker backups
 The script `~/IOTstack/scripts/docker_backup.sh` performs the master backup for the stack. 
 
 This script can be placed in a cron job to backup on a schedule.
@@ -27,20 +28,20 @@ Then add `0 23 * * * ~/IOTstack/scripts/docker_backup.sh >/dev/null 2>&1` to hav
 
 This script cheats by copying the volume folder live. The correct way would be to stop the stack first then copy the volumes and restart. The cheating method shouldn't be a problem unless you have fast changing data like in influxdb. This is why the script makes a database export of influxdb and ignores its volume. 
 
-## Cloud integration
+### Cloud integration
 The docker_backup.sh script now no longer requires modification to enable cloud backups. It now tests for the presence of and enable file in the backups folder
-### Drobox-Uploader
+#### Drobox-Uploader
 The backup tests for a file called `~/IOTstack/backups/dropbox`, if it is present it will upload to dropbox. To disable dropbox upload delete the file. To enable run `sudo touch ~/IOTstack/backups/dropbox`
-### rclone
+#### rclone
 The backup tests for a file called `~/IOTstack/backups/rclone`, if it is present it will upload to google drive. To disable rclone upload delete the file. To enable run `sudo touch ~/IOTstack/backups/rclone`
 
-### Pruning online backups
+#### Pruning online backups
 @877dev has added functionality to prune both local and cloud backups. For dropbox make sure you dont have any files that contain spaces in your backup directory as the script cannot handle it at this time.
 
-## Restoring a backup
+### Restoring a backup
 The "volumes" directory contains all the persistent data necessary to recreate the container. The docker-compose.yml and the environment files are optional as they can be regenerated with the menu. Simply copy the volumes directory into the IOTstack directory, Rebuild the stack and start. 
 
-# Added your Dropbox token incorrectly or aborted the install at the token screen
+## Added your Dropbox token incorrectly or aborted the install at the token screen
 
 Make sure you are running the latest version of the project [link](https://github.com/gcgarner/IOTstack/wiki/Updating-the-Project).
 
@@ -70,7 +71,7 @@ Ensure you **are not** running as sudo as this will store your api in the /root 
 
 If you ran the command with sudo the remove the old token file if it exists with either `sudo rm /root/.dropbox_uploader` or `sudo ~/Dropbox-Uploader/dropbox_uploader.sh unlink`
 
-# Auto-mount Gdrive with rclone
+## Auto-mount Gdrive with rclone
 
 To enable rclone to mount on boot you will need to make a user service. Run the following commands
 

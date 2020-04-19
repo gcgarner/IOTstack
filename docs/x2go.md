@@ -1,9 +1,10 @@
+# x2go
 x2go is an "alternative" to using VNC for a remote connection. It uses X11 forwarding over ssh to provide a desktop environment
 
 Reason for using:
 I have a Pi 4 and I didn't buy a micro hdmi cable. You can use VNC however you are limited to a 800x600 window.
 
-# Installation
+## Installation
 
 Install with `sudo apt install x2goserver`
 
@@ -19,5 +20,5 @@ Now I have a full-screen client
 
 ![image](https://user-images.githubusercontent.com/46672225/69007780-0045e800-094b-11ea-9626-4947595a016e.png)
 
-# YouTube tutorial
+## YouTube tutorial
 [Laurence systems](https://www.youtube.com/watch?v=oSuy1TS8FGs)

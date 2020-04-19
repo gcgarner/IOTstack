@@ -1,12 +1,13 @@
-# References
+# MotionQye
+## References
 
 * [Website](https://github.com/ccrisan/motioneye/wiki/Install-In-Docker)
 
-# About
+## About
 
 MotionEye is a camera/webcam package. The port is set to 8765
 
-# Config
+## Config
 
 This is the yml entry. Notice that the devices is commented out. This is because if you don't have a camera attached then it will fail to start. Uncomment if you need to. This is for a Pi camera, you will need to add additional lines for usb cameras
 
@@ -26,11 +27,11 @@ This is the yml entry. Notice that the devices is commented out. This is because
     #  - "/dev/video0:/dev/video0"
 ```
 
-# Login Details
+## Login Details
 
 On first login you will be asked for login details. The default user is `admin` (all lowercase) with no password
 
-# Storage
+## Storage
 
 By default local camera data will be stored in `/var/lib/motioneye/camera_name` in the container which equates to the following:
 
@@ -38,6 +39,6 @@ By default local camera data will be stored in `/var/lib/motioneye/camera_name` 
 
 ![image](https://user-images.githubusercontent.com/46672225/69735408-4fed9600-1139-11ea-8618-f5b6c0064f27.png)
 
-## Remote motioneye
+### Remote motioneye
 
 If you have connected to a remote motion eye note that the directory is on that device and has nothing to do with the container.

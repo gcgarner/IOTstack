@@ -1,7 +1,7 @@
-
+# Zigbe2MQTT
 * [Web Guide](https://www.zigbee2mqtt.io/information/docker.html)
 
-# First startup
+## First startup
 
 After starting the stack check to see if there is an error due to missing device. This is because the devices are mapped differently on the Pi. If your device is not showing in the container then you can also follow the followings steps.
 
@@ -29,6 +29,6 @@ To edit the configuration file `sudo nano volumes/zigbee2mqtt/data/configuration
 
 Unfortunately I don't own a zigbee device and cannot offer support on the setup you will need to follow the website instructions for further instructions https://www.zigbee2mqtt.io/
 
-# terminal access
+## terminal access
 
 to access the terminal run `docker exec -it zigbee2mqtt /bin/sh` or select `/bin/sh

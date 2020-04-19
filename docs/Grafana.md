@@ -1,11 +1,12 @@
-# References
+# Grafana
+## References
 - [Docker](https://hub.docker.com/r/grafana/grafana)
 - [Website](https://grafana.com/)
 
-# Security 
+## Security 
 Grafana's default credentials are username "admin" password "admin" it will ask you to choose a new password on boot. Go to `<yourIP>:3000` in your web browser.
 
-# Overwriting grafana.ini settings
+## Overwriting grafana.ini settings
 
 A list of the settings available in grafana.ini are listed [here](https://grafana.com/docs/installation/configuration/)
 

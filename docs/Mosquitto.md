@@ -1,10 +1,11 @@
-# References
+# Mosquitto
+## References
 - [Docker](https://hub.docker.com/_/eclipse-mosquitto)
 - [Website](https://mosquitto.org/)
 
 [Setting up passwords](https://www.youtube.com/watch?v=1msiFQT_flo)
 
-# Security
+## Security
 By default, the Mosquitto container has no password. You can leave it that way if you like but its always a good idea to secure your services.
 
 Step 1

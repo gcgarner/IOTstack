@@ -1,14 +1,15 @@
-# DO NOT EXPOSE PORT 80 TO THE WEB
+# Next Cloud
+## DO NOT EXPOSE PORT 80 TO THE WEB
 
 It is a very bad idea to expose unencrypted traffic to the web. You will need to use a reverse-proxy to ensure your password is not stolen and your account hacked.
 
 I'm still working on getting a good encrypted reverse proxy working. However in the interim you can use a VPN tunnel like OpenVPN or Zerotier to securely connect to your private cloud
 
-# Backups
+## Backups
 
 Nextcloud has been excluded from the docker_backup script due to its potential size. Once I've found a better way of backing it up I will add a dedicated script for it.
 
-# Setup
+## Setup
 
 Next-Cloud recommends using MySQL/MariaDB for the accounts and file list. The alternative is to use SQLite however they strongly discourage using it
 

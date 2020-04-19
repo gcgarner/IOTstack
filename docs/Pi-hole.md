@@ -1,3 +1,4 @@
+# Pi-hole
 Pi-hole is a fantastic utility to reduce ads
 
 The interface can be found on `"your_ip":8089/admin`
