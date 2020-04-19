@@ -1,8 +1,9 @@
+# accessing your device from the internet
 The challenge most of us face with remotely accessing your home network is that you don't have a static IP. From time to time the IP that your ISP assigns to you changes and it's difficult to keep up. Fortunately, there is a solution, a DynamicDNS. The section below shows you how to set up an easy to remember address that follows your public IP no matter when it changes.
 
 Secondly, how do you get into your home network? Your router has a firewall that is designed to keep the rest of the internet out of your network to protect you. Here we install a VPN and configure the firewall to only allow very secure VPN traffic in. 
 
-# DuckDNS
+## DuckDNS
 If you want to have a dynamic DNS point to your Public IP I added a helper script.
 Register with duckdns.org and create a subdomain name. Then edit the `nano ~/IOTstack/duck/duck.sh` file and add your
 
@@ -20,7 +21,7 @@ paste the following in the editor `*/5 * * * * sudo ~/IOTstack/duck/duck.sh >/de
 
 Your Public IP should be updated every five minutes
 
-# PiVPN
+## PiVPN
 pimylifeup.com has an excellent tutorial on how to install [PiVPN](https://pimylifeup.com/raspberry-pi-vpn-server/)
 
 In point 17 and 18 they mention using noip for their dynamic DNS. Here you can use the DuckDNS address if you created one.
@@ -31,7 +32,7 @@ Once you activate your VPN (from your phone/laptop/work computer) you will effec
 
 I personally use the VPN any time I'm on public wifi, all your traffic is secure.
 
-# Zerotier
+## Zerotier
 https://www.zerotier.com/
 
 Zerotier is an alternative to PiVPN that doesn't require port forwarding on your router. It does however require registering for their free tier service [here](https://my.zerotier.com/login). 

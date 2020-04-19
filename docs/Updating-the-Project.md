@@ -1,3 +1,4 @@
+# Updating the project
 **If you ran the git checkout -- 'git ls-files -m' as suggested in the old wiki entry then please check your duck.sh because it removed your domain and token**
 
 

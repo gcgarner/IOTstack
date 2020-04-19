@@ -1,4 +1,5 @@
-# Aliases
+# Docker commands
+## Aliases
 
 I've added bash aliases for stopping and starting the stack. They can be installed in the docker commands menu. These commands no longer need to be executed from the IOTstack directory and can be executed in any directory
 
