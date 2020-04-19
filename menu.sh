@@ -28,11 +28,34 @@ declare -A cont_array=(
 	[diyhue]="diyHue"
 	[homebridge]="Homebridge"
 	[python]="Python 3"
-
 )
-declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
-	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python")
+
+declare -a armhf_keys=(
+	"portainer"
+	"nodered"
+	"influxdb"
+	"grafana"
+	"mosquitto"
+	"telegraf"
+	"mariadb"
+	"postgres"
+	"adminer"
+	"openhab"
+	"zigbee2mqtt"
+	"pihole"
+	"plex"
+	"tasmoadmin"
+	"rtl_433"
+	"espruinohub"
+	"motioneye"
+	"webthings_gateway"
+	"blynk_server"
+	"nextcloud"
+	"diyhue"
+	"homebridge"
+	"python"
+	# add yours here
+)
 
 sys_arch=$(uname -m)
 
