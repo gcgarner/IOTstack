@@ -2,7 +2,11 @@
     container_name: homebridge
     image: oznu/homebridge:no-avahi-arm32v6
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - 8380:8080
     env_file: ./services/homebridge/homebridge.env
+    environment:
+      - VIRTUAL_HOST=~^homebridge\..*\.xip\.io
+      - VIRTUAL_PORT=8380
     volumes:
       - ./volumes/homebridge:/homebridge

@@ -6,4 +6,7 @@
       - "8088:80"
     volumes:
       - ./volumes/tasmoadmin/data:/data
+    environment:
+      - VIRTUAL_HOST=~^tasmoadmin\..*\.xip\.io
+      - VIRTUAL_PORT=8088
       

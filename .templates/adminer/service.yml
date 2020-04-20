@@ -4,3 +4,6 @@
     restart: unless-stopped
     ports:
       - 9080:8080
+    environment:
+      - VIRTUAL_HOST=~^adminer\..*\.xip\.io
+      - VIRTUAL_PORT=9080
