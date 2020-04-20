@@ -29,12 +29,35 @@ declare -A cont_array=(
 	[homebridge]="Homebridge"
 	[python]="Python 3"
 	[gitea]="Gitea"
-
 )
-declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
-	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python" "gitea")
 
+declare -a armhf_keys=(
+	"portainer"
+	"nodered"
+	"influxdb"
+	"grafana"
+	"mosquitto"
+	"telegraf"
+	"mariadb"
+	"postgres"
+	"adminer"
+	"openhab"
+	"zigbee2mqtt"
+	"pihole"
+	"plex"
+	"tasmoadmin"
+	"rtl_433"
+	"espruinohub"
+	"motioneye"
+	"webthings_gateway"
+	"blynk_server"
+	"nextcloud"
+	"diyhue"
+	"homebridge"
+	"python"
+	"gitea"
+	# add yours here
+)
 sys_arch=$(uname -m)
 
 #timezones
@@ -192,7 +215,7 @@ case $mainmenu_selection in
 		sudo apt install -y docker-compose
 	fi
 
-	if (whiptail --title "Restart Required" --yesno "It is recommended that you restart you device now. Select yes to do so now" 20 78); then
+	if (whiptail --title "Restart Required" --yesno "It is recommended that you restart your device now. Select yes to do so now" 20 78); then
 		sudo reboot
 	fi
 	;;
