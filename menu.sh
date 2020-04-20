@@ -28,6 +28,7 @@ declare -A cont_array=(
 	[diyhue]="diyHue"
 	[homebridge]="Homebridge"
 	[python]="Python 3"
+	[gitea]="Gitea"
 )
 
 declare -a armhf_keys=(
@@ -54,9 +55,9 @@ declare -a armhf_keys=(
 	"diyhue"
 	"homebridge"
 	"python"
+	"gitea"
 	# add yours here
 )
-
 sys_arch=$(uname -m)
 
 #timezones
