@@ -28,14 +28,39 @@ declare -A cont_array=(
 	[diyhue]="diyHue"
 	[homebridge]="Homebridge"
 	[python]="Python 3"
+	[gitea]="Gitea"
 	[qbittorrent]="qbittorrent"
-
+	# add yours here
 )
-declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
-	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python"
-	"qbittorrent")
 
+declare -a armhf_keys=(
+	"portainer"
+	"nodered"
+	"influxdb"
+	"grafana"
+	"mosquitto"
+	"telegraf"
+	"mariadb"
+	"postgres"
+	"adminer"
+	"openhab"
+	"zigbee2mqtt"
+	"pihole"
+	"plex"
+	"tasmoadmin"
+	"rtl_433"
+	"espruinohub"
+	"motioneye"
+	"webthings_gateway"
+	"blynk_server"
+	"nextcloud"
+	"diyhue"
+	"homebridge"
+	"python"
+	"gitea"
+	"qbittorrent"
+	# add yours here
+)
 sys_arch=$(uname -m)
 
 #timezones
@@ -193,7 +218,7 @@ case $mainmenu_selection in
 		sudo apt install -y docker-compose
 	fi
 
-	if (whiptail --title "Restart Required" --yesno "It is recommended that you restart you device now. Select yes to do so now" 20 78); then
+	if (whiptail --title "Restart Required" --yesno "It is recommended that you restart your device now. Select yes to do so now" 20 78); then
 		sudo reboot
 	fi
 	;;
@@ -233,7 +258,7 @@ case $mainmenu_selection in
 	#if no container is selected then dont overwrite the docker-compose.yml file
 	if [ -n "$container_selection" ]; then
 		touch docker-compose.yml
-		echo "version: '2'" >docker-compose.yml
+		echo "version: '3.6'" >docker-compose.yml
 		echo "services:" >>docker-compose.yml
 
 		#set the ACL for the stack
