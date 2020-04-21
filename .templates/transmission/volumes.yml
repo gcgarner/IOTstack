@@ -1,0 +1,21 @@
+
+  transm_download_volume:
+    driver: local
+    driver_opts:
+       o: bind
+       type: none
+       device: <transm_download_volume absolute path on disk>
+
+  transm_watch_volume:
+    driver: local
+    driver_opts:
+       o: bind
+       type: none
+       device: <transm_watch_volume absolute path on disk>
+
+  transm_config_volume:
+    driver: local
+    driver_opts:
+       o: bind
+       type: none
+       device: <transm_config_volume absolute path on disk>
