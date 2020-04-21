@@ -9,7 +9,7 @@ https://sensorsiot.github.io/IOTstack/
 https://youtu.be/a6mjt8tWUws
 
 ## Installation
-1. On the (PRi) lite image you will need to install git first
+1. On the (RPi) lite image you will need to install git first
 
 ```
 sudo apt-get install git -y
