@@ -181,6 +181,25 @@ else
 fi
 
 #---------------------------------------------------------------------------------------------------
+# Docker updates
+echo "checking docker version"
+SERVER_VERSION=$(docker version -f "{{.Server.Version}}")
+SERVER_VERSION_MAJOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 1)
+SERVER_VERSION_MINOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 2)
+SERVER_VERSION_BUILD=$(echo "$SERVER_VERSION"| cut -d'.' -f 3)
+
+if [ "${SERVER_VERSION_MAJOR}" -ge 18 ] && \
+	[ "${SERVER_VERSION_MINOR}" -ge 2 ]  && \
+	[ "${SERVER_VERSION_BUILD}" -ge 0 ]; then
+	echo "Docker version >= 18.2.0. You are good to go."
+else
+	echo ""
+	echo "Docker version less than 18.02.0 consider upgrading or you may experience issues"
+	echo "Upgrade by typing: 'sudo apt upgrade docker docker-compose'"
+	sleep 2
+fi
+
+#---------------------------------------------------------------------------------------------------
 # Menu system starts here
 # Display main menu
 mainmenu_selection=$(whiptail --title "Main Menu" --menu --notags \
