@@ -4,18 +4,18 @@
     driver_opts:
        o: bind
        type: none
-       device: <transm_download_volume absolute path on disk>
+       device: /home/${USER}/IOTstack/.volumes/transmission/downloads
 
   transm_watch_volume:
     driver: local
     driver_opts:
        o: bind
        type: none
-       device: <transm_watch_volume absolute path on disk>
+       device: /home/${USER}/IOTstack/.volumes/transmission/watch
 
   transm_config_volume:
     driver: local
     driver_opts:
        o: bind
        type: none
-       device: <transm_config_volume absolute path on disk>
+       device: /home/${USER}/IOTstack/.volumes/transmission/config
