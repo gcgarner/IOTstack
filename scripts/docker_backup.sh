@@ -58,7 +58,7 @@ if [ -f ./backups/dropbox ]; then
 
 	#upload new backup to dropbox
 	echo "uploading to dropbox"
-	$dropboxuploader upload ./backups/$backupfile $dropboxfolder
+	$dropboxuploader upload ./backups/$backupfile $backupfile
 
 	#list older files to be deleted from cloud (exludes last 7)
 	#to change dropbox backups retained, change below -7 to whatever you want
