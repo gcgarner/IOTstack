@@ -8,6 +8,7 @@ declare -A cont_array=(
 	[nodered]="Node-RED"
 	[influxdb]="InfluxDB"
 	[telegraf]="Telegraf (Requires InfluxDB and Mosquitto)"
+	[transmission]="transmission"
 	[grafana]="Grafana"
 	[mosquitto]="Eclipse-Mosquitto"
 	[postgres]="Postgres"
@@ -31,6 +32,7 @@ declare -A cont_array=(
 	[gitea]="Gitea"
 )
 
+
 declare -a armhf_keys=(
 	"portainer"
 	"nodered"
@@ -40,6 +42,7 @@ declare -a armhf_keys=(
 	"telegraf"
 	"mariadb"
 	"postgres"
+  "transmission"
 	"adminer"
 	"openhab"
 	"zigbee2mqtt"
@@ -139,6 +142,9 @@ function yml_builder() {
 
 	#if an env file exists check for timezone
 	[ -f "./services/$1/$1.env" ] && timezones ./services/$1/$1.env
+
+    # if a volumes.yml exists, append to overall volumes.yml file
+    [ -f "./services/$1/volumes.yml" ] && cat "./services/$1/volumes.yml" >> docker-volumes.yml
 
 	#add new line then append service
 	echo "" >>docker-compose.yml
@@ -301,6 +307,14 @@ case $mainmenu_selection in
 					yml_builder "$container"
 				done
 			fi
+		fi
+		
+		# if a container needs volume, put it at the end of docker-compose
+		if [ -f docker-volumes.yml ]; then
+			echo "" >> docker-compose.yml
+			echo "volumes:" >> docker-compose.yml
+			cat docker-volumes.yml >> docker-compose.yml
+			rm docker-volumes.yml
 		fi
 
 		echo "docker-compose successfully created"
