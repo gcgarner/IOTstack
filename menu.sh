@@ -3,6 +3,9 @@
 #get path of menu correct
 pushd ~/IOTstack
 
+#This is the Display name for the menu
+#structure : [CONTAINER]=MENU Display Text
+#One entry per line to simplify PRs
 declare -A cont_array=(
 	[portainer]="Portainer"
 	[nodered]="Node-RED"
@@ -31,9 +34,38 @@ declare -A cont_array=(
 	[qbittorrent]="qbittorrent"
 	[zigbee2mqttassistant]="zigbee2mqttassistant"
 )
-declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
-	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python" "zigbee2mqttassistant" "qbittorrent")
+
+#The convension for CONTAINER is that it is the name of the .templates/CONTAINER directory and as the key below for the relevant arch
+
+# keys for CONTAINER
+# One per line to simply PR
+declare -a armhf_keys=(
+	"portainer" 
+	"nodered" 
+	"influxdb" 
+	"grafana" 
+	"mosquitto" 
+	"telegraf" 
+	"mariadb" 
+	"postgres"
+	"adminer" 
+	"openhab" 
+	"zigbee2mqtt" 
+	"pihole" 
+	"plex" 
+	"tasmoadmin" 
+	"rtl_433" 
+	"espruinohub"
+	"motioneye" 
+	"webthings_gateway" 
+	"blynk_server" 
+	"nextcloud" 
+	"diyhue" 
+	"homebridge" 
+	"python" 
+	"zigbee2mqttassistant" 
+	"qbittorrent"
+)
 
 sys_arch=$(uname -m)
 
