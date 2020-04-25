@@ -1,0 +1,11 @@
+  zigbee2mqttassistant:
+    container_name: zigbee2mqttassistant
+    image: carldebilly/zigbee2mqttassistant
+    restart: unless-stopped
+    env_file:
+      - ./services/zigbee2mqttassistant/zigbee2mqttassistant.env
+    ports:
+      - 8880:80
+    environment:
+      - VIRTUAL_HOST=~^zigbee2mqttassistant\..*\.xip\.io
+      - VIRTUAL_PORT=8880

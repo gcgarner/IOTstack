@@ -3,8 +3,12 @@
     image: koenkk/zigbee2mqtt
     volumes:
       - ./volumes/zigbee2mqtt/data:/app/data
+      - /run/udev:/run/udev:ro
     devices:
       - /dev/ttyAMA0:/dev/ttyACM0
       #- /dev/ttyACM0:/dev/ttyACM0
-    restart: unless-stopped
+    restart: always
     network_mode: host
+    privileged: true
+    environment:
+      - TZ=Europe/Amsterdam

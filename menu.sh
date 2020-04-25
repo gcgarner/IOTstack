@@ -29,12 +29,11 @@ declare -A cont_array=(
 	[homebridge]="Homebridge"
 	[python]="Python 3"
 	[qbittorrent]="qbittorrent"
-
+	[zigbee2mqttassistant]="zigbee2mqttassistant"
 )
 declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
 	"adminer" "openhab" "zigbee2mqtt" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python"
-	"qbittorrent")
+	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python" "zigbee2mqttassistant" "qbittorrent")
 
 sys_arch=$(uname -m)
 
@@ -193,7 +192,7 @@ case $mainmenu_selection in
 		sudo apt install -y docker-compose
 	fi
 
-	if (whiptail --title "Restart Required" --yesno "It is recommended that you restart you device now. Select yes to do so now" 20 78); then
+	if (whiptail --title "Restart Required" --yesno "It is recommended that you restart your device now. Select yes to do so now" 20 78); then
 		sudo reboot
 	fi
 	;;
@@ -408,7 +407,7 @@ case $mainmenu_selection in
 		"tinker" " " \
 		3>&1 1>&2 2>&3)
 	if [ -n "$hassio_machine" ]; then
-		curl -sL https://raw.githubusercontent.com/home-assistant/hassio-installer/master/hassio_install.sh | sudo bash -s -- -m $hassio_machine
+		curl -sL https://raw.githubusercontent.com/home-assistant/supervised-installer/master/installer.sh | sudo bash -s -- -m $hassio_machine
 	else
 		echo "no selection"
 		exit
