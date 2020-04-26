@@ -33,4 +33,4 @@ mergedYaml = mergeYaml(yamlOverride, yamlTempDockerCompose)
 
 with open(r'%s' % pathOutput, 'w') as outputFile:
   # yaml.dump(mergedYaml, outputFile, default_flow_style=False, sort_keys=False) # TODO: 'sort_keys' not available in this version of Python/yaml
-  yaml.dump(mergedYaml, outputFile, default_flow_style=False) # Gotta pretty this up for human consumption
+  yaml.dump(mergedYaml, outputFile, default_flow_style=False)

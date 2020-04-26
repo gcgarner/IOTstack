@@ -1,4 +1,0 @@
-services:
-  mosquitto:
-    ports:
-      - 1882:1882
