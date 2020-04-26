@@ -2,5 +2,8 @@
 /services/
 /volumes/
 /backups/
+/.tmp/*
 docker-compose.yml
 .outofdate
+
+!.gitkeep

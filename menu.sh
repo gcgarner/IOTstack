@@ -3,6 +3,16 @@
 #get path of menu correct
 pushd ~/IOTstack
 
+# Consts/vars
+TMP_DOCKER_COMPOSE_YML=./.tmp/docker-compose.tmp.yml
+DOCKER_COMPOSE_YML=./docker-compose.yml
+DOCKER_COMPOSE_OVERRIDE_YML=./compose-override.yml
+
+COMPOSE_VERSION="3.6"
+DOCKER_VERSION_MAJOR=18
+DOCKER_VERSION_MINOR=2
+DOCKER_VERSION_BUILD=0
+
 declare -A cont_array=(
 	[portainer]="Portainer"
 	[nodered]="Node-RED"
@@ -79,6 +89,7 @@ docker_setfacl() {
 	[ -d ./services ] || mkdir ./services
 	[ -d ./volumes ] || mkdir ./volumes
 	[ -d ./backups ] || mkdir ./backups
+	[ -d ./tmp ] || mkdir ./tmp
 
 	#give current user rwx on the volumes and backups
 	[ $(getfacl ./volumes | grep -c "default:user:$USER") -eq 0 ] && sudo setfacl -Rdm u:$USER:rwx ./volumes
@@ -108,47 +119,47 @@ function yml_builder() {
 
 	[ -d ./services/ ] || mkdir ./services/
 
-		if [ -d ./services/$1 ]; then
-			#directory already exists prompt user to overwrite
-			sevice_overwrite=$(whiptail --radiolist --title "Overwrite Option" --notags \
-				"$1 service directory has been detected, use [SPACEBAR] to select you overwrite option" 20 78 12 \
-				"none" "Do not overwrite" "ON" \
-				"env" "Preserve Environment and Config files" "OFF" \
-				"full" "Pull full service from template" "OFF" \
-				3>&1 1>&2 2>&3)
+	if [ -d ./services/$1 ]; then
+		#directory already exists prompt user to overwrite
+		sevice_overwrite=$(whiptail --radiolist --title "Overwrite Option" --notags \
+			"$1 service directory has been detected, use [SPACEBAR] to select you overwrite option" 20 78 12 \
+			"none" "Do not overwrite" "ON" \
+			"env" "Preserve Environment and Config files" "OFF" \
+			"full" "Pull full service from template" "OFF" \
+			3>&1 1>&2 2>&3)
 
-			case $sevice_overwrite in
+		case $sevice_overwrite in
 
-			"full")
-				echo "...pulled full $1 from template"
-				rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh'
-				;;
-			"env")
-				echo "...pulled $1 excluding env file"
-				rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh' --exclude '$1.env' --exclude '*.conf'
-				;;
-			"none")
-				echo "...$1 service not overwritten"
-				;;
-
-			esac
-
-		else
-			mkdir ./services/$1
+		"full")
 			echo "...pulled full $1 from template"
 			rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh'
-		fi
+			;;
+		"env")
+			echo "...pulled $1 excluding env file"
+			rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh' --exclude '$1.env' --exclude '*.conf'
+			;;
+		"none")
+			echo "...$1 service not overwritten"
+			;;
+
+		esac
+
+	else
+		mkdir ./services/$1
+		echo "...pulled full $1 from template"
+		rsync -a -q .templates/$1/ services/$1/ --exclude 'build.sh'
+	fi
 
 
 	#if an env file exists check for timezone
 	[ -f "./services/$1/$1.env" ] && timezones ./services/$1/$1.env
 
-    # if a volumes.yml exists, append to overall volumes.yml file
-    [ -f "./services/$1/volumes.yml" ] && cat "./services/$1/volumes.yml" >> docker-volumes.yml
+	# if a volumes.yml exists, append to overall volumes.yml file
+	[ -f "./services/$1/volumes.yml" ] && cat "./services/$1/volumes.yml" >> docker-volumes.yml
 
 	#add new line then append service
-	echo "" >>docker-compose.yml
-	cat $service >>docker-compose.yml
+	echo "" >> $TMP_DOCKER_COMPOSE_YML
+	cat $service >> $TMP_DOCKER_COMPOSE_YML
 
 	#test for post build
 	if [ -f ./.templates/$1/build.sh ]; then
@@ -194,9 +205,9 @@ SERVER_VERSION_MAJOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 1)
 SERVER_VERSION_MINOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 2)
 SERVER_VERSION_BUILD=$(echo "$SERVER_VERSION"| cut -d'.' -f 3)
 
-if [ "${SERVER_VERSION_MAJOR}" -ge 18 ] && \
-	[ "${SERVER_VERSION_MINOR}" -ge 2 ]  && \
-	[ "${SERVER_VERSION_BUILD}" -ge 0 ]; then
+if [ "${SERVER_VERSION_MAJOR}" -ge $DOCKER_VERSION_MAJOR ] && \
+	[ "${SERVER_VERSION_MINOR}" -ge $DOCKER_VERSION_MINOR ]  && \
+	[ "${SERVER_VERSION_BUILD}" -ge $DOCKER_VERSION_BUILD ]; then
 	echo "Docker version >= 18.2.0. You are good to go."
 else
 	echo ""
@@ -279,9 +290,12 @@ case $mainmenu_selection in
 
 	#if no container is selected then dont overwrite the docker-compose.yml file
 	if [ -n "$container_selection" ]; then
-		touch docker-compose.yml
-		echo "version: '3.6'" >docker-compose.yml
-		echo "services:" >>docker-compose.yml
+		touch $TMP_DOCKER_COMPOSE_YML
+		echo "services:" > $TMP_DOCKER_COMPOSE_YML
+
+		# Uncomment once sort_keys is available in Pyton->yaml
+		# echo "version: '$COMPOSE_VERSION'" > $TMP_DOCKER_COMPOSE_YML
+		# echo "services:" >> $TMP_DOCKER_COMPOSE_YML
 
 		#set the ACL for the stack
 		#docker_setfacl
@@ -298,24 +312,16 @@ case $mainmenu_selection in
 			echo "$container" >>./services/selection.txt
 		done
 
-		# add custom containers
-		if [ -f ./services/custom.txt ]; then
-			if (whiptail --title "Custom Container detected" --yesno "custom.txt has been detected do you want to add these containers to the stack?" 20 78); then
-				mapfile -t containers <<<$(cat ./services/custom.txt)
-				for container in "${containers[@]}"; do
-					echo "Adding $container container"
-					yml_builder "$container"
-				done
-			fi
+		if [ -f "$DOCKER_COMPOSE_OVERRIDE_YML" ]; then
+			echo "merging docker overrides with docker-compose.yaml"
+			python ./scripts/yaml_merge.py $TMP_DOCKER_COMPOSE_YML  $DOCKER_COMPOSE_OVERRIDE_YML $DOCKER_COMPOSE_YML
+		else
+			echo "no override found, using docker-compose.yaml"
+			cp $TMP_DOCKER_COMPOSE_YML $DOCKER_COMPOSE_YML
 		fi
-		
-		# if a container needs volume, put it at the end of docker-compose
-		if [ -f docker-volumes.yml ]; then
-			echo "" >> docker-compose.yml
-			echo "volumes:" >> docker-compose.yml
-			cat docker-volumes.yml >> docker-compose.yml
-			rm docker-volumes.yml
-		fi
+
+		# Prepend compose version after merging/copying, so that merging doesn't move it to the bottom (alphabetically ordered).
+		echo -e "version: '$COMPOSE_VERSION'\n$(cat $DOCKER_COMPOSE_YML)" > $DOCKER_COMPOSE_YML  # Remove once sort_keys works in Python->yaml.
 
 		echo "docker-compose successfully created"
 		echo "run 'docker-compose up -d' to start the stack"
@@ -496,4 +502,4 @@ case $mainmenu_selection in
 
 esac
 
-popd
+popd > /dev/null 2>&1
