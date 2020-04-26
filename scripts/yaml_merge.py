@@ -32,5 +32,5 @@ with open(r'%s' % pathOverride) as fileOverride:
 mergedYaml = mergeYaml(yamlOverride, yamlTempDockerCompose)
 
 with open(r'%s' % pathOutput, 'w') as outputFile:
-  # yaml.dump(mergedYaml, outputFile, default_flow_style=False, sort_keys=False) # TODO: 'sort_keys' not available in this version of Python/yaml
-  yaml.dump(mergedYaml, outputFile, default_flow_style=False)
+  # yaml.dump(mergedYaml, outputFile, Loader=yaml.FullLoader, default_flow_style=False, sort_keys=False) # TODO: 'sort_keys' not available in this version of Python/yaml
+  yaml.dump(mergedYaml, outputFile, Loader=yaml.FullLoader, default_flow_style=False)
