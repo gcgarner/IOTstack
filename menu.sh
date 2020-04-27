@@ -10,17 +10,9 @@ DOCKER_COMPOSE_OVERRIDE_YML=./compose-override.yml
 
 # Minimum Software Versions
 COMPOSE_VERSION="3.6"
-REQ_DOCKER_VERSION_MAJOR=18
-REQ_DOCKER_VERSION_MINOR=2
-REQ_DOCKER_VERSION_BUILD=0
-
-REQ_PYTHON_VERSION_MAJOR=3
-REQ_PYTHON_VERSION_MINOR=6
-REQ_PYTHON_VERSION_BUILD=9
-
-REQ_PYYAML_VERSION_MAJOR=5
-REQ_PYYAML_VERSION_MINOR=3
-REQ_PYYAML_VERSION_BUILD=1
+REQ_DOCKER_VERSION=18.2.0
+REQ_PYTHON_VERSION=3.6.9
+REQ_PYYAML_VERSION_=5.3.1
 
 declare -A cont_array=(
 	[portainer]="Portainer"
@@ -121,6 +113,37 @@ function command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
 
+function minimum_version_check() {
+	# minimum_version_check required_version current_major current_minor current_build
+	# minimum_version_check "1.2.3" 1 2 3
+	REQ_MIN_VERSION_MAJOR=$(echo "$1"| cut -d' ' -f 2 | cut -d'.' -f 1)
+	REQ_MIN_VERSION_MINOR=$(echo "$1"| cut -d' ' -f 2 | cut -d'.' -f 2)
+	REQ_MIN_VERSION_BUILD=$(echo "$1"| cut -d' ' -f 2 | cut -d'.' -f 3)
+
+	CURR_VERSION_MAJOR=$2
+	CURR_VERSION_MINOR=$3
+	CURR_VERSION_BUILD=$4
+
+	VERSION_GOOD="false"
+
+	if [ "${CURR_VERSION_MAJOR}" -ge $REQ_MIN_VERSION_MAJOR ]; then
+		VERSION_GOOD="true"
+	fi
+
+	if [ "${CURR_VERSION_MAJOR}" -ge $REQ_MIN_VERSION_MAJOR ] && \
+		[ "${CURR_VERSION_MINOR}" -ge $REQ_MIN_VERSION_MINOR ]; then
+		VERSION_GOOD="true"
+	fi
+
+	if [ "${CURR_VERSION_MAJOR}" -ge $REQ_MIN_VERSION_MAJOR ] && \
+		[ "${CURR_VERSION_MINOR}" -ge $REQ_MIN_VERSION_MINOR ] && \
+		[ "${CURR_VERSION_BUILD}" -ge $REQ_MIN_VERSION_BUILD ]; then
+		VERSION_GOOD="true"
+	fi
+
+	echo "$VERSION_GOOD"
+}
+
 function install_python3_and_deps() {
 	if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3 (v3.6.9) or later, PyYaml 5.3.1 and pip3 is required for compose-overrides.yml file to merge into the docker-compose.yml file. Install now?" 20 78); then
 		sudo apt install -y python3-pip python3-dev
@@ -151,9 +174,7 @@ function do_python3_pip() {
 		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d'.' -f 2)
 		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d'.' -f 3)
 
-		if [ "${PYTHON_VERSION_MAJOR}" -eq $REQ_PYTHON_VERSION_MAJOR ] && \
-			[ "${PYTHON_VERSION_MINOR}" -eq $REQ_PYTHON_VERSION_MINOR ]  && \
-			[ "${PYTHON_VERSION_BUILD}" -ge $REQ_PYTHON_VERSION_BUILD ]; then
+		if [ "$(minimum_version_check $REQ_PYTHON_VERSION $PYTHON_VERSION_MAJOR $PYTHON_VERSION_MINOR $PYTHON_VERSION_BUILD )" == "true" ]; then
 			PYTHON_VERSION_GOOD="true"
 		else
 			echo "Python is outdated."
@@ -166,9 +187,7 @@ function do_python3_pip() {
 		PYYAML_VERSION_MINOR=$(echo "$PYYAML_VERSION"| cut -d'.' -f 2)
 		PYYAML_VERSION_BUILD=$(echo "$PYYAML_VERSION"| cut -d'.' -f 3)
 
-		if [ "${PYYAML_VERSION_MAJOR}" -ge $REQ_PYYAML_VERSION_MAJOR ] && \
-			[ "${PYYAML_VERSION_MINOR}" -ge $REQ_PYYAML_VERSION_MINOR ]  && \
-			[ "${PYYAML_VERSION_BUILD}" -ge $REQ_PYYAML_VERSION_BUILD ]; then
+		if [ "$(minimum_version_check $REQ_PYYAML_VERSION $PYYAML_VERSION_MAJOR $PYYAML_VERSION_MINOR $PYYAML_VERSION_BUILD )" == "true" ]; then
 			PYYAML_VERSION_GOOD="true"
 		else
 			echo "PyYaml is outdated."
@@ -268,20 +287,17 @@ fi
 #---------------------------------------------------------------------------------------------------
 # Docker updates
 echo "checking docker version"
-SERVER_VERSION=$(docker version -f "{{.Server.Version}}")
-SERVER_VERSION_MAJOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 1)
-SERVER_VERSION_MINOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 2)
-SERVER_VERSION_BUILD=$(echo "$SERVER_VERSION"| cut -d'.' -f 3)
+DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
+DOCKER_VERSION_MAJOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 1)
+DOCKER_VERSION_MINOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 2)
+DOCKER_VERSION_BUILD=$(echo "$DOCKER_VERSION"| cut -d'.' -f 3)
 
-if [ "${SERVER_VERSION_MAJOR}" -ge $REQ_DOCKER_VERSION_MAJOR ] && \
-	[ "${SERVER_VERSION_MINOR}" -ge $REQ_DOCKER_VERSION_MINOR ]  && \
-	[ "${SERVER_VERSION_BUILD}" -ge $REQ_DOCKER_VERSION_BUILD ]; then
-	echo "Docker version >= 18.2.0. You are good to go."
+if [ "$(minimum_version_check $REQ_DOCKER_VERSION $DOCKER_VERSION_MAJOR $DOCKER_VERSION_MINOR $DOCKER_VERSION_BUILD )" == "true" ]; then
+	echo "Docker version >= $REQ_DOCKER_VERSION. You are good to go."
 else
-	echo ""
-	echo "Docker version less than 18.02.0 consider upgrading or you may experience issues"
-	echo "Upgrade by typing: 'sudo apt upgrade docker docker-compose'"
-	sleep 2
+	if (whiptail --title "Docker and Docker-Compose Version Issue" --yesno "Docker version is currently $DOCKER_VERSION which is less than $REQ_DOCKER_VERSION consider upgrading or you may experience issues. You can manually upgrade by typing 'sudo apt upgrade docker docker-compose'. Attempt to upgrade now?" 20 78); then
+		sudo apt upgrade docker docker-compose
+	fi
 fi
 
 #---------------------------------------------------------------------------------------------------
