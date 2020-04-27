@@ -8,10 +8,19 @@ TMP_DOCKER_COMPOSE_YML=./.tmp/docker-compose.tmp.yml
 DOCKER_COMPOSE_YML=./docker-compose.yml
 DOCKER_COMPOSE_OVERRIDE_YML=./compose-override.yml
 
+# Minimum Software Versions
 COMPOSE_VERSION="3.6"
-DOCKER_VERSION_MAJOR=18
-DOCKER_VERSION_MINOR=2
-DOCKER_VERSION_BUILD=0
+REQ_DOCKER_VERSION_MAJOR=18
+REQ_DOCKER_VERSION_MINOR=2
+REQ_DOCKER_VERSION_BUILD=0
+
+REQ_PYTHON_VERSION_MAJOR=3
+REQ_PYTHON_VERSION_MINOR=6
+REQ_PYTHON_VERSION_BUILD=9
+
+REQ_PYYAML_VERSION_MAJOR=5
+REQ_PYYAML_VERSION_MINOR=3
+REQ_PYYAML_VERSION_BUILD=1
 
 declare -A cont_array=(
 	[portainer]="Portainer"
@@ -109,8 +118,67 @@ password_dialog() {
 #test=$( password_dialog )
 
 function command_exists() {
-	command -v "$@" >/dev/null 2>&1
+	command -v "$@" > /dev/null 2>&1
 }
+
+function install_python3_and_deps() {
+	if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3 (v3.6.9) or later, PyYaml 5.3.1 and pip3 is required for compose-overrides.yml file to merge into the docker-compose.yml file. Install now?" 20 78); then
+		sudo apt install -y python3-pip python3-dev
+		if [ $? -eq 0 ]; then
+			PYTHON_VERSION_GOOD="true"
+		else
+			echo "Failed to install Python"
+			exit 1
+		fi
+		pip3 install -U pyyaml==5.3.1
+				if [ $? -eq 0 ]; then
+			PYYAML_VERSION_GOOD="true"
+		else
+			echo "Failed to install Python"
+			exit 1
+		fi
+	fi
+}
+
+function do_python3_pip() {
+	PYTHON_VERSION_GOOD="false"
+	PYYAML_VERSION_GOOD="false"
+
+	if command_exists python3 && command_exists pip3; then
+		PYTHON_VERSION=$(python3 --version)
+		echo "Python Version: $PYTHON_VERSION"
+		PYTHON_VERSION_MAJOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
+		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d'.' -f 2)
+		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d'.' -f 3)
+
+		if [ "${PYTHON_VERSION_MAJOR}" -eq $REQ_PYTHON_VERSION_MAJOR ] && \
+			[ "${PYTHON_VERSION_MINOR}" -eq $REQ_PYTHON_VERSION_MINOR ]  && \
+			[ "${PYTHON_VERSION_BUILD}" -ge $REQ_PYTHON_VERSION_BUILD ]; then
+			PYTHON_VERSION_GOOD="true"
+		else
+			echo "Python is outdated."
+			install_python3_and_deps
+		fi
+
+		PYYAML_VERSION=$(python3 ./scripts/yaml_merge.py --pyyaml-version)
+		echo "PyYaml Version: $PYYAML_VERSION"
+		PYYAML_VERSION_MAJOR=$(echo "$PYYAML_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
+		PYYAML_VERSION_MINOR=$(echo "$PYYAML_VERSION"| cut -d'.' -f 2)
+		PYYAML_VERSION_BUILD=$(echo "$PYYAML_VERSION"| cut -d'.' -f 3)
+
+		if [ "${PYYAML_VERSION_MAJOR}" -ge $REQ_PYYAML_VERSION_MAJOR ] && \
+			[ "${PYYAML_VERSION_MINOR}" -ge $REQ_PYYAML_VERSION_MINOR ]  && \
+			[ "${PYYAML_VERSION_BUILD}" -ge $REQ_PYYAML_VERSION_BUILD ]; then
+			PYYAML_VERSION_GOOD="true"
+		else
+			echo "PyYaml is outdated."
+			install_python3_and_deps
+		fi
+	else
+		install_python3_and_deps
+	fi
+}
+
 
 #function copies the template yml file to the local service folder and appends to the docker-compose.yml file
 function yml_builder() {
@@ -205,9 +273,9 @@ SERVER_VERSION_MAJOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 1)
 SERVER_VERSION_MINOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 2)
 SERVER_VERSION_BUILD=$(echo "$SERVER_VERSION"| cut -d'.' -f 3)
 
-if [ "${SERVER_VERSION_MAJOR}" -ge $DOCKER_VERSION_MAJOR ] && \
-	[ "${SERVER_VERSION_MINOR}" -ge $DOCKER_VERSION_MINOR ]  && \
-	[ "${SERVER_VERSION_BUILD}" -ge $DOCKER_VERSION_BUILD ]; then
+if [ "${SERVER_VERSION_MAJOR}" -ge $REQ_DOCKER_VERSION_MAJOR ] && \
+	[ "${SERVER_VERSION_MINOR}" -ge $REQ_DOCKER_VERSION_MINOR ]  && \
+	[ "${SERVER_VERSION_BUILD}" -ge $REQ_DOCKER_VERSION_BUILD ]; then
 	echo "Docker version >= 18.2.0. You are good to go."
 else
 	echo ""
@@ -291,11 +359,11 @@ case $mainmenu_selection in
 	#if no container is selected then dont overwrite the docker-compose.yml file
 	if [ -n "$container_selection" ]; then
 		touch $TMP_DOCKER_COMPOSE_YML
-		echo "services:" > $TMP_DOCKER_COMPOSE_YML
+		# echo "services:" > $TMP_DOCKER_COMPOSE_YML
 
 		# Uncomment once sort_keys is available in Pyton->yaml
-		# echo "version: '$COMPOSE_VERSION'" > $TMP_DOCKER_COMPOSE_YML
-		# echo "services:" >> $TMP_DOCKER_COMPOSE_YML
+		echo "version: '$COMPOSE_VERSION'" > $TMP_DOCKER_COMPOSE_YML
+		echo "services:" >> $TMP_DOCKER_COMPOSE_YML
 
 		#set the ACL for the stack
 		#docker_setfacl
@@ -313,15 +381,22 @@ case $mainmenu_selection in
 		done
 
 		if [ -f "$DOCKER_COMPOSE_OVERRIDE_YML" ]; then
-			echo "merging docker overrides with docker-compose.yaml"
-			python ./scripts/yaml_merge.py $TMP_DOCKER_COMPOSE_YML  $DOCKER_COMPOSE_OVERRIDE_YML $DOCKER_COMPOSE_YML
+			do_python3_pip
+			
+			if [ "$PYTHON_VERSION_GOOD" == "true" ] && [ "$PYYAML_VERSION_GOOD" == "true" ]; then
+				echo "merging docker overrides with docker-compose.yml"
+				python3 ./scripts/yaml_merge.py $TMP_DOCKER_COMPOSE_YML  $DOCKER_COMPOSE_OVERRIDE_YML $DOCKER_COMPOSE_YML
+			else
+				echo "incorrect python or dependency versions, aborting override and using docker-compose.yml"
+				cp $TMP_DOCKER_COMPOSE_YML $DOCKER_COMPOSE_YML
+			fi
 		else
-			echo "no override found, using docker-compose.yaml"
+			echo "no override found, using docker-compose.yml"
 			cp $TMP_DOCKER_COMPOSE_YML $DOCKER_COMPOSE_YML
 		fi
 
 		# Prepend compose version after merging/copying, so that merging doesn't move it to the bottom (alphabetically ordered).
-		echo -e "version: '$COMPOSE_VERSION'\n$(cat $DOCKER_COMPOSE_YML)" > $DOCKER_COMPOSE_YML  # Remove once sort_keys works in Python->yaml.
+		# echo -e "version: '$COMPOSE_VERSION'\n$(cat $DOCKER_COMPOSE_YML)" > $DOCKER_COMPOSE_YML  # Remove once sort_keys works in Python->yaml.
 
 		echo "docker-compose successfully created"
 		echo "run 'docker-compose up -d' to start the stack"
