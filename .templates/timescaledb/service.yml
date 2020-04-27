@@ -1,0 +1,10 @@
+  timescaledb:
+    container_name: timescaledb
+    image: timescale/timescaledb:latest-pg12
+    restart: unless-stopped
+    env_file:
+      - ./services/timescaledb/timescaledb.env
+    ports:
+      - 5432:5432
+    volumes:
+      - ./volumes/timescaledb/data:/var/lib/postgresql/data
