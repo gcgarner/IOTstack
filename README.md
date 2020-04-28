@@ -1,12 +1,15 @@
 # IOT Stack
 IOTstack is a builder for docker-compose to easily make and maintain IoT stacks on the Raspberry Pi.
 
+
 ## Documentation for the project: 
 
 https://sensorsiot.github.io/IOTstack/
 
+
 ## Video
 https://youtu.be/a6mjt8tWUws
+
 
 ## Installation
 1. On the (RPi) lite image you will need to install git first
@@ -31,5 +34,16 @@ cd ~/IOTstack && bash ./menu.sh
 
 5. Run menu again to select your build options, then start docker-compose with
 ```
+docker-compose up -d
+```
+
+
+## Migrating from the old repo?
+```
+cd ~/IOTstack/
+git remote set-url origin https://github.com/SensorsIot/IOTstack.git
+git pull origin master
+docker-compose down
+./menu.sh
 docker-compose up -d
 ```
