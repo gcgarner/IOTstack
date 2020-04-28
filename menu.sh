@@ -334,6 +334,7 @@ if command_exists docker; then
 		if (whiptail --title "Docker and Docker-Compose Version Issue" --yesno "Docker version is currently $DOCKER_VERSION which is less than $REQ_DOCKER_VERSION consider upgrading or you may experience issues. You can manually upgrade by typing 'sudo apt upgrade docker docker-compose'. Attempt to upgrade now?" 20 78); then
 			sudo apt upgrade docker docker-compose
 		fi
+	fi
 else
 	echo "docker not installed"
 fi
