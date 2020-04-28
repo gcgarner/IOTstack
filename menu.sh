@@ -3,6 +3,8 @@
 #get path of menu correct
 pushd ~/IOTstack
 
+CURRENT_BRANCH=${1:-$(git name-rev --name-only HEAD)}
+
 # Consts/vars
 TMP_DOCKER_COMPOSE_YML=./.tmp/docker-compose.tmp.yml
 DOCKER_COMPOSE_YML=./docker-compose.yml
@@ -602,7 +604,7 @@ case $mainmenu_selection in
 	;;
 "update")
 	echo "Pulling latest project file from Github.com ---------------------------------------------"
-	git pull origin master
+	git pull origin $CURRENT_BRANCH
 	echo "git status ------------------------------------------------------------------------------"
 	git status
 	;;
