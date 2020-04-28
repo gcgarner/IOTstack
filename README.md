@@ -37,6 +37,14 @@ cd ~/IOTstack && bash ./menu.sh
 docker-compose up -d
 ```
 
+## Experimental Features
+Want to have the latest and greatest features? Switch to the experimental branch:
+```
+git pull && git checkout experimental
+./menu.sh
+```
+
+Do note that the experimental branch may be broken, or may break your setup, so ensure you have a good backup, and please report any issues.
 
 ## Migrating from the old repo?
 ```
