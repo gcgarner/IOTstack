@@ -321,18 +321,21 @@ fi
 
 #---------------------------------------------------------------------------------------------------
 # Docker updates
-echo "checking docker version"
-DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
-DOCKER_VERSION_MAJOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 1)
-DOCKER_VERSION_MINOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 2)
-DOCKER_VERSION_BUILD=$(echo "$DOCKER_VERSION"| cut -d'.' -f 3)
+if command_exists docker; then
+	echo "checking docker version"
+	DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
+	DOCKER_VERSION_MAJOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 1)
+	DOCKER_VERSION_MINOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 2)
+	DOCKER_VERSION_BUILD=$(echo "$DOCKER_VERSION"| cut -d'.' -f 3)
 
-if [ "$(minimum_version_check $REQ_DOCKER_VERSION $DOCKER_VERSION_MAJOR $DOCKER_VERSION_MINOR $DOCKER_VERSION_BUILD )" == "true" ]; then
-	echo "Docker version >= $REQ_DOCKER_VERSION. You are good to go."
+	if [ "$(minimum_version_check $REQ_DOCKER_VERSION $DOCKER_VERSION_MAJOR $DOCKER_VERSION_MINOR $DOCKER_VERSION_BUILD )" == "true" ]; then
+		echo "Docker version >= $REQ_DOCKER_VERSION. You are good to go."
+	else
+		if (whiptail --title "Docker and Docker-Compose Version Issue" --yesno "Docker version is currently $DOCKER_VERSION which is less than $REQ_DOCKER_VERSION consider upgrading or you may experience issues. You can manually upgrade by typing 'sudo apt upgrade docker docker-compose'. Attempt to upgrade now?" 20 78); then
+			sudo apt upgrade docker docker-compose
+		fi
 else
-	if (whiptail --title "Docker and Docker-Compose Version Issue" --yesno "Docker version is currently $DOCKER_VERSION which is less than $REQ_DOCKER_VERSION consider upgrading or you may experience issues. You can manually upgrade by typing 'sudo apt upgrade docker docker-compose'. Attempt to upgrade now?" 20 78); then
-		sudo apt upgrade docker docker-compose
-	fi
+	echo "docker not installed"
 fi
 
 #---------------------------------------------------------------------------------------------------
