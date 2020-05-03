@@ -9,7 +9,7 @@
       - '5901:5900'
     volumes:
        - ./volumes/deconz/:/root/.local/share/dresden-elektronik/deCONZ
-    devices:
+    #devices:
       #ConBee II uncomment next line
       #- /dev/ttyACM0
       #ConBee uncomment next line
