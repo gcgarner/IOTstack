@@ -4,18 +4,18 @@
     restart: unless-stopped
     network_mode: bridge
     ports:
-      - '80:80'
-      - '443:443'
+      - '8090:80'
+      - '4439:443'
       - '5901:5900'
     volumes:
        - ./volumes/deconz/:/root/.local/share/dresden-elektronik/deCONZ
     devices:
-      #ConBee II:
-      - /dev/ttyACM0
-      #ConBee:
-      # - /dev/ttyUSB0
-      #RaspBee: 
-      # - /dev/ttyAMA0 or /dev/ttyS0
+      #ConBee II uncomment next line
+      #- /dev/ttyACM0
+      #ConBee uncomment next line
+      #- /dev/ttyUSB0
+      #RaspBee uncomment next line
+      #- /dev/ttyAMA0 or /dev/ttyS0
     environment:
       - DECONZ_VNC_MODE=1
       - DECONZ_VNC_PASSWORD=changeme
