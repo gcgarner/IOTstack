@@ -8,9 +8,11 @@ declare -A cont_array=(
 	[nodered]="Node-RED"
 	[influxdb]="InfluxDB"
 	[telegraf]="Telegraf (Requires InfluxDB and Mosquitto)"
+	[transmission]="transmission"
 	[grafana]="Grafana"
 	[mosquitto]="Eclipse-Mosquitto"
 	[postgres]="Postgres"
+	[timescaledb]="Timescaledb"
 	[mariadb]="MariaDB (MySQL fork)"
 	[adminer]="Adminer"
 	[openhab]="openHAB"
@@ -29,12 +31,39 @@ declare -A cont_array=(
 	[diyhue]="diyHue"
 	[homebridge]="Homebridge"
 	[python]="Python 3"
-
+	[gitea]="Gitea"
 )
-declare -a armhf_keys=("portainer" "nodered" "influxdb" "grafana" "mosquitto" "telegraf" "mariadb" "postgres"
-	"adminer" "openhab" "zigbee2mqtt" "deconz" "pihole" "plex" "tasmoadmin" "rtl_433" "espruinohub"
-	"motioneye" "webthings_gateway" "blynk_server" "nextcloud" "diyhue" "homebridge" "python")
 
+declare -a armhf_keys=(
+	"portainer"
+	"nodered"
+	"influxdb"
+	"grafana"
+	"mosquitto"
+	"telegraf"
+	"mariadb"
+	"postgres"
+	"timescaledb"
+	"transmission"
+	"adminer"
+	"openhab"
+	"zigbee2mqtt"
+  "deconz"
+	"pihole"
+	"plex"
+	"tasmoadmin"
+	"rtl_433"
+	"espruinohub"
+	"motioneye"
+	"webthings_gateway"
+	"blynk_server"
+	"nextcloud"
+	"diyhue"
+	"homebridge"
+	"python"
+	"gitea"
+	# add yours here
+)
 sys_arch=$(uname -m)
 
 #timezones
@@ -117,6 +146,9 @@ function yml_builder() {
 	#if an env file exists check for timezone
 	[ -f "./services/$1/$1.env" ] && timezones ./services/$1/$1.env
 
+    # if a volumes.yml exists, append to overall volumes.yml file
+    [ -f "./services/$1/volumes.yml" ] && cat "./services/$1/volumes.yml" >> docker-volumes.yml
+
 	#add new line then append service
 	echo "" >>docker-compose.yml
 	cat $service >>docker-compose.yml
@@ -158,6 +190,25 @@ else
 fi
 
 #---------------------------------------------------------------------------------------------------
+# Docker updates
+echo "checking docker version"
+SERVER_VERSION=$(docker version -f "{{.Server.Version}}")
+SERVER_VERSION_MAJOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 1)
+SERVER_VERSION_MINOR=$(echo "$SERVER_VERSION"| cut -d'.' -f 2)
+SERVER_VERSION_BUILD=$(echo "$SERVER_VERSION"| cut -d'.' -f 3)
+
+if [ "${SERVER_VERSION_MAJOR}" -ge 18 ] && \
+	[ "${SERVER_VERSION_MINOR}" -ge 2 ]  && \
+	[ "${SERVER_VERSION_BUILD}" -ge 0 ]; then
+	echo "Docker version >= 18.2.0. You are good to go."
+else
+	echo ""
+	echo "Docker version less than 18.02.0 consider upgrading or you may experience issues"
+	echo "Upgrade by typing: 'sudo apt upgrade docker docker-compose'"
+	sleep 2
+fi
+
+#---------------------------------------------------------------------------------------------------
 # Menu system starts here
 # Display main menu
 mainmenu_selection=$(whiptail --title "Main Menu" --menu --notags \
@@ -192,7 +243,7 @@ case $mainmenu_selection in
 		sudo apt install -y docker-compose
 	fi
 
-	if (whiptail --title "Restart Required" --yesno "It is recommended that you restart you device now. Select yes to do so now" 20 78); then
+	if (whiptail --title "Restart Required" --yesno "It is recommended that you restart your device now. Select yes to do so now" 20 78); then
 		sudo reboot
 	fi
 	;;
@@ -232,7 +283,7 @@ case $mainmenu_selection in
 	#if no container is selected then dont overwrite the docker-compose.yml file
 	if [ -n "$container_selection" ]; then
 		touch docker-compose.yml
-		echo "version: '2'" >docker-compose.yml
+		echo "version: '3.6'" >docker-compose.yml
 		echo "services:" >>docker-compose.yml
 
 		#set the ACL for the stack
@@ -259,6 +310,14 @@ case $mainmenu_selection in
 					yml_builder "$container"
 				done
 			fi
+		fi
+		
+		# if a container needs volume, put it at the end of docker-compose
+		if [ -f docker-volumes.yml ]; then
+			echo "" >> docker-compose.yml
+			echo "volumes:" >> docker-compose.yml
+			cat docker-volumes.yml >> docker-compose.yml
+			rm docker-volumes.yml
 		fi
 
 		echo "docker-compose successfully created"
@@ -407,7 +466,7 @@ case $mainmenu_selection in
 		"tinker" " " \
 		3>&1 1>&2 2>&3)
 	if [ -n "$hassio_machine" ]; then
-		curl -sL https://raw.githubusercontent.com/home-assistant/hassio-installer/master/hassio_install.sh | sudo bash -s -- -m $hassio_machine
+		curl -sL https://raw.githubusercontent.com/home-assistant/supervised-installer/master/installer.sh | sudo bash -s -- -m $hassio_machine
 	else
 		echo "no selection"
 		exit
