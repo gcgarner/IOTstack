@@ -17,6 +17,7 @@ declare -A cont_array=(
 	[adminer]="Adminer"
 	[openhab]="openHAB"
 	[zigbee2mqtt]="zigbee2mqtt"
+	[deconz]="deCONZ"
 	[pihole]="Pi-Hole"
 	[plex]="Plex media server"
 	[tasmoadmin]="TasmoAdmin"
@@ -33,7 +34,6 @@ declare -A cont_array=(
 	[gitea]="Gitea"
 )
 
-
 declare -a armhf_keys=(
 	"portainer"
 	"nodered"
@@ -48,6 +48,7 @@ declare -a armhf_keys=(
 	"adminer"
 	"openhab"
 	"zigbee2mqtt"
+  "deconz"
 	"pihole"
 	"plex"
 	"tasmoadmin"
