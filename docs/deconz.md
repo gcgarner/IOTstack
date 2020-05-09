@@ -3,17 +3,7 @@
 - [Docker](https://hub.docker.com/r/marthoc/deconz)
 - [Website](https://github.com/dresden-elektronik/deconz-rest-plugin/blob/master/README.md)
 
-## Installing deCONZ
-1) Plug in you ConBee II, ConBee or Raspbee (if no device is plugged in, deCONZ will not be properly installed)
-2) Add deCONZ to your stack using `cd ~/IOTstack && bash ./menu.sh`and select deCONZ
-3) Edit the deconz service.yml using `sudo nano ~/IOTstack/services/deconz/service.yml` - activate your device by removing the "#" in front of "devices" and the "#" in front of your specific device. Save the changes using "ctrl+x", "y" and "enter".
-4) Build the stack again using `cd ~/IOTstack && bash ./menu.sh` to apply the changes and select "Do not overwrite".
-5) Run `docker-compose up -d` to build the deCONZ container.
-
-These steps are also shown in the gif below:
-
-![installing deCONZ](https://github.com/DIYtechie/resources/blob/master/images/installing%20deconz%20-%20short%20version.gif?raw=true)
-
+## Accessing Phoscon ui
 deCONZ should now be available at http://ip.address.of.your.IOTstack.pc.here:8090/
 
 ## Viewing the deCONZ Zigbee mesh
