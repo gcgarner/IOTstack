@@ -20,6 +20,7 @@ menuNavigateDirection = 0
 projectStatusPollRateRefresh = 1
 needsRender = True
 promptFiles = False
+buildComplete = None
 
 # Menu Functions
 def exitMenu():
@@ -31,13 +32,15 @@ def updateProject():
   sys.exit(0)
 
 def buildStack():
+  global buildComplete
+  buildComplete = None
   buildstackFilePath = "./scripts/buildstack_menu.py"
   with open(buildstackFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), buildstackFilePath, "exec")
   execGlobals = globals()
   execLocals = locals()
   exec(code, execGlobals, execLocals)
-  print("Building images", execGlobals["checkedMenuItems"])
+  buildComplete = execGlobals["results"]["buildState"]
 
 def doNothing():
   selectionInProgress = True
@@ -214,6 +217,11 @@ def mainRender(menu, selection):
   print(term.move_y(term.height // 16))
   print(term.black_on_cornsilk4(term.center('IOTstack Main Menu')))
   print("")
+
+  if (buildComplete):
+    print("")
+    print(term.center('{t.blue_on_green} {text} {t.normal}{t.white_on_black}{cPath} {t.normal}'.format(t=term, text="Build completed:", cPath=" ./docker-compose.yml")))
+    print("")
 
   for (index, menuItem) in enumerate(menu):
     if index == selection:

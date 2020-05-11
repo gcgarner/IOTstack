@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 checkedMenuItems = []
+results = {}
 
 def main():
   import os
@@ -12,12 +13,44 @@ def main():
   templateDirectory = './.templates'
   serviceFile = 'service.yml'
   buildScriptFile = 'build.py'
+  dockerPathOutput = './docker-compose.yml'
+  composeOverrideFile = './compose-override.yml'
 
   # Runtime vars
   menu = []
   dockerComposeYaml = {}
   templateDirectoryFolders = next(os.walk(templateDirectory))[1]
   term = Terminal()
+
+  def buildServices():
+    try:
+      dockerFileYaml = {}
+      dockerFileYaml["version"] = "3.6"
+      dockerFileYaml["services"] = {}
+      dockerFileYaml["services"] = dockerComposeYaml
+
+      if os.path.exists(composeOverrideFile):
+        with open(r'%s' % composeOverrideFile) as fileOverride:
+          yamlOverride = yaml.load(fileOverride, Loader=yaml.SafeLoader)
+
+        mergedYaml = mergeYaml(yamlOverride, dockerFileYaml)
+        dockerFileYaml = mergedYaml
+
+      with open(r'%s' % dockerPathOutput, 'w') as outputFile:
+        yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
+
+      return True
+    except:
+      return False
+
+  def mergeYaml(priorityYaml, defaultYaml):
+    if isinstance(priorityYaml, dict) and isinstance(defaultYaml, dict):
+      for k, v in defaultYaml.iteritems():
+        if k not in priorityYaml:
+          priorityYaml[k] = v
+        else:
+          priorityYaml[k] = mergeYaml(priorityYaml[k], v)
+    return defaultYaml
 
   def generateTemplateList(templateDirectoryFolders):
     templateListDirectories = []
@@ -158,7 +191,7 @@ def main():
       serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
       with open(r'%s' % serviceFilePath) as yamlServiceFile:
         dockerComposeYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
-      
+
     return True
 
   def checkForIssues():
@@ -169,13 +202,25 @@ def main():
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
           execGlobals = {
             "dockerComposeYaml": dockerComposeYaml,
-            "toRun": "runChecks",
+            "toRun": "checkForRunChecksHook",
             "currentServiceName": checkedMenuItem
           }
           execLocals = locals()
           exec(code, execGlobals, execLocals)
-          if "issues" in execGlobals and len(execGlobals["issues"]) > 0:
-            menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = execGlobals["issues"]
+          if "buildHooks" in execGlobals and "runChecksHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["runChecksHook"]:
+            execGlobals = {
+              "dockerComposeYaml": dockerComposeYaml,
+              "toRun": "runChecks",
+              "currentServiceName": checkedMenuItem
+            }
+            execLocals = locals()
+            exec(code, execGlobals, execLocals)
+            if "issues" in execGlobals and len(execGlobals["issues"]) > 0:
+              menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = execGlobals["issues"]
+            else:
+              menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = []
+          else:
+            menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = []
 
   def checkForOptions():
     for (index, menuItem) in enumerate(menu):
@@ -185,17 +230,17 @@ def main():
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
           execGlobals = {
             "dockerComposeYaml": dockerComposeYaml,
-            "toRun": "checkForMenu",
+            "toRun": "checkForOptionsHook",
             "currentServiceName": menuItem[0]
           }
           execLocals = locals()
           exec(code, execGlobals, execLocals)
-          if "options" in execGlobals["buildMenus"] and execGlobals["buildMenus"]["options"]:
+          if "options" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["options"]:
             menu[getMenuItemIndexByService(menuItem[0])][1]["options"] = True
 
   def executeServiceOptions():
     menuItem = menu[selection]
-    if "buildMenus" in menuItem[1] and "options" in menuItem[1]["buildMenus"] and menuItem[1]["buildMenus"]["options"]:
+    if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
       buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
@@ -221,6 +266,7 @@ def main():
       menu[selection][1]["checked"] = True
 
   if __name__ == '__main__':
+    global results
     term = Terminal()
     with term.fullscreen():
       selection = 0
@@ -243,7 +289,8 @@ def main():
               loadServices()
               checkForIssues()
               selectionInProgress = False
-              return True
+              results["buildState"] = buildServices()
+              return results["buildState"]
             if key.name == 'KEY_ESCAPE':
               return True
           elif key:
