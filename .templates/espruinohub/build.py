@@ -122,7 +122,7 @@ def main():
 
 # This check isn't required, but placed here for debugging purposes
 global currentServiceName # Name of the current service
-if currentServiceName == 'blynk_server':
+if currentServiceName == 'espruinohub':
   main()
 else:
-  print("Error. '{}' Tried to run 'blynk_server' config".format(currentServiceName))
+  print("Error. '{}' Tried to run 'espruinohub' config".format(currentServiceName))

@@ -24,6 +24,7 @@ def main():
 
   def buildServices():
     try:
+      runPrebuildHook()
       dockerFileYaml = {}
       dockerFileYaml["version"] = "3.6"
       dockerFileYaml["services"] = {}
@@ -39,6 +40,7 @@ def main():
       with open(r'%s' % dockerPathOutput, 'w') as outputFile:
         yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
 
+      runPostbuildHook()
       return True
     except:
       return False
@@ -63,7 +65,7 @@ def main():
 
   templatesList = generateTemplateList(templateDirectoryFolders)
   for directory in templatesList:
-    menu.append([directory, { "checked": False, "issues": False }])
+    menu.append([directory, { "checked": False, "issues": None }])
 
   def generateLineText(text, textLength=None, paddingBefore=0, lineLength=26):
     result = ""
@@ -131,8 +133,15 @@ def main():
         toPrint = toPrint + ' {t.orange_on_black} Issue {t.normal}'.format(t=term)
         allIssues.append({ "serviceName": menuItem[0], "issues": menuItem[1]["issues"] })
       else:
-        for i in range(issuesLength):
-          toPrint += " "
+        if menuItem[1]["checked"]:
+          if not menuItem[1]["issues"] == None and len(menuItem[1]["issues"]) == 0:
+            toPrint = toPrint + '     {t.green_on_blue} Pass {t.normal} '.format(t=term)
+          else:
+            for i in range(issuesLength):
+              toPrint += " "
+        else:
+          for i in range(issuesLength):
+            toPrint += " "
 
       for i in range(spaceAfterissues):
         toPrint += " "
@@ -164,17 +173,18 @@ def main():
       print(term.center(""))
       print(term.center(""))
       print(term.center(""))
-      print(term.center("╔══════ Build Issues ══════════════════════════════════════════════════════════════════════════════╗"))
-      print(term.center("║                                                                                                  ║"))
+      print(term.center("╔══════ Build Issues ═════════════════════════════════════════════════════════════════════════════════════════════════════════╗"))
+      print(term.center("║                                                                                                                             ║"))
       for serviceIssues in allIssues:
         for index, issue in enumerate(serviceIssues["issues"]):
           spacesAndBracketsLen = 5
           issueAndTypeLen = len(issue) + len(serviceIssues["serviceName"]) + spacesAndBracketsLen
-          formattedServiceName = '{t.red_on_black}{issueService}{t.normal} ({t.yellow_on_black}{issueType}{t.normal}) '.format(t=term, issueService=serviceIssues["serviceName"], issueType=issue)
-          issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=64)
-          print(term.center("║ {} - {} ║".format(formattedServiceName, issueDescription) ))
-      print(term.center("║                                                                                                  ║"))
-      print(term.center("╚══════════════════════════════════════════════════════════════════════════════════════════════════╝"))
+          serviceNameAndConflictType = '{t.red_on_black}{issueService}{t.normal} ({t.yellow_on_black}{issueType}{t.normal}) '.format(t=term, issueService=serviceIssues["serviceName"], issueType=issue)
+          formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=49)
+          issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=72)
+          print(term.center("║ {} - {} ║".format(formattedServiceNameAndConflictType, issueDescription) ))
+      print(term.center("║                                                                                                                             ║"))
+      print(term.center("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"))
 
     return
 
@@ -238,6 +248,50 @@ def main():
           if "options" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["options"]:
             menu[getMenuItemIndexByService(menuItem[0])][1]["options"] = True
 
+  def runPrebuildHook():
+    for (index, checkedMenuItem) in enumerate(checkedMenuItems):
+      buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
+      if os.path.exists(buildScriptPath):
+          with open(buildScriptPath, "rb") as pythonDynamicImportFile:
+            code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
+          execGlobals = {
+            "dockerComposeYaml": dockerComposeYaml,
+            "toRun": "checkForPreBuildHook",
+            "currentServiceName": checkedMenuItem
+          }
+          execLocals = locals()
+          exec(code, execGlobals, execLocals)
+          if "preBuildHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["preBuildHook"]:
+            execGlobals = {
+              "dockerComposeYaml": dockerComposeYaml,
+              "toRun": "preBuild",
+              "currentServiceName": checkedMenuItem
+            }
+            execLocals = locals()
+            exec(code, execGlobals, execLocals)
+
+  def runPostbuildHook():
+    for (index, checkedMenuItem) in enumerate(checkedMenuItems):
+      buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
+      if os.path.exists(buildScriptPath):
+          with open(buildScriptPath, "rb") as pythonDynamicImportFile:
+            code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
+          execGlobals = {
+            "dockerComposeYaml": dockerComposeYaml,
+            "toRun": "checkForPostBuildHook",
+            "currentServiceName": checkedMenuItem
+          }
+          execLocals = locals()
+          exec(code, execGlobals, execLocals)
+          if "postBuildHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["postBuildHook"]:
+            execGlobals = {
+              "dockerComposeYaml": dockerComposeYaml,
+              "toRun": "postBuild",
+              "currentServiceName": checkedMenuItem
+            }
+            execLocals = locals()
+            exec(code, execGlobals, execLocals)
+
   def executeServiceOptions():
     menuItem = menu[selection]
     if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
@@ -261,7 +315,7 @@ def main():
   def checkMenuItem(selection):
     if menu[selection][1]["checked"] == True:
       menu[selection][1]["checked"] = False
-      menu[selection][1]["issues"] = False
+      menu[selection][1]["issues"] = None
     else:
       menu[selection][1]["checked"] = True
 
@@ -292,7 +346,8 @@ def main():
               results["buildState"] = buildServices()
               return results["buildState"]
             if key.name == 'KEY_ESCAPE':
-              return True
+              results["buildState"] = False
+              return results["buildState"]
           elif key:
             if key == ' ': # Space pressed
               checkMenuItem(selection)
