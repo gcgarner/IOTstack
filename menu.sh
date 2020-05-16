@@ -32,6 +32,7 @@ declare -A cont_array=(
 	[homebridge]="Homebridge"
 	[python]="Python 3"
 	[gitea]="Gitea"
+	[dozzle]="Dozzle"
 )
 
 declare -a armhf_keys=(
@@ -62,6 +63,7 @@ declare -a armhf_keys=(
 	"homebridge"
 	"python"
 	"gitea"
+	"dozzle"
 	# add yours here
 )
 sys_arch=$(uname -m)
