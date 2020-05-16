@@ -6,7 +6,6 @@ haltOnErrors = True
 
 # Main wrapper function. Required to make local vars work correctly
 def main():
-  import time
   global dockerComposeYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
@@ -60,12 +59,6 @@ def main():
     checkForIssues()
     return []
 
-  # This is the menu that will run for " >> Options "
-  # def runOptionsMenu():
-  #   print("Options!")
-  #   time.sleep(2)
-  #   return True
-
   # This function is optional, and will run after the docker-compose.yml file is written to disk.
   def postBuild():
     return True
@@ -79,38 +72,7 @@ def main():
   # #####################################
 
   def checkForIssues():
-    for (index, serviceName) in enumerate(dockerComposeYaml):
-      if not currentServiceName == serviceName: # Skip self
-        currentServicePorts = getExternalPorts(currentServiceName)
-        portConflicts = checkPortConflicts(serviceName, currentServicePorts)
-        if (len(portConflicts) > 0):
-          issues["portConflicts"] = portConflicts
-
-  def getExternalPorts(serviceName):
-    try:
-      yamlService = dockerComposeYaml[serviceName]
-      externalPorts = []
-      if "ports" in yamlService:
-        for (index, port) in enumerate(yamlService["ports"]):
-          try:
-            externalAndInternal = port.split(":")
-            externalPorts.append(externalAndInternal[0])
-          except:
-            pass
-    except:
-      pass
-    return externalPorts
-
-  def checkPortConflicts(serviceName, currentPorts):
-    portConflicts = []
-    if not currentServiceName == serviceName:
-      yamlService = dockerComposeYaml[serviceName]
-      servicePorts = getExternalPorts(serviceName)
-      for (index, servicePort) in enumerate(servicePorts):
-        for (index, currentPort) in enumerate(currentPorts):
-          if (servicePort == currentPort):
-            portConflicts.append([servicePort, serviceName])
-    return portConflicts
+    return True
 
   if haltOnErrors:
     eval(toRun)()

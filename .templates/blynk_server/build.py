@@ -6,7 +6,6 @@ haltOnErrors = True
 
 # Main wrapper function. Required to make local vars work correctly
 def main():
-  import time
   global dockerComposeYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
@@ -60,12 +59,6 @@ def main():
     checkForIssues()
     return []
 
-  # This is the menu that will run for " >> Options "
-  # def runOptionsMenu():
-  #   print("Options!")
-  #   time.sleep(2)
-  #   return True
-
   # This function is optional, and will run after the docker-compose.yml file is written to disk.
   def postBuild():
     return True
@@ -87,9 +80,9 @@ def main():
           issues["portConflicts"] = portConflicts
 
   def getExternalPorts(serviceName):
+    externalPorts = []
     try:
       yamlService = dockerComposeYaml[serviceName]
-      externalPorts = []
       if "ports" in yamlService:
         for (index, port) in enumerate(yamlService["ports"]):
           try:

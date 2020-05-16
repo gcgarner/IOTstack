@@ -14,6 +14,7 @@ def main():
   serviceFile = 'service.yml'
   buildScriptFile = 'build.py'
   dockerPathOutput = './docker-compose.yml'
+  dockerSavePathOutput = './services/docker-compose.save.yml'
   composeOverrideFile = './compose-override.yml'
 
   # Runtime vars
@@ -38,6 +39,9 @@ def main():
         dockerFileYaml = mergedYaml
 
       with open(r'%s' % dockerPathOutput, 'w') as outputFile:
+        yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
+
+      with open(r'%s' % dockerSavePathOutput, 'w') as outputFile:
         yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
 
       runPostbuildHook()
@@ -205,6 +209,7 @@ def main():
     return True
 
   def checkForIssues():
+    global dockerComposeYaml
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
       buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
@@ -319,11 +324,32 @@ def main():
     else:
       menu[selection][1]["checked"] = True
 
+  def prepareMenuState():
+    global dockerComposeYaml
+    for (index, serviceName) in enumerate(dockerComposeYaml):
+      checkMenuItem(getMenuItemIndexByService(serviceName))
+      setCheckedMenuItems()
+      checkForIssues()
+
+    return True
+
+  def loadCurrentConfigs():
+    global dockerComposeYaml
+    if os.path.exists(dockerSavePathOutput):
+      with open(r'%s' % dockerSavePathOutput) as fileSavedConfigs:
+        previousConfigs = yaml.load(fileSavedConfigs, Loader=yaml.SafeLoader)
+        if "services" in previousConfigs:
+          dockerComposeYaml = previousConfigs["services"]
+          return True
+    return False
+
   if __name__ == '__main__':
     global results
     term = Terminal()
     with term.fullscreen():
       selection = 0
+      if loadCurrentConfigs():
+        prepareMenuState()
       mainRender(menu, selection)
       selectionInProgress = True
       with term.cbreak():

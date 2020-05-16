@@ -42,6 +42,25 @@ def buildStack():
   exec(code, execGlobals, execLocals)
   buildComplete = execGlobals["results"]["buildState"]
 
+def runExampleMenu():
+  exampleMenuFilePath = "./.templates/example_template/example_build.py"
+  with open(exampleMenuFilePath, "rb") as pythonDynamicImportFile:
+    code = compile(pythonDynamicImportFile.read(), exampleMenuFilePath, "exec")
+  # execGlobals = globals()
+  execGlobals = {}
+  execLocals = locals()
+  execGlobals["currentServiceName"] = 'SERVICENAME'
+  execGlobals["toRun"] = 'runOptionsMenu'
+  exec(code, execGlobals, execLocals)
+
+def dockerCommands():
+  dockerCommandsFilePath = "./scripts/docker_commands.py"
+  with open(dockerCommandsFilePath, "rb") as pythonDynamicImportFile:
+    code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
+  execGlobals = globals()
+  execLocals = locals()
+  exec(code, execGlobals, execLocals)
+
 def doNothing():
   selectionInProgress = True
 
@@ -83,10 +102,11 @@ def upgradeDocker(): # TODO: Fix shell issues
 
 baseMenu = [
   ["Build Stack", buildStack],
-  ["Docker Commands"],
+  ["Docker Commands", dockerCommands],
   ["Backup and Restore"],
   ["Miscellaneous Commands"],
   ["Native Installs"],
+  # ["Developer: Example Menu", runExampleMenu], # Uncomment if you want to see the example menu
   ["Exit", exitMenu]
 ]
 
