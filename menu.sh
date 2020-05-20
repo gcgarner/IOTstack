@@ -439,7 +439,7 @@ case $mainmenu_selection in
 		"tinker" " " \
 		3>&1 1>&2 2>&3)
 	if [ -n "$hassio_machine" ]; then
-		curl -sL https://raw.githubusercontent.com/home-assistant/supervised-installer/master/installer.sh | sudo bash -s -- -m $hassio_machine
+		curl -sL https://raw.githubusercontent.com/home-assistant/supervised-installer/1f30d124ef7d0ee84b45d1772cb5c1e4a94c67b8/installer.sh | sudo bash -s -- -m $hassio_machine
 	else
 		echo "no selection"
 		exit
