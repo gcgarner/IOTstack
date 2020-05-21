@@ -24,6 +24,7 @@ The Zigbee mesh can be viewed using VNC on port 5901. The default VNC password i
 Install [node-red-contrib-deconz](https://flows.nodered.org/node/node-red-contrib-deconz) via the "Manage palette" menu in Node-RED (if not already installed) and follow these 2 simple steps (also shown in the video below):
 
 Step 1: In the Phoscon UI, Go to Settings > Gateway > Advanced and click "Authenticate app".
+
 Step 2: In Node-RED, open a deCONZ node, select "Add new deonz-server", insert your ip adress and port 8090 and click "Get settings".  Click "Add", "Done" and "Deploy". Your device list will not be updated before deploying.
 
 ![installing deCONZ](https://github.com/DIYtechie/resources/blob/master/images/Setup%20deCONZ%20in%20Node-RED.gif?raw=true)
