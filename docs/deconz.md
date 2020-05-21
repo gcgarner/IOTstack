@@ -4,15 +4,13 @@
 - [Website](https://github.com/dresden-elektronik/deconz-rest-plugin/blob/master/README.md)
 
 ## Troubleshooting
-Make sure your Conbee/Conbee II/RaspBee gateway is connected. If your gateway is not detected, or no lights can be paired, try moving the device to another usb port, reboot your computer and build the stack from the menu again `cd ~/IOTstack && bash ./menu.sh` (select "Pull full service from template" if prompted). The device must be plugged in when the deCONZ Docker container is being built.
+Make sure your Conbee/Conbee II/RaspBee gateway is connected. If your gateway is not detected, or no lights can be paired, try moving the device to another usb port, reboot your computer and build the stack from the menu again `cd ~/IOTstack && bash ./menu.sh` (select "Pull full service from template" if prompted). The gateway must be plugged in when the deCONZ Docker container is being built.
 
-Before running `docker-compose up -d`, make sure your Linux user is part of the dialout group, which allows the user access to serial devices (i.e. Conbee/Conbee II/RaspBee). If you are not certain, simply add your user to the dialout group by running the following command (username "pi" being used as an example):
+Before running `docker-compose up -d`, make sure your Linux user is part of the dialout group, which allows the user access to serial devices (i.e. Conbee/Conbee II/RaspBee). If you are not certain, simply add your user to the dialout group by running the following command (username "pi" being used as an example): `sudo usermod -a -G dialout pi`
 
-`sudo usermod -a -G dialout pi`
+Now run `docker-compose up -d` to build the stack.
 
-Now run `docker-compose up -d`.
-
-If you are still experiencing issues, run `docker-compose down` and then `docker-compose up -d` again.
+If you are still experiencing issues, run `docker-compose down` to remove all containers from the stack and then `docker-compose up -d` to build them again.
 
 Use a 0.5-1m usb extension cable with ConBee (II) to avoid wifi and bluetooth noise/interference from your Raspberry Pi (recommended by the manufacturer and often the solution to poor performance).
 
