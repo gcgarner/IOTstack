@@ -27,4 +27,5 @@ Step 1: In the Phoscon UI, Go to Settings > Gateway > Advanced and click "Authen
 
 Step 2: In Node-RED, open a deCONZ node, select "Add new deonz-server", insert your ip adress and port 8090 and click "Get settings".  Click "Add", "Done" and "Deploy". Your device list will not be updated before deploying.
 
+
 ![installing deCONZ](https://github.com/DIYtechie/resources/blob/master/images/Setup%20deCONZ%20in%20Node-RED.gif?raw=true)
