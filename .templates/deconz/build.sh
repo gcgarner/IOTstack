@@ -2,8 +2,8 @@
 
 #deCONZ device configuration
 
-device_selection=$(whiptail --radiolist --title "deCONZ device configuration" --notags \
-        "Use the [SPACEBAR] to select your Zigbee device from the list below and make sure it is plugged in (if not, press [ESC])." 20 78 12 \
+device_selection=$(whiptail --radiolist --title "Select deCONZ gateway" --notags \
+        "Use the [SPACEBAR] to select your deCONZ gateway from the list below AND MAKE SURE IT IS PLUGGED IN (if not, press [ESC])." 20 78 12 \
         "ConBeeII" "ConBee II " "ON" \
         "ConBee" "ConBee " "OFF" \
         "RaspBee" "RaspBee " "OFF" \
@@ -12,18 +12,15 @@ device_selection=$(whiptail --radiolist --title "deCONZ device configuration" --
         case $device_selection in
 
                         "ConBeeII")
-                                echo "...copied ConBee II config from template"
-                                echo "" >>docker-compose.yml
                                 cat .templates/deconz/service_conbee_II.yml >>docker-compose.yml
+                                echo "...copied ConBee II config from template"
                                 ;;
                         "ConBee")
-                                echo "...copied ConBee config from template"
-                                echo "" >>docker-compose.yml
                                 cat .templates/deconz/service_conbee.yml >>docker-compose.yml
+                                echo "...copied ConBee config from template"
                                 ;;
                         "RaspBee")
-                                echo "...copied RaspBee config from template"
-                                echo "" >>docker-compose.yml
                                 cat .templates/deconz/service_raspbee.yml >>docker-compose.yml
+                                echo "...copied RaspBee config from template"
                                 ;;
                         esac
