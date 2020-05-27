@@ -1,5 +1,6 @@
-  diyhue:
-    container_name: diyhue
+containerNameGoesHere:
+    container_name: containerNameGoesHere
+    restart: unless-stopped
     image: diyhue/core:latest
     ports:
       - "8070:80/tcp"
@@ -11,4 +12,3 @@
       - ./services/diyhue/diyhue.env
     volumes:
        - ./volumes/diyhue/:/opt/hue-emulator/export/
-    restart: unless-stopped

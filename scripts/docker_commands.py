@@ -3,19 +3,80 @@
 def main():
   from blessed import Terminal
   import time
+  import subprocess
+  
+  def startStack():
+    print("Start Stack:")
+    print("docker-compose up -d")
+    subprocess.call("docker-compose up -d", shell=True)
+    print("")
+    print("Stack Started")
+    time.sleep(2)
+    return True
+  
+  def restartStack():
+    print("Restart Stack:")
+    print("docker-compose restart")
+    subprocess.call("docker-compose restart", shell=True)
+    print("")
+    print("Stack Restarted")
+    time.sleep(2)
+    return True
+
+  def stopStack():
+    print("Stop Stack:")
+    print("docker-compose down")
+    subprocess.call("docker-compose down", shell=True)
+    print("")
+    print("Stack Stopped")
+    time.sleep(2)
+    return True
+
+  def stopAllStack():
+    print("Stop All Stack:")
+    print("docker container stop $(docker container ls -aq)")
+    subprocess.call("docker container stop $(docker container ls -aq)", shell=True)
+    print("")
+    print("Stack Stopped. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(2)
+    return True
+
+  def pruneVolumes():
+    print("Stop All Stack:")
+    print("docker container stop $(docker container ls -aq)")
+    subprocess.call("docker container stop $(docker container ls -aq)", shell=True)
+    print("")
+    print("Stack Stopped. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(2)
+    return True
+
+  def updateAllContainers():
+    print("Update All Containers:")
+    print("docker-compose down")
+    subprocess.call("docker-compose down", shell=True)
+    print("")
+    print("docker-compose pull")
+    subprocess.call("docker-compose pull", shell=True)
+    print("")
+    print("docker-compose build")
+    subprocess.call("docker-compose build", shell=True)
+    print("")
+    print("docker-compose up -d")
+    subprocess.call("docker-compose up -d", shell=True)
+    print("")
+    print("Stack Updated. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(0.5)
+    return True
+
   mainMenuList = [
-    ["Start stack"],
-    ["Restart stack"],
-    ["Stop stack"],
-    ["Stop ALL running docker containers"],
-    ["Update all containers"],
-    ["Delete all stopped containers and docker volumes"],
+    ["Start stack", startStack],
+    ["Restart stack", restartStack],
+    ["Stop stack", stopStack],
+    ["Stop ALL running docker containers", stopAllStack],
+    ["Update all containers (may take a long time)", updateAllContainers],
+    ["Delete all stopped containers and docker volumes (prune volumes)"],
     ["Delete all images not associated with container"]
   ]
-
-  def startStack():
-    print("Start Stack")
-    time.sleep(2)
 
   selectionInProgress = True
   currentMenuItemIndex = 0
@@ -104,6 +165,7 @@ def main():
             if key.name == 'KEY_ENTER':
               runSelection(currentMenuItemIndex)
             if key.name == 'KEY_ESCAPE':
+              selectionInProgress = False
               return True
           elif key:
             print("got {0}.".format(key))
@@ -116,5 +178,6 @@ def main():
             while not isMenuItemSelectable(mainMenuList, currentMenuItemIndex):
               currentMenuItemIndex += menuNavigateDirection
               currentMenuItemIndex = currentMenuItemIndex % len(mainMenuList)
+    return True
 
 main()

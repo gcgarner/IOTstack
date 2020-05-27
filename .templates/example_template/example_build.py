@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# Be warned that globals and variable scopes do not function normally in this Python script. This is because this script is eval'd with exec.
+
 issues = {} # Returned issues dict
 buildHooks = {} # Options, and others hooks
 haltOnErrors = True
@@ -119,7 +121,7 @@ def main():
   # #####################################
   # Example menu below
   # #####################################
-  # You can build your menu system anyway you like. This one is provided as an example.
+  # You can build your menu system any way you like. This one is provided as an example.
   # Checkout Blessed for full functionality, like text entry and so on at: https://blessed.readthedocs.io/en/latest/
 
   # The functions the menu executes are below. They must be placed before the menu list 'menuItemsExample'
@@ -188,7 +190,7 @@ def main():
       if index == selection: # This checks if the current rendering item is the one that's selected
         toPrint += ('║   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
       else:
-        if len(menu[index]) > 2 and "customProperty" in menu[index][2] and menu[index][2]["customProperty"] == True: # A custom property check
+        if len(menu[index]) > 2 and "customProperty" in menu[index][2] and menu[index][2]["customProperty"] == True: # A custom property check example
           toPrint += ('║   {t.black_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
         else:
           toPrint += ('║   {t.normal} {title} '.format(t=term, title=menuItem[0]))

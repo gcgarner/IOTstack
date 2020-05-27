@@ -181,8 +181,6 @@ def addPotentialMenuItem(menuItemName, hasSpacer=True):
   return False
 
 def removeMenuItemByLabel(potentialItemKey):
-  # global mainMenuList
-  # global potentialMenu
   i = -1
   for menuItem in mainMenuList:
     i += 1
