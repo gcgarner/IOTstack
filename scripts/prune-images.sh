@@ -1,1 +1,0 @@
-docker image prune -a

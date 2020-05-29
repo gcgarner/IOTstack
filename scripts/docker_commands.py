@@ -4,6 +4,8 @@ def main():
   from blessed import Terminal
   import time
   import subprocess
+
+  global dockerCommandsSelectionInProgress
   
   def startStack():
     print("Start Stack:")
@@ -68,17 +70,44 @@ def main():
     time.sleep(0.5)
     return True
 
+  def deleteAndPruneVolumes():
+    print("Delete and prune volumes:")
+    print("docker system prune --volumes")
+    subprocess.call("docker system prune --volumes", shell=True)
+    print("")
+    print("Volume pruning completed. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(0.5)
+    return True
+
+  def deleteAndPruneImages():
+    print("Delete and prune volumes:")
+    print("docker image prune -a")
+    subprocess.call("docker image prune -a", shell=True)
+    print("")
+    print("Image pruning completed. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(0.5)
+    return True
+
+  def goBack():
+    global dockerCommandsSelectionInProgress
+    global needsRender
+    dockerCommandsSelectionInProgress = False
+    needsRender = True
+    print("Back to main menu")
+    return True
+
   mainMenuList = [
     ["Start stack", startStack],
     ["Restart stack", restartStack],
     ["Stop stack", stopStack],
     ["Stop ALL running docker containers", stopAllStack],
     ["Update all containers (may take a long time)", updateAllContainers],
-    ["Delete all stopped containers and docker volumes (prune volumes)"],
-    ["Delete all images not associated with container"]
+    ["Delete all stopped containers and docker volumes (prune volumes)", deleteAndPruneVolumes],
+    ["Delete all images not associated with container", deleteAndPruneImages],
+    ["Back", goBack]
   ]
 
-  selectionInProgress = True
+  dockerCommandsSelectionInProgress = True
   currentMenuItemIndex = 0
   menuNavigateDirection = 0
   needsRender = True
@@ -145,9 +174,9 @@ def main():
     with term.fullscreen():
       menuNavigateDirection = 0
       mainRender(mainMenuList, currentMenuItemIndex)
-      selectionInProgress = True
+      dockerCommandsSelectionInProgress = True
       with term.cbreak():
-        while selectionInProgress:
+        while dockerCommandsSelectionInProgress:
           menuNavigateDirection = 0
 
           if needsRender: # Only rerender when changed to prevent flickering
@@ -164,8 +193,10 @@ def main():
               menuNavigateDirection -= 1
             if key.name == 'KEY_ENTER':
               runSelection(currentMenuItemIndex)
+              if dockerCommandsSelectionInProgress == False:
+                return True
             if key.name == 'KEY_ESCAPE':
-              selectionInProgress = False
+              dockerCommandsSelectionInProgress = False
               return True
           elif key:
             print("got {0}.".format(key))
@@ -179,5 +210,7 @@ def main():
               currentMenuItemIndex += menuNavigateDirection
               currentMenuItemIndex = currentMenuItemIndex % len(mainMenuList)
     return True
+
+  return True
 
 main()
