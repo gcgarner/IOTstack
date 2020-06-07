@@ -58,6 +58,7 @@ def runExampleMenu():
   exec(code, execGlobals, execLocals)
 
 def dockerCommands():
+  global needsRender
   dockerCommandsFilePath = "./scripts/docker_commands.py"
   with open(dockerCommandsFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
@@ -66,6 +67,7 @@ def dockerCommands():
   execGlobals = {}
   execLocals = {}
   exec(code, execGlobals, execLocals)
+  needsRender = True
 
 def doNothing():
   selectionInProgress = True
@@ -109,9 +111,9 @@ def upgradeDocker(): # TODO: Fix shell issues
 baseMenu = [
   ["Build Stack", buildStack],
   ["Docker Commands", dockerCommands],
-  ["Backup and Restore"],
-  ["Miscellaneous Commands"],
-  ["Native Installs"],
+  # ["Backup and Restore"],
+  # ["Miscellaneous Commands"],
+  # ["Native Installs"],
   # ["Developer: Example Menu", runExampleMenu], # Uncomment if you want to see the example menu
   ["Exit", exitMenu]
 ]
@@ -130,6 +132,10 @@ potentialMenu = {
   },
   "dockerNotUpdated": { # TODO: Do note use, fix shell issues first
     "menuItem": [term.red_on_black("Docker is not up to date"), doNothing, { "skip": True }],
+    "added": False
+  },
+  "dockerTerminals": { # TODO: Do note use, not finished
+    "menuItem": ["Docker Terminals", doNothing],
     "added": False
   },
   "noProjectUpdate": {
