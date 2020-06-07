@@ -10,8 +10,74 @@ REQ_DOCKER_VERSION=18.2.0
 REQ_PYTHON_VERSION=3.6.9
 REQ_PYYAML_VERSION=5.3.1
 
+<<<<<<< HEAD
 PYTHON_CMD=python3
 
+=======
+declare -A cont_array=(
+	[portainer]="Portainer"
+	[nodered]="Node-RED"
+	[influxdb]="InfluxDB"
+	[telegraf]="Telegraf (Requires InfluxDB and Mosquitto)"
+	[transmission]="transmission"
+	[grafana]="Grafana"
+	[mosquitto]="Eclipse-Mosquitto"
+	[postgres]="Postgres"
+	[timescaledb]="Timescaledb"
+	[mariadb]="MariaDB (MySQL fork)"
+	[adminer]="Adminer"
+	[openhab]="openHAB"
+	[zigbee2mqtt]="zigbee2mqtt"
+	[deconz]="deCONZ"
+	[pihole]="Pi-Hole"
+	[plex]="Plex media server"
+	[tasmoadmin]="TasmoAdmin"
+	[rtl_433]="RTL_433 to mqtt"
+	[espruinohub]="EspruinoHub"
+	[motioneye]="motionEye"
+	[webthings_gateway]="Mozilla webthings-gateway"
+	[blynk_server]="blynk-server"
+	[nextcloud]="Next-Cloud"
+	[nginx]="NGINX by linuxserver"
+	[diyhue]="diyHue"
+	[homebridge]="Homebridge"
+	[python]="Python 3"
+	[gitea]="Gitea"
+	[dozzle]="Dozzle"
+)
+
+declare -a armhf_keys=(
+	"portainer"
+	"nodered"
+	"influxdb"
+	"grafana"
+	"mosquitto"
+	"telegraf"
+	"mariadb"
+	"postgres"
+	"timescaledb"
+	"transmission"
+	"adminer"
+	"openhab"
+	"zigbee2mqtt"
+  "deconz"
+	"pihole"
+	"plex"
+	"tasmoadmin"
+	"rtl_433"
+	"espruinohub"
+	"motioneye"
+	"webthings_gateway"
+	"blynk_server"
+	"nextcloud"
+	"diyhue"
+	"homebridge"
+	"python"
+	"gitea"
+	"dozzle"
+	# add yours here
+)
+>>>>>>> master
 sys_arch=$(uname -m)
 
 # ----------------------------------------------
