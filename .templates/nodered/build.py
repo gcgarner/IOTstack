@@ -65,6 +65,13 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    import time
+    import subprocess
+    print("Starting NodeRed Build script")
+    time.sleep(0.2)
+    subprocess.call("./.templates/nodered/build.sh", shell=True) # TODO: Put this step into the new build system
+    print("Finished NodeRed Build script")
+    time.sleep(0.2)
     return True
 
   # #####################################
@@ -72,7 +79,6 @@ def main():
   # #####################################
 
   def checkForIssues():
-    import time
     for (index, serviceName) in enumerate(dockerComposeYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName)
@@ -116,7 +122,7 @@ def main():
 
 # This check isn't required, but placed here for debugging purposes
 global currentServiceName # Name of the current service
-if currentServiceName == 'blynk_server':
+if currentServiceName == 'nodered':
   main()
 else:
-  print("Error. '{}' Tried to run 'blynk_server' config".format(currentServiceName))
+  print("Error. '{}' Tried to run 'nodered' config".format(currentServiceName))

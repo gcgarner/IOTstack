@@ -157,6 +157,7 @@ def main():
 
 
   def runSelection(selection):
+    import types
     if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
       mainMenuList[selection][1]()
     else:
@@ -169,7 +170,7 @@ def main():
           return False
     return True
 
-  if __name__ == '__main__':
+  if __name__ == 'builtins':
     term = Terminal()
     with term.fullscreen():
       menuNavigateDirection = 0

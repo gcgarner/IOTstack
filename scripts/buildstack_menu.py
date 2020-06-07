@@ -24,6 +24,7 @@ def main():
   term = Terminal()
 
   def buildServices():
+    global dockerComposeYaml
     try:
       runPrebuildHook()
       dockerFileYaml = {}
@@ -43,10 +44,12 @@ def main():
 
       with open(r'%s' % dockerSavePathOutput, 'w') as outputFile:
         yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
-
       runPostbuildHook()
       return True
-    except:
+    except Exception as err: 
+      print("Issue running build:")
+      print(err)
+      time.sleep(5)
       return False
 
   def mergeYaml(priorityYaml, defaultYaml):
@@ -200,6 +203,7 @@ def main():
         checkedMenuItems.append(menuItem[0])
 
   def loadServices():
+    global dockerComposeYaml
     dockerComposeYaml.clear()
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
       serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
@@ -338,12 +342,15 @@ def main():
     if os.path.exists(dockerSavePathOutput):
       with open(r'%s' % dockerSavePathOutput) as fileSavedConfigs:
         previousConfigs = yaml.load(fileSavedConfigs, Loader=yaml.SafeLoader)
-        if "services" in previousConfigs:
-          dockerComposeYaml = previousConfigs["services"]
-          return True
+        if not previousConfigs == None:
+          if "services" in previousConfigs:
+            dockerComposeYaml = previousConfigs["services"]
+            return True
+        else:
+          dockerComposeYaml = {}
     return False
 
-  if __name__ == '__main__':
+  if __name__ == 'builtins':
     global results
     term = Terminal()
     with term.fullscreen():
@@ -376,8 +383,8 @@ def main():
               return results["buildState"]
           elif key:
             if key == ' ': # Space pressed
-              checkMenuItem(selection)
-              setCheckedMenuItems()
+              checkMenuItem(selection) # Update checked list
+              setCheckedMenuItems() # Update UI memory
               loadServices()
               checkForIssues()
             else:

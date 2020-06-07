@@ -72,39 +72,7 @@ def main():
   # #####################################
 
   def checkForIssues():
-    import time
-    for (index, serviceName) in enumerate(dockerComposeYaml):
-      if not currentServiceName == serviceName: # Skip self
-        currentServicePorts = getExternalPorts(currentServiceName)
-        portConflicts = checkPortConflicts(serviceName, currentServicePorts)
-        if (len(portConflicts) > 0):
-          issues["portConflicts"] = portConflicts
-
-  def getExternalPorts(serviceName):
-    externalPorts = []
-    try:
-      yamlService = dockerComposeYaml[serviceName]
-      if "ports" in yamlService:
-        for (index, port) in enumerate(yamlService["ports"]):
-          try:
-            externalAndInternal = port.split(":")
-            externalPorts.append(externalAndInternal[0])
-          except:
-            pass
-    except:
-      pass
-    return externalPorts
-
-  def checkPortConflicts(serviceName, currentPorts):
-    portConflicts = []
-    if not currentServiceName == serviceName:
-      yamlService = dockerComposeYaml[serviceName]
-      servicePorts = getExternalPorts(serviceName)
-      for (index, servicePort) in enumerate(servicePorts):
-        for (index, currentPort) in enumerate(currentPorts):
-          if (servicePort == currentPort):
-            portConflicts.append([servicePort, serviceName])
-    return portConflicts
+    return True
 
   if haltOnErrors:
     eval(toRun)()
@@ -116,7 +84,7 @@ def main():
 
 # This check isn't required, but placed here for debugging purposes
 global currentServiceName # Name of the current service
-if currentServiceName == 'blynk_server':
+if currentServiceName == 'nextcloud':
   main()
 else:
-  print("Error. '{}' Tried to run 'blynk_server' config".format(currentServiceName))
+  print("Error. '{}' Tried to run 'nextcloud' config".format(currentServiceName))

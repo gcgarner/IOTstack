@@ -33,14 +33,20 @@ def updateProject():
 
 def buildStack():
   global buildComplete
+  global needsRender
   buildComplete = None
   buildstackFilePath = "./scripts/buildstack_menu.py"
   with open(buildstackFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), buildstackFilePath, "exec")
-  execGlobals = globals()
-  execLocals = locals()
+  # execGlobals = globals()
+  # print(2222, execGlobals)
+  # time.sleep(5)
+  # execLocals = locals()
+  execGlobals = {}
+  execLocals = {}
   exec(code, execGlobals, execLocals)
   buildComplete = execGlobals["results"]["buildState"]
+  needsRender = True
 
 def runExampleMenu():
   exampleMenuFilePath = "./.templates/example_template/example_build.py"
@@ -57,8 +63,10 @@ def dockerCommands():
   dockerCommandsFilePath = "./scripts/docker_commands.py"
   with open(dockerCommandsFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
-  execGlobals = globals()
-  execLocals = locals()
+  # execGlobals = globals()
+  # execLocals = locals()
+  execGlobals = {}
+  execLocals = {}
   exec(code, execGlobals, execLocals)
 
 def doNothing():
