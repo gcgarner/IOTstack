@@ -39,8 +39,6 @@ def buildStack():
   with open(buildstackFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), buildstackFilePath, "exec")
   # execGlobals = globals()
-  # print(2222, execGlobals)
-  # time.sleep(5)
   # execLocals = locals()
   execGlobals = {}
   execLocals = {}

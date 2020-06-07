@@ -9,8 +9,10 @@ COMPOSE_VERSION="3.6"
 REQ_DOCKER_VERSION=18.2.0
 REQ_PYTHON_VERSION=3.6.9
 REQ_PYYAML_VERSION=5.3.1
+REQ_BLESSED_VERSION=1.17.5
 
 PYTHON_CMD=python3
+PIP_CMD=pip3
 
 sys_arch=$(uname -m)
 
@@ -126,11 +128,17 @@ function do_python3_checks() {
 		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d'.' -f 2)
 		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d'.' -f 3)
 
-		PYYAML_VERSION=$($PYTHON_CMD ./scripts/yaml_merge.py --pyyaml-version)
+		PYYAML_VERSION=$($PIP_CMD list --format=legacy | grep -F PyYAML | cut -d "(" -f2 | cut -d ")" -f1)
 		PYYAML_VERSION="${PYYAML_VERSION:-Unknown}"
 		PYYAML_VERSION_MAJOR=$(echo "$PYYAML_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
 		PYYAML_VERSION_MINOR=$(echo "$PYYAML_VERSION"| cut -d'.' -f 2)
 		PYYAML_VERSION_BUILD=$(echo "$PYYAML_VERSION"| cut -d'.' -f 3)
+
+		BLESSED_VERSION=$($PIP_CMD list --format=legacy | grep -F blessed | cut -d "(" -f2 | cut -d ")" -f1)
+		BLESSED_VERSION="${BLESSED_VERSION:-Unknown}"
+		BLESSED_VERSION_MAJOR=$(echo "$BLESSED_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
+		BLESSED_VERSION_MINOR=$(echo "$BLESSED_VERSION"| cut -d'.' -f 2)
+		BLESSED_VERSION_BUILD=$(echo "$BLESSED_VERSION"| cut -d'.' -f 3)
 
 		if [ "$(minimum_version_check $REQ_PYTHON_VERSION $PYTHON_VERSION_MAJOR $PYTHON_VERSION_MINOR $PYTHON_VERSION_BUILD)" == "true" ]; then
 			PYTHON_VERSION_GOOD="true"
@@ -153,13 +161,17 @@ function do_python3_checks() {
 			fi
 			return 1
 		fi
-		pip3 list --format=legacy | grep -F blessed > /dev/null
-		if [ "$?" == "0" ]; then
-			BLESSED_GOOD="true"
-			echo "Blessed is installed." >&2
+		printf "Blessed Version: '$BLESSED_VERSION'. "
+		if [ "$(minimum_version_check $REQ_BLESSED_VERSION $BLESSED_VERSION_MAJOR $BLESSED_VERSION_MINOR $BLESSED_VERSION_BUILD)" == "true" ]; then
+			PYYAML_VERSION_GOOD="true"
+			echo "Blessed is up to date." >&2
 		else
-			echo "Blessed is not installed" >&2
-			install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYYAML_VERSION_MAJOR.$PYYAML_VERSION_MINOR.$PYYAML_VERSION_BUILD"
+			echo "Blessed is outdated." >&2
+			if [ "$BLESSED_VERSION" != "Unknown" ]; then
+				install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYYAML_VERSION_MAJOR.$PYYAML_VERSION_MINOR.$PYYAML_VERSION_BUILD"
+			else
+				install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD"
+			fi
 			return 1
 		fi
 	else
