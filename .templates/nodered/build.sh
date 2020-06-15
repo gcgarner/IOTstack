@@ -40,6 +40,7 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 	"node-red-contrib-alexa-local" " " "OFF" \
 	"node-red-contrib-heater-controller" " " "OFF" \
 	"node-red-contrib-deconz" " " "OFF" \
+	"node-red-contrib-generic-ble" " " "OFF" \
 	3>&1 1>&2 2>&3)
 
 ##echo "$check_selection"
@@ -51,6 +52,12 @@ sqliteflag=0
 
 touch $nr_dfile
 echo "FROM nodered/node-red:latest" >$nr_dfile
+
+echo "USER root" >>$nr_dfile
+echo "RUN apk update" >>$nr_dfile
+echo "RUN apk upgrade" >>$nr_dfile
+echo "RUN apk add --no-cache eudev-dev" >>$nr_dfile
+
 #node red install script inspired from https://tech.scargill.net/the-script/
 echo "RUN for addonnodes in \\" >>$nr_dfile
 for checked in "${checked_nodes[@]}"; do
