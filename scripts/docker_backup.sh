@@ -1,6 +1,7 @@
 #!/bin/bash
 
 pushd ~/IOTstack
+USER=$(whoami)
 
 [ -d ./backups ] || mkdir ./backups
 
@@ -8,6 +9,10 @@ pushd ~/IOTstack
 echo "./docker-compose.yml" >list.txt
 echo "./services/" >>list.txt
 echo "./volumes/" >>list.txt
+
+if [ -f "./compose-override.yml" ]; then
+	echo "./compose-override.yml" >>list.txt
+fi
 
 #if influxdb is running
 if [ $(docker ps | grep -c influxdb) -gt 0 ]; then
@@ -30,12 +35,12 @@ sudo tar -czf \
 rm list.txt
 
 #set permission for backup files
-sudo chown pi:pi ./backups/backup*
+sudo chown $USER:$USER ./backups/backup*
 
 #create local logfile and append the latest backup file to it
 echo "backup saved to ./backups/$backupfile"
 sudo touch $logfile
-sudo chown pi:pi $logfile
+sudo chown $USER:$USER $logfile
 echo $backupfile >>$logfile
 
 #show size of archive file
@@ -58,7 +63,7 @@ if [ -f ./backups/dropbox ]; then
 
 	#upload new backup to dropbox
 	echo "uploading to dropbox"
-	$dropboxuploader upload ./backups/$backupfile $dropboxfolder
+	$dropboxuploader upload ./backups/$backupfile $backupfile
 
 	#list older files to be deleted from cloud (exludes last 7)
 	#to change dropbox backups retained, change below -7 to whatever you want
@@ -67,7 +72,7 @@ if [ -f ./backups/dropbox ]; then
 
 	#write files to be deleted to dropbox logfile
 	sudo touch $dropboxlog
-	sudo chown pi:pi $dropboxlog
+	sudo chown $USER:$USER $dropboxlog
 	echo $files | tr " " "\n" >$dropboxlog
 
 	#delete files from dropbox as per logfile
@@ -81,9 +86,7 @@ if [ -f ./backups/dropbox ]; then
 	    	$dropboxuploader delete $dropboxfolder/$file
 		done < "$input"
 	fi
-
 	echo "backups deleted from dropbox" >>$dropboxlog
-
 fi
 
 

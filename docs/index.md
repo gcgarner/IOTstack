@@ -1,10 +1,8 @@
-# IOTStack
+# IOTstack
 
-IOTstack is a builder for docker-compose to easily make and maintain IoT stacks on the Raspberry Pi
+IOTstack is a builder for docker-compose to easily make and maintain IoT stacks on the Raspberry Pi.
 
 ## Announcements
-
-The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
 
 * 2019-12-19 Added python container, tweaked update script
 * 2019-12-12 modified zigbee2mqtt template file
@@ -25,15 +23,15 @@ The bulk of the README has moved to the Wiki. Please check it out [here](https:/
 * 2019-11-20 BUGFIX influxdb backup: Placing docker_backup in crontab caused influxdb backup not to execute correctly
 * 2019-11-20 BUGFIX disable swap: swapfile recreation on reboot fixed. Re-run from menu to fix.
 * Node-RED: serial port. New template adds privileged which allows acces to serial devices
-* EspurinoHub: is available for testing see wiki entry
+* EspruinoHub: available for testing
 
 ***
 
 ## Highlighted topics
 
-* [Bluetooth and Node-RED](https://github.com/gcgarner/IOTstack/wiki/Node-RED#using-bluetooth)
-* [Saving files to disk inside containers](https://github.com/gcgarner/IOTstack/wiki/Node-RED#sharing-files-between-node-red-and-the-host)
-* [Updating the Project](https://github.com/gcgarner/IOTstack/wiki/Updating-the-Project)
+* [Bluetooth and Node-RED](https://sensorsiot.github.io/IOTstack/Node-RED#using-bluetooth)
+* [Saving files to disk inside containers](https://sensorsiot.github.io/IOTstack/Node-RED#sharing-files-between-node-red-and-the-host)
+* [Updating the Project](https://sensorsiot.github.io/IOTstack/Updating-the-Project/)
 
  ***
 
@@ -90,47 +88,47 @@ For those looking for a script that installs native applications check out [Pete
   
 ## Tested platform
 
-Raspberry Pi 3B and 4B Raspbian (Buster)
+Raspberry Pi 3B and 4B Raspbian (Buster).
 
 ### Older Pi's
 
-Docker will not run on a PiZero or A model 1 because of the CPU. It has not been tested on a Model 2. You can still use Peter Scargill's [script](https://tech.scargill.net/the-script/)
+Docker will not run on a PiZero or A model 1 because of the CPU. It has not been tested on a Model 2. You can still use Peter Scargill's [script](https://tech.scargill.net/the-script/).
 
 ## Running under a virtual machine
 
-For those wanting to test out the script in a Virtual Machine before installing on their Pi there are some limitations. The script is designed to work with Debian based distributions. Not all the container have x86_64 images. For example Portainer does not and will give an error when you try and start the stack. Please see the pinned issue [#29](https://github.com/gcgarner/IOTstack/issues/29), there is more info there.
+For those wanting to test out the script in a Virtual Machine before installing on their Pi there are some limitations. The script is designed to work with Debian based distributions. Not all the container have x86_64 images. For example Portainer does not and will give an error when you try and start the stack.
 
 ## Feature Requests
 
-Please direct all feature requests to [Discord](https://discord.gg/W45tD83)
+Please direct all feature requests to [Discord](https://discord.gg/W45tD83).
   
 ## Youtube reference
 
 This repo was originally inspired by Andreas Spiess's video on using some of these tools. Some containers have been added to extend its functionality.
 
-[YouTube video](https://www.youtube.com/watch?v=JdV4x925au0): This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see the wiki under Docker Networks.
+[YouTube video](https://www.youtube.com/watch?v=JdV4x925au0): This is an alternative approach to the setup. Be sure to watch the video for the instructions. Just note that the network addresses are different, see [Networking](https://sensorsiot.github.io/IOTstack/Networking/).
 
 ### YouTube guide
 
-@peyanski (Kiril) made a YouTube video on getting started using the project, check it out [here](https://youtu.be/5JMNHuHv134)
+@peyanski (Kiril) made a [YouTube video](https://youtu.be/5JMNHuHv134) on getting started using the project.
 
 ## Download the project
 
-1.On the lite image you will need to install git first
+1.&nbsp;On the lite image you will need to install git first.
 
 ```bash
-sudo apt-get install git
+sudo apt install git
 ```
 
-2.Download the repository with:
+2.&nbsp;Download the repository with:
 
 ```bash
-git clone https://github.com/gcgarner/IOTstack.git ~/IOTstack
+git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 ```
 
 Due to some script restraints, this project needs to be stored in ~/IOTstack
 
-3.To enter the directory run:
+3.&nbsp;To enter the directory run:
 
 ```bash
 cd ~/IOTstack
@@ -139,13 +137,13 @@ cd ~/IOTstack
 ## The Menu
 
 I've added a menu to make things easier. It is good to familiarise yourself with the installation process.
-The menu can be used to install docker and build the docker-compose.yml file necessary for starting the stack. It also runs a few common commands. I do recommend you start to learn the docker and docker-compose commands if you plan on using docker in the long run. I've added several helper scripts, have a look inside.
+The menu can be used to install docker and build the docker-compose.yml file necessary for starting the stack. It also runs a few common commands. I do recommend you start to learn the docker and docker-compose commands if you plan on using Docker in the long run. I've added several helper scripts, have a look inside.
 
 Navigate to the project folder and run `./menu.sh`
 
-### Installing from the menu
+### Installing Docker from the menu
 
-Select the first option and follow the prompts
+Select "Install Docker" and follow the prompts. This ends with a reboot.
 
 ### Build the docker-compose file
 
@@ -165,13 +163,19 @@ From this point on make sure you are executing the commands from inside the proj
 
 ## Starting and Stopping containers
 
-to start the stack navigate to the project folder containing the docker-compose.yml file
+To start the stack:
 
-To start the stack run:
-`docker-compose up -d` or `./scripts/start.sh`
+```bash
+cd ~/IOTstack
+docker-compose up -d
+```
 
-To stop:
-`docker-compose stop`
+To stop the stack:
+
+```bash
+cd ~/IOTstack
+docker-compose stop
+```
 
 The first time you run 'start' the stack docker will download all the images for the web. Depending on how many containers you selected and your internet speed this can take a long while.
 
@@ -181,9 +185,26 @@ The `docker-compose down` command stops the containers then deletes them.
 
 Docker allows you to map folders inside your containers to folders on the disk. This is done with the "volume" key. There are two types of volumes. Modification to the container are reflected in the volume.
 
-## See Wiki for further info
+## Networking
 
-[Wiki](https://github.com/gcgarner/IOTstack/wiki)
+One common problem newcomers face is understanding that Docker creates an internal bridged network. A process running inside one container reaches a process running inside another container by using the **name** of that other container as the domain name. For example, if a Node-Red flow needs to:
+
+* subscribe to an MQTT topic being managed by Mosquitto, it refers to "mosquitto" as the domain name and communicates over port 1883.
+* send data to InfluxDB, it refers to "influxdb" as the domain name and communicates over port 8086.
+
+In particular, if you are migrating Node-Red flows from a non-Docker environment, they will probably contain references to the loopback address (127.0.0.1). Those will need to be updated.
+
+Similarly, if you are migrating a Grafana dashboard that relies on, say, InfluxDB as for its data. The data source will need to be updated to refer to "influxdb:8086". 
+
+You can discover container names like this:
+
+```bash
+cd ~/IOTstack
+docker-compose ps
+```
+
+See also [Networking](https://sensorsiot.github.io/IOTstack/Networking/).
+
 
 ## Add to the project
 
