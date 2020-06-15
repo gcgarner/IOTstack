@@ -1,0 +1,9 @@
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest 
+    restart: unless-stopped
+    network_mode: host
+    ports:
+      - 8888:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
