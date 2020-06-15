@@ -1,4 +1,4 @@
-# accessing your device from the internet
+# Accessing your device from the internet
 The challenge most of us face with remotely accessing your home network is that you don't have a static IP. From time to time the IP that your ISP assigns to you changes and it's difficult to keep up. Fortunately, there is a solution, a DynamicDNS. The section below shows you how to set up an easy to remember address that follows your public IP no matter when it changes.
 
 Secondly, how do you get into your home network? Your router has a firewall that is designed to keep the rest of the internet out of your network to protect you. Here we install a VPN and configure the firewall to only allow very secure VPN traffic in. 
