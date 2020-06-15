@@ -8,6 +8,7 @@ pushd ~/IOTstack
 #One entry per line to simplify PRs
 declare -A cont_array=(
 	[portainer]="Portainer"
+	[portainer_agent]="Portainer agent"
 	[nodered]="Node-RED"
 	[influxdb]="InfluxDB"
 	[telegraf]="Telegraf (Requires InfluxDB and Mosquitto)"
@@ -64,7 +65,8 @@ declare -a armhf_keys=(
 	"homebridge" 
 	"python" 
 	"zigbee2mqttassistant" 
-	"qbittorrent"
+	"qbittorrent",
+	"portainer_agent"
 )
 
 sys_arch=$(uname -m)
