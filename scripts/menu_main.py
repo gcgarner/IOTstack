@@ -69,6 +69,30 @@ def dockerCommands():
   exec(code, execGlobals, execLocals)
   needsRender = True
 
+def miscCommands():
+  global needsRender
+  dockerCommandsFilePath = "./scripts/misc_commands.py"
+  with open(dockerCommandsFilePath, "rb") as pythonDynamicImportFile:
+    code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
+  # execGlobals = globals()
+  # execLocals = locals()
+  execGlobals = {}
+  execLocals = {}
+  exec(code, execGlobals, execLocals)
+  needsRender = True
+
+def nativeInstalls():
+  global needsRender
+  dockerCommandsFilePath = "./scripts/native_installs.py"
+  with open(dockerCommandsFilePath, "rb") as pythonDynamicImportFile:
+    code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
+  # execGlobals = globals()
+  # execLocals = locals()
+  execGlobals = {}
+  execLocals = {}
+  exec(code, execGlobals, execLocals)
+  needsRender = True
+
 def doNothing():
   selectionInProgress = True
 
@@ -112,8 +136,8 @@ baseMenu = [
   ["Build Stack", buildStack],
   ["Docker Commands", dockerCommands],
   # ["Backup and Restore"],
-  # ["Miscellaneous Commands"],
-  # ["Native Installs"],
+  ["Miscellaneous Commands", miscCommands],
+  ["Native Installs", nativeInstalls],
   # ["Developer: Example Menu", runExampleMenu], # Uncomment if you want to see the example menu
   ["Exit", exitMenu]
 ]
@@ -251,6 +275,8 @@ def mainRender(menu, selection):
   if (buildComplete):
     print("")
     print(term.center('{t.blue_on_green} {text} {t.normal}{t.white_on_black}{cPath} {t.normal}'.format(t=term, text="Build completed:", cPath=" ./docker-compose.yml")))
+    if os.path.exists('./compose-override.yml'):
+      print(term.center('{t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}'.format(t=term, text="'compose-override.yml' was merged into 'docker-compose.yml'")))
     print("")
 
   for (index, menuItem) in enumerate(menu):

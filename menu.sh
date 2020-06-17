@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd ~/IOTstack
+pushd ~/IOTstack > /dev/null 2>&1
 
 CURRENT_BRANCH=${1:-$(git name-rev --name-only HEAD)}
 
@@ -237,21 +237,25 @@ function do_project_checks() {
 # ----------------------------------------------
 # Menu bootstrap entry point
 # ----------------------------------------------
-do_project_checks
-do_python3_checks
-do_docker_checks
-
-if [ "$DOCKER_VERSION_GOOD" == "true" ] && \
-	[ "$PYTHON_VERSION_GOOD" == "true" ] && \
-	[ "$PYYAML_VERSION_GOOD" == "true" ] && \
-	[ "$BLESSED_GOOD" == "true" ]; then
-	echo "Project dependencies up to date"
-	echo ""
+if [ "$2" = "--no-check" ]; then
+	echo "Skipping preflight checks."
 else
-	echo "Project dependencies not up to date. Menu may crash."
-	echo "To be prompted to update again, run command:"
-	echo "  rm .docker_notinstalled || rm .docker_outofdate || rm .project_outofdate"
-	echo ""
+	do_project_checks
+	do_python3_checks
+	do_docker_checks
+
+	if [ "$DOCKER_VERSION_GOOD" == "true" ] && \
+		[ "$PYTHON_VERSION_GOOD" == "true" ] && \
+		[ "$PYYAML_VERSION_GOOD" == "true" ] && \
+		[ "$BLESSED_GOOD" == "true" ]; then
+		echo "Project dependencies up to date"
+		echo ""
+	else
+		echo "Project dependencies not up to date. Menu may crash."
+		echo "To be prompted to update again, run command:"
+		echo "  rm .docker_notinstalled || rm .docker_outofdate || rm .project_outofdate"
+		echo ""
+	fi
 fi
 
 # Hand control to new menu
