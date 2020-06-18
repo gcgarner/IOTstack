@@ -281,7 +281,7 @@ def mainRender(menu, selection):
 
   for (index, menuItem) in enumerate(menu):
     if index == selection:
-      print(term.center('{t.white_on_gold4}{title}{t.normal}'.format(t=term, title=menuItem[0])))
+      print(term.center('{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])))
     else:
       print(term.center('{title}'.format(t=term, title=menuItem[0])))
 
