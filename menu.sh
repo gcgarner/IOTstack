@@ -8,11 +8,12 @@ CURRENT_BRANCH=${1:-$(git name-rev --name-only HEAD)}
 COMPOSE_VERSION="3.6"
 REQ_DOCKER_VERSION=18.2.0
 REQ_PYTHON_VERSION=3.6.9
+REQ_PIP_VERSION=3.6.9
 REQ_PYYAML_VERSION=5.3.1
 REQ_BLESSED_VERSION=1.17.5
 
 PYTHON_CMD=python3
-PIP_CMD=pip3
+VGET_CMD="$PYTHON_CMD ./scripts/python_deps_check.py"
 
 sys_arch=$(uname -m)
 
@@ -123,23 +124,23 @@ function do_python3_checks() {
 
 	if command_exists $PYTHON_CMD && command_exists pip3; then
 		PYTHON_VERSION=$($PYTHON_CMD --version)
-		printf "Python Version: '${PYTHON_VERSION:-Unknown}'. "
 		PYTHON_VERSION_MAJOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
 		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d'.' -f 2)
 		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d'.' -f 3)
 
-		PYYAML_VERSION=$($PIP_CMD list --format=legacy | grep -F PyYAML | cut -d "(" -f2 | cut -d ")" -f1)
+		PYYAML_VERSION=$($VGET_CMD --pyyaml-version)
 		PYYAML_VERSION="${PYYAML_VERSION:-Unknown}"
 		PYYAML_VERSION_MAJOR=$(echo "$PYYAML_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
 		PYYAML_VERSION_MINOR=$(echo "$PYYAML_VERSION"| cut -d'.' -f 2)
 		PYYAML_VERSION_BUILD=$(echo "$PYYAML_VERSION"| cut -d'.' -f 3)
 
-		BLESSED_VERSION=$($PIP_CMD list --format=legacy | grep -F blessed | cut -d "(" -f2 | cut -d ")" -f1)
+		BLESSED_VERSION=$($VGET_CMD --blessed-version)
 		BLESSED_VERSION="${BLESSED_VERSION:-Unknown}"
 		BLESSED_VERSION_MAJOR=$(echo "$BLESSED_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
 		BLESSED_VERSION_MINOR=$(echo "$BLESSED_VERSION"| cut -d'.' -f 2)
 		BLESSED_VERSION_BUILD=$(echo "$BLESSED_VERSION"| cut -d'.' -f 3)
 
+		printf "Python Version: '${PYTHON_VERSION:-Unknown}'. "
 		if [ "$(minimum_version_check $REQ_PYTHON_VERSION $PYTHON_VERSION_MAJOR $PYTHON_VERSION_MINOR $PYTHON_VERSION_BUILD)" == "true" ]; then
 			PYTHON_VERSION_GOOD="true"
 			echo "Python is up to date." >&2
