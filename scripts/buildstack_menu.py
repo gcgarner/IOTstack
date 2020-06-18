@@ -17,11 +17,13 @@ def main():
   dockerSavePathOutput = './services/docker-compose.save.yml'
   composeOverrideFile = './compose-override.yml'
 
+
   # Runtime vars
   menu = []
   dockerComposeYaml = {}
   templateDirectoryFolders = next(os.walk(templateDirectory))[1]
   term = Terminal()
+  hotzoneLocation = [((term.height // 16) + 6), 0]
 
   def buildServices():
     global dockerComposeYaml
@@ -92,32 +94,20 @@ def main():
     
     return result
 
-  def mainRender(menu, selection):
-    paddingBefore = 4
+  def renderHotZone(term, menu, selection, paddingBefore):
     optionsLength = len(" >>   Options ")
     optionsIssuesSpace = len("      ")
     spaceAfterissues = len("      ")
     issuesLength = len(" !!   Issue ")
 
-    term = Terminal()
-    allIssues = []
-    print(term.clear())
-    print(term.move_y(term.height // 16))
-    print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
-    print("")
-    print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║      Select containers to build                                                ║"))
-    print(term.center("║                                                                                ║"))
-
-    checkForOptions()
+    print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
 
     for (index, menuItem) in enumerate(menu): # Menu loop
       lineText = generateLineText(menuItem[0], paddingBefore=paddingBefore)
 
        # Menu highlight logic
       if index == selection:
-        formattedLineText = '{t.white_on_gold4}{title}{t.normal}'.format(t=term, title=menuItem[0])
+        formattedLineText = '{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])
         paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]), paddingBefore=paddingBefore)
         toPrint = paddedLineText
       else:
@@ -165,33 +155,53 @@ def main():
       # #####
       print(toPrint)
 
-    print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║      Controls:                                                                 ║"))
-    print(term.center("║      [Space] to select or deselect image                                       ║"))
-    print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
-    print(term.center("║      [Right] for options for containers that support it (none at the moment)   ║"))
-    print(term.center("║      [Enter] to begin build                                                    ║"))
-    print(term.center("║      [Escape] to cancel build                                                  ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
-    if len(allIssues) > 0:
-      print(term.center(""))
-      print(term.center(""))
-      print(term.center(""))
-      print(term.center("╔══════ Build Issues ═════════════════════════════════════════════════════════════════════════════════════════════════════════╗"))
-      print(term.center("║                                                                                                                             ║"))
-      for serviceIssues in allIssues:
-        for index, issue in enumerate(serviceIssues["issues"]):
-          spacesAndBracketsLen = 5
-          issueAndTypeLen = len(issue) + len(serviceIssues["serviceName"]) + spacesAndBracketsLen
-          serviceNameAndConflictType = '{t.red_on_black}{issueService}{t.normal} ({t.yellow_on_black}{issueType}{t.normal}) '.format(t=term, issueService=serviceIssues["serviceName"], issueType=issue)
-          formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=49)
-          issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=72)
-          print(term.center("║ {} - {} ║".format(formattedServiceNameAndConflictType, issueDescription) ))
-      print(term.center("║                                                                                                                             ║"))
-      print(term.center("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"))
+
+  def mainRender(menu, selection, fullRender = True):
+    paddingBefore = 4
+
+    term = Terminal()
+    allIssues = []
+    if (fullRender):
+      print(term.clear())
+      print(term.move_y(term.height // 16))
+      print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
+      print("")
+      print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║      Select containers to build                                                ║"))
+      print(term.center("║                                                                                ║"))
+
+    checkForOptions()
+    renderHotZone(term, menu, selection, paddingBefore)
+
+    if (fullRender):
+      print(term.center("║                                                                                ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║      Controls:                                                                 ║"))
+      print(term.center("║      [Space] to select or deselect image                                       ║"))
+      print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
+      print(term.center("║      [Right] for options for containers that support it (none at the moment)   ║"))
+      print(term.center("║      [Enter] to begin build                                                    ║"))
+      print(term.center("║      [Escape] to cancel build                                                  ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+      if len(allIssues) > 0:
+        print(term.center(""))
+        print(term.center(""))
+        print(term.center(""))
+        print(term.center("╔══════ Build Issues ═════════════════════════════════════════════════════════════════════════════════════════════════════════╗"))
+        print(term.center("║                                                                                                                             ║"))
+        for serviceIssues in allIssues:
+          for index, issue in enumerate(serviceIssues["issues"]):
+            spacesAndBracketsLen = 5
+            issueAndTypeLen = len(issue) + len(serviceIssues["serviceName"]) + spacesAndBracketsLen
+            serviceNameAndConflictType = '{t.red_on_black}{issueService}{t.normal} ({t.yellow_on_black}{issueType}{t.normal}) '.format(t=term, issueService=serviceIssues["serviceName"], issueType=issue)
+            formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=49)
+            issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=72)
+            print(term.center("║ {} - {} ║".format(formattedServiceNameAndConflictType, issueDescription) ))
+        print(term.center("║                                                                                                                             ║"))
+        print(term.center("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"))
 
     return
 
@@ -393,6 +403,6 @@ def main():
 
           selection = selection % len(menu)
 
-          mainRender(menu, selection)
+          mainRender(menu, selection, False)
 
 main()

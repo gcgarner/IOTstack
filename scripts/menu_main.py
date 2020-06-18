@@ -18,9 +18,15 @@ selectionInProgress = True
 currentMenuItemIndex = 0
 menuNavigateDirection = 0
 projectStatusPollRateRefresh = 1
-needsRender = True
 promptFiles = False
 buildComplete = None
+hotzoneLocation = [((term.height // 16) + 6), 0]
+
+  # Render Modes:
+  #  0 = No render needed
+  #  1 = Full render
+  #  2 = Hotzone only
+needsRender = 1
 
 # Menu Functions
 def exitMenu():
@@ -44,7 +50,7 @@ def buildStack():
   execLocals = {}
   exec(code, execGlobals, execLocals)
   buildComplete = execGlobals["results"]["buildState"]
-  needsRender = True
+  needsRender = 1
 
 def runExampleMenu():
   exampleMenuFilePath = "./.templates/example_template/example_build.py"
@@ -67,7 +73,7 @@ def dockerCommands():
   execGlobals = {}
   execLocals = {}
   exec(code, execGlobals, execLocals)
-  needsRender = True
+  needsRender = 1
 
 def miscCommands():
   global needsRender
@@ -79,7 +85,7 @@ def miscCommands():
   execGlobals = {}
   execLocals = {}
   exec(code, execGlobals, execLocals)
-  needsRender = True
+  needsRender = 1
 
 def nativeInstalls():
   global needsRender
@@ -91,7 +97,7 @@ def nativeInstalls():
   execGlobals = {}
   execLocals = {}
   exec(code, execGlobals, execLocals)
-  needsRender = True
+  needsRender = 1
 
 def doNothing():
   selectionInProgress = True
@@ -229,13 +235,13 @@ def doPotentialMenuCheck(projectStatus, dockerVersion=True, promptFiles=False):
 
   if (promptFiles == True):
     addPotentialMenuItem("deletePromptFiles")
-    needsRender = True
+    needsRender = 2
   else:
     removeMenuItemByLabel("deletePromptFiles")
 
   if (projectStatus.poll() == None):
     addPotentialMenuItem("updatesCheck", False)
-    needsRender = True
+    needsRender = 2
   else:
     removeMenuItemByLabel("updatesCheck")
 
@@ -243,18 +249,18 @@ def doPotentialMenuCheck(projectStatus, dockerVersion=True, promptFiles=False):
     added = addPotentialMenuItem("projectUpdate")
     projectStatusPollRateRefresh = None
     if (added):
-      needsRender = True
+      needsRender = 2
 
   if (projectStatus.poll() == 0):
     added = addPotentialMenuItem("noProjectUpdate")
     projectStatusPollRateRefresh = None
     if (added):
-      needsRender = True
+      needsRender = 2
 
   if (dockerVersion == False):
     added = addPotentialMenuItem("dockerNotUpdated")
     if (added):
-      needsRender = True
+      needsRender = 2
 
 def checkIfPromptFilesExist():
   if os.path.exists(".project_outofdate"):
@@ -265,12 +271,24 @@ def checkIfPromptFilesExist():
     return True
   return False
 
-def mainRender(menu, selection):
+def renderHotZone(term, menu, selection):
+  print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
+  for (index, menuItem) in enumerate(menu):
+    if index == selection:
+      print(term.center('{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])))
+    else:
+      print(term.center('{title}'.format(t=term, title=menuItem[0])))
+
+def mainRender(needsRender, menu, selection):
   term = Terminal()
-  print(term.clear())
-  print(term.move_y(term.height // 16))
-  print(term.black_on_cornsilk4(term.center('IOTstack Main Menu')))
-  print("")
+  if needsRender == 1:
+    print(term.clear())
+    print(term.move_y(term.height // 16))
+    print(term.black_on_cornsilk4(term.center('IOTstack Main Menu')))
+    print("")
+
+  if needsRender >= 1:
+    renderHotZone(term, menu, selection)
 
   if (buildComplete):
     print("")
@@ -279,15 +297,11 @@ def mainRender(menu, selection):
       print(term.center('{t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}'.format(t=term, text="'compose-override.yml' was merged into 'docker-compose.yml'")))
     print("")
 
-  for (index, menuItem) in enumerate(menu):
-    if index == selection:
-      print(term.center('{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])))
-    else:
-      print(term.center('{title}'.format(t=term, title=menuItem[0])))
-
 def runSelection(selection):
+  global needsRender
   if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
     mainMenuList[selection][1]()
+    needsRender = 1
   else:
     print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(mainMenuList[selection][0])))
 
@@ -305,18 +319,19 @@ if __name__ == '__main__':
   promptFiles = checkIfPromptFilesExist()
   term = Terminal()
   with term.fullscreen():
-    mainRender(mainMenuList, currentMenuItemIndex) # Initial Draw
+    mainRender(needsRender, mainMenuList, currentMenuItemIndex) # Initial Draw
     with term.cbreak():
       while selectionInProgress:
         menuNavigateDirection = 0
         if (promptFiles):
           promptFiles = checkIfPromptFilesExist()
+
+        if needsRender > 0: # Only rerender when changed to prevent flickering
+          mainRender(needsRender, mainMenuList, currentMenuItemIndex)
+          needsRender = 0
+
         doPotentialMenuCheck(projectStatus=projectStatus, dockerVersion=dockerVersion, promptFiles=promptFiles)
         
-        if needsRender: # Only rerender when changed to prevent flickering
-          mainRender(mainMenuList, currentMenuItemIndex)
-          needsRender = False
-
         key = term.inkey(timeout=projectStatusPollRateRefresh)
         if key.is_sequence:
           if key.name == 'KEY_TAB':
@@ -332,10 +347,10 @@ if __name__ == '__main__':
         elif key:
           print("got {0}.".format(key))
         
-        if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
+        if not menuNavigateDirection == 0: # If a direction was pressed, find next selectable item
           currentMenuItemIndex += menuNavigateDirection
           currentMenuItemIndex = currentMenuItemIndex % len(mainMenuList)
-          needsRender = True
+          needsRender = 2
 
           while not isMenuItemSelectable(mainMenuList, currentMenuItemIndex):
             currentMenuItemIndex += menuNavigateDirection

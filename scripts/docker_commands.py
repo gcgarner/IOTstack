@@ -6,6 +6,8 @@ def main():
   import subprocess
 
   global dockerCommandsSelectionInProgress
+  term = Terminal()
+  hotzoneLocation = [((term.height // 16) + 6), 0]
   
   def startStack():
     print("Start Stack:")
@@ -92,7 +94,7 @@ def main():
     global dockerCommandsSelectionInProgress
     global needsRender
     dockerCommandsSelectionInProgress = False
-    needsRender = True
+    needsRender = 1
     print("Back to main menu")
     return True
 
@@ -110,21 +112,15 @@ def main():
   dockerCommandsSelectionInProgress = True
   currentMenuItemIndex = 0
   menuNavigateDirection = 0
-  needsRender = True
 
-  def mainRender(menu, selection):
-    term = Terminal()
-    print(term.clear())
+  # Render Modes:
+  #  0 = No render needed
+  #  1 = Full render
+  #  2 = Hotzone only
+  needsRender = 1
 
-    print(term.clear())
-    print(term.move_y(term.height // 16))
-    print(term.black_on_cornsilk4(term.center('IOTstack Docker Commands')))
-    print("")
-    print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║      Select Docker Command to run                                              ║"))
-    print(term.center("║                                                                                ║"))
-
+  def renderHotZone(term, menu, selection, hotzoneLocation):
+    print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
     lineLengthAtTextStart = 75
 
     for (index, menuItem) in enumerate(menu):
@@ -143,15 +139,35 @@ def main():
       
       print(toPrint)
 
-    print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║      Controls:                                                                 ║"))
-    print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
-    print(term.center("║      [Enter] to run command                                                    ║"))
-    print(term.center("║      [Escape] to go back to main menu                                          ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+
+  def mainRender(needsRender, menu, selection):
+    term = Terminal()
+
+    if needsRender == 1:
+      print(term.clear())
+
+      print(term.clear())
+      print(term.move_y(term.height // 16))
+      print(term.black_on_cornsilk4(term.center('IOTstack Docker Commands')))
+      print("")
+      print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║      Select Docker Command to run                                              ║"))
+      print(term.center("║                                                                                ║"))
+
+    if needsRender >= 1:
+      renderHotZone(term, menu, selection, hotzoneLocation)
+
+    if needsRender == 1:
+      print(term.center("║                                                                                ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║      Controls:                                                                 ║"))
+      print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
+      print(term.center("║      [Enter] to run command                                                    ║"))
+      print(term.center("║      [Escape] to go back to main menu                                          ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
 
 
 
@@ -174,15 +190,15 @@ def main():
     term = Terminal()
     with term.fullscreen():
       menuNavigateDirection = 0
-      mainRender(mainMenuList, currentMenuItemIndex)
+      mainRender(needsRender, mainMenuList, currentMenuItemIndex)
       dockerCommandsSelectionInProgress = True
       with term.cbreak():
         while dockerCommandsSelectionInProgress:
           menuNavigateDirection = 0
 
-          if needsRender: # Only rerender when changed to prevent flickering
-            mainRender(mainMenuList, currentMenuItemIndex)
-            needsRender = False
+          if not needsRender == 0: # Only rerender when changed to prevent flickering
+            mainRender(needsRender, mainMenuList, currentMenuItemIndex)
+            needsRender = 0
 
           key = term.inkey()
           if key.is_sequence:
@@ -205,7 +221,7 @@ def main():
           if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
             currentMenuItemIndex += menuNavigateDirection
             currentMenuItemIndex = currentMenuItemIndex % len(mainMenuList)
-            needsRender = True
+            needsRender = 2
 
             while not isMenuItemSelectable(mainMenuList, currentMenuItemIndex):
               currentMenuItemIndex += menuNavigateDirection
