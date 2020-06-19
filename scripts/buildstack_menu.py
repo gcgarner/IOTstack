@@ -10,6 +10,8 @@ def main():
   import yaml
   from blessed import Terminal
   global signal
+  global paginationSize
+  global paginationStartIndex
 
   # Constants
   templateDirectory = './.templates'
@@ -26,6 +28,8 @@ def main():
   templateDirectoryFolders = next(os.walk(templateDirectory))[1]
   term = Terminal()
   hotzoneLocation = [((term.height // 16) + 6), 0]
+  paginationStartIndex = 0
+  paginationSize = 10
 
   def buildServices():
     global dockerComposeYaml
@@ -96,74 +100,88 @@ def main():
     
     return result
 
-  def renderHotZone(term, menu, selection, paddingBefore):
-    optionsLength = len(" >>   Options ")
+  def renderHotZone(term, renderType, menu, selection, paddingBefore):
+    optionsLength = len(" ►►   Options ")
     optionsIssuesSpace = len("      ")
     spaceAfterissues = len("      ")
     issuesLength = len(" !!   Issue ")
 
     print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
 
+    if paginationStartIndex >= 1:
+      print(term.center("║       ▲      ▲▲▲                                                   ↑           ║"))
+    else:
+      print(term.center("║                                                                                ║"))
+
     for (index, menuItem) in enumerate(menu): # Menu loop
-      lineText = generateLineText(menuItem[0], paddingBefore=paddingBefore)
+      if index >= paginationStartIndex and index < paginationStartIndex + paginationSize:
+        lineText = generateLineText(menuItem[0], paddingBefore=paddingBefore)
 
-       # Menu highlight logic
-      if index == selection:
-        formattedLineText = '{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])
-        paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]), paddingBefore=paddingBefore)
-        toPrint = paddedLineText
-      else:
-        toPrint = '{title}{t.normal}'.format(t=term, title=lineText)
-      # #####
+        # Menu highlight logic
+        if index == selection:
+          formattedLineText = '{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])
+          paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]), paddingBefore=paddingBefore)
+          toPrint = paddedLineText
+        else:
+          toPrint = '{title}{t.normal}'.format(t=term, title=lineText)
+        # #####
 
-      # Options and issues
-      if "options" in menuItem[1] and menuItem[1]["options"]:
-        toPrint = toPrint + '{t.blue_on_black} >> {t.normal}'.format(t=term)
-        toPrint = toPrint + ' {t.white_on_black} Options {t.normal}'.format(t=term)
-      else:
-        for i in range(optionsLength):
+        # Options and issues
+        if "options" in menuItem[1] and menuItem[1]["options"]:
+          toPrint = toPrint + '{t.blue_on_black} >> {t.normal}'.format(t=term)
+          toPrint = toPrint + ' {t.white_on_black} Options {t.normal}'.format(t=term)
+        else:
+          for i in range(optionsLength):
+            toPrint += " "
+
+        for i in range(optionsIssuesSpace):
           toPrint += " "
 
-      for i in range(optionsIssuesSpace):
-        toPrint += " "
-
-      if "issues" in menuItem[1] and menuItem[1]["issues"]:
-        toPrint = toPrint + '{t.red_on_orange} !! {t.normal}'.format(t=term)
-        toPrint = toPrint + ' {t.orange_on_black} Issue {t.normal}'.format(t=term)
-        allIssues.append({ "serviceName": menuItem[0], "issues": menuItem[1]["issues"] })
-      else:
-        if menuItem[1]["checked"]:
-          if not menuItem[1]["issues"] == None and len(menuItem[1]["issues"]) == 0:
-            toPrint = toPrint + '     {t.green_on_blue} Pass {t.normal} '.format(t=term)
+        if "issues" in menuItem[1] and menuItem[1]["issues"]:
+          toPrint = toPrint + '{t.red_on_orange} !! {t.normal}'.format(t=term)
+          toPrint = toPrint + ' {t.orange_on_black} Issue {t.normal}'.format(t=term)
+          allIssues.append({ "serviceName": menuItem[0], "issues": menuItem[1]["issues"] })
+        else:
+          if menuItem[1]["checked"]:
+            if not menuItem[1]["issues"] == None and len(menuItem[1]["issues"]) == 0:
+              toPrint = toPrint + '     {t.green_on_blue} Pass {t.normal} '.format(t=term)
+            else:
+              for i in range(issuesLength):
+                toPrint += " "
           else:
             for i in range(issuesLength):
               toPrint += " "
+
+        for i in range(spaceAfterissues):
+          toPrint += " "
+        # #####
+
+        # Menu check render logic
+        if menuItem[1]["checked"]:
+          toPrint = "     (X) " + toPrint
         else:
-          for i in range(issuesLength):
-            toPrint += " "
+          toPrint = "     ( ) " + toPrint
 
-      for i in range(spaceAfterissues):
-        toPrint += " "
-      # #####
+        toPrint = "║ " + toPrint + "  ║" # Generate border
+        toPrint = term.center(toPrint) # Center Text (All lines should have the same amount of printable characters)
+        # #####
+        print(toPrint)
 
-      # Menu check render logic
-      if menuItem[1]["checked"]:
-        toPrint = "     (X) " + toPrint
-      else:
-        toPrint = "     ( ) " + toPrint
-
-      toPrint = "║ " + toPrint + "  ║" # Generate border
-      toPrint = term.center(toPrint) # Center Text (All lines should have the same amount of printable characters)
-      # #####
-      print(toPrint)
+    if paginationStartIndex + paginationSize < len(menu):
+      print(term.center("║       ▼      ▼▼▼                                                   ↓           ║"))
+    else:
+      print(term.center("║                                                                                ║"))
+    print(term.center("║                                                                                ║"))
+    print(term.center("║                                                                                ║"))
 
 
-  def mainRender(menu, selection, fullRender = True):
+  def mainRender(menu, selection, renderType = 1):
+    global paginationStartIndex
     paddingBefore = 4
 
     term = Terminal()
     allIssues = []
-    if (fullRender):
+    if (renderType == 1):
       print(term.clear())
       print(term.move_y(term.height // 16))
       print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
@@ -174,9 +192,16 @@ def main():
       print(term.center("║                                                                                ║"))
 
     checkForOptions()
-    renderHotZone(term, menu, selection, paddingBefore)
 
-    if (fullRender):
+    if selection >= paginationStartIndex + paginationSize:
+      paginationStartIndex = selection - (paginationSize - 1) + 1
+      
+    if selection <= paginationStartIndex - 1:
+      paginationStartIndex = selection
+
+    renderHotZone(term, renderType, menu, selection, paddingBefore)
+
+    if (renderType == 1):
       print(term.center("║                                                                                ║"))
       print(term.center("║                                                                                ║"))
       print(term.center("║      Controls:                                                                 ║"))
@@ -362,7 +387,7 @@ def main():
     return False
 
   def onResize(sig, action):
-    mainRender(menu, selection, True)
+    mainRender(menu, selection, 1)
 
   if __name__ == 'builtins':
     global results
@@ -373,7 +398,7 @@ def main():
       selection = 0
       if loadCurrentConfigs():
         prepareMenuState()
-      mainRender(menu, selection)
+      mainRender(menu, selection, 1)
       selectionInProgress = True
       with term.cbreak():
         while selectionInProgress:
@@ -403,13 +428,14 @@ def main():
               setCheckedMenuItems() # Update UI memory
               loadServices()
               checkForIssues()
+              mainRender(menu, selection, 1)
             else:
               print("got {0}.".format((str(key), key.name, key.code)))
               time.sleep(0.1)
 
           selection = selection % len(menu)
 
-          mainRender(menu, selection, False)
+          mainRender(menu, selection, 2)
 
 originalSignalHandler = signal.getsignal(signal.SIGINT)
 main()
