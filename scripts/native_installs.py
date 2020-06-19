@@ -1,14 +1,23 @@
 #!/usr/bin/env python3
+import signal
 
 def main():
   from blessed import Terminal
   import time
   import subprocess
 
+  global signal
   global dockerCommandsSelectionInProgress
+  global mainMenuList
+  global currentMenuItemIndex
   term = Terminal()
   hotzoneLocation = [((term.height // 16) + 6), 0]
   
+  def onResize(sig, action):
+    global mainMenuList
+    global currentMenuItemIndex
+    mainRender(1, mainMenuList, currentMenuItemIndex)
+
   def installHassIo():
     print("Install Hass.IO")
     print("./.native/hassio.sh")
@@ -170,4 +179,7 @@ def main():
 
   return True
 
+
+originalSignalHandler = signal.getsignal(signal.SIGINT)
 main()
+signal.signal(signal.SIGWINCH, originalSignalHandler)

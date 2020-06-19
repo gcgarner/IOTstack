@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import signal
 
 checkedMenuItems = []
 results = {}
@@ -8,6 +9,7 @@ def main():
   import time
   import yaml
   from blessed import Terminal
+  global signal
 
   # Constants
   templateDirectory = './.templates'
@@ -356,13 +358,17 @@ def main():
           if "services" in previousConfigs:
             dockerComposeYaml = previousConfigs["services"]
             return True
-        else:
-          dockerComposeYaml = {}
+    dockerComposeYaml = {}
     return False
+
+  def onResize(sig, action):
+    mainRender(menu, selection, True)
 
   if __name__ == 'builtins':
     global results
+    global signal
     term = Terminal()
+    signal.signal(signal.SIGWINCH, onResize)
     with term.fullscreen():
       selection = 0
       if loadCurrentConfigs():
@@ -405,4 +411,6 @@ def main():
 
           mainRender(menu, selection, False)
 
+originalSignalHandler = signal.getsignal(signal.SIGINT)
 main()
+signal.signal(signal.SIGWINCH, originalSignalHandler)

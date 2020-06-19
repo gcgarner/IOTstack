@@ -6,6 +6,7 @@ import subprocess
 import os
 import time
 import types
+import signal
 from deps.version_check import checkVersion
 
 term = Terminal()
@@ -27,6 +28,12 @@ hotzoneLocation = [((term.height // 16) + 6), 0]
   #  1 = Full render
   #  2 = Hotzone only
 needsRender = 1
+
+def onResize(sig, action):
+  global needsRender
+  global mainMenuList
+  global currentMenuItemIndex
+  mainRender(1, mainMenuList, currentMenuItemIndex)
 
 # Menu Functions
 def exitMenu():
@@ -249,18 +256,18 @@ def doPotentialMenuCheck(projectStatus, dockerVersion=True, promptFiles=False):
     added = addPotentialMenuItem("projectUpdate")
     projectStatusPollRateRefresh = None
     if (added):
-      needsRender = 2
+      needsRender = 1
 
   if (projectStatus.poll() == 0):
     added = addPotentialMenuItem("noProjectUpdate")
     projectStatusPollRateRefresh = None
     if (added):
-      needsRender = 2
+      needsRender = 1
 
   if (dockerVersion == False):
     added = addPotentialMenuItem("dockerNotUpdated")
     if (added):
-      needsRender = 2
+      needsRender = 1
 
 def checkIfPromptFilesExist():
   if os.path.exists(".project_outofdate"):
@@ -318,6 +325,7 @@ if __name__ == '__main__':
   dockerVersion, reason, data = checkDockerVersion()
   promptFiles = checkIfPromptFilesExist()
   term = Terminal()
+  signal.signal(signal.SIGWINCH, onResize)
   with term.fullscreen():
     mainRender(needsRender, mainMenuList, currentMenuItemIndex) # Initial Draw
     with term.cbreak():

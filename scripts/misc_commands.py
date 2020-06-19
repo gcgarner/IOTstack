@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 
+import signal
+
 def main():
   from blessed import Terminal
   import time
   import subprocess
+  global signal
 
   global dockerCommandsSelectionInProgress
+  global mainMenuList
+  global currentMenuItemIndex
   term = Terminal()
   
   def setSwapinessTo0():
@@ -56,6 +61,11 @@ def main():
   #  2 = Hotzone only
   needsRender = 1
 
+  def onResize(sig, action):
+    global mainMenuList
+    global currentMenuItemIndex
+    mainRender(1, mainMenuList, currentMenuItemIndex)
+
   def renderHotZone(term, menu, selection, hotzoneLocation):
     lineLengthAtTextStart = 75
     print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
@@ -77,9 +87,8 @@ def main():
 
   def mainRender(needsRender, menu, selection):
     term = Terminal()
+    
     if needsRender == 1:
-      print(term.clear())
-
       print(term.clear())
       print(term.move_y(term.height // 16))
       print(term.black_on_cornsilk4(term.center('IOTstack Miscellaneous Commands')))
@@ -103,8 +112,6 @@ def main():
       print(term.center("║                                                                                ║"))
       print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
 
-
-
   def runSelection(selection):
     import types
     if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
@@ -120,7 +127,9 @@ def main():
     return True
 
   if __name__ == 'builtins':
+    global signal
     term = Terminal()
+    signal.signal(signal.SIGWINCH, onResize)
     with term.fullscreen():
       menuNavigateDirection = 0
       mainRender(needsRender, mainMenuList, currentMenuItemIndex)
@@ -163,4 +172,6 @@ def main():
 
   return True
 
+originalSignalHandler = signal.getsignal(signal.SIGINT)
 main()
+signal.signal(signal.SIGWINCH, originalSignalHandler)

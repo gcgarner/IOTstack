@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import signal
 
 def main():
   from blessed import Terminal
@@ -6,9 +7,17 @@ def main():
   import subprocess
 
   global dockerCommandsSelectionInProgress
+  global signal
+  global mainMenuList
+  global currentMenuItemIndex
   term = Terminal()
   hotzoneLocation = [((term.height // 16) + 6), 0]
   
+  def onResize(sig, action):
+    global mainMenuList
+    global currentMenuItemIndex
+    mainRender(1, mainMenuList, currentMenuItemIndex)
+
   def startStack():
     print("Start Stack:")
     print("docker-compose up -d")
@@ -230,4 +239,6 @@ def main():
 
   return True
 
+originalSignalHandler = signal.getsignal(signal.SIGINT)
 main()
+signal.signal(signal.SIGWINCH, originalSignalHandler)
