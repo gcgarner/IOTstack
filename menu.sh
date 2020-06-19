@@ -2,7 +2,20 @@
 
 pushd ~/IOTstack > /dev/null 2>&1
 
-CURRENT_BRANCH=${1:-$(git name-rev --name-only HEAD)}
+CURRENT_BRANCH=$(git name-rev --name-only HEAD)
+
+while test $# -gt 0
+do
+    case "$1" in
+        --branch) CURRENT_BRANCH=${2:-$(git name-rev --name-only HEAD)}
+            ;;
+        --no-check) echo ""
+            ;;
+        --*) echo "bad option $1"
+            ;;
+    esac
+    shift
+done
 
 # Minimum Software Versions
 COMPOSE_VERSION="3.6"
@@ -238,7 +251,7 @@ function do_project_checks() {
 # ----------------------------------------------
 # Menu bootstrap entry point
 # ----------------------------------------------
-if [ "$2" = "--no-check" ]; then
+if [[ "$*" == *"--no-check"* ]]; then
 	echo "Skipping preflight checks."
 else
 	do_project_checks
