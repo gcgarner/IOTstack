@@ -197,6 +197,7 @@ def main():
 
   if __name__ == 'builtins':
     term = Terminal()
+    signal.signal(signal.SIGWINCH, onResize)
     with term.fullscreen():
       menuNavigateDirection = 0
       mainRender(needsRender, mainMenuList, currentMenuItemIndex)

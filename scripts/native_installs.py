@@ -10,13 +10,15 @@ def main():
   global dockerCommandsSelectionInProgress
   global mainMenuList
   global currentMenuItemIndex
+  global screenActive
   term = Terminal()
   hotzoneLocation = [((term.height // 16) + 6), 0]
   
   def onResize(sig, action):
     global mainMenuList
     global currentMenuItemIndex
-    mainRender(1, mainMenuList, currentMenuItemIndex)
+    if (screenActive):
+      mainRender(1, mainMenuList, currentMenuItemIndex)
 
   def installHassIo():
     print("Install Hass.IO")
@@ -49,6 +51,8 @@ def main():
   def goBack():
     global dockerCommandsSelectionInProgress
     global needsRender
+    global screenActive
+    screenActive = False
     dockerCommandsSelectionInProgress = False
     needsRender = 1
     print("Back to main menu")
@@ -91,7 +95,7 @@ def main():
       
       print(toPrint)
 
-  def mainRender(menu, selection):
+  def mainRender(needsRender, menu, selection):
     term = Terminal()
 
     if needsRender == 1:
@@ -138,15 +142,18 @@ def main():
   if __name__ == 'builtins':
     term = Terminal()
     with term.fullscreen():
+      global screenActive
+      screenActive = True
+      signal.signal(signal.SIGWINCH, onResize)
       menuNavigateDirection = 0
-      mainRender(mainMenuList, currentMenuItemIndex)
+      mainRender(needsRender, mainMenuList, currentMenuItemIndex)
       dockerCommandsSelectionInProgress = True
       with term.cbreak():
         while dockerCommandsSelectionInProgress:
           menuNavigateDirection = 0
 
           if not needsRender == 0: # Only rerender when changed to prevent flickering
-            mainRender(mainMenuList, currentMenuItemIndex)
+            mainRender(needsRender, mainMenuList, currentMenuItemIndex)
             needsRender = 0
 
           key = term.inkey()
@@ -160,8 +167,10 @@ def main():
             if key.name == 'KEY_ENTER':
               runSelection(currentMenuItemIndex)
               if dockerCommandsSelectionInProgress == False:
+                screenActive = False
                 return True
             if key.name == 'KEY_ESCAPE':
+              screenActive = False
               dockerCommandsSelectionInProgress = False
               return True
           elif key:
@@ -175,11 +184,11 @@ def main():
             while not isMenuItemSelectable(mainMenuList, currentMenuItemIndex):
               currentMenuItemIndex += menuNavigateDirection
               currentMenuItemIndex = currentMenuItemIndex % len(mainMenuList)
+    screenActive = False
     return True
 
+  screenActive = False
   return True
 
-
-originalSignalHandler = signal.getsignal(signal.SIGINT)
 main()
-signal.signal(signal.SIGWINCH, originalSignalHandler)
+

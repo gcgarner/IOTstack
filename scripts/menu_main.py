@@ -22,6 +22,7 @@ projectStatusPollRateRefresh = 1
 promptFiles = False
 buildComplete = None
 hotzoneLocation = [((term.height // 16) + 6), 0]
+screenActive = True
 
   # Render Modes:
   #  0 = No render needed
@@ -33,7 +34,9 @@ def onResize(sig, action):
   global needsRender
   global mainMenuList
   global currentMenuItemIndex
-  mainRender(1, mainMenuList, currentMenuItemIndex)
+  global screenActive
+  if screenActive:
+    mainRender(1, mainMenuList, currentMenuItemIndex)
 
 # Menu Functions
 def exitMenu():
@@ -47,16 +50,19 @@ def updateProject():
 def buildStack():
   global buildComplete
   global needsRender
+  global screenActive
+  
   buildComplete = None
   buildstackFilePath = "./scripts/buildstack_menu.py"
   with open(buildstackFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), buildstackFilePath, "exec")
-  # execGlobals = globals()
-  # execLocals = locals()
   execGlobals = {}
   execLocals = {}
+  screenActive = False
   exec(code, execGlobals, execLocals)
   buildComplete = execGlobals["results"]["buildState"]
+  signal.signal(signal.SIGWINCH, onResize)
+  screenActive = True
   needsRender = 1
 
 def runExampleMenu():
@@ -68,7 +74,10 @@ def runExampleMenu():
   execLocals = locals()
   execGlobals["currentServiceName"] = 'SERVICENAME'
   execGlobals["toRun"] = 'runOptionsMenu'
+  screenActive = False
   exec(code, execGlobals, execLocals)
+  signal.signal(signal.SIGWINCH, onResize)
+  screenActive = True
 
 def dockerCommands():
   global needsRender
@@ -79,7 +88,10 @@ def dockerCommands():
   # execLocals = locals()
   execGlobals = {}
   execLocals = {}
+  screenActive = False
   exec(code, execGlobals, execLocals)
+  signal.signal(signal.SIGWINCH, onResize)
+  screenActive = True
   needsRender = 1
 
 def miscCommands():
@@ -91,19 +103,26 @@ def miscCommands():
   # execLocals = locals()
   execGlobals = {}
   execLocals = {}
+  screenActive = False
   exec(code, execGlobals, execLocals)
+  signal.signal(signal.SIGWINCH, onResize)
+  screenActive = True
   needsRender = 1
 
 def nativeInstalls():
   global needsRender
+  global screenActive
   dockerCommandsFilePath = "./scripts/native_installs.py"
   with open(dockerCommandsFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
-  # execGlobals = globals()
-  # execLocals = locals()
+  # currGlobals = globals()
+  # currLocals = locals()
   execGlobals = {}
   execLocals = {}
+  screenActive = False
   exec(code, execGlobals, execLocals)
+  signal.signal(signal.SIGWINCH, onResize)
+  screenActive = True
   needsRender = 1
 
 def doNothing():
@@ -325,7 +344,9 @@ if __name__ == '__main__':
   dockerVersion, reason, data = checkDockerVersion()
   promptFiles = checkIfPromptFilesExist()
   term = Terminal()
+  
   signal.signal(signal.SIGWINCH, onResize)
+
   with term.fullscreen():
     mainRender(needsRender, mainMenuList, currentMenuItemIndex) # Initial Draw
     with term.cbreak():
