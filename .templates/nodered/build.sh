@@ -53,6 +53,13 @@ sqliteflag=0
 touch $nr_dfile
 echo "FROM nodered/node-red:latest" >$nr_dfile
 #node red install script inspired from https://tech.scargill.net/the-script/
+
+# From: @Paraphraser - https://github.com/SensorsIot/IOTstack/pull/70/files
+echo "USER root" >>$nr_dfile
+echo "RUN apk update" >>$nr_dfile
+echo "RUN apk upgrade" >>$nr_dfile
+echo "RUN apk add --no-cache eudev-dev" >>$nr_dfile
+
 echo "RUN for addonnodes in \\" >>$nr_dfile
 for checked in "${checked_nodes[@]}"; do
 	#test to see if sqlite is selected and set flag, sqlite require additional flags
