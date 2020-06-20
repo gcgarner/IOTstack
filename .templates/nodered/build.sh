@@ -40,6 +40,7 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 	"node-red-contrib-alexa-local" " " "OFF" \
 	"node-red-contrib-heater-controller" " " "OFF" \
 	"node-red-contrib-deconz" " " "OFF" \
+	"node-red-contrib-generic-ble" " " "OFF" \
 	3>&1 1>&2 2>&3)
 
 ##echo "$check_selection"

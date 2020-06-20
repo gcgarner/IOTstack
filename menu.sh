@@ -4,19 +4,6 @@ pushd ~/IOTstack > /dev/null 2>&1
 
 CURRENT_BRANCH=$(git name-rev --name-only HEAD)
 
-while test $# -gt 0
-do
-    case "$1" in
-        --branch) CURRENT_BRANCH=${2:-$(git name-rev --name-only HEAD)}
-            ;;
-        --no-check) echo ""
-            ;;
-        --*) echo "bad option $1"
-            ;;
-    esac
-    shift
-done
-
 # Minimum Software Versions
 COMPOSE_VERSION="3.6"
 REQ_DOCKER_VERSION=18.2.0
@@ -93,6 +80,19 @@ function minimum_version_check() {
 	fi
 
 	echo "$VERSION_GOOD"
+}
+
+function user_in_group()
+{
+	if grep -q $1 /etc/group ; then
+		if id -nGz "$USER" | grep -qzxF "$1";	then
+				echo "true"
+		else
+				echo "false"
+		fi
+	else
+		echo "notgroup"
+	fi
 }
 
 function install_python3_and_deps() {
@@ -177,7 +177,7 @@ function do_python3_checks() {
 		fi
 		printf "Blessed Version: '$BLESSED_VERSION'. "
 		if [ "$(minimum_version_check $REQ_BLESSED_VERSION $BLESSED_VERSION_MAJOR $BLESSED_VERSION_MINOR $BLESSED_VERSION_BUILD)" == "true" ]; then
-			PYYAML_VERSION_GOOD="true"
+			BLESSED_GOOD="true"
 			echo "Blessed is up to date." >&2
 		else
 			echo "Blessed is outdated." >&2
@@ -191,6 +191,21 @@ function do_python3_checks() {
 	else
 		install_python3_and_deps
 		return 1
+	fi
+}
+
+function do_env_setup() {
+	echo "Setting up environment:"
+	if [[ ! "$(user_in_group bluetooth)" == "notgroup" ]] && [[ ! "$(user_in_group bluetooth)" == "true" ]]; then
+    echo "User is NOT in 'bluetooth' group. Adding:" >&2
+    echo "sudo usermod -G bluetooth -a $USER" >&2
+		sudo usermod -G "bluetooth" -a $USER
+	fi
+
+	if [ ! "$(user_in_group docker)" == "true" ]; then
+    echo "User is NOT in 'docker' group. Adding:" >&2
+    echo "sudo usermod -G docker -a $USER" >&2
+		sudo usermod -G "docker" -a $USER
 	fi
 }
 
@@ -221,6 +236,7 @@ function do_docker_checks() {
 		if [ ! -f .docker_notinstalled ]; then
 			if (whiptail --title "Docker and Docker-Compose" --yesno "Docker is not currently installed, and is required to run IOTstack. You will not be prompted again.\nWould you like to install docker and docker-compose now?" 20 78); then
 					[ -f .docker_notinstalled ] && rm .docker_notinstalled
+					do_env_setup
 					install_docker
 				else
 					touch .docker_notinstalled
@@ -248,20 +264,55 @@ function do_project_checks() {
 	fi
 }
 
+function do_env_checks() {
+	GROUPSGOOD=0
+
+	if [[ ! "$(user_in_group bluetooth)" == "notgroup" ]] && [[ ! "$(user_in_group bluetooth)" == "true" ]]; then
+	  GROUPSGOOD=1
+    echo "User is NOT in 'bluetooth' group" >&2
+	fi
+
+	if [[ ! "$(user_in_group docker)" == "true" ]]; then
+	  GROUPSGOOD=1
+    echo "User is NOT in 'docker' group" >&2
+	fi
+
+	if [ "$GROUPSGOOD" == 1 ]; then
+		echo "!! You might experience issues with docker or bluetooth. To fix run: ./menu.sh --run-env-setup"
+	fi
+}
+
 # ----------------------------------------------
 # Menu bootstrap entry point
 # ----------------------------------------------
+
+while test $# -gt 0
+do
+    case "$1" in
+        --branch) CURRENT_BRANCH=${2:-$(git name-rev --name-only HEAD)}
+            ;;
+        --no-check) echo ""
+            ;;
+        --run-env-setup) do_env_setup
+            ;;
+        --*) echo "bad option $1"
+            ;;
+    esac
+    shift
+done
+
 if [[ "$*" == *"--no-check"* ]]; then
 	echo "Skipping preflight checks."
 else
 	do_project_checks
+	do_env_checks
 	do_python3_checks
 	do_docker_checks
 
-	if [ "$DOCKER_VERSION_GOOD" == "true" ] && \
-		[ "$PYTHON_VERSION_GOOD" == "true" ] && \
-		[ "$PYYAML_VERSION_GOOD" == "true" ] && \
-		[ "$BLESSED_GOOD" == "true" ]; then
+	if [[ "$DOCKER_VERSION_GOOD" == "true" ]] && \
+		[[ "$PYTHON_VERSION_GOOD" == "true" ]] && \
+		[[ "$PYYAML_VERSION_GOOD" == "true" ]] && \
+		[[ "$BLESSED_GOOD" == "true" ]]; then
 		echo "Project dependencies up to date"
 		echo ""
 	else
