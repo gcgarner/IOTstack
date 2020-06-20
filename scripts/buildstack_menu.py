@@ -28,8 +28,9 @@ def main():
   templateDirectoryFolders = next(os.walk(templateDirectory))[1]
   term = Terminal()
   hotzoneLocation = [((term.height // 16) + 6), 0]
+  paginationToggle = [10, term.height - 25]
   paginationStartIndex = 0
-  paginationSize = 10
+  paginationSize = paginationToggle[0]
 
   def buildServices():
     global dockerComposeYaml
@@ -101,6 +102,7 @@ def main():
     return result
 
   def renderHotZone(term, renderType, menu, selection, paddingBefore):
+    global paginationSize
     optionsLength = len(" ►►   Options ")
     optionsIssuesSpace = len("      ")
     spaceAfterissues = len("      ")
@@ -177,58 +179,66 @@ def main():
 
   def mainRender(menu, selection, renderType = 1):
     global paginationStartIndex
+    global paginationSize
     paddingBefore = 4
 
     term = Terminal()
     allIssues = []
-    if (renderType == 1):
-      print(term.clear())
-      print(term.move_y(term.height // 16))
-      print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
-      print("")
-      print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║      Select containers to build                                                ║"))
-      print(term.center("║                                                                                ║"))
-
     checkForOptions()
 
     if selection >= paginationStartIndex + paginationSize:
       paginationStartIndex = selection - (paginationSize - 1) + 1
+      renderType = 1
       
     if selection <= paginationStartIndex - 1:
       paginationStartIndex = selection
+      renderType = 1
 
-    renderHotZone(term, renderType, menu, selection, paddingBefore)
+    try:
+      if (renderType == 1):
+        print(term.clear())
+        print(term.move_y(term.height // 16))
+        print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
+        print("")
+        print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
+        print(term.center("║                                                                                ║"))
+        print(term.center("║      Select containers to build                                                ║"))
+        print(term.center("║                                                                                ║"))
 
-    if (renderType == 1):
-      print(term.center("║                                                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║      Controls:                                                                 ║"))
-      print(term.center("║      [Space] to select or deselect image                                       ║"))
-      print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
-      print(term.center("║      [Right] for options for containers that support it (none at the moment)   ║"))
-      print(term.center("║      [Enter] to begin build                                                    ║"))
-      print(term.center("║      [Escape] to cancel build                                                  ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
-      if len(allIssues) > 0:
-        print(term.center(""))
-        print(term.center(""))
-        print(term.center(""))
-        print(term.center("╔══════ Build Issues ═════════════════════════════════════════════════════════════════════════════════════════════════════════╗"))
-        print(term.center("║                                                                                                                             ║"))
-        for serviceIssues in allIssues:
-          for index, issue in enumerate(serviceIssues["issues"]):
-            spacesAndBracketsLen = 5
-            issueAndTypeLen = len(issue) + len(serviceIssues["serviceName"]) + spacesAndBracketsLen
-            serviceNameAndConflictType = '{t.red_on_black}{issueService}{t.normal} ({t.yellow_on_black}{issueType}{t.normal}) '.format(t=term, issueService=serviceIssues["serviceName"], issueType=issue)
-            formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=49)
-            issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=72)
-            print(term.center("║ {} - {} ║".format(formattedServiceNameAndConflictType, issueDescription) ))
-        print(term.center("║                                                                                                                             ║"))
-        print(term.center("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"))
+      renderHotZone(term, renderType, menu, selection, paddingBefore)
+
+      if (renderType == 1):
+        print(term.center("║                                                                                ║"))
+        print(term.center("║                                                                                ║"))
+        print(term.center("║      Controls:                                                                 ║"))
+        print(term.center("║      [Space] to select or deselect image                                       ║"))
+        print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
+        print(term.center("║      [Right] for options for containers that support it (none at the moment)   ║"))
+        print(term.center("║      [Tab] Expand or collapse build menu size                                  ║"))
+        print(term.center("║      [Enter] to begin build                                                    ║"))
+        print(term.center("║      [Escape] to cancel build                                                  ║"))
+        print(term.center("║                                                                                ║"))
+        print(term.center("║                                                                                ║"))
+        print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+        if len(allIssues) > 0:
+          print(term.center(""))
+          print(term.center(""))
+          print(term.center(""))
+          print(term.center("╔══════ Build Issues ═════════════════════════════════════════════════════════════════════════════════════════════════════════╗"))
+          print(term.center("║                                                                                                                             ║"))
+          for serviceIssues in allIssues:
+            for index, issue in enumerate(serviceIssues["issues"]):
+              spacesAndBracketsLen = 5
+              issueAndTypeLen = len(issue) + len(serviceIssues["serviceName"]) + spacesAndBracketsLen
+              serviceNameAndConflictType = '{t.red_on_black}{issueService}{t.normal} ({t.yellow_on_black}{issueType}{t.normal}) '.format(t=term, issueService=serviceIssues["serviceName"], issueType=issue)
+              formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=49)
+              issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=72)
+              print(term.center("║ {} - {} ║".format(formattedServiceNameAndConflictType, issueDescription) ))
+          print(term.center("║                                                                                                                             ║"))
+          print(term.center("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"))
+
+    except:
+      return
 
     return
 
@@ -387,6 +397,8 @@ def main():
     return False
 
   def onResize(sig, action):
+    global paginationToggle
+    paginationToggle = [10, term.height - 25]
     mainRender(menu, selection, 1)
 
   if __name__ == 'builtins':
@@ -405,7 +417,11 @@ def main():
           key = term.inkey()
           if key.is_sequence:
             if key.name == 'KEY_TAB':
-              selection += 1
+              if paginationSize == paginationToggle[0]:
+                paginationSize = paginationToggle[1]
+              else:
+                paginationSize = paginationToggle[0]
+              mainRender(menu, selection, 1)
             if key.name == 'KEY_DOWN':
               selection += 1
             if key.name == 'KEY_UP':
