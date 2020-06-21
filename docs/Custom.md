@@ -98,69 +98,10 @@ Custom services can be added in a similar way to overriding default settings for
 Firstly, put the following into `compose-override.yml`:
 ```
 services:
-  minecraft:
-    image: itzg/minecraft-server
-    ports:
-      - "25565:25565"
-    volumes:
-      - "./services/minecraft:/data"
-    environment:
-      EULA: "TRUE"
-      TYPE: "PAPER"
-      ENABLE_RCON: "true"
-      RCON_PASSWORD: "PASSWORD"
-      RCON_PORT: 28016
-      VERSION: "1.15.2"
-      REPLACE_ENV_VARIABLES: "TRUE"
-      ENV_VARIABLE_PREFIX: "CFG_"
-      CFG_DB_HOST: "http://localhost:3306"
-      CFG_DB_NAME: "IOTstack Minecraft"
-      CFG_DB_PASSWORD_FILE: "/run/secrets/db_password"
-    restart: unless-stopped
-  rcon:
-    image: itzg/rcon
-    ports:
-      - "4326:4326"
-      - "4327:4327"
-    volumes:
-      - "./rcon_data:/opt/rcon-web-admin/db"
-
-secrets:
-  db_password:
-    file: ./db_password
-```
-
-Then create the service directory that the new instance will use to store persistant data:
-
-`mkdir -p ./volumes/minecraft`
-
-and
-
-`mkdir -p ./volumes/rcon_data`
-
-Obviously you will need to give correct folder names depending on the `volumes` you specify for your custom services. If your new service doesn't require persistant storage, then you can skip this step.
-
-Then simply run the `./menu.sh` command, and rebuild the stack with what ever services you had before.
-
-Using the Mosquitto example above, the final `docker-compose.yml` file will look like:
-
-```
-version: '3.6'
-services:
   mosquitto:
-    container_name: mosquitto
-    image: eclipse-mosquitto
-    restart: unless-stopped
-    user: "1883"
     ports:
-      - 1883:1883
+      - 1996:1996
       - 9001:9001
-    volumes:
-      - ./volumes/mosquitto/data:/mosquitto/data
-      - ./volumes/mosquitto/log:/mosquitto/log
-      - ./volumes/mosquitto/pwfile:/mosquitto/pwfile
-      - ./services/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-      - ./services/mosquitto/filter.acl:/mosquitto/config/filter.acl
   minecraft:
     image: itzg/minecraft-server
     ports:
@@ -191,3 +132,66 @@ secrets:
   db_password:
     file: ./db_password
 ```
+
+Then create the service directory that the new instance will use to store persistant data:
+
+`mkdir -p ./volumes/minecraft`
+
+and
+
+`mkdir -p ./volumes/rcon_data`
+
+Obviously you will need to give correct folder names depending on the `volumes` you specify for your custom services. If your new service doesn't require persistant storage, then you can skip this step.
+
+Then simply run the `./menu.sh` command, and rebuild the stack with what ever services you had before.
+
+Using the Mosquitto example above, the final `docker-compose.yml` file will look like:
+
+```
+version: '3.6'
+services:
+  mosquitto:
+    ports:
+    - 1996:1996
+    - 9001:9001
+    container_name: mosquitto
+    image: eclipse-mosquitto
+    restart: unless-stopped
+    user: '1883'
+    volumes:
+    - ./volumes/mosquitto/data:/mosquitto/data
+    - ./volumes/mosquitto/log:/mosquitto/log
+    - ./services/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    - ./services/mosquitto/filter.acl:/mosquitto/config/filter.acl
+  minecraft:
+    image: itzg/minecraft-server
+    ports:
+    - 25565:25565
+    volumes:
+    - ./volumes/minecraft:/data
+    environment:
+      EULA: 'TRUE'
+      TYPE: PAPER
+      ENABLE_RCON: 'true'
+      RCON_PASSWORD: PASSWORD
+      RCON_PORT: 28016
+      VERSION: 1.15.2
+      REPLACE_ENV_VARIABLES: 'TRUE'
+      ENV_VARIABLE_PREFIX: CFG_
+      CFG_DB_HOST: http://localhost:3306
+      CFG_DB_NAME: IOTstack Minecraft
+      CFG_DB_PASSWORD_FILE: /run/secrets/db_password
+    restart: unless-stopped
+  rcon:
+    image: itzg/rcon
+    ports:
+    - 4326:4326
+    - 4327:4327
+    volumes:
+    - ./volumes/rcon_data:/opt/rcon-web-admin/db
+secrets:
+  db_password:
+    file: ./db_password
+```
+
+Do note that the order of the YAML keys is not guaranteed.
