@@ -37,9 +37,12 @@ def main():
     try:
       runPrebuildHook()
       dockerFileYaml = {}
+      menuStateFileYaml = {}
       dockerFileYaml["version"] = "3.6"
       dockerFileYaml["services"] = {}
+      menuStateFileYaml["services"] = {}
       dockerFileYaml["services"] = dockerComposeYaml
+      menuStateFileYaml["services"] = dockerComposeYaml
 
       if os.path.exists(composeOverrideFile):
         with open(r'%s' % composeOverrideFile) as fileOverride:
@@ -52,7 +55,7 @@ def main():
         yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
 
       with open(r'%s' % dockerSavePathOutput, 'w') as outputFile:
-        yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(menuStateFileYaml, outputFile, default_flow_style=False, sort_keys=False)
       runPostbuildHook()
       return True
     except Exception as err: 
