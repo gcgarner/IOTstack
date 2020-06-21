@@ -11,6 +11,23 @@ Create a file called `compose-override.yml` in the main directory, and place you
 3. Using the `yaml_merge.py` script, merge both the `compose-override.yml` and the temporary docker compose file together; Using the temporary file as the default values and interating through each level of the yaml structure, check to see if the `compose-override.yml` has a value set.
 4. Output the final file to the main directory, calling it `docker-compose.yml`.
 
+## A word of caution
+If you specify an override for a service, and then rebuild the `compose-override.yml` file, but deselect the service from the list, then the YAML merging will still produce that override.
+
+For example, lets say NodeRed was selected to have have the following override specified in `compose-override.yml`:
+```
+services:
+  nodered:
+    restart: always
+```
+
+When rebuilding the menu, since the NodeRed service is not longer included, the only values showing in the final `docker-compose.yml` file for NodeRed will be the `restart` key and its value. Docker Compose will error with the following message:
+```
+Service nodered has neither an image nor a build context specified. At least one must be provided.
+```
+
+When attempting to bring the services up with `docker-compose up -d`.
+
 ## Examples
 
 ### Overriding default settings
