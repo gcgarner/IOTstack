@@ -125,6 +125,22 @@ def nativeInstalls():
   screenActive = True
   needsRender = 1
 
+def backupAndRestore():
+  global needsRender
+  global screenActive
+  dockerCommandsFilePath = "./scripts/backup_restore.py"
+  with open(dockerCommandsFilePath, "rb") as pythonDynamicImportFile:
+    code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
+  # currGlobals = globals()
+  # currLocals = locals()
+  execGlobals = {}
+  execLocals = {}
+  screenActive = False
+  exec(code, execGlobals, execLocals)
+  signal.signal(signal.SIGWINCH, onResize)
+  screenActive = True
+  needsRender = 1
+
 def doNothing():
   selectionInProgress = True
 
@@ -167,8 +183,8 @@ def upgradeDocker(): # TODO: Fix shell issues
 baseMenu = [
   ["Build Stack", buildStack],
   ["Docker Commands", dockerCommands],
-  # ["Backup and Restore"],
   ["Miscellaneous Commands", miscCommands],
+  ["Backup and Restore", backupAndRestore],
   ["Native Installs", nativeInstalls],
   # ["Developer: Example Menu", runExampleMenu], # Uncomment if you want to see the example menu
   ["Exit", exitMenu]

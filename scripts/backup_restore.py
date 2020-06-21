@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+
+import signal
+
+def main():
+  from blessed import Terminal
+  import time
+  import subprocess
+  global signal
+
+  global backupRestoreSelectionInProgress
+  global mainMenuList
+  global currentMenuItemIndex
+  term = Terminal()
+  
+  def dropboxInstall():
+    print("Install Dropbox:")
+    subprocess.call("git clone https://github.com/andreafabrizi/Dropbox-Uploader.git ~/Dropbox-Uploader", shell=True)
+    subprocess.call("chmod +x ~/Dropbox-Uploader/dropbox_uploader.sh", shell=True)
+    subprocess.call("cd ~/Dropbox-Uploader && ./dropbox_uploader.sh", shell=True)
+    print("")
+    print("Dropbox install finished")
+    print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(1)
+    return True
+  
+  def rcloneInstall():
+    print("Install rClone:")
+    print("sudo apt install -y rclone")
+    subprocess.call("sudo apt install -y rclone", shell=True)
+    print("")
+    print("rClone install finished")
+    print("Please run 'rclone config' to configure the rclone google drive backup")
+    print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    return True
+
+  def rCloneSetup():
+    print("Setup rclone:")
+    subprocess.call("rclone config", shell=True)
+    print("")
+    print("rclone setup completed. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(1)
+    return True
+
+  def goBack():
+    global backupRestoreSelectionInProgress
+    global needsRender
+    backupRestoreSelectionInProgress = False
+    needsRender = 1
+    print("Back to main menu")
+    return True
+
+  mainMenuList = [
+    ["Install Dropbox", dropboxInstall],
+    ["Install rclone", rcloneInstall],
+    ["Setup rclone (must be installed first)", rCloneSetup],
+    ["Back", goBack]
+  ]
+
+  hotzoneLocation = [((term.height // 16) + 6), 0]
+
+  backupRestoreSelectionInProgress = True
+  currentMenuItemIndex = 0
+  menuNavigateDirection = 0
+
+  # Render Modes:
+  #  0 = No render needed
+  #  1 = Full render
+  #  2 = Hotzone only
+  needsRender = 1
+
+  def onResize(sig, action):
+    global mainMenuList
+    global currentMenuItemIndex
+    mainRender(1, mainMenuList, currentMenuItemIndex)
+
+  def renderHotZone(term, menu, selection, hotzoneLocation):
+    lineLengthAtTextStart = 75
+    print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
+    for (index, menuItem) in enumerate(menu):
+      toPrint = ""
+      if index == selection:
+        toPrint += ('║   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
+      else:
+        toPrint += ('║   {t.normal} {title} '.format(t=term, title=menuItem[0]))
+
+      for i in range(lineLengthAtTextStart - len(menuItem[0])):
+        toPrint += " "
+
+      toPrint += "║"
+
+      toPrint = term.center(toPrint)
+      
+      print(toPrint)
+
+  def mainRender(needsRender, menu, selection):
+    term = Terminal()
+    
+    if needsRender == 1:
+      print(term.clear())
+      print(term.move_y(term.height // 16))
+      print(term.black_on_cornsilk4(term.center('IOTstack Backup Commands')))
+      print("")
+      print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║      Select backup command to run                                              ║"))
+      print(term.center("║                                                                                ║"))
+
+    if needsRender >= 1:
+      renderHotZone(term, menu, selection, hotzoneLocation)
+
+    if needsRender == 1:
+      print(term.center("║                                                                                ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║      Controls:                                                                 ║"))
+      print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
+      print(term.center("║      [Enter] to run command                                                    ║"))
+      print(term.center("║      [Escape] to go back to main menu                                          ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("║                                                                                ║"))
+      print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+
+  def runSelection(selection):
+    import types
+    if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
+      mainMenuList[selection][1]()
+    else:
+      print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(mainMenuList[selection][0])))
+
+  def isMenuItemSelectable(menu, index):
+    if len(menu) > index:
+      if len(menu[index]) > 2:
+        if menu[index][2]["skip"] == True:
+          return False
+    return True
+
+  if __name__ == 'builtins':
+    global signal
+    term = Terminal()
+    signal.signal(signal.SIGWINCH, onResize)
+    with term.fullscreen():
+      menuNavigateDirection = 0
+      mainRender(needsRender, mainMenuList, currentMenuItemIndex)
+      backupRestoreSelectionInProgress = True
+      with term.cbreak():
+        while backupRestoreSelectionInProgress:
+          menuNavigateDirection = 0
+
+          if not needsRender == 0: # Only rerender when changed to prevent flickering
+            mainRender(needsRender, mainMenuList, currentMenuItemIndex)
+            needsRender = 0
+
+          key = term.inkey()
+          if key.is_sequence:
+            if key.name == 'KEY_TAB':
+              menuNavigateDirection += 1
+            if key.name == 'KEY_DOWN':
+              menuNavigateDirection += 1
+            if key.name == 'KEY_UP':
+              menuNavigateDirection -= 1
+            if key.name == 'KEY_ENTER':
+              runSelection(currentMenuItemIndex)
+              if backupRestoreSelectionInProgress == False:
+                return True
+            if key.name == 'KEY_ESCAPE':
+              backupRestoreSelectionInProgress = False
+              return True
+          elif key:
+            print("got {0}.".format(key))
+
+          if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
+            currentMenuItemIndex += menuNavigateDirection
+            currentMenuItemIndex = currentMenuItemIndex % len(mainMenuList)
+            needsRender = 2
+
+            while not isMenuItemSelectable(mainMenuList, currentMenuItemIndex):
+              currentMenuItemIndex += menuNavigateDirection
+              currentMenuItemIndex = currentMenuItemIndex % len(mainMenuList)
+    return True
+
+  return True
+
+originalSignalHandler = signal.getsignal(signal.SIGINT)
+main()
+signal.signal(signal.SIGWINCH, originalSignalHandler)
