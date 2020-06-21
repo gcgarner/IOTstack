@@ -122,9 +122,10 @@ def main():
     print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
 
     if paginationStartIndex >= 1:
-      print(term.center("║       ▲      ▲▲▲                                                   ↑           ║"))
+      # print(term.center("║       ▲      ▲▲▲                                                   ↑           ║"))
+      print(term.center("|       ^      ^^^                                                   ^           |"))
     else:
-      print(term.center("║                                                                                ║"))
+      print(term.center("|                                                                                |"))
 
     for (index, menuItem) in enumerate(menu): # Menu loop
       if index >= paginationStartIndex and index < paginationStartIndex + paginationSize:
@@ -175,17 +176,18 @@ def main():
         else:
           toPrint = "     ( ) " + toPrint
 
-        toPrint = "║ " + toPrint + "  ║" # Generate border
+        toPrint = "| " + toPrint + "  |" # Generate border
         toPrint = term.center(toPrint) # Center Text (All lines should have the same amount of printable characters)
         # #####
         print(toPrint)
 
     if paginationStartIndex + paginationSize < len(menu):
-      print(term.center("║       ▼      ▼▼▼                                                   ↓           ║"))
+      # print(term.center("|       ▼      ▼▼▼                                                   ↓           |"))
+      print(term.center("|       v      vvv                                                   v           |"))
     else:
-      print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
+      print(term.center("|                                                                                |"))
+    print(term.center("|                                                                                |"))
+    print(term.center("|                                                                                |"))
 
 
   def mainRender(menu, selection, renderType = 1):
@@ -211,32 +213,32 @@ def main():
         print(term.move_y(term.height // 16))
         print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
         print("")
-        print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-        print(term.center("║                                                                                ║"))
-        print(term.center("║      Select containers to build                                                ║"))
-        print(term.center("║                                                                                ║"))
+        print(term.center("/--------------------------------------------------------------------------------\\"))
+        print(term.center("|                                                                                |"))
+        print(term.center("|      Select containers to build                                                |"))
+        print(term.center("|                                                                                |"))
 
       renderHotZone(term, renderType, menu, selection, paddingBefore)
 
       if (renderType == 1):
-        print(term.center("║                                                                                ║"))
-        print(term.center("║                                                                                ║"))
-        print(term.center("║      Controls:                                                                 ║"))
-        print(term.center("║      [Space] to select or deselect image                                       ║"))
-        print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
-        print(term.center("║      [Right] for options for containers that support it (none at the moment)   ║"))
-        print(term.center("║      [Tab] Expand or collapse build menu size                                  ║"))
-        print(term.center("║      [Enter] to begin build                                                    ║"))
-        print(term.center("║      [Escape] to cancel build                                                  ║"))
-        print(term.center("║                                                                                ║"))
-        print(term.center("║                                                                                ║"))
-        print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+        print(term.center("|                                                                                |"))
+        print(term.center("|                                                                                |"))
+        print(term.center("|      Controls:                                                                 |"))
+        print(term.center("|      [Space] to select or deselect image                                       |"))
+        print(term.center("|      [Up] and [Down] to move selection cursor                                  |"))
+        print(term.center("|      [Right] for options for containers that support it (none at the moment)   |"))
+        print(term.center("|      [Tab] Expand or collapse build menu size                                  |"))
+        print(term.center("|      [Enter] to begin build                                                    |"))
+        print(term.center("|      [Escape] to cancel build                                                  |"))
+        print(term.center("|                                                                                |"))
+        print(term.center("|                                                                                |"))
+        print(term.center("\\--------------------------------------------------------------------------------/"))
         if len(allIssues) > 0:
           print(term.center(""))
           print(term.center(""))
           print(term.center(""))
-          print(term.center("╔══════ Build Issues ═════════════════════════════════════════════════════════════════════════════════════════════════════════╗"))
-          print(term.center("║                                                                                                                             ║"))
+          print(term.center("/------ Build Issues ---------------------------------------------------------------------------------------------------------\\"))
+          print(term.center("|                                                                                                                             |"))
           for serviceIssues in allIssues:
             for index, issue in enumerate(serviceIssues["issues"]):
               spacesAndBracketsLen = 5
@@ -244,9 +246,9 @@ def main():
               serviceNameAndConflictType = '{t.red_on_black}{issueService}{t.normal} ({t.yellow_on_black}{issueType}{t.normal}) '.format(t=term, issueService=serviceIssues["serviceName"], issueType=issue)
               formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=49)
               issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=72)
-              print(term.center("║ {} - {} ║".format(formattedServiceNameAndConflictType, issueDescription) ))
-          print(term.center("║                                                                                                                             ║"))
-          print(term.center("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"))
+              print(term.center("| {} - {} |".format(formattedServiceNameAndConflictType, issueDescription) ))
+          print(term.center("|                                                                                                                             |"))
+          print(term.center("\\-----------------------------------------------------------------------------------------------------------------------------/"))
 
     except Exception as err: 
       print("There was an error rendering the menu:")
