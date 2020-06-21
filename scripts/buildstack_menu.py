@@ -245,7 +245,10 @@ def main():
           print(term.center("║                                                                                                                             ║"))
           print(term.center("╚═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝"))
 
-    except:
+    except Exception as err: 
+      print("There was an error rendering the menu:")
+      print(err)
+      print("Press [Esc] to go back")
       return
 
     return
