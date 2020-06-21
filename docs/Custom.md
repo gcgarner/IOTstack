@@ -3,6 +3,8 @@ You can specify modifcations to the `docker-compose.yml` file, including your ow
 
 Create a file called `compose-override.yml` in the main directory, and place your modifications into it. These changes will be merged into the `docker-compose.yml` file next time you run the build script.
 
+The `compose-override.yml` file has been added to the `.gitignore` file, so it shouldn't be touched when upgrading IOTstack. It has been added to the backup script, and so will be included when you back up and restore IOTstack. Always test your backups though! New versions of IOTstack may break previous builds.
+
 ## How it works
 1. After the build process has been completed, a temporary docker compose file is created in the `tmp` directory.
 2. The script then checks if `compose-override.yml` exists:
@@ -12,7 +14,7 @@ Create a file called `compose-override.yml` in the main directory, and place you
 4. Output the final file to the main directory, calling it `docker-compose.yml`.
 
 ## A word of caution
-If you specify an override for a service, and then rebuild the `compose-override.yml` file, but deselect the service from the list, then the YAML merging will still produce that override.
+If you specify an override for a service, and then rebuild the `docker-compose.yml` file, but deselect the service from the list, then the YAML merging will still produce that override.
 
 For example, lets say NodeRed was selected to have have the following override specified in `compose-override.yml`:
 ```
@@ -21,17 +23,19 @@ services:
     restart: always
 ```
 
-When rebuilding the menu, since the NodeRed service is not longer included, the only values showing in the final `docker-compose.yml` file for NodeRed will be the `restart` key and its value. Docker Compose will error with the following message:
+When rebuilding the menu, ensure to have NodeRed service always included because if it's no longer included, the only values showing in the final `docker-compose.yml` file for NodeRed will be the `restart` key and its value. Docker Compose will error with the following message:
 ```
 Service nodered has neither an image nor a build context specified. At least one must be provided.
 ```
 
 When attempting to bring the services up with `docker-compose up -d`.
 
+Either remove the override for NodeRed in `compose-override.yml` and rebuild the stack, or ensure that NodeRed is built with the stack to fix this.
+
 ## Examples
 
 ### Overriding default settings
-For example, lets assume you put the following into the `compose-override.yml` file:
+Lets assume you put the following into the `compose-override.yml` file:
 ```
 services:
   mosquitto:
