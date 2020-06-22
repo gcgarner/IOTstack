@@ -6,6 +6,10 @@ haltOnErrors = True
 
 # Main wrapper function. Required to make local vars work correctly
 def main():
+  import os
+  import time
+  from shutil import copyfile
+
   global dockerComposeYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
@@ -15,6 +19,9 @@ def main():
 
   # runtime vars
   portConflicts = []
+  serviceVolume = './.volumes/' + currentServiceName
+  serviceService = './services/' + currentServiceName
+  serviceTemplate = './.templates/' + currentServiceName
 
   # This lets the menu know whether to put " >> Options " or not
   # This function is REQUIRED.
@@ -61,6 +68,20 @@ def main():
 
   # This function is optional, and will run after the docker-compose.yml file is written to disk.
   def postBuild():
+    if not os.path.exists(serviceService):
+      try:
+        os.mkdir(serviceService)
+        print("Created", serviceService, "for", currentServiceName)
+      except Exception as err: 
+        print("Error creating directory", currentServiceName)
+        print(err)
+    if not os.path.exists(serviceService + '/grafana.env'):
+      try:
+        copyfile(serviceTemplate + '/grafana.env', serviceService + '/grafana.env')
+      except Exception as err: 
+        print("Error copying file for", currentServiceName)
+        print(err)
+        time.sleep(5)
     return True
 
   # This function is optional, and will run just before the build docker-compose.yml code.
@@ -72,7 +93,48 @@ def main():
   # #####################################
 
   def checkForIssues():
-    return True
+    envFileIssues = checkEnvFiles()
+    if (len(envFileIssues) > 0):
+      issues["envFileIssues"] = envFileIssues
+
+    for (index, serviceName) in enumerate(dockerComposeYaml):
+      if not currentServiceName == serviceName: # Skip self
+        currentServicePorts = getExternalPorts(currentServiceName)
+        portConflicts = checkPortConflicts(serviceName, currentServicePorts)
+        if (len(portConflicts) > 0):
+          issues["portConflicts"] = portConflicts
+
+  def getExternalPorts(serviceName):
+    externalPorts = []
+    try:
+      yamlService = dockerComposeYaml[serviceName]
+      if "ports" in yamlService:
+        for (index, port) in enumerate(yamlService["ports"]):
+          try:
+            externalAndInternal = port.split(":")
+            externalPorts.append(externalAndInternal[0])
+          except:
+            pass
+    except:
+      pass
+    return externalPorts
+
+  def checkEnvFiles():
+    envFileIssues = []
+    if not os.path.exists(serviceTemplate + '/grafana.env'):
+      envFileIssues.append(serviceTemplate + '/grafana.env does not exist')
+    return envFileIssues
+
+  def checkPortConflicts(serviceName, currentPorts):
+    portConflicts = []
+    if not currentServiceName == serviceName:
+      yamlService = dockerComposeYaml[serviceName]
+      servicePorts = getExternalPorts(serviceName)
+      for (index, servicePort) in enumerate(servicePorts):
+        for (index, currentPort) in enumerate(currentPorts):
+          if (servicePort == currentPort):
+            portConflicts.append([servicePort, serviceName])
+    return portConflicts
 
   if haltOnErrors:
     eval(toRun)()

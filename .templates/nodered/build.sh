@@ -46,6 +46,7 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 ##echo "$check_selection"
 mapfile -t checked_nodes <<<"$node_selection"
 
+mkdir -p ./services/nodered
 nr_dfile=./services/nodered/Dockerfile
 
 sqliteflag=0

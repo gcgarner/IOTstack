@@ -286,21 +286,6 @@ function do_env_checks() {
 # Menu bootstrap entry point
 # ----------------------------------------------
 
-while test $# -gt 0
-do
-    case "$1" in
-        --branch) CURRENT_BRANCH=${2:-$(git name-rev --name-only HEAD)}
-            ;;
-        --no-check) echo ""
-            ;;
-        --run-env-setup) do_env_setup
-            ;;
-        --*) echo "bad option $1"
-            ;;
-    esac
-    shift
-done
-
 if [[ "$*" == *"--no-check"* ]]; then
 	echo "Skipping preflight checks."
 else
@@ -322,6 +307,21 @@ else
 		echo ""
 	fi
 fi
+
+while test $# -gt 0
+do
+    case "$1" in
+        --branch) CURRENT_BRANCH=${2:-$(git name-rev --name-only HEAD)}
+            ;;
+        --no-check) echo ""
+            ;;
+        --run-env-setup) do_env_setup
+            ;;
+        --*) echo "bad option $1"
+            ;;
+    esac
+    shift
+done
 
 # Hand control to new menu
 $PYTHON_CMD ./scripts/menu_main.py

@@ -112,7 +112,7 @@ def main():
     
     return result
 
-  def renderHotZone(term, renderType, menu, selection, paddingBefore):
+  def renderHotZone(term, renderType, menu, selection, paddingBefore, allIssues):
     global paginationSize
     optionsLength = len(" ►►   Options ")
     optionsIssuesSpace = len("      ")
@@ -213,12 +213,13 @@ def main():
         print(term.move_y(term.height // 16))
         print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
         print("")
+        # print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
         print(term.center("/--------------------------------------------------------------------------------\\"))
         print(term.center("|                                                                                |"))
         print(term.center("|      Select containers to build                                                |"))
         print(term.center("|                                                                                |"))
 
-      renderHotZone(term, renderType, menu, selection, paddingBefore)
+      renderHotZone(term, renderType, menu, selection, paddingBefore, allIssues)
 
       if (renderType == 1):
         print(term.center("|                                                                                |"))
@@ -232,6 +233,8 @@ def main():
         print(term.center("|      [Escape] to cancel build                                                  |"))
         print(term.center("|                                                                                |"))
         print(term.center("|                                                                                |"))
+        # print(term.center("║                                                                                ║"))
+        # print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
         print(term.center("\\--------------------------------------------------------------------------------/"))
         if len(allIssues) > 0:
           print(term.center(""))
