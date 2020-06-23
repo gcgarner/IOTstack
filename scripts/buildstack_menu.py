@@ -82,6 +82,7 @@ def main():
     return finalYaml
 
   def generateTemplateList(templateDirectoryFolders):
+    templateDirectoryFolders.sort()
     templateListDirectories = []
     for directory in templateDirectoryFolders:
       serviceFilePath = templateDirectory + '/' + directory + '/' + serviceFile
@@ -89,10 +90,6 @@ def main():
         templateListDirectories.append(directory)
 
     return templateListDirectories
-
-  templatesList = generateTemplateList(templateDirectoryFolders)
-  for directory in templatesList:
-    menu.append([directory, { "checked": False, "issues": None }])
 
   def generateLineText(text, textLength=None, paddingBefore=0, lineLength=26):
     result = ""
@@ -419,6 +416,10 @@ def main():
     global paginationToggle
     paginationToggle = [10, term.height - 25]
     mainRender(menu, selection, 1)
+
+  templatesList = generateTemplateList(templateDirectoryFolders)
+  for directory in templatesList:
+    menu.append([directory, { "checked": False, "issues": None }])
 
   if __name__ == 'builtins':
     global results
