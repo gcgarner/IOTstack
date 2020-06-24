@@ -5,7 +5,6 @@ pushd ~/IOTstack > /dev/null 2>&1
 CURRENT_BRANCH=$(git name-rev --name-only HEAD)
 
 # Minimum Software Versions
-COMPOSE_VERSION="3.6"
 REQ_DOCKER_VERSION=18.2.0
 REQ_PYTHON_VERSION=3.6.9
 REQ_PIP_VERSION=3.6.9
