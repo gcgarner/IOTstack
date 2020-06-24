@@ -111,7 +111,8 @@ def main():
 
   def renderHotZone(term, renderType, menu, selection, paddingBefore, allIssues):
     global paginationSize
-    optionsLength = len(" ►►   Options ")
+    # optionsLength = len(" ►►   Options ")
+    optionsLength = len(" >>   Options ")
     optionsIssuesSpace = len("      ")
     spaceAfterissues = len("      ")
     issuesLength = len(" !!   Issue ")
@@ -139,8 +140,8 @@ def main():
 
         # Options and issues
         if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
-          toPrint = toPrint + '{t.blue_on_black} ►► {t.normal}'.format(t=term)
-          # toPrint = toPrint + '{t.blue_on_black} >> {t.normal}'.format(t=term)
+          # toPrint = toPrint + '{t.blue_on_black} ►► {t.normal}'.format(t=term)
+          toPrint = toPrint + '{t.blue_on_black} >> {t.normal}'.format(t=term)
           toPrint = toPrint + ' {t.white_on_black} Options {t.normal}'.format(t=term)
         else:
           for i in range(optionsLength):
