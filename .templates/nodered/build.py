@@ -178,14 +178,14 @@ def main():
     for (index, menuItem) in enumerate(menu):
       toPrint = ""
       if index == selection:
-        toPrint += ('║   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
+        toPrint += ('|   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
       else:
-        toPrint += ('║   {t.normal} {title} '.format(t=term, title=menuItem[0]))
+        toPrint += ('|   {t.normal} {title} '.format(t=term, title=menuItem[0]))
 
       for i in range(lineLengthAtTextStart - len(menuItem[0])):
         toPrint += " "
 
-      toPrint += "║"
+      toPrint += "|"
 
       toPrint = term.center(toPrint)
 
@@ -199,24 +199,26 @@ def main():
       print(term.move_y(term.height // 16))
       print(term.black_on_cornsilk4(term.center('IOTstack NodeRed Options')))
       print("")
-      print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║      Select Option to configure                                                ║"))
-      print(term.center("║                                                                                ║"))
+      # print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
+      print(term.center("/--------------------------------------------------------------------------------\\"))
+      print(term.center("|                                                                                |"))
+      print(term.center("|      Select Option to configure                                                |"))
+      print(term.center("|                                                                                |"))
 
     if needsRender >= 1:
       renderHotZone(term, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      print(term.center("║                                                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║      Controls:                                                                 ║"))
-      print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
-      print(term.center("║      [Enter] to run command                                                    ║"))
-      print(term.center("║      [Escape] to go back to main menu                                          ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+      print(term.center("|                                                                                |"))
+      print(term.center("|                                                                                |"))
+      print(term.center("|      Controls:                                                                 |"))
+      print(term.center("|      [Up] and [Down] to move selection cursor                                  |"))
+      print(term.center("|      [Enter] to run command                                                    |"))
+      print(term.center("|      [Escape] to go back to main menu                                          |"))
+      print(term.center("|                                                                                |"))
+      print(term.center("|                                                                                |"))
+      # print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+      print(term.center("\\--------------------------------------------------------------------------------/"))
 
   def runSelection(selection):
     import types

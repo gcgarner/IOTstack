@@ -75,10 +75,10 @@ def main():
     print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
 
     if paginationStartIndex >= 1:
-      # print(term.center("║       ▲      ▲▲▲                                                   ↑           ║"))
-      print(term.center("║       ^      ^^^                                                   ^           ║"))
+      # print(term.center("|       ▲      ▲▲▲                                                   ↑           |"))
+      print(term.center("|       ^      ^^^                                                   ^           |"))
     else:
-      print(term.center("║                                                                                ║"))
+      print(term.center("|                                                                                |"))
 
     for (index, menuItem) in enumerate(menu): # Menu loop
       if index >= paginationStartIndex and index < paginationStartIndex + paginationSize:
@@ -99,18 +99,18 @@ def main():
         else:
           toPrint = "     ( ) " + toPrint
 
-        toPrint = "║ " + toPrint + "  ║" # Generate border
+        toPrint = "| " + toPrint + "  |" # Generate border
         toPrint = term.center(toPrint) # Center Text (All lines should have the same amount of printable characters)
         # #####
         print(toPrint)
 
     if paginationStartIndex + paginationSize < len(menu):
-      # print(term.center("║       ▼      ▼▼▼                                                   ↓           ║"))
-      print(term.center("║       v      vvv                                                   v           ║"))
+      # print(term.center("|       ▼      ▼▼▼                                                   ↓           |"))
+      print(term.center("|       v      vvv                                                   v           |"))
     else:
-      print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
+      print(term.center("|                                                                                |"))
+    print(term.center("|                                                                                |"))
+    print(term.center("|                                                                                |"))
 
 
   def mainRender(needsRender, menu, selection):
@@ -131,27 +131,30 @@ def main():
       print(term.move_y(term.height // 16))
       print(term.black_on_cornsilk4(term.center('IOTstack NodeRed Addons')))
       print("")
-      print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║      Select NodeRed Addons (npm) to install                                    ║"))
-      print(term.center("║                                                                                ║"))
+      # print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
+      print(term.center("/--------------------------------------------------------------------------------\\"))
+      print(term.center("|                                                                                |"))
+      print(term.center("|      Select NodeRed Addons (npm) to install                                    |"))
+      print(term.center("|                                                                                |"))
 
     if needsRender >= 1:
       renderHotZone(term, needsRender, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      print(term.center("║                                                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║      Controls:                                                                 ║"))
-      print(term.center("║      [Space] to select or deselect addon                                       ║"))
-      print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
-      print(term.center("║      [Tab] Expand or collapse addon menu size                                  ║"))
-      print(term.center("║      [S] Switch between sorted by checked and sorted alphabetically            ║"))
-      print(term.center("║      [Enter] to save updated list                                              ║"))
-      print(term.center("║      [Escape] to cancel changes                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+      print(term.center("|                                                                                |"))
+      print(term.center("|                                                                                |"))
+      print(term.center("|      Controls:                                                                 |"))
+      print(term.center("|      [Space] to select or deselect addon                                       |"))
+      print(term.center("|      [Up] and [Down] to move selection cursor                                  |"))
+      print(term.center("|      [Tab] Expand or collapse addon menu size                                  |"))
+      print(term.center("|      [S] Switch between sorted by checked and sorted alphabetically            |"))
+      print(term.center("|      [Enter] to save updated list                                              |"))
+      print(term.center("|      [Escape] to cancel changes                                                |"))
+      print(term.center("|                                                                                |"))
+      print(term.center("|                                                                                |"))
+      # print(term.center("║                                                                                ║"))
+      # print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+      print(term.center("\\--------------------------------------------------------------------------------/"))
 
   def runSelection(selection):
     import types
