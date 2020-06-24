@@ -119,9 +119,8 @@ def main():
     print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
 
     if paginationStartIndex >= 1:
-      print(term.center("║       ▲      ▲▲▲                                                   ^           ║"))
       # print(term.center("║       ▲      ▲▲▲                                                   ↑           ║"))
-      # print(term.center("║       ^      ^^^                                                   ^           ║"))
+      print(term.center("║       ^      ^^^                                                   ^           ║"))
     else:
       print(term.center("║                                                                                ║"))
 
@@ -181,9 +180,8 @@ def main():
         print(toPrint)
 
     if paginationStartIndex + paginationSize < len(menu):
-      print(term.center("║       ▼      ▼▼▼                                                   v           ║"))
       # print(term.center("║       ▼      ▼▼▼                                                   ↓           ║"))
-      # print(term.center("║       v      vvv                                                   v           ║"))
+      print(term.center("║       v      vvv                                                   v           ║"))
     else:
       print(term.center("║                                                                                ║"))
     print(term.center("║                                                                                ║"))
