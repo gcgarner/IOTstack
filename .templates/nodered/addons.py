@@ -120,11 +120,11 @@ def main():
     
     if selection >= paginationStartIndex + paginationSize:
       paginationStartIndex = selection - (paginationSize - 1) + 1
-      renderType = 1
+      needsRender = 1
       
     if selection <= paginationStartIndex - 1:
       paginationStartIndex = selection
-      renderType = 1
+      needsRender = 1
 
     if needsRender == 1:
       print(term.clear())
@@ -197,6 +197,7 @@ def main():
 
   if __name__ == 'builtins':
     global signal
+    sortBy = 0
     term = Terminal()
     signal.signal(signal.SIGWINCH, onResize)
     loadAddonsMenu()
@@ -236,7 +237,14 @@ def main():
               checkMenuItem(currentMenuItemIndex) # Update checked list
               needsRender = 2
             if key == 's':
-              print("Not yet finished")
+              if sortBy == 0:
+                sortBy = 1
+                mainMenuList.sort(key=lambda x: x[0], reverse=False)
+              else:
+                sortBy = 0
+                mainMenuList.sort(key=lambda x: (x[1]["checked"], x[0]), reverse=True)
+              
+              needsRender = 2
 
           if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
             currentMenuItemIndex += menuNavigateDirection

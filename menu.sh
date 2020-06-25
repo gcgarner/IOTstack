@@ -316,6 +316,8 @@ do
             ;;
         --run-env-setup) do_env_setup
             ;;
+        --encoding) ENCODING_TYPE=${2:-$("utf-8")}
+            ;;
         --*) echo "bad option $1"
             ;;
     esac
@@ -323,6 +325,6 @@ do
 done
 
 # Hand control to new menu
-$PYTHON_CMD ./scripts/menu_main.py
+$PYTHON_CMD ./scripts/menu_main.py $ENCODING_TYPE
 
 popd > /dev/null 2>&1
