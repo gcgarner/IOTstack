@@ -10,9 +10,11 @@ def main():
   import time
   import yaml
   import signal
+  from deps.chars import specialChars
   from blessed import Terminal
   
   global dockerComposeYaml # The loaded memory YAML of all checked services
+  global renderMode # For rendering fancy or basic ascii characters
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
   global currentServiceName # Name of the current service
@@ -155,7 +157,10 @@ def main():
       code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
     # execGlobals = globals()
     # execLocals = locals()
-    execGlobals = {}
+    execGlobals = {
+      "currentServiceName": currentServiceName,
+      "renderMode": renderMode
+    }
     execLocals = {}
     screenActive = False
     exec(code, execGlobals, execLocals)
@@ -178,14 +183,14 @@ def main():
     for (index, menuItem) in enumerate(menu):
       toPrint = ""
       if index == selection:
-        toPrint += ('|   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
+        toPrint += ('{bv}   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
       else:
-        toPrint += ('|   {t.normal} {title} '.format(t=term, title=menuItem[0]))
+        toPrint += ('{bv}   {t.normal} {title} '.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
 
       for i in range(lineLengthAtTextStart - len(menuItem[0])):
         toPrint += " "
 
-      toPrint += "|"
+      toPrint += "{bv}".format(bv=specialChars[renderMode]["borderVertical"])
 
       toPrint = term.center(toPrint)
 
@@ -199,26 +204,42 @@ def main():
       print(term.move_y(term.height // 16))
       print(term.black_on_cornsilk4(term.center('IOTstack NodeRed Options')))
       print("")
-      # print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-      print(term.center("/--------------------------------------------------------------------------------\\"))
-      print(term.center("|                                                                                |"))
-      print(term.center("|      Select Option to configure                                                |"))
-      print(term.center("|                                                                                |"))
+      print(term.center(("{btl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{btr}").format(
+        btl=specialChars[renderMode]["borderTopLeft"],
+        btr=specialChars[renderMode]["borderTopRight"],
+        bh=specialChars[renderMode]["borderHorizontal"]
+      )))
+      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      Select Option to configure                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
 
     if needsRender >= 1:
       renderHotZone(term, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      print(term.center("|                                                                                |"))
-      print(term.center("|                                                                                |"))
-      print(term.center("|      Controls:                                                                 |"))
-      print(term.center("|      [Up] and [Down] to move selection cursor                                  |"))
-      print(term.center("|      [Enter] to run command                                                    |"))
-      print(term.center("|      [Escape] to go back to main menu                                          |"))
-      print(term.center("|                                                                                |"))
-      print(term.center("|                                                                                |"))
-      # print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
-      print(term.center("\\--------------------------------------------------------------------------------/"))
+      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Enter] to run command                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(("{bbl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bbr}").format(
+        bbl=specialChars[renderMode]["borderBottomLeft"],
+        bbr=specialChars[renderMode]["borderBottomRight"],
+        bh=specialChars[renderMode]["borderHorizontal"]
+      )))
 
   def runSelection(selection):
     import types

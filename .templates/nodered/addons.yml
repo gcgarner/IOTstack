@@ -1,6 +1,7 @@
 version: 1
 application: "IOTstack"
 service: "nodered"
+comment: "Addons available for NodeRed"
 addons:
   default_on:
     - "node-red-node-pi-gpiod"

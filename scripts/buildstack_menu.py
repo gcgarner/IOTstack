@@ -8,8 +8,10 @@ def main():
   import os
   import time
   import yaml
+  from deps.chars import specialChars
   from blessed import Terminal
   global signal
+  global renderMode
   global term
   global paginationSize
   global paginationStartIndex
@@ -22,7 +24,6 @@ def main():
   dockerSavePathOutput = './services/docker-compose.save.yml'
   composeOverrideFile = './compose-override.yml'
 
-
   # Runtime vars
   menu = []
   dockerComposeYaml = {}
@@ -32,35 +33,6 @@ def main():
   paginationToggle = [10, term.height - 25]
   paginationStartIndex = 0
   paginationSize = paginationToggle[0]
-  renderMode = "utf-8"
-  specialChars = {
-    "utf-8": {
-      "rightArrowFull": "►",
-      "upArrowFull": "▲",
-      "upArrowLine": "↑",
-      "downArrowFull": "▼",
-      "downArrowLine": "↓",
-      "borderVertical": "║",
-      "borderHorizontal": "═",
-      "borderTopLeft": "╔",
-      "borderTopRight": "╗",
-      "borderBottomLeft": "╚",
-      "borderBottomRight": "╝"
-    },
-    "ascii": {
-      "rightArrowFull": ">",
-      "upArrowFull": "^",
-      "upArrowLine": "^",
-      "downArrowFull": "v",
-      "downArrowLine": "v",
-      "borderVertical": "{bv}",
-      "borderHorizontal": "-",
-      "borderTopLeft": "/",
-      "borderTopRight": "\\",
-      "borderBottomLeft": "\\",
-      "borderBottomRight": "/"
-    }
-  }
 
   def buildServices():
     global dockerComposeYaml
@@ -390,7 +362,8 @@ def main():
           execGlobals = {
             "dockerComposeYaml": dockerComposeYaml,
             "toRun": "checkForOptionsHook",
-            "currentServiceName": menuItem[0]
+            "currentServiceName": menuItem[0],
+            "renderMode": renderMode
           }
           execLocals = {}
           exec(code, execGlobals, execLocals)
@@ -447,7 +420,6 @@ def main():
     menuItem = menu[selection]
     print(1111, menuItem)
     if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
-      print(3333)
       buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
       print(buildScriptPath)
       if os.path.exists(buildScriptPath):
@@ -456,7 +428,8 @@ def main():
         execGlobals = {
           "dockerComposeYaml": dockerComposeYaml,
           "toRun": "runOptionsMenu",
-          "currentServiceName": menuItem[0]
+          "currentServiceName": menuItem[0],
+          "renderMode": renderMode
         }
         execLocals = locals()
         exec(code, execGlobals, execLocals)

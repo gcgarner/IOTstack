@@ -316,7 +316,7 @@ do
             ;;
         --run-env-setup) do_env_setup
             ;;
-        --encoding) ENCODING_TYPE=${2:-$("utf-8")}
+        --encoding) ENCODING_TYPE=$2
             ;;
         --*) echo "bad option $1"
             ;;

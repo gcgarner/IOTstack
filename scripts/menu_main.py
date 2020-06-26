@@ -7,6 +7,7 @@ import os
 import time
 import types
 import signal
+from deps.chars import specialChars
 from deps.version_check import checkVersion
 
 term = Terminal()
@@ -29,6 +30,35 @@ screenActive = True
   #  1 = Full render
   #  2 = Hotzone only
 needsRender = 1
+
+def checkRenderOptions():
+  global term
+  global renderMode
+  if len(sys.argv) > 1 and (sys.argv[1] == "utf-8" or sys.argv[1] == "ascii"):
+    renderMode = sys.argv[1]
+  else:
+    print(term.clear())
+    try:
+      print(
+        specialChars["utf-8"]["rightArrowFull"],
+        specialChars["utf-8"]["upArrowFull"],
+        specialChars["utf-8"]["upArrowLine"],
+        specialChars["utf-8"]["downArrowFull"],
+        specialChars["utf-8"]["downArrowLine"],
+        specialChars["utf-8"]["borderVertical"],
+        specialChars["utf-8"]["borderHorizontal"],
+        specialChars["utf-8"]["borderTopLeft"],
+        specialChars["utf-8"]["borderTopRight"],
+        specialChars["utf-8"]["borderBottomLeft"],
+        specialChars["utf-8"]["borderBottomRight"],
+      )
+      print(term.clear())
+      renderMode = "utf-8"
+      return "utf-8"
+    except:
+      print(term.clear())
+      renderMode = "ascii"
+      return "ascii"
 
 def onResize(sig, action):
   global needsRender
@@ -56,7 +86,9 @@ def buildStack():
   buildstackFilePath = "./scripts/buildstack_menu.py"
   with open(buildstackFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), buildstackFilePath, "exec")
-  execGlobals = {}
+  execGlobals = {
+    "renderMode": renderMode
+  }
   execLocals = {}
   screenActive = False
   exec(code, execGlobals, execLocals)
@@ -70,7 +102,9 @@ def runExampleMenu():
   with open(exampleMenuFilePath, "rb") as pythonDynamicImportFile:
     code = compile(pythonDynamicImportFile.read(), exampleMenuFilePath, "exec")
   # execGlobals = globals()
-  execGlobals = {}
+  execGlobals = {
+    "renderMode": renderMode
+  }
   execLocals = locals()
   execGlobals["currentServiceName"] = 'SERVICENAME'
   execGlobals["toRun"] = 'runOptionsMenu'
@@ -86,7 +120,9 @@ def dockerCommands():
     code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
   # execGlobals = globals()
   # execLocals = locals()
-  execGlobals = {}
+  execGlobals = {
+    "renderMode": renderMode
+  }
   execLocals = {}
   screenActive = False
   exec(code, execGlobals, execLocals)
@@ -101,7 +137,9 @@ def miscCommands():
     code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
   # execGlobals = globals()
   # execLocals = locals()
-  execGlobals = {}
+  execGlobals = {
+    "renderMode": renderMode
+  }
   execLocals = {}
   screenActive = False
   exec(code, execGlobals, execLocals)
@@ -117,7 +155,9 @@ def nativeInstalls():
     code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
   # currGlobals = globals()
   # currLocals = locals()
-  execGlobals = {}
+  execGlobals = {
+    "renderMode": renderMode
+  }
   execLocals = {}
   screenActive = False
   exec(code, execGlobals, execLocals)
@@ -133,7 +173,9 @@ def backupAndRestore():
     code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
   # currGlobals = globals()
   # currLocals = locals()
-  execGlobals = {}
+  execGlobals = {
+    "renderMode": renderMode
+  }
   execLocals = {}
   screenActive = False
   exec(code, execGlobals, execLocals)
@@ -364,6 +406,7 @@ if __name__ == '__main__':
   signal.signal(signal.SIGWINCH, onResize)
 
   with term.fullscreen():
+    checkRenderOptions()
     mainRender(needsRender, mainMenuList, currentMenuItemIndex) # Initial Draw
     with term.cbreak():
       while selectionInProgress:

@@ -10,6 +10,7 @@ def main():
   import os
 
   global signal
+  global currentServiceName
   global dockerCommandsSelectionInProgress
   global mainMenuList
   global currentMenuItemIndex
@@ -21,6 +22,9 @@ def main():
   paginationToggle = [10, term.height - 25]
   paginationStartIndex = 0
   paginationSize = paginationToggle[0]
+
+  serviceService = './services/' + currentServiceName
+  serviceTemplate = './.templates/' + currentServiceName
 
   addonsFile = "./.templates/nodered/addons.yml"
   
@@ -177,13 +181,31 @@ def main():
         addonsLoaded = yaml.load(objAddonsFile, Loader=yaml.SafeLoader)
         defaultOnAddons = addonsLoaded["addons"]["default_on"]
         defaultOffAddons = addonsLoaded["addons"]["default_off"]
-        defaultOnAddons.sort()
-        for (index, addonName) in enumerate(defaultOnAddons):
-          mainMenuList.append([addonName, { "checked": True }])
+        if not os.path.exists(serviceService + '/addons_list.yml'):
+          defaultOnAddons.sort()
+          for (index, addonName) in enumerate(defaultOnAddons):
+            mainMenuList.append([addonName, { "checked": True }])
 
-        defaultOffAddons.sort()
-        for (index, addonName) in enumerate(defaultOffAddons):
-          mainMenuList.append([addonName, { "checked": False }])
+          defaultOffAddons.sort()
+          for (index, addonName) in enumerate(defaultOffAddons):
+            mainMenuList.append([addonName, { "checked": False }])
+        else:
+          with open(r'%s' % serviceService + '/addons_list.yml') as objSavedAddonsFile:
+            savedAddonsFile = yaml.load(objSavedAddonsFile, Loader=yaml.SafeLoader)
+            savedAddons = savedAddonsFile["addons"]
+            savedAddons.sort()
+            for (index, addonName) in enumerate(savedAddons):
+              mainMenuList.append([addonName, { "checked": True }])
+
+            for (index, addonName) in enumerate(defaultOnAddons):
+              if not addonName in savedAddons:
+                mainMenuList.append([addonName, { "checked": False }])
+
+            for (index, addonName) in enumerate(defaultOffAddons):
+              if not addonName in savedAddons:
+                mainMenuList.append([addonName, { "checked": False }])
+            sortBy = 0
+            mainMenuList.sort(key=lambda x: (x[1]["checked"], x[0]), reverse=True)
 
     else:
       print("Error: '{addonsFile}' file doesn't exist.".format(addonsFile=addonsFile))
@@ -194,6 +216,31 @@ def main():
       mainMenuList[selection][1]["checked"] = False
     else:
       mainMenuList[selection][1]["checked"] = True
+
+  def saveAddonList():
+    try:
+      if not os.path.exists(serviceService):
+        os.mkdir(serviceService)
+      nodeRedYamlAddonsList = {
+        "version": "1",
+        "application": "IOTstack",
+        "service": "nodered",
+        "comment": "Selected addons",
+        "addons": []
+      }
+      for (index, addon) in enumerate(mainMenuList):
+        if addon[1]["checked"]:
+          nodeRedYamlAddonsList["addons"].append(addon[0])
+
+      with open(r'%s/addons_list.yml' % serviceService, 'w') as outputFile:
+        yaml.dump(nodeRedYamlAddonsList, outputFile, default_flow_style=False, sort_keys=False)
+
+    except Exception as err: 
+      print("Error saving NodeRed Addons list", currentServiceName)
+      print(err)
+      return False
+    return True
+
 
   if __name__ == 'builtins':
     global signal
@@ -226,9 +273,10 @@ def main():
             if key.name == 'KEY_UP':
               menuNavigateDirection -= 1
             if key.name == 'KEY_ENTER':
-              runSelection(currentMenuItemIndex)
-              if dockerCommandsSelectionInProgress == False:
+              if saveAddonList():
                 return True
+              else:
+                print("Something went wrong. Try saving the list again.")
             if key.name == 'KEY_ESCAPE':
               dockerCommandsSelectionInProgress = False
               return True
