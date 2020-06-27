@@ -12,7 +12,7 @@ def main():
   import signal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from blessed import Terminal
-  
+
   global dockerComposeYaml # The loaded memory YAML of all checked services
   global renderMode # For rendering fancy or basic ascii characters
   global toRun # Switch for which function to run when executed
@@ -20,9 +20,18 @@ def main():
   global currentServiceName # Name of the current service
   global issues # Returned issues dict
   global haltOnErrors # Turn on to allow erroring
+  global serviceService
+  global serviceTemplate
+  global addonsFile
 
   # runtime vars
   portConflicts = []
+
+  serviceService = './services/' + currentServiceName
+  serviceTemplate = './.templates/' + currentServiceName
+  addonsFile = serviceService + "/addons_list.yml"
+
+  dockerfileTemplateReplace = "%run npm install modules list%"
 
   # This lets the menu know whether to put " >> Options " or not
   # This function is REQUIRED.
@@ -78,7 +87,25 @@ def main():
     import subprocess
     print("Starting NodeRed Build script")
     time.sleep(0.2)
-    subprocess.call("./.templates/nodered/build.sh", shell=True) # TODO: Put this step into the new build system
+    with open(r'%s/Dockerfile.template' % serviceTemplate, 'r') as dockerTemplate:
+      templateData = dockerTemplate.read()
+
+    with open(r'%s' % addonsFile) as objAddonsFile:
+      addonsSelected = yaml.load(objAddonsFile, Loader=yaml.SafeLoader)
+
+    addonsInstallCommands = ""
+    if os.path.exists(addonsFile):
+      for (index, addonName) in enumerate(addonsSelected["addons"]):
+        if (addonName == 'node-red-node-sqlite'):
+          addonsInstallCommands = addonsInstallCommands + "RUN npm install --unsafe-perm {addonName}\n".format(addonName=addonName)
+        else:
+          addonsInstallCommands = addonsInstallCommands + "RUN npm install {addonName}\n".format(addonName=addonName)
+
+    templateData = templateData.replace(dockerfileTemplateReplace, addonsInstallCommands)
+
+    with open(r'%s/Dockerfile' % serviceService, 'w') as dockerTemplate:
+      dockerTemplate.write(templateData)
+    # subprocess.call("./.templates/nodered/build.sh", shell=True) # TODO: Put this step into the new build system
     print("Finished NodeRed Build script")
     time.sleep(0.2)
     return True

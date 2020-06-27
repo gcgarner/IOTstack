@@ -27,8 +27,7 @@ def main():
 
   serviceService = './services/' + currentServiceName
   serviceTemplate = './.templates/' + currentServiceName
-
-  addonsFile = "./.templates/nodered/addons.yml"
+  addonsFile = serviceTemplate + "/addons.yml"
   
   def goBack():
     global dockerCommandsSelectionInProgress
