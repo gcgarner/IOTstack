@@ -34,31 +34,50 @@ needsRender = 1
 def checkRenderOptions():
   global term
   global renderMode
-  if len(sys.argv) > 1 and (sys.argv[1] == "utf-8" or sys.argv[1] == "ascii"):
+  if len(sys.argv) > 1 and (sys.argv[1] == "simple" or sys.argv[1] == "latin" or sys.argv[1] == "ascii"):
     renderMode = sys.argv[1]
   else:
     print(term.clear())
     try:
       print(
-        specialChars["utf-8"]["rightArrowFull"],
-        specialChars["utf-8"]["upArrowFull"],
-        specialChars["utf-8"]["upArrowLine"],
-        specialChars["utf-8"]["downArrowFull"],
-        specialChars["utf-8"]["downArrowLine"],
-        specialChars["utf-8"]["borderVertical"],
-        specialChars["utf-8"]["borderHorizontal"],
-        specialChars["utf-8"]["borderTopLeft"],
-        specialChars["utf-8"]["borderTopRight"],
-        specialChars["utf-8"]["borderBottomLeft"],
-        specialChars["utf-8"]["borderBottomRight"],
+        specialChars["latin"]["rightArrowFull"],
+        specialChars["latin"]["upArrowFull"],
+        specialChars["latin"]["upArrowLine"],
+        specialChars["latin"]["downArrowFull"],
+        specialChars["latin"]["downArrowLine"],
+        specialChars["latin"]["borderVertical"],
+        specialChars["latin"]["borderHorizontal"],
+        specialChars["latin"]["borderTopLeft"],
+        specialChars["latin"]["borderTopRight"],
+        specialChars["latin"]["borderBottomLeft"],
+        specialChars["latin"]["borderBottomRight"],
       )
       print(term.clear())
-      renderMode = "utf-8"
-      return "utf-8"
+      renderMode = "latin"
+      return "latin"
     except:
-      print(term.clear())
-      renderMode = "ascii"
-      return "ascii"
+      try:
+        print(
+          specialChars["simple"]["rightArrowFull"],
+          specialChars["simple"]["upArrowFull"],
+          specialChars["simple"]["upArrowLine"],
+          specialChars["simple"]["downArrowFull"],
+          specialChars["simple"]["downArrowLine"],
+          specialChars["simple"]["borderVertical"],
+          specialChars["simple"]["borderHorizontal"],
+          specialChars["simple"]["borderTopLeft"],
+          specialChars["simple"]["borderTopRight"],
+          specialChars["simple"]["borderBottomLeft"],
+          specialChars["simple"]["borderBottomRight"],
+        )
+        print(term.clear())
+        renderMode = "simple"
+        return "simple"
+      except:
+        print(term.clear())
+        renderMode = "ascii"
+        return "ascii"
+
 
 def onResize(sig, action):
   global needsRender

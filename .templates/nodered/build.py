@@ -10,7 +10,7 @@ def main():
   import time
   import yaml
   import signal
-  from deps.chars import specialChars
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from blessed import Terminal
   
   global dockerComposeYaml # The loaded memory YAML of all checked services
@@ -204,42 +204,24 @@ def main():
       print(term.move_y(term.height // 16))
       print(term.black_on_cornsilk4(term.center('IOTstack NodeRed Options')))
       print("")
-      print(term.center(("{btl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{btr}").format(
-        btl=specialChars[renderMode]["borderTopLeft"],
-        btr=specialChars[renderMode]["borderTopRight"],
-        bh=specialChars[renderMode]["borderHorizontal"]
-      )))
-      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonTopBorder(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
       print(term.center("{bv}      Select Option to configure                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
 
     if needsRender >= 1:
       renderHotZone(term, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
       print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
       print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
       print(term.center("{bv}      [Enter] to run command                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
       print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center(("{bbl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bbr}").format(
-        bbl=specialChars[renderMode]["borderBottomLeft"],
-        bbr=specialChars[renderMode]["borderBottomRight"],
-        bh=specialChars[renderMode]["borderHorizontal"]
-      )))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonBottomBorder(renderMode)))
 
   def runSelection(selection):
     import types

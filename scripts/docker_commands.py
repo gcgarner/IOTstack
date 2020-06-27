@@ -3,6 +3,8 @@ import signal
 
 def main():
   from blessed import Terminal
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
+  global renderMode
   import time
   import subprocess
 
@@ -135,14 +137,14 @@ def main():
     for (index, menuItem) in enumerate(menu):
       toPrint = ""
       if index == selection:
-        toPrint += ('║   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
+        toPrint += ('{bv}   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
       else:
-        toPrint += ('║   {t.normal} {title} '.format(t=term, title=menuItem[0]))
+        toPrint += ('{bv}   {t.normal} {title} '.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
 
       for i in range(lineLengthAtTextStart - len(menuItem[0])):
         toPrint += " "
 
-      toPrint += "║"
+      toPrint += "{bv}".format(bv=specialChars[renderMode]["borderVertical"])
 
       toPrint = term.center(toPrint)
       
@@ -159,24 +161,24 @@ def main():
       print(term.move_y(term.height // 16))
       print(term.black_on_cornsilk4(term.center('IOTstack Docker Commands')))
       print("")
-      print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║      Select Docker Command to run                                              ║"))
-      print(term.center("║                                                                                ║"))
+      print(term.center(commonTopBorder(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center("{bv}      Select Docker Command to run                                              {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
 
     if needsRender >= 1:
       renderHotZone(term, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      print(term.center("║                                                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║      Controls:                                                                 ║"))
-      print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
-      print(term.center("║      [Enter] to run command                                                    ║"))
-      print(term.center("║      [Escape] to go back to main menu                                          ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("║                                                                                ║"))
-      print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Enter] to run command                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Escape] to go back to main menu                                          {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonBottomBorder(renderMode)))
 
 
 

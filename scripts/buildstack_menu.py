@@ -8,7 +8,7 @@ def main():
   import os
   import time
   import yaml
-  from deps.chars import specialChars
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from blessed import Terminal
   global signal
   global renderMode
@@ -127,9 +127,8 @@ def main():
         ual=specialChars[renderMode]["upArrowLine"]
       )))
     else:
-      print(term.center("{b}                                                                                {b}".format(
-        b=specialChars[renderMode]["borderVertical"]
-      )))
+      print(term.center(commonEmptyLine(renderMode)))
+
 
     for (index, menuItem) in enumerate(menu): # Menu loop
       if index >= paginationStartIndex and index < paginationStartIndex + paginationSize:
@@ -192,9 +191,8 @@ def main():
         dal=specialChars[renderMode]["downArrowLine"]
       )))
     else:
-      print(term.center("{b}                                                                                {b}".format(
-        b=specialChars[renderMode]["borderVertical"]
-      )))
+      print(term.center(commonEmptyLine(renderMode)))
+
 
 
 
@@ -220,25 +218,17 @@ def main():
         print(term.move_y(term.height // 16))
         print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
         print("")
-        print(term.center(("{btl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{btr}").format(
-        btl=specialChars[renderMode]["borderTopLeft"],
-        btr=specialChars[renderMode]["borderTopRight"],
-        bh=specialChars[renderMode]["borderHorizontal"]
-      )))
-        print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center(commonTopBorder(renderMode)))
+
+        print(term.center(commonEmptyLine(renderMode)))
         print(term.center("{bv}      Select containers to build                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center(commonEmptyLine(renderMode)))
 
       renderHotZone(term, renderType, menu, selection, paddingBefore, allIssues)
 
       if (renderType == 1):
-        print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center(commonEmptyLine(renderMode)))
         print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center("{bv}      [Space] to select or deselect image                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
@@ -246,19 +236,11 @@ def main():
         print(term.center("{bv}      [Tab] Expand or collapse build menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center("{bv}      [Enter] to begin build                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center("{bv}      [Escape] to cancel build                                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center(("{bbl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bbr}").format(
-        bbl=specialChars[renderMode]["borderBottomLeft"],
-        bbr=specialChars[renderMode]["borderBottomRight"],
-        bh=specialChars[renderMode]["borderHorizontal"]
-      )))
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center(commonBottomBorder(renderMode)))
+
         if len(allIssues) > 0:
           print(term.center(""))
           print(term.center(""))
@@ -284,19 +266,8 @@ def main():
               formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=49)
               issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=72)
               print(term.center("{bv} {nm} - {desc} {bv}".format(nm=formattedServiceNameAndConflictType, desc=issueDescription, bv=specialChars[renderMode]["borderVertical"]) ))
-          print(term.center("{bv}                                                                                                                             {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center(("{bbl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-          "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bbr}").format(
-            bbl=specialChars[renderMode]["borderBottomLeft"],
-            bbr=specialChars[renderMode]["borderBottomRight"],
-            bh=specialChars[renderMode]["borderHorizontal"]
-          )))
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center(commonBottomBorder(renderMode)))
 
     except Exception as err: 
       print("There was an error rendering the menu:")
@@ -433,6 +404,7 @@ def main():
         }
         execLocals = locals()
         exec(code, execGlobals, execLocals)
+        mainRender(menu, selection, 1)
 
   def getMenuItemIndexByService(serviceName):
     for (index, menuItem) in enumerate(menu):

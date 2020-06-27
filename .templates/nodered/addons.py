@@ -4,6 +4,7 @@ import signal
 
 def main():
   from blessed import Terminal
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   import time
   import subprocess
   import yaml
@@ -14,6 +15,7 @@ def main():
   global dockerCommandsSelectionInProgress
   global mainMenuList
   global currentMenuItemIndex
+  global renderMode
   global paginationSize
   global paginationStartIndex
   global addonsFile
@@ -79,10 +81,13 @@ def main():
     print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
 
     if paginationStartIndex >= 1:
-      # print(term.center("|       ▲      ▲▲▲                                                   ↑           |"))
-      print(term.center("|       ^      ^^^                                                   ^           |"))
+      print(term.center("{b}       {uaf}      {uaf}{uaf}{uaf}                                                   {ual}           {b}".format(
+        b=specialChars[renderMode]["borderVertical"],
+        uaf=specialChars[renderMode]["upArrowFull"],
+        ual=specialChars[renderMode]["upArrowLine"]
+      )))
     else:
-      print(term.center("|                                                                                |"))
+      print(term.center(commonEmptyLine(renderMode)))
 
     for (index, menuItem) in enumerate(menu): # Menu loop
       if index >= paginationStartIndex and index < paginationStartIndex + paginationSize:
@@ -103,18 +108,21 @@ def main():
         else:
           toPrint = "     ( ) " + toPrint
 
-        toPrint = "| " + toPrint + "  |" # Generate border
+        toPrint = "{bv} {toPrint}  {bv}".format(bv=specialChars[renderMode]["borderVertical"], toPrint=toPrint) # Generate border
         toPrint = term.center(toPrint) # Center Text (All lines should have the same amount of printable characters)
         # #####
         print(toPrint)
 
     if paginationStartIndex + paginationSize < len(menu):
-      # print(term.center("|       ▼      ▼▼▼                                                   ↓           |"))
-      print(term.center("|       v      vvv                                                   v           |"))
+      print(term.center("{b}       {daf}      {daf}{daf}{daf}                                                   {dal}           {b}".format(
+        b=specialChars[renderMode]["borderVertical"],
+        daf=specialChars[renderMode]["downArrowFull"],
+        dal=specialChars[renderMode]["downArrowLine"]
+      )))
     else:
-      print(term.center("|                                                                                |"))
-    print(term.center("|                                                                                |"))
-    print(term.center("|                                                                                |"))
+      print(term.center(commonEmptyLine(renderMode)))
+    print(term.center(commonEmptyLine(renderMode)))
+    print(term.center(commonEmptyLine(renderMode)))
 
 
   def mainRender(needsRender, menu, selection):
@@ -135,30 +143,27 @@ def main():
       print(term.move_y(term.height // 16))
       print(term.black_on_cornsilk4(term.center('IOTstack NodeRed Addons')))
       print("")
-      # print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-      print(term.center("/--------------------------------------------------------------------------------\\"))
-      print(term.center("|                                                                                |"))
-      print(term.center("|      Select NodeRed Addons (npm) to install                                    |"))
-      print(term.center("|                                                                                |"))
+      print(term.center(commonTopBorder(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center("{bv}      Select NodeRed Addons (npm) to install                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
 
     if needsRender >= 1:
       renderHotZone(term, needsRender, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      print(term.center("|                                                                                |"))
-      print(term.center("|                                                                                |"))
-      print(term.center("|      Controls:                                                                 |"))
-      print(term.center("|      [Space] to select or deselect addon                                       |"))
-      print(term.center("|      [Up] and [Down] to move selection cursor                                  |"))
-      print(term.center("|      [Tab] Expand or collapse addon menu size                                  |"))
-      print(term.center("|      [S] Switch between sorted by checked and sorted alphabetically            |"))
-      print(term.center("|      [Enter] to save updated list                                              |"))
-      print(term.center("|      [Escape] to cancel changes                                                |"))
-      print(term.center("|                                                                                |"))
-      print(term.center("|                                                                                |"))
-      # print(term.center("║                                                                                ║"))
-      # print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
-      print(term.center("\\--------------------------------------------------------------------------------/"))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Space] to select or deselect addon                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Tab] Expand or collapse addon menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [S] Switch between sorted by checked and sorted alphabetically            {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Enter] to save updated list                                              {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Escape] to cancel changes                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonBottomBorder(renderMode)))
 
   def runSelection(selection):
     import types
