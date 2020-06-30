@@ -294,10 +294,13 @@ potentialMenu = {
 }
 
 def checkDockerVersion():
-  getDockerVersion = subprocess.Popen(['docker', 'version', '-f', '"{{.Server.Version}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  getDockerVersion.wait()
-  currentDockerVersion, stdError = getDockerVersion.communicate()
-  currentDockerVersion = currentDockerVersion.decode("utf-8").rstrip().replace('"', '')
+  try:
+    getDockerVersion = subprocess.Popen(['docker', 'version', '-f', '"{{.Server.Version}}"'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    getDockerVersion.wait()
+    currentDockerVersion, stdError = getDockerVersion.communicate()
+    currentDockerVersion = currentDockerVersion.decode("utf-8").rstrip().replace('"', '')
+  except Exception as err:
+    print("Error attempting to run docker command:", err)
 
   return checkVersion(requiredDockerVersion, currentDockerVersion)
 

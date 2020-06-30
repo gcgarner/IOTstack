@@ -117,11 +117,11 @@ function install_python3_and_deps() {
 }
 
 function install_docker() {
-	sudo source ./scripts/install_docker.sh install
+	sudo bash ./scripts/install_docker.sh install
 }
 
 function update_docker() {
-	sudo source ./scripts/install_docker.sh upgrade
+	sudo bash ./scripts/install_docker.sh upgrade
 }
 
 function update_project() {
@@ -212,6 +212,9 @@ function do_docker_checks() {
 	if command_exists docker; then
 		DOCKER_VERSION_GOOD="false"
 		DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
+		if [ ! -z "$DOCKER_VERSION" ]; then
+			echo "Error getting docker version. Error when running docker command. Check that docker is installed correctly."
+		fi
 		DOCKER_VERSION_MAJOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 1)
 		DOCKER_VERSION_MINOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 2)
 		DOCKER_VERSION_BUILD=$(echo "$DOCKER_VERSION"| cut -d'.' -f 3)
@@ -233,7 +236,7 @@ function do_docker_checks() {
 		[ -f .docker_outofdate ] && rm .docker_outofdate
 		echo "Docker not installed" >&2
 		if [ ! -f .docker_notinstalled ]; then
-			if (whiptail --title "Docker and Docker-Compose" --yesno "Docker is not currently installed, and is required to run IOTstack. You will not be prompted again.\nWould you like to install docker and docker-compose now?" 20 78); then
+			if (whiptail --title "Docker and Docker-Compose" --yesno "Docker is not currently installed, and is required to run IOTstack. Would you like to install docker and docker-compose now?\nYou will not be prompted again." 20 78); then
 					[ -f .docker_notinstalled ] && rm .docker_notinstalled
 					do_env_setup
 					install_docker

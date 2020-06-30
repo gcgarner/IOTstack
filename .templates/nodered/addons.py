@@ -224,7 +224,7 @@ def main():
   def saveAddonList():
     try:
       if not os.path.exists(serviceService):
-        os.mkdir(serviceService)
+        os.makedirs(serviceService, exist_ok=True)
       nodeRedYamlAddonsList = {
         "version": "1",
         "application": "IOTstack",

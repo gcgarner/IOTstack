@@ -1,4 +1,4 @@
-if [ -z "$var" ]; then
+if [ -z "$1" ]; then
   echo "You must specify whether to install or upgrade docker."
   exit
 fi
@@ -7,6 +7,9 @@ if [ "$EUID" -ne 0 ]
   then echo "Please run as root"
   exit
 fi
+function command_exists() {
+	command -v "$@" > /dev/null 2>&1
+}
 
 if [ "$1" == "install" ]; then
   RESTART_REQUIRED="false"
