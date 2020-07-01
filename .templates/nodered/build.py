@@ -228,14 +228,14 @@ def main():
     return True
 
   def renderHotZone(term, menu, selection, hotzoneLocation):
-    lineLengthAtTextStart = 75
+    lineLengthAtTextStart = 71
     print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
     for (index, menuItem) in enumerate(menu):
       toPrint = ""
       if index == selection:
-        toPrint += ('{bv}   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
+        toPrint += ('{bv} -> {t.blue_on_green} {title} {t.normal} <-'.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
       else:
-        toPrint += ('{bv}   {t.normal} {title} '.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
+        toPrint += ('{bv}    {t.normal} {title}    '.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
 
       for i in range(lineLengthAtTextStart - len(menuItem[0])):
         toPrint += " "

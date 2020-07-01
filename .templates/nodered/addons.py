@@ -77,6 +77,7 @@ def main():
 
   def renderHotZone(term, renderType, menu, selection, hotzoneLocation, paddingBefore = 4):
     global paginationSize
+    selectedTextLength = len("-> ")
 
     print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
 
@@ -95,8 +96,8 @@ def main():
 
         # Menu highlight logic
         if index == selection:
-          formattedLineText = '{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])
-          paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]), paddingBefore=paddingBefore)
+          formattedLineText = '-> {t.blue_on_green}{title}{t.normal} <-'.format(t=term, title=menuItem[0])
+          paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]) + selectedTextLength, paddingBefore=paddingBefore - selectedTextLength)
           toPrint = paddedLineText
         else:
           toPrint = '{title}{t.normal}'.format(t=term, title=lineText)
