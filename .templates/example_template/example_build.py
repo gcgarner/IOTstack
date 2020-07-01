@@ -9,6 +9,7 @@ haltOnErrors = True
 # Main wrapper function. Required to make local vars work correctly
 def main():
   from blessed import Terminal
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine # Common functions used when creating menu
   import types
   import time
 
@@ -178,41 +179,42 @@ def main():
     print(term.move_y(term.height // 16))
     print(term.black_on_cornsilk4(term.center('IOTstack Example Commands')))
     print("")
-    print(term.center("╔════════════════════════════════════════════════════════════════════════════════╗"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║      Select Command to run                                                     ║"))
-    print(term.center("║                                                                                ║"))
+    print(term.center(commonTopBorder(renderMode)))
+    print(term.center(commonEmptyLine(renderMode)))
+    print(term.center("{bv}      Select Command to run                                                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
 
-    lineLengthAtTextStart = 75
+    print(term.center(commonEmptyLine(renderMode)))
+
+    lineLengthAtTextStart = 71
 
     for (index, menuItem) in enumerate(menu):
       toPrint = ""
       if index == selection: # This checks if the current rendering item is the one that's selected
-        toPrint += ('║   {t.blue_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
+        toPrint += ('{bv} -> {t.blue_on_green} {title} {t.normal} <-'.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
       else:
         if len(menu[index]) > 2 and "customProperty" in menu[index][2] and menu[index][2]["customProperty"] == True: # A custom property check example
-          toPrint += ('║   {t.black_on_green} {title} {t.normal}'.format(t=term, title=menuItem[0]))
+          toPrint += ('{bv}    {t.black_on_green} {title} {t.normal}   '.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
         else:
-          toPrint += ('║   {t.normal} {title} '.format(t=term, title=menuItem[0]))
+          toPrint += ('{bv}    {t.normal} {title}    '.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
 
       for i in range(lineLengthAtTextStart - len(menuItem[0])): # Pad the remainder of the line
         toPrint += " "
 
-      toPrint += "║"
+      toPrint += "{bv}".format(bv=specialChars[renderMode]["borderVertical"])
 
       toPrint = term.center(toPrint)
       
       print(toPrint)
 
-    print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║      Controls:                                                                 ║"))
-    print(term.center("║      [Up] and [Down] to move selection cursor                                  ║"))
-    print(term.center("║      [Enter] to run command                                                    ║"))
-    print(term.center("║      [Escape] to go back to main menu                                          ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("║                                                                                ║"))
-    print(term.center("╚════════════════════════════════════════════════════════════════════════════════╝"))
+    print(term.center(commonEmptyLine(renderMode)))
+    print(term.center(commonEmptyLine(renderMode)))
+    print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+    print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+    print(term.center("{bv}      [Enter] to run command                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+    print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+    print(term.center(commonEmptyLine(renderMode)))
+    print(term.center(commonEmptyLine(renderMode)))
+    print(term.center(commonBottomBorder(renderMode)))
 
 
   def runSelection(selection):
