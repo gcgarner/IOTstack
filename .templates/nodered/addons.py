@@ -5,6 +5,7 @@ import signal
 def main():
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
+  from deps.consts import servicesDirectory, templatesDirectory
   import time
   import subprocess
   import yaml
@@ -25,8 +26,8 @@ def main():
   paginationStartIndex = 0
   paginationSize = paginationToggle[0]
 
-  serviceService = './services/' + currentServiceName
-  serviceTemplate = './.templates/' + currentServiceName
+  serviceService = servicesDirectory + currentServiceName
+  serviceTemplate = templatesDirectory + currentServiceName
   addonsFile = serviceTemplate + "/addons.yml"
   
   def goBack():
@@ -158,7 +159,7 @@ def main():
       print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
       print(term.center("{bv}      [Tab] Expand or collapse addon menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
       print(term.center("{bv}      [S] Switch between sorted by checked and sorted alphabetically            {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Enter] to save updated list                                              {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      [Enter] to build and save addons list                                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
       print(term.center("{bv}      [Escape] to cancel changes                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
       print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))

@@ -40,30 +40,28 @@ specialChars = {
   }
 }
 
-def commonTopBorder(renderMode):
-  return ("{btl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{btr}").format(
-    btl=specialChars[renderMode]["borderTopLeft"],
-    btr=specialChars[renderMode]["borderTopRight"],
-    bh=specialChars[renderMode]["borderHorizontal"]
-  )
+def commonTopBorder(renderMode, size=80):
+  output = ""
+  output += "{btl}".format(btl=specialChars[renderMode]["borderTopLeft"])
+  for i in range(size):
+    output += "{bh}".format(bh=specialChars[renderMode]["borderHorizontal"])
+  output += "{btr}".format(btr=specialChars[renderMode]["borderTopRight"])
+  return output
 
-def commonBottomBorder(renderMode):
-  return ("{bbl}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-      "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bbr}").format(
-    bbl=specialChars[renderMode]["borderBottomLeft"],
-    bbr=specialChars[renderMode]["borderBottomRight"],
-    bh=specialChars[renderMode]["borderHorizontal"]
-  )
+  return output
 
-def commonEmptyLine(renderMode):
-  return "{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])
+def commonBottomBorder(renderMode, size=80):
+  output = ""
+  output += "{bbl}".format(bbl=specialChars[renderMode]["borderBottomLeft"])
+  for i in range(size):
+    output += "{bh}".format(bh=specialChars[renderMode]["borderHorizontal"])
+  output += "{bbr}".format(bbr=specialChars[renderMode]["borderBottomRight"])
+  return output
 
+def commonEmptyLine(renderMode, size=80):
+  output = ""
+  output += "{bv}".format(bv=specialChars[renderMode]["borderVertical"])
+  for i in range(size):
+    output += " "
+  output += "{bv}".format(bv=specialChars[renderMode]["borderVertical"])
+  return output

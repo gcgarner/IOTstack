@@ -131,6 +131,9 @@ def main():
 
 
     for (index, menuItem) in enumerate(menu): # Menu loop
+      if "issues" in menuItem[1] and menuItem[1]["issues"]:
+        allIssues.append({ "serviceName": menuItem[0], "issues": menuItem[1]["issues"] })
+
       if index >= paginationStartIndex and index < paginationStartIndex + paginationSize:
         lineText = generateLineText(menuItem[0], paddingBefore=paddingBefore)
 
@@ -157,7 +160,6 @@ def main():
         if "issues" in menuItem[1] and menuItem[1]["issues"]:
           toPrint = toPrint + '{t.red_on_orange} !! {t.normal}'.format(t=term)
           toPrint = toPrint + ' {t.orange_on_black} Issue {t.normal}'.format(t=term)
-          allIssues.append({ "serviceName": menuItem[0], "issues": menuItem[1]["issues"] })
         else:
           if menuItem[1]["checked"]:
             if not menuItem[1]["issues"] == None and len(menuItem[1]["issues"]) == 0:
@@ -252,22 +254,23 @@ def main():
             "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
             "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
             "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
-            "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{btr}").format(
+            "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}{bh}"
+            "{bh}{bh}{bh}{bh}{bh}{bh}{bh}{btr}").format(
             btl=specialChars[renderMode]["borderTopLeft"],
             btr=specialChars[renderMode]["borderTopRight"],
             bh=specialChars[renderMode]["borderHorizontal"]
           )))
-          print(term.center("{bv}                                                                                                                             {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center(commonEmptyLine(renderMode, size = 139)))
           for serviceIssues in allIssues:
             for index, issue in enumerate(serviceIssues["issues"]):
               spacesAndBracketsLen = 5
               issueAndTypeLen = len(issue) + len(serviceIssues["serviceName"]) + spacesAndBracketsLen
               serviceNameAndConflictType = '{t.red_on_black}{issueService}{t.normal} ({t.yellow_on_black}{issueType}{t.normal}) '.format(t=term, issueService=serviceIssues["serviceName"], issueType=issue)
-              formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=49)
-              issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=72)
+              formattedServiceNameAndConflictType = generateLineText(str(serviceNameAndConflictType), textLength=issueAndTypeLen, paddingBefore=0, lineLength=32)
+              issueDescription = generateLineText(str(serviceIssues["issues"][issue]), textLength=len(str(serviceIssues["issues"][issue])), paddingBefore=0, lineLength=103)
               print(term.center("{bv} {nm} - {desc} {bv}".format(nm=formattedServiceNameAndConflictType, desc=issueDescription, bv=specialChars[renderMode]["borderVertical"]) ))
-          print(term.center(commonEmptyLine(renderMode)))
-          print(term.center(commonBottomBorder(renderMode)))
+          print(term.center(commonEmptyLine(renderMode, size = 139)))
+          print(term.center(commonBottomBorder(renderMode, size = 139)))
 
     except Exception as err: 
       print("There was an error rendering the menu:")
@@ -404,6 +407,7 @@ def main():
         }
         execLocals = locals()
         exec(code, execGlobals, execLocals)
+        checkForIssues()
         mainRender(menu, selection, 1)
 
   def getMenuItemIndexByService(serviceName):

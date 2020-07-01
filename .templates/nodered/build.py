@@ -10,7 +10,9 @@ def main():
   import time
   import yaml
   import signal
+  import shutil
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
+  from deps.consts import servicesDirectory, templatesDirectory
   from blessed import Terminal
 
   global dockerComposeYaml # The loaded memory YAML of all checked services
@@ -27,8 +29,8 @@ def main():
   # runtime vars
   portConflicts = []
 
-  serviceService = './services/' + currentServiceName
-  serviceTemplate = './.templates/' + currentServiceName
+  serviceService = servicesDirectory + currentServiceName
+  serviceTemplate = templatesDirectory + currentServiceName
   addonsFile = serviceService + "/addons_list.yml"
 
   dockerfileTemplateReplace = "%run npm install modules list%"
@@ -65,7 +67,7 @@ def main():
   # This function is REQUIRED.
   def checkForRunChecksHook():
     try:
-      buildHooks["runChecksHook"] = callable(checkForIssues)
+      buildHooks["runChecksHook"] = callable(runChecks)
     except:
       buildHooks["runChecksHook"] = False
       return buildHooks
@@ -84,9 +86,17 @@ def main():
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
     import time
-    import subprocess
+
+    # Setup service directory
+    if not os.path.exists(serviceService):
+      os.makedirs(serviceService, exist_ok=True)
+
+    # Files copy
+    shutil.copy(r'%s/nodered.env' % serviceTemplate, r'%s/nodered.env' % serviceService)
+
+    # Other prebuild steps
     print("Starting NodeRed Build script")
-    time.sleep(0.2)
+    time.sleep(0.1)
     with open(r'%s/Dockerfile.template' % serviceTemplate, 'r') as dockerTemplate:
       templateData = dockerTemplate.read()
 
@@ -105,9 +115,8 @@ def main():
 
     with open(r'%s/Dockerfile' % serviceService, 'w') as dockerTemplate:
       dockerTemplate.write(templateData)
-    # subprocess.call("./.templates/nodered/build.sh", shell=True) # TODO: Put this step into the new build system
     print("Finished NodeRed Build script")
-    time.sleep(0.2)
+    time.sleep(0.3)
     return True
 
   # #####################################
@@ -115,12 +124,23 @@ def main():
   # #####################################
 
   def checkForIssues():
+    fileIssues = checkFiles()
+    if (len(fileIssues) > 0):
+      issues["fileIssues"] = fileIssues
     for (index, serviceName) in enumerate(dockerComposeYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName)
         portConflicts = checkPortConflicts(serviceName, currentServicePorts)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
+
+  def checkFiles():
+    fileIssues = []
+    if not os.path.exists(serviceTemplate + '/nodered.env'):
+      fileIssues.append(serviceTemplate + '/nodered.env does not exist')
+    if not os.path.exists(serviceService + '/addons_list.yml'):
+      fileIssues.append(serviceService + '/addons_list.yml does not exist. Build addons file to fix.')
+    return fileIssues
 
   def getExternalPorts(serviceName):
     externalPorts = []
@@ -195,10 +215,13 @@ def main():
     screenActive = True
     needsRender = 1
 
-  nodeRedBuildOptions = [
-    ["Select Addons", selectNodeRedAddons],
-    ["Go back", goBack]
-  ]
+  nodeRedBuildOptions = []
+  nodeRedBuildOptions.append(["Go back", goBack])
+
+  if os.path.exists(serviceService + '/addons_list.yml'):
+    nodeRedBuildOptions.insert(0, ["Select & overwrite addons list", selectNodeRedAddons])
+  else:
+    nodeRedBuildOptions.insert(0, ["Select & build addons list", selectNodeRedAddons])
 
   def runOptionsMenu():
     menuEntryPoint()
