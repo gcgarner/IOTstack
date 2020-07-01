@@ -14,7 +14,7 @@ def main():
   global currentMenuItemIndex
   global screenActive
   term = Terminal()
-  hotzoneLocation = [((term.height // 16) + 6), 0]
+  hotzoneLocation = [7, 0] # Top text
   
   def onResize(sig, action):
     global mainMenuList
@@ -102,12 +102,14 @@ def main():
 
     if needsRender == 1:
       print(term.clear())
-      print(term.move_y(term.height // 16))
+      print(term.move_y(6 - hotzoneLocation[0]))
       print(term.black_on_cornsilk4(term.center('Native Installs')))
       print("")
       print(term.center(commonTopBorder(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))
       print(term.center("{bv}      Select service to install                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))
 
     if needsRender >= 1:

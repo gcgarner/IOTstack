@@ -8,6 +8,7 @@ def main():
   import os
   import time
   import yaml
+  import math
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from blessed import Terminal
   global signal
@@ -29,11 +30,11 @@ def main():
   dockerComposeYaml = {}
   templateDirectoryFolders = next(os.walk(templateDirectory))[1]
   term = Terminal()
-  hotzoneLocation = [((term.height // 16) + 6), 0]
-  paginationToggle = [10, term.height - 25]
+  hotzoneLocation = [7, 0] # Top text
+  paginationToggle = [10, term.height - 21] # Top text + controls text
   paginationStartIndex = 0
   paginationSize = paginationToggle[0]
-
+  
   def buildServices():
     global dockerComposeYaml
     try:
@@ -115,6 +116,7 @@ def main():
     global paginationSize
     optionsLength = len(" >>   Options ")
     optionsIssuesSpace = len("      ")
+    selectedTextLength = len("-> ")
     spaceAfterissues = len("      ")
     issuesLength = len(" !!   Issue ")
 
@@ -139,8 +141,8 @@ def main():
 
         # Menu highlight logic
         if index == selection:
-          formattedLineText = '{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])
-          paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]), paddingBefore=paddingBefore)
+          formattedLineText = '-> {t.blue_on_green}{title}{t.normal} <-'.format(t=term, title=menuItem[0])
+          paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]) + selectedTextLength, paddingBefore=paddingBefore - selectedTextLength)
           toPrint = paddedLineText
         else:
           toPrint = '{title}{t.normal}'.format(t=term, title=lineText)
@@ -217,13 +219,15 @@ def main():
     try:
       if (renderType == 1):
         print(term.clear())
-        print(term.move_y(term.height // 16))
+        print(term.move_y(7 - hotzoneLocation[0]))
         print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
         print("")
         print(term.center(commonTopBorder(renderMode)))
 
         print(term.center(commonEmptyLine(renderMode)))
         print(term.center("{bv}      Select containers to build                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center(commonEmptyLine(renderMode)))
         print(term.center(commonEmptyLine(renderMode)))
 
       renderHotZone(term, renderType, menu, selection, paddingBefore, allIssues)
@@ -392,7 +396,6 @@ def main():
 
   def executeServiceOptions():
     menuItem = menu[selection]
-    print(1111, menuItem)
     if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
       buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
       print(buildScriptPath)
@@ -496,7 +499,6 @@ def main():
               checkForIssues()
               mainRender(menu, selection, 1)
             else:
-              # print("got {0}.".format((str(key), key.name, key.code)))
               time.sleep(0.1)
 
           selection = selection % len(menu)

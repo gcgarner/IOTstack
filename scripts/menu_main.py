@@ -381,7 +381,7 @@ def renderHotZone(term, menu, selection):
   print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
   for (index, menuItem) in enumerate(menu):
     if index == selection:
-      print(term.center('{t.blue_on_green}{title}{t.normal}'.format(t=term, title=menuItem[0])))
+      print(term.center('-> {t.blue_on_green}{title}{t.normal} <-'.format(t=term, title=menuItem[0])))
     else:
       print(term.center('{title}'.format(t=term, title=menuItem[0])))
 
@@ -454,8 +454,6 @@ if __name__ == '__main__':
             runSelection(currentMenuItemIndex)
           if key.name == 'KEY_ESCAPE':
             exitMenu()
-        elif key:
-          print("got {0}.".format(key))
         
         if not menuNavigateDirection == 0: # If a direction was pressed, find next selectable item
           currentMenuItemIndex += menuNavigateDirection
