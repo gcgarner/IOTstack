@@ -16,6 +16,7 @@ def main():
   global term
   global paginationSize
   global paginationStartIndex
+  global hideHelpText
 
   # Constants
   templateDirectory = './.templates'
@@ -34,6 +35,7 @@ def main():
   paginationToggle = [10, term.height - 21] # Top text + controls text
   paginationStartIndex = 0
   paginationSize = paginationToggle[0]
+  hideHelpText = False
   
   def buildServices():
     global dockerComposeYaml
@@ -234,16 +236,18 @@ def main():
 
       if (renderType == 1):
         print(term.center(commonEmptyLine(renderMode)))
-        print(term.center(commonEmptyLine(renderMode)))
-        print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Space] to select or deselect image                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Right] for options for containers that support them                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Tab] Expand or collapse build menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Enter] to begin build                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Escape] to cancel build                                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center(commonEmptyLine(renderMode)))
-        print(term.center(commonEmptyLine(renderMode)))
+        if not hideHelpText:
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Space] to select or deselect image                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Right] for options for containers that support them                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Tab] Expand or collapse build menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Enter] to begin build                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Escape] to cancel build                                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center(commonEmptyLine(renderMode)))
         print(term.center(commonEmptyLine(renderMode)))
         print(term.center(commonBottomBorder(renderMode)))
 
@@ -497,6 +501,12 @@ def main():
               setCheckedMenuItems() # Update UI memory
               loadServices()
               checkForIssues()
+              mainRender(menu, selection, 1)
+            elif key == 'h': # H pressed
+              if hideHelpText:
+                hideHelpText = False
+              else:
+                hideHelpText = True
               mainRender(menu, selection, 1)
             else:
               time.sleep(0.1)
