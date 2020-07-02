@@ -35,8 +35,12 @@ def main():
   paginationToggle = [10, term.height - 21] # Top text + controls text
   paginationStartIndex = 0
   paginationSize = paginationToggle[0]
-  hideHelpText = False
   
+  try: # If not already set, then set it.
+    hideHelpText = hideHelpText
+  except:
+    hideHelpText = False
+
   def buildServices():
     global dockerComposeYaml
     try:

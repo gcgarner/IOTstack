@@ -25,6 +25,13 @@ def main():
   global serviceService
   global serviceTemplate
   global addonsFile
+  global hideHelpText
+
+  try: # If not already set, then set it.
+    hideHelpText = hideHelpText
+  except:
+    hideHelpText = False
+
 
   # runtime vars
   portConflicts = []
@@ -264,12 +271,14 @@ def main():
 
     if needsRender == 1:
       print(term.center(commonEmptyLine(renderMode)))
-      print(term.center(commonEmptyLine(renderMode)))
-      print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Enter] to run command                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center(commonEmptyLine(renderMode)))
+      if not hideHelpText:
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Enter] to run command                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonBottomBorder(renderMode)))
 
@@ -293,6 +302,7 @@ def main():
     global selectionInProgress
     global menuNavigateDirection
     global needsRender
+    global hideHelpText
     term = Terminal()
     with term.fullscreen():
       menuNavigateDirection = 0
@@ -319,7 +329,12 @@ def main():
             if key.name == 'KEY_ESCAPE':
               return True
           elif key:
-            print("got {0}.".format(key))
+            if key == 'h': # H pressed
+              if hideHelpText:
+                hideHelpText = False
+              else:
+                hideHelpText = True
+              mainRender(1, nodeRedBuildOptions, currentMenuItemIndex)
 
           if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
             currentMenuItemIndex += menuNavigateDirection

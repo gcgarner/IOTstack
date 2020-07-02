@@ -20,6 +20,13 @@ def main():
   global paginationSize
   global paginationStartIndex
   global addonsFile
+  global hideHelpText
+
+  try: # If not already set, then set it.
+    hideHelpText = hideHelpText
+  except:
+    hideHelpText = False
+
   term = Terminal()
   hotzoneLocation = [((term.height // 16) + 6), 0]
   paginationToggle = [10, term.height - 25]
@@ -154,16 +161,18 @@ def main():
 
     if needsRender == 1:
       print(term.center(commonEmptyLine(renderMode)))
-      print(term.center(commonEmptyLine(renderMode)))
-      print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Space] to select or deselect addon                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Tab] Expand or collapse addon menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [S] Switch between sorted by checked and sorted alphabetically            {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Enter] to build and save addons list                                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center("{bv}      [Escape] to cancel changes                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-      print(term.center(commonEmptyLine(renderMode)))
-      print(term.center(commonEmptyLine(renderMode)))
+      if not hideHelpText:
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Space] to select or deselect addon                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Tab] Expand or collapse addon menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [S] Switch between sorted by checked and sorted alphabetically            {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Enter] to build and save addons list                                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Escape] to cancel changes                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonBottomBorder(renderMode)))
 
   def runSelection(selection):
@@ -290,15 +299,20 @@ def main():
             if key == ' ': # Space pressed
               checkMenuItem(currentMenuItemIndex) # Update checked list
               needsRender = 2
-            if key == 's':
+            elif key == 's':
               if sortBy == 0:
                 sortBy = 1
                 mainMenuList.sort(key=lambda x: x[0], reverse=False)
               else:
                 sortBy = 0
                 mainMenuList.sort(key=lambda x: (x[1]["checked"], x[0]), reverse=True)
-              
               needsRender = 2
+            elif key == 'h': # H pressed
+              if hideHelpText:
+                hideHelpText = False
+              else:
+                hideHelpText = True
+              mainRender(1, mainMenuList, currentMenuItemIndex)
 
           if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
             currentMenuItemIndex += menuNavigateDirection
