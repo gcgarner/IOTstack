@@ -11,6 +11,7 @@ def main():
   import yaml
   import signal
   import shutil
+  import sys
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory
   from blessed import Terminal
@@ -26,6 +27,7 @@ def main():
   global serviceTemplate
   global addonsFile
   global hideHelpText
+  global hasRebuiltAddons
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -35,6 +37,7 @@ def main():
 
   # runtime vars
   portConflicts = []
+  hasRebuiltAddons = False
 
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
@@ -164,6 +167,21 @@ def main():
       pass
     return externalPorts
 
+  def getInternalPorts(serviceName):
+    externalPorts = []
+    try:
+      yamlService = dockerComposeYaml[serviceName]
+      if "ports" in yamlService:
+        for (index, port) in enumerate(yamlService["ports"]):
+          try:
+            externalAndInternal = port.split(":")
+            externalPorts.append(externalAndInternal[1])
+          except:
+            pass
+    except:
+      pass
+    return externalPorts
+
   def checkPortConflicts(serviceName, currentPorts):
     portConflicts = []
     if not currentServiceName == serviceName:
@@ -199,6 +217,43 @@ def main():
     print("Back to build stack menu")
     return True
 
+  def enterPortNumber():
+    global needsRender
+    global dockerComposeYaml
+    newPortNumber = ""
+    try:
+      print(term.move_y(hotzoneLocation[0]))
+      print(term.center("                                              "))
+      print(term.center("                                              "))
+      print(term.center("                                              "))
+      print(term.move_y(hotzoneLocation[0] + 1))
+      time.sleep(0.1) # Prevent loop
+      newPortNumber = input(term.center("Enter new port number: "))
+      # newPortNumber = sys.stdin.readline()
+      time.sleep(0.1) # Prevent loop
+      newPortNumber = int(str(newPortNumber))
+      if 1 <= newPortNumber <= 65535:
+        needsRender = 1
+        time.sleep(0.2) # Prevent loop
+        internalPort = getInternalPorts(currentServiceName)[0]
+        dockerComposeYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
+          newExtPort = newPortNumber,
+          oldIntPort = internalPort
+        )
+        createMenu()
+        return True
+      else:
+        print(term.center('   {t.white_on_red} "{port}" {message} {t.normal} <-'.format(t=term, port=newPortNumber, message="is not a valid port")))
+        needsRender = 1
+        time.sleep(2) # Give time to read error
+        return False
+    except Exception as err: 
+      print(term.center('   {t.white_on_red} "{port}" {message} {t.normal} <-'.format(t=term, port=newPortNumber, message="is not a valid port")))
+      print(term.center('   {t.white_on_red} Error: {errorMsg} {t.normal} <-'.format(t=term, errorMsg=err)))
+      needsRender = 1
+      time.sleep(2.5) # Give time to read error
+      return False
+
   def onResize(sig, action):
     global nodeRedBuildOptions
     global currentMenuItemIndex
@@ -206,6 +261,7 @@ def main():
 
   def selectNodeRedAddons():
     global needsRender
+    global hasRebuiltAddons
     dockerCommandsFilePath = "./.templates/nodered/addons.py"
     with open(dockerCommandsFilePath, "rb") as pythonDynamicImportFile:
       code = compile(pythonDynamicImportFile.read(), dockerCommandsFilePath, "exec")
@@ -219,18 +275,35 @@ def main():
     screenActive = False
     exec(code, execGlobals, execLocals)
     signal.signal(signal.SIGWINCH, onResize)
+    try:
+      hasRebuiltAddons = execGlobals["hasRebuiltAddons"]
+    except:
+      hasRebuiltAddons = False
     screenActive = True
     needsRender = 1
 
   nodeRedBuildOptions = []
-  nodeRedBuildOptions.append(["Go back", goBack])
 
-  if os.path.exists(serviceService + '/addons_list.yml'):
-    nodeRedBuildOptions.insert(0, ["Select & overwrite addons list", selectNodeRedAddons])
-  else:
-    nodeRedBuildOptions.insert(0, ["Select & build addons list", selectNodeRedAddons])
+  def createMenu():
+    global nodeRedBuildOptions
+    try:
+      nodeRedBuildOptions = []
+      portNumber = getExternalPorts(currentServiceName)[0]
+      nodeRedBuildOptions.append([
+        "Change external WUI Port Number from: {port}".format(port=portNumber),
+        enterPortNumber
+      ])
+    except: # Error getting port
+      pass
+    nodeRedBuildOptions.append(["Go back", goBack])
+
+    if os.path.exists(serviceService + '/addons_list.yml'):
+      nodeRedBuildOptions.insert(0, ["Select & overwrite addons list", selectNodeRedAddons])
+    else:
+      nodeRedBuildOptions.insert(0, ["Select & build addons list", selectNodeRedAddons])
 
   def runOptionsMenu():
+    createMenu()
     menuEntryPoint()
     return True
 
@@ -270,13 +343,22 @@ def main():
       renderHotZone(term, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      print(term.center(commonEmptyLine(renderMode)))
+      if os.path.exists(serviceService + '/addons_list.yml'):
+        if hasRebuiltAddons:
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center('{bv}     {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}                            {bv}'.format(t=term, text="Addons list has been rebuilt: addons_list.yml", bv=specialChars[renderMode]["borderVertical"])))
+        else:
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center('{bv}     {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}                   {bv}'.format(t=term, text="Using existing addons_list.yml for addons installation", bv=specialChars[renderMode]["borderVertical"])))
+      else:
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center(commonEmptyLine(renderMode)))
       if not hideHelpText:
         print(term.center(commonEmptyLine(renderMode)))
         print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Enter] to run command                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Enter] to run command or save input                                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))
@@ -284,6 +366,7 @@ def main():
 
   def runSelection(selection):
     import types
+    global nodeRedBuildOptions
     if len(nodeRedBuildOptions[selection]) > 1 and isinstance(nodeRedBuildOptions[selection][1], types.FunctionType):
       nodeRedBuildOptions[selection][1]()
     else:
@@ -303,6 +386,7 @@ def main():
     global menuNavigateDirection
     global needsRender
     global hideHelpText
+    global nodeRedBuildOptions
     term = Terminal()
     with term.fullscreen():
       menuNavigateDirection = 0

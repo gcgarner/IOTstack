@@ -162,17 +162,22 @@ def main():
     if needsRender == 1:
       print(term.center(commonEmptyLine(renderMode)))
       if not hideHelpText:
-        print(term.center(commonEmptyLine(renderMode)))
-        print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Space] to select or deselect addon                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Tab] Expand or collapse addon menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [S] Switch between sorted by checked and sorted alphabetically            {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Enter] to build and save addons list                                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center("{bv}      [Escape] to cancel changes                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-        print(term.center(commonEmptyLine(renderMode)))
-        print(term.center(commonEmptyLine(renderMode)))
+        if term.height < 32:
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center("{bv}      Not enough vertical room to render controls help text                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center(commonEmptyLine(renderMode)))
+        else: 
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Space] to select or deselect addon                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Tab] Expand or collapse addon menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [S] Switch between sorted by checked and sorted alphabetically            {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Enter] to build and save addons list                                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      [Escape] to cancel changes                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonBottomBorder(renderMode)))
 
   def runSelection(selection):
@@ -254,6 +259,8 @@ def main():
       print("Error saving NodeRed Addons list", currentServiceName)
       print(err)
       return False
+    global hasRebuiltAddons
+    hasRebuiltAddons = True
     return True
 
 

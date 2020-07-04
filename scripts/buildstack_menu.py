@@ -241,17 +241,22 @@ def main():
       if (renderType == 1):
         print(term.center(commonEmptyLine(renderMode)))
         if not hideHelpText:
-          print(term.center(commonEmptyLine(renderMode)))
-          print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center("{bv}      [Space] to select or deselect image                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center("{bv}      [Right] for options for containers that support them                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center("{bv}      [Tab] Expand or collapse build menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center("{bv}      [Enter] to begin build                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center("{bv}      [Escape] to cancel build                                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
-          print(term.center(commonEmptyLine(renderMode)))
-          print(term.center(commonEmptyLine(renderMode)))
+          if term.height < 30:
+            print(term.center(commonEmptyLine(renderMode)))
+            print(term.center("{bv}      Not enough vertical room to render controls help text                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center(commonEmptyLine(renderMode)))
+          else: 
+            print(term.center(commonEmptyLine(renderMode)))
+            print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}      [Space] to select or deselect image                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}      [Right] for options for containers that support them                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}      [Tab] Expand or collapse build menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}      [Enter] to begin build                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}      [Escape] to cancel build                                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center(commonEmptyLine(renderMode)))
+            print(term.center(commonEmptyLine(renderMode)))
         print(term.center(commonEmptyLine(renderMode)))
         print(term.center(commonBottomBorder(renderMode)))
 
@@ -299,13 +304,37 @@ def main():
       if menuItem[1]["checked"]:
         checkedMenuItems.append(menuItem[0])
 
-  def loadServices():
+  def loadAllServices(reload = False):
     global dockerComposeYaml
     dockerComposeYaml.clear()
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
-      serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
+      if reload == False:
+        if not checkedMenuItem in dockerComposeYaml:
+          serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
+          with open(r'%s' % serviceFilePath) as yamlServiceFile:
+            dockerComposeYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
+      else:
+        print("reload!")
+        time.sleep(1)
+        serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
+        with open(r'%s' % serviceFilePath) as yamlServiceFile:
+          dockerComposeYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
+
+    return True
+
+  def loadService(serviceName, reload = False):
+    global dockerComposeYaml
+    if reload == False:
+      if not serviceName in dockerComposeYaml:
+        serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
+        with open(r'%s' % serviceFilePath) as yamlServiceFile:
+          dockerComposeYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
+    else:
+      print("reload!")
+      time.sleep(1)
+      serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
       with open(r'%s' % serviceFilePath) as yamlServiceFile:
-        dockerComposeYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
+        dockerComposeYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
 
     return True
 
@@ -403,6 +432,7 @@ def main():
             exec(code, execGlobals, execLocals)
 
   def executeServiceOptions():
+    global dockerComposeYaml
     menuItem = menu[selection]
     if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
       buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
@@ -410,6 +440,7 @@ def main():
       if os.path.exists(buildScriptPath):
         with open(buildScriptPath, "rb") as pythonDynamicImportFile:
           code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
+
         execGlobals = {
           "dockerComposeYaml": dockerComposeYaml,
           "toRun": "runOptionsMenu",
@@ -418,6 +449,7 @@ def main():
         }
         execLocals = locals()
         exec(code, execGlobals, execLocals)
+        dockerComposeYaml = execGlobals["dockerComposeYaml"]
         checkForIssues()
         mainRender(menu, selection, 1)
 
@@ -427,11 +459,14 @@ def main():
         return index
 
   def checkMenuItem(selection):
+    global dockerComposeYaml
     if menu[selection][1]["checked"] == True:
       menu[selection][1]["checked"] = False
       menu[selection][1]["issues"] = None
+      del dockerComposeYaml[menu[selection][0]]
     else:
       menu[selection][1]["checked"] = True
+      loadService(menu[selection][0])
 
   def prepareMenuState():
     global dockerComposeYaml
@@ -491,7 +526,6 @@ def main():
               executeServiceOptions()
             if key.name == 'KEY_ENTER':
               setCheckedMenuItems()
-              loadServices()
               checkForIssues()
               selectionInProgress = False
               results["buildState"] = buildServices()
@@ -503,7 +537,6 @@ def main():
             if key == ' ': # Space pressed
               checkMenuItem(selection) # Update checked list
               setCheckedMenuItems() # Update UI memory
-              loadServices()
               checkForIssues()
               mainRender(menu, selection, 1)
             elif key == 'h': # H pressed
