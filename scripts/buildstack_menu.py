@@ -434,7 +434,7 @@ def main():
   def executeServiceOptions():
     global dockerComposeYaml
     menuItem = menu[selection]
-    if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
+    if menu[selection][1]["checked"] and "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
       buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
       print(buildScriptPath)
       if os.path.exists(buildScriptPath):

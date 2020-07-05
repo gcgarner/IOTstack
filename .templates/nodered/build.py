@@ -12,9 +12,10 @@ def main():
   import signal
   import shutil
   import sys
+  from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory
-  from blessed import Terminal
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
 
   global dockerComposeYaml # The loaded memory YAML of all checked services
   global renderMode # For rendering fancy or basic ascii characters
@@ -139,8 +140,8 @@ def main():
       issues["fileIssues"] = fileIssues
     for (index, serviceName) in enumerate(dockerComposeYaml):
       if not currentServiceName == serviceName: # Skip self
-        currentServicePorts = getExternalPorts(currentServiceName)
-        portConflicts = checkPortConflicts(serviceName, currentServicePorts)
+        currentServicePorts = getExternalPorts(currentServiceName, dockerComposeYaml)
+        portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
 
@@ -151,47 +152,6 @@ def main():
     if not os.path.exists(serviceService + '/addons_list.yml'):
       fileIssues.append(serviceService + '/addons_list.yml does not exist. Build addons file to fix.')
     return fileIssues
-
-  def getExternalPorts(serviceName):
-    externalPorts = []
-    try:
-      yamlService = dockerComposeYaml[serviceName]
-      if "ports" in yamlService:
-        for (index, port) in enumerate(yamlService["ports"]):
-          try:
-            externalAndInternal = port.split(":")
-            externalPorts.append(externalAndInternal[0])
-          except:
-            pass
-    except:
-      pass
-    return externalPorts
-
-  def getInternalPorts(serviceName):
-    externalPorts = []
-    try:
-      yamlService = dockerComposeYaml[serviceName]
-      if "ports" in yamlService:
-        for (index, port) in enumerate(yamlService["ports"]):
-          try:
-            externalAndInternal = port.split(":")
-            externalPorts.append(externalAndInternal[1])
-          except:
-            pass
-    except:
-      pass
-    return externalPorts
-
-  def checkPortConflicts(serviceName, currentPorts):
-    portConflicts = []
-    if not currentServiceName == serviceName:
-      yamlService = dockerComposeYaml[serviceName]
-      servicePorts = getExternalPorts(serviceName)
-      for (index, servicePort) in enumerate(servicePorts):
-        for (index, currentPort) in enumerate(currentPorts):
-          if (servicePort == currentPort):
-            portConflicts.append([servicePort, serviceName])
-    return portConflicts
 
   ############################
   # Menu Logic
@@ -235,7 +195,7 @@ def main():
       if 1 <= newPortNumber <= 65535:
         needsRender = 1
         time.sleep(0.2) # Prevent loop
-        internalPort = getInternalPorts(currentServiceName)[0]
+        internalPort = getInternalPorts(currentServiceName, dockerComposeYaml)[0]
         dockerComposeYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
           newExtPort = newPortNumber,
           oldIntPort = internalPort
@@ -288,7 +248,7 @@ def main():
     global nodeRedBuildOptions
     try:
       nodeRedBuildOptions = []
-      portNumber = getExternalPorts(currentServiceName)[0]
+      portNumber = getExternalPorts(currentServiceName, dockerComposeYaml)[0]
       nodeRedBuildOptions.append([
         "Change external WUI Port Number from: {port}".format(port=portNumber),
         enterPortNumber

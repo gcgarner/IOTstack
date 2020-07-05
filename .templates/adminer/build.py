@@ -6,12 +6,30 @@ haltOnErrors = True
 
 # Main wrapper function. Required to make local vars work correctly
 def main():
+  import os
+  import time
+  import yaml
+  import signal
+  import shutil
+  import sys
+  from blessed import Terminal
+  
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
+  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
+
   global dockerComposeYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
   global currentServiceName # Name of the current service
   global issues # Returned issues dict
   global haltOnErrors # Turn on to allow erroring
+  global hideHelpText # Showing and hiding the help controls text
+
+  try: # If not already set, then set it.
+    hideHelpText = hideHelpText
+  except:
+    hideHelpText = False
 
   # runtime vars
   portConflicts = []
@@ -74,36 +92,220 @@ def main():
   def checkForIssues():
     for (index, serviceName) in enumerate(dockerComposeYaml):
       if not currentServiceName == serviceName: # Skip self
-        currentServicePorts = getExternalPorts(currentServiceName)
-        portConflicts = checkPortConflicts(serviceName, currentServicePorts)
+        currentServicePorts = getExternalPorts(currentServiceName, dockerComposeYaml)
+        portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
 
-  def getExternalPorts(serviceName):
-    externalPorts = []
-    try:
-      yamlService = dockerComposeYaml[serviceName]
-      if "ports" in yamlService:
-        for (index, port) in enumerate(yamlService["ports"]):
-          try:
-            externalAndInternal = port.split(":")
-            externalPorts.append(externalAndInternal[0])
-          except:
-            pass
-    except:
-      pass
-    return externalPorts
+  # #####################################
+  # End Supporting functions
+  # #####################################
 
-  def checkPortConflicts(serviceName, currentPorts):
-    portConflicts = []
-    if not currentServiceName == serviceName:
-      yamlService = dockerComposeYaml[serviceName]
-      servicePorts = getExternalPorts(serviceName)
-      for (index, servicePort) in enumerate(servicePorts):
-        for (index, currentPort) in enumerate(currentPorts):
-          if (servicePort == currentPort):
-            portConflicts.append([servicePort, serviceName])
-    return portConflicts
+  ############################
+  # Menu Logic
+  ############################
+
+  global currentMenuItemIndex
+  global selectionInProgress
+  global menuNavigateDirection
+  global needsRender
+
+  selectionInProgress = True
+  currentMenuItemIndex = 0
+  menuNavigateDirection = 0
+  needsRender = 1
+  term = Terminal()
+  hotzoneLocation = [((term.height // 16) + 6), 0]
+
+  def goBack():
+    global selectionInProgress
+    global needsRender
+    selectionInProgress = False
+    needsRender = 1
+    print("Back to build stack menu")
+    return True
+
+  def enterPortNumber():
+    global needsRender
+    global dockerComposeYaml
+    newPortNumber = ""
+    try:
+      print(term.move_y(hotzoneLocation[0]))
+      print(term.center("                                              "))
+      print(term.center("                                              "))
+      print(term.center("                                              "))
+      print(term.move_y(hotzoneLocation[0] + 1))
+      time.sleep(0.1) # Prevent loop
+      newPortNumber = input(term.center("Enter new port number: "))
+      # newPortNumber = sys.stdin.readline()
+      time.sleep(0.1) # Prevent loop
+      newPortNumber = int(str(newPortNumber))
+      if 1 <= newPortNumber <= 65535:
+        needsRender = 1
+        time.sleep(0.2) # Prevent loop
+        internalPort = getInternalPorts(currentServiceName, dockerComposeYaml)[0]
+        dockerComposeYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
+          newExtPort = newPortNumber,
+          oldIntPort = internalPort
+        )
+        createMenu()
+        return True
+      else:
+        print(term.center('   {t.white_on_red} "{port}" {message} {t.normal} <-'.format(t=term, port=newPortNumber, message="is not a valid port")))
+        needsRender = 1
+        time.sleep(2) # Give time to read error
+        return False
+    except Exception as err: 
+      print(term.center('   {t.white_on_red} "{port}" {message} {t.normal} <-'.format(t=term, port=newPortNumber, message="is not a valid port")))
+      print(term.center('   {t.white_on_red} Error: {errorMsg} {t.normal} <-'.format(t=term, errorMsg=err)))
+      needsRender = 1
+      time.sleep(2.5) # Give time to read error
+      return False
+
+  def onResize(sig, action):
+    global adminerBuildOptions
+    global currentMenuItemIndex
+    mainRender(1, adminerBuildOptions, currentMenuItemIndex)
+
+  adminerBuildOptions = []
+
+  def createMenu():
+    global adminerBuildOptions
+    try:
+      adminerBuildOptions = []
+      portNumber = getExternalPorts(currentServiceName, dockerComposeYaml)[0]
+      adminerBuildOptions.append([
+        "Change external WUI Port Number from: {port}".format(port=portNumber),
+        enterPortNumber
+      ])
+    except: # Error getting port
+      pass
+    adminerBuildOptions.append(["Go back", goBack])
+
+  def runOptionsMenu():
+    createMenu()
+    menuEntryPoint()
+    return True
+
+  def renderHotZone(term, menu, selection, hotzoneLocation):
+    lineLengthAtTextStart = 71
+    print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
+    for (index, menuItem) in enumerate(menu):
+      toPrint = ""
+      if index == selection:
+        toPrint += ('{bv} -> {t.blue_on_green} {title} {t.normal} <-'.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
+      else:
+        toPrint += ('{bv}    {t.normal} {title}    '.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
+
+      for i in range(lineLengthAtTextStart - len(menuItem[0])):
+        toPrint += " "
+
+      toPrint += "{bv}".format(bv=specialChars[renderMode]["borderVertical"])
+
+      toPrint = term.center(toPrint)
+
+      print(toPrint)
+
+  def mainRender(needsRender, menu, selection):
+    term = Terminal()
+    
+    if needsRender == 1:
+      print(term.clear())
+      print(term.move_y(term.height // 16))
+      print(term.black_on_cornsilk4(term.center('IOTstack Adminer Options')))
+      print("")
+      print(term.center(commonTopBorder(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center("{bv}      Select Option to configure                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
+
+    if needsRender >= 1:
+      renderHotZone(term, menu, selection, hotzoneLocation)
+
+    if needsRender == 1:
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      if not hideHelpText:
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Enter] to run command or save input                                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonBottomBorder(renderMode)))
+
+  def runSelection(selection):
+    import types
+    global adminerBuildOptions
+    if len(adminerBuildOptions[selection]) > 1 and isinstance(adminerBuildOptions[selection][1], types.FunctionType):
+      adminerBuildOptions[selection][1]()
+    else:
+      print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(nodeRedBuildOptions[selection][0])))
+
+  def isMenuItemSelectable(menu, index):
+    if len(menu) > index:
+      if len(menu[index]) > 2:
+        if menu[index][2]["skip"] == True:
+          return False
+    return True
+
+  def menuEntryPoint():
+    # These need to be reglobalised due to eval()
+    global currentMenuItemIndex
+    global selectionInProgress
+    global menuNavigateDirection
+    global needsRender
+    global hideHelpText
+    global adminerBuildOptions
+    term = Terminal()
+    with term.fullscreen():
+      menuNavigateDirection = 0
+      mainRender(needsRender, adminerBuildOptions, currentMenuItemIndex)
+      selectionInProgress = True
+      with term.cbreak():
+        while selectionInProgress:
+          menuNavigateDirection = 0
+
+          if needsRender: # Only rerender when changed to prevent flickering
+            mainRender(needsRender, adminerBuildOptions, currentMenuItemIndex)
+            needsRender = 0
+
+          key = term.inkey()
+          if key.is_sequence:
+            if key.name == 'KEY_TAB':
+              menuNavigateDirection += 1
+            if key.name == 'KEY_DOWN':
+              menuNavigateDirection += 1
+            if key.name == 'KEY_UP':
+              menuNavigateDirection -= 1
+            if key.name == 'KEY_ENTER':
+              runSelection(currentMenuItemIndex)
+            if key.name == 'KEY_ESCAPE':
+              return True
+          elif key:
+            if key == 'h': # H pressed
+              if hideHelpText:
+                hideHelpText = False
+              else:
+                hideHelpText = True
+              mainRender(1, adminerBuildOptions, currentMenuItemIndex)
+
+          if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
+            currentMenuItemIndex += menuNavigateDirection
+            currentMenuItemIndex = currentMenuItemIndex % len(adminerBuildOptions)
+            needsRender = 2
+
+            while not isMenuItemSelectable(adminerBuildOptions, currentMenuItemIndex):
+              currentMenuItemIndex += menuNavigateDirection
+              currentMenuItemIndex = currentMenuItemIndex % len(adminerBuildOptions)
+    return True
+
+  ####################
+  # End menu section
+  ####################
+
 
   if haltOnErrors:
     eval(toRun)()
