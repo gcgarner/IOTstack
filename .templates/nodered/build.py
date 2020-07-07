@@ -116,11 +116,12 @@ def main():
 
     addonsInstallCommands = ""
     if os.path.exists(addonsFile):
+      installCommand = addonsSelected["dockerFileInstallCommand"]
       for (index, addonName) in enumerate(addonsSelected["addons"]):
-        if (addonName == 'node-red-node-sqlite'):
-          addonsInstallCommands = addonsInstallCommands + "RUN npm install --unsafe-perm {addonName}\n".format(addonName=addonName)
+        if (addonName == 'node-red-node-sqlite'): # SQLite requires a special param
+          addonsInstallCommands = addonsInstallCommands + "{installCommand} --unsafe-perm {addonName}\n".format(addonName=addonName, installCommand=installCommand)
         else:
-          addonsInstallCommands = addonsInstallCommands + "RUN npm install {addonName}\n".format(addonName=addonName)
+          addonsInstallCommands = addonsInstallCommands + "{installCommand} {addonName}\n".format(addonName=addonName, installCommand=installCommand)
 
     templateData = templateData.replace(dockerfileTemplateReplace, addonsInstallCommands)
 

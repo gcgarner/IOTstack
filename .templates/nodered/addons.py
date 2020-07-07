@@ -22,6 +22,8 @@ def main():
   global addonsFile
   global hideHelpText
 
+  global installCommand
+
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
   except:
@@ -196,9 +198,11 @@ def main():
 
   def loadAddonsMenu():
     global mainMenuList
+    global installCommand
     if os.path.exists(addonsFile):
       with open(r'%s' % addonsFile) as objAddonsFile:
         addonsLoaded = yaml.load(objAddonsFile, Loader=yaml.SafeLoader)
+        installCommand = addonsLoaded["dockerFileInstallCommand"]
         defaultOnAddons = addonsLoaded["addons"]["default_on"]
         defaultOffAddons = addonsLoaded["addons"]["default_off"]
         if not os.path.exists(serviceService + '/addons_list.yml'):
@@ -246,6 +250,7 @@ def main():
         "application": "IOTstack",
         "service": "nodered",
         "comment": "Selected addons",
+        "dockerFileInstallCommand": installCommand,
         "addons": []
       }
       for (index, addon) in enumerate(mainMenuList):
