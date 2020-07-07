@@ -9,6 +9,7 @@ addons:
     - "node-red-contrib-boolean-logic"
     - "node-red-node-rbe"
     - "node-red-configurable-ping"
+    - "node-red-dashboard"
   default_off:
     - "node-red-node-openweathermap"
     - "node-red-contrib-discord"
