@@ -25,7 +25,15 @@ def main():
   global issues # Returned issues dict
   global haltOnErrors # Turn on to allow erroring
   global hideHelpText # Showing and hiding the help controls text
+  global serviceService
+  global serviceTemplate
+  global hasRebuiltHardwareSelection
 
+  serviceService = servicesDirectory + currentServiceName
+  serviceTemplate = templatesDirectory + currentServiceName
+
+  hasRebuiltHardwareSelection = False
+  
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
   except:
@@ -90,12 +98,21 @@ def main():
   # #####################################
 
   def checkForIssues():
+    fileIssues = checkFiles()
+    if (len(fileIssues) > 0):
+      issues["fileIssues"] = fileIssues
     for (index, serviceName) in enumerate(dockerComposeYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName, dockerComposeYaml)
         portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
+
+  def checkFiles():
+    fileIssues = []
+    if not os.path.exists(serviceService + '/hardware_selected.yml'):
+      fileIssues.append(serviceService + '/hardware_selected.yml does not exist. Select hardware in options to fix.')
+    return fileIssues
 
   # #####################################
   # End Supporting functions
@@ -124,6 +141,29 @@ def main():
     needsRender = 1
     print("Back to build stack menu")
     return True
+
+  def selectDeconzHardware():
+    global needsRender
+    global hasRebuiltHardwareSelection
+    deconzSelectHardwareFilePath = "./.templates/deconz/select_hw.py"
+    with open(deconzSelectHardwareFilePath, "rb") as pythonDynamicImportFile:
+      code = compile(pythonDynamicImportFile.read(), deconzSelectHardwareFilePath, "exec")
+    # execGlobals = globals()
+    # execLocals = locals()
+    execGlobals = {
+      "currentServiceName": currentServiceName,
+      "renderMode": renderMode
+    }
+    execLocals = {}
+    screenActive = False
+    exec(code, execGlobals, execLocals)
+    signal.signal(signal.SIGWINCH, onResize)
+    try:
+      hasRebuiltHardwareSelection = execGlobals["hasRebuiltHardwareSelection"]
+    except:
+      hasRebuiltHardwareSelection = False
+    screenActive = True
+    needsRender = 1
 
   def enterPortNumber():
     global needsRender
@@ -171,6 +211,7 @@ def main():
 
   def createMenu():
     global deconzBuildOptions
+    global serviceService
     try:
       deconzBuildOptions = []
       portNumber = getExternalPorts(currentServiceName, dockerComposeYaml)[0]
@@ -180,6 +221,13 @@ def main():
       ])
     except: # Error getting port
       pass
+
+    
+    if os.path.exists(serviceService + '/hardware_selected.yml'):
+      deconzBuildOptions.insert(0, ["Change selected hardware", selectDeconzHardware])
+    else:
+      deconzBuildOptions.insert(0, ["Select hardware", selectDeconzHardware])
+
     deconzBuildOptions.append(["Go back", goBack])
 
   def runOptionsMenu():
@@ -207,6 +255,7 @@ def main():
       print(toPrint)
 
   def mainRender(needsRender, menu, selection):
+    global hasRebuiltHardwareSelection
     term = Terminal()
     
     if needsRender == 1:
@@ -223,8 +272,16 @@ def main():
       renderHotZone(term, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      print(term.center(commonEmptyLine(renderMode)))
-      print(term.center(commonEmptyLine(renderMode)))
+      if os.path.exists(serviceService + '/hardware_selected.yml'):
+        if hasRebuiltHardwareSelection:
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center('{bv}     {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}                    {bv}'.format(t=term, text="Hardware list has been rebuilt: hardware_selected.yml", bv=specialChars[renderMode]["borderVertical"])))
+        else:
+          print(term.center(commonEmptyLine(renderMode)))
+          print(term.center('{bv}     {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}           {bv}'.format(t=term, text="Using existing hardware_selected.yml for hardware installation", bv=specialChars[renderMode]["borderVertical"])))
+      else:
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center(commonEmptyLine(renderMode)))
       if not hideHelpText:
         print(term.center(commonEmptyLine(renderMode)))
         print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
