@@ -30,6 +30,8 @@ def main():
     return True
   
   def uninstallSwapfile():
+    print("Disabling swap...")
+    setSwapinessTo0()
     print("Uninstall Swapfile:")
     subprocess.call(".scripts/disable_swap.sh uninstallswap", shell=True)
     print("")
@@ -52,8 +54,8 @@ def main():
     return True
 
   mainMenuList = [
+    ["Set swapiness to 0 (Disables swap until restart)", setSwapinessTo0],
     ["Uninstall Swapfile (Disables swap)", uninstallSwapfile],
-    ["Set swapiness to 0 (Also disables swap)", setSwapinessTo0],
     ["Install log2ram", installLog2Ram],
     ["Back", goBack]
   ]

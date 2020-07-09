@@ -25,6 +25,9 @@ def main():
   global issues # Returned issues dict
   global haltOnErrors # Turn on to allow erroring
   global hideHelpText # Showing and hiding the help controls text
+  global serviceService
+
+  serviceService = servicesDirectory + currentServiceName
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -83,7 +86,14 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    # Setup service directory
+    if not os.path.exists(serviceService):
+      os.makedirs(serviceService, exist_ok=True)
+
+    # Files copy
+    shutil.copy(r'%s/Dockerfile' % serviceTemplate, r'%s/Dockerfile' % serviceService)
     return True
+
 
   # #####################################
   # Supporting functions below

@@ -399,7 +399,9 @@ def mainRender(needsRender, menu, selection):
   if (buildComplete):
     print("")
     print(term.center('{t.blue_on_green} {text} {t.normal}{t.white_on_black}{cPath} {t.normal}'.format(t=term, text="Build completed:", cPath=" ./docker-compose.yml")))
+    print(term.center('{t.white_on_black}{text}{t.blue_on_green2} {commandString} {t.normal}'.format(t=term, text="You can start the stack from the Docker Commands menu, or from the CLI with: ", commandString="docker-compose up -d")))
     if os.path.exists('./compose-override.yml'):
+      print("")
       print(term.center('{t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}'.format(t=term, text="'compose-override.yml' was merged into 'docker-compose.yml'")))
     print("")
 
