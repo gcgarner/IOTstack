@@ -28,7 +28,7 @@ def main():
 
   # Runtime vars
   menu = []
-  dockerComposeYaml = {}
+  dockerComposeServicesYaml = {}
   templateDirectoryFolders = next(os.walk(templateDirectory))[1]
   term = Terminal()
   hotzoneLocation = [7, 0] # Top text
@@ -41,8 +41,8 @@ def main():
   except:
     hideHelpText = False
 
-  def buildServices():
-    global dockerComposeYaml
+  def buildServices(): # TODO: Move this into a dependency so that it can be executed with just a list of services.
+    global dockerComposeServicesYaml
     try:
       runPrebuildHook()
       dockerFileYaml = {}
@@ -50,8 +50,8 @@ def main():
       dockerFileYaml["version"] = "3.6"
       dockerFileYaml["services"] = {}
       menuStateFileYaml["services"] = {}
-      dockerFileYaml["services"] = dockerComposeYaml
-      menuStateFileYaml["services"] = dockerComposeYaml
+      dockerFileYaml["services"] = dockerComposeServicesYaml
+      menuStateFileYaml["services"] = dockerComposeServicesYaml
 
       if os.path.exists(composeOverrideFile):
         with open(r'%s' % composeOverrideFile) as fileOverride:
@@ -70,7 +70,7 @@ def main():
     except Exception as err: 
       print("Issue running build:")
       print(err)
-      time.sleep(5)
+      time.sleep(3)
       return False
 
   def mergeYaml(priorityYaml, defaultYaml):
@@ -305,48 +305,48 @@ def main():
         checkedMenuItems.append(menuItem[0])
 
   def loadAllServices(reload = False):
-    global dockerComposeYaml
-    dockerComposeYaml.clear()
+    global dockerComposeServicesYaml
+    dockerComposeServicesYaml.clear()
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
       if reload == False:
-        if not checkedMenuItem in dockerComposeYaml:
+        if not checkedMenuItem in dockerComposeServicesYaml:
           serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
           with open(r'%s' % serviceFilePath) as yamlServiceFile:
-            dockerComposeYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
+            dockerComposeServicesYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
       else:
         print("reload!")
         time.sleep(1)
         serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
         with open(r'%s' % serviceFilePath) as yamlServiceFile:
-          dockerComposeYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
+          dockerComposeServicesYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
 
     return True
 
   def loadService(serviceName, reload = False):
-    global dockerComposeYaml
+    global dockerComposeServicesYaml
     if reload == False:
-      if not serviceName in dockerComposeYaml:
+      if not serviceName in dockerComposeServicesYaml:
         serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
         with open(r'%s' % serviceFilePath) as yamlServiceFile:
-          dockerComposeYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
+          dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
     else:
       print("reload!")
       time.sleep(1)
       serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
       with open(r'%s' % serviceFilePath) as yamlServiceFile:
-        dockerComposeYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
+        dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
 
     return True
 
   def checkForIssues():
-    global dockerComposeYaml
+    global dockerComposeServicesYaml
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
       buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
           execGlobals = {
-            "dockerComposeYaml": dockerComposeYaml,
+            "dockerComposeServicesYaml": dockerComposeServicesYaml,
             "toRun": "checkForRunChecksHook",
             "currentServiceName": checkedMenuItem
           }
@@ -354,7 +354,7 @@ def main():
           exec(code, execGlobals, execLocals)
           if "buildHooks" in execGlobals and "runChecksHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["runChecksHook"]:
             execGlobals = {
-              "dockerComposeYaml": dockerComposeYaml,
+              "dockerComposeServicesYaml": dockerComposeServicesYaml,
               "toRun": "runChecks",
               "currentServiceName": checkedMenuItem
             }
@@ -368,14 +368,14 @@ def main():
             menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = []
 
   def checkForOptions():
-    global dockerComposeYaml
+    global dockerComposeServicesYaml
     for (index, menuItem) in enumerate(menu):
       buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
           execGlobals = {
-            "dockerComposeYaml": dockerComposeYaml,
+            "dockerComposeServicesYaml": dockerComposeServicesYaml,
             "toRun": "checkForOptionsHook",
             "currentServiceName": menuItem[0],
             "renderMode": renderMode
@@ -388,13 +388,14 @@ def main():
             menu[getMenuItemIndexByService(menuItem[0])][1]["buildHooks"]["options"] = True
 
   def runPrebuildHook():
+    global dockerComposeServicesYaml
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
       buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
           execGlobals = {
-            "dockerComposeYaml": dockerComposeYaml,
+            "dockerComposeServicesYaml": dockerComposeServicesYaml,
             "toRun": "checkForPreBuildHook",
             "currentServiceName": checkedMenuItem
           }
@@ -402,12 +403,16 @@ def main():
           exec(code, execGlobals, execLocals)
           if "preBuildHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["preBuildHook"]:
             execGlobals = {
-              "dockerComposeYaml": dockerComposeYaml,
+              "dockerComposeServicesYaml": dockerComposeServicesYaml,
               "toRun": "preBuild",
               "currentServiceName": checkedMenuItem
             }
             execLocals = locals()
             exec(code, execGlobals, execLocals)
+            try: # If the prebuild hook modified the docker-compose object, pull it from the script back to here.
+              dockerComposeServicesYaml = execGlobals["dockerComposeServicesYaml"]
+            except:
+              pass
 
   def runPostbuildHook():
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
@@ -416,7 +421,7 @@ def main():
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
           execGlobals = {
-            "dockerComposeYaml": dockerComposeYaml,
+            "dockerComposeServicesYaml": dockerComposeServicesYaml,
             "toRun": "checkForPostBuildHook",
             "currentServiceName": checkedMenuItem
           }
@@ -424,7 +429,7 @@ def main():
           exec(code, execGlobals, execLocals)
           if "postBuildHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["postBuildHook"]:
             execGlobals = {
-              "dockerComposeYaml": dockerComposeYaml,
+              "dockerComposeServicesYaml": dockerComposeServicesYaml,
               "toRun": "postBuild",
               "currentServiceName": checkedMenuItem
             }
@@ -432,7 +437,7 @@ def main():
             exec(code, execGlobals, execLocals)
 
   def executeServiceOptions():
-    global dockerComposeYaml
+    global dockerComposeServicesYaml
     menuItem = menu[selection]
     if menu[selection][1]["checked"] and "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
       buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
@@ -442,14 +447,14 @@ def main():
           code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
 
         execGlobals = {
-          "dockerComposeYaml": dockerComposeYaml,
+          "dockerComposeServicesYaml": dockerComposeServicesYaml,
           "toRun": "runOptionsMenu",
           "currentServiceName": menuItem[0],
           "renderMode": renderMode
         }
         execLocals = locals()
         exec(code, execGlobals, execLocals)
-        dockerComposeYaml = execGlobals["dockerComposeYaml"]
+        dockerComposeServicesYaml = execGlobals["dockerComposeServicesYaml"]
         checkForIssues()
         mainRender(menu, selection, 1)
 
@@ -459,18 +464,18 @@ def main():
         return index
 
   def checkMenuItem(selection):
-    global dockerComposeYaml
+    global dockerComposeServicesYaml
     if menu[selection][1]["checked"] == True:
       menu[selection][1]["checked"] = False
       menu[selection][1]["issues"] = None
-      del dockerComposeYaml[menu[selection][0]]
+      del dockerComposeServicesYaml[menu[selection][0]]
     else:
       menu[selection][1]["checked"] = True
       loadService(menu[selection][0])
 
   def prepareMenuState():
-    global dockerComposeYaml
-    for (index, serviceName) in enumerate(dockerComposeYaml):
+    global dockerComposeServicesYaml
+    for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       checkMenuItem(getMenuItemIndexByService(serviceName))
       setCheckedMenuItems()
       checkForIssues()
@@ -478,15 +483,15 @@ def main():
     return True
 
   def loadCurrentConfigs():
-    global dockerComposeYaml
+    global dockerComposeServicesYaml
     if os.path.exists(dockerSavePathOutput):
       with open(r'%s' % dockerSavePathOutput) as fileSavedConfigs:
         previousConfigs = yaml.load(fileSavedConfigs, Loader=yaml.SafeLoader)
         if not previousConfigs == None:
           if "services" in previousConfigs:
-            dockerComposeYaml = previousConfigs["services"]
+            dockerComposeServicesYaml = previousConfigs["services"]
             return True
-    dockerComposeYaml = {}
+    dockerComposeServicesYaml = {}
     return False
 
   def onResize(sig, action):

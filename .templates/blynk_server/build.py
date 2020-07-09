@@ -18,7 +18,7 @@ def main():
   from deps.consts import servicesDirectory, templatesDirectory
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
 
-  global dockerComposeYaml # The loaded memory YAML of all checked services
+  global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
   global currentServiceName # Name of the current service
@@ -90,10 +90,10 @@ def main():
   # #####################################
 
   def checkForIssues():
-    for (index, serviceName) in enumerate(dockerComposeYaml):
+    for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
-        currentServicePorts = getExternalPorts(currentServiceName, dockerComposeYaml)
-        portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeYaml)
+        currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
+        portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeServicesYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
 
@@ -127,7 +127,7 @@ def main():
 
   def enterPortNumber():
     global needsRender
-    global dockerComposeYaml
+    global dockerComposeServicesYaml
     newPortNumber = ""
     try:
       print(term.move_y(hotzoneLocation[0]))
@@ -143,8 +143,8 @@ def main():
       if 1 <= newPortNumber <= 65535:
         needsRender = 1
         time.sleep(0.2) # Prevent loop
-        internalPort = getInternalPorts(currentServiceName, dockerComposeYaml)[0]
-        dockerComposeYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
+        internalPort = getInternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+        dockerComposeServicesYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
           newExtPort = newPortNumber,
           oldIntPort = internalPort
         )
@@ -173,7 +173,7 @@ def main():
     global blynkServerBuildOptions
     try:
       blynkServerBuildOptions = []
-      portNumber = getExternalPorts(currentServiceName, dockerComposeYaml)[0]
+      portNumber = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
       blynkServerBuildOptions.append([
         "Change external WUI Port Number from: {port}".format(port=portNumber),
         enterPortNumber

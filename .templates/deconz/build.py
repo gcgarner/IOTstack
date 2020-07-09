@@ -18,7 +18,7 @@ def main():
   from deps.consts import servicesDirectory, templatesDirectory
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
 
-  global dockerComposeYaml # The loaded memory YAML of all checked services
+  global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
   global currentServiceName # Name of the current service
@@ -91,6 +91,16 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    global dockerComposeServicesYaml
+    with open(r'%s/hardware_selected.yml' % serviceService) as objHardwareListFile:
+      hardwareList = yaml.load(objHardwareListFile, Loader=yaml.SafeLoader)
+    try:
+      if "deconz" in dockerComposeServicesYaml:
+        dockerComposeServicesYaml["deconz"]["devices"] = hardwareList["hardware"]
+    except Exception as err:
+      print("Error setting deconz hardware: ", err)
+      return False
+
     return True
 
   # #####################################
@@ -101,10 +111,10 @@ def main():
     fileIssues = checkFiles()
     if (len(fileIssues) > 0):
       issues["fileIssues"] = fileIssues
-    for (index, serviceName) in enumerate(dockerComposeYaml):
+    for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
-        currentServicePorts = getExternalPorts(currentServiceName, dockerComposeYaml)
-        portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeYaml)
+        currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
+        portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeServicesYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
 
@@ -167,7 +177,7 @@ def main():
 
   def enterPortNumber():
     global needsRender
-    global dockerComposeYaml
+    global dockerComposeServicesYaml
     newPortNumber = ""
     try:
       print(term.move_y(hotzoneLocation[0]))
@@ -183,8 +193,8 @@ def main():
       if 1 <= newPortNumber <= 65535:
         needsRender = 1
         time.sleep(0.2) # Prevent loop
-        internalPort = getInternalPorts(currentServiceName, dockerComposeYaml)[0]
-        dockerComposeYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
+        internalPort = getInternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+        dockerComposeServicesYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
           newExtPort = newPortNumber,
           oldIntPort = internalPort
         )
@@ -214,7 +224,7 @@ def main():
     global serviceService
     try:
       deconzBuildOptions = []
-      portNumber = getExternalPorts(currentServiceName, dockerComposeYaml)[0]
+      portNumber = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
       deconzBuildOptions.append([
         "Change external WUI Port Number from: {port}".format(port=portNumber),
         enterPortNumber

@@ -6,7 +6,7 @@ haltOnErrors = True
 
 # Main wrapper function. Required to make local vars work correctly
 def main():
-  global dockerComposeYaml # The loaded memory YAML of all checked services
+  global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
   global currentServiceName # Name of the current service

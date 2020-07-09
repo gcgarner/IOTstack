@@ -6,7 +6,7 @@ haltOnErrors = True
 
 # Main wrapper function. Required to make local vars work correctly
 def main():
-  global dockerComposeYaml # The loaded memory YAML of all checked services
+  global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
   global currentServiceName # Name of the current service
@@ -72,7 +72,7 @@ def main():
   # #####################################
 
   def checkForIssues():
-    for (index, serviceName) in enumerate(dockerComposeYaml):
+    for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName)
         portConflicts = checkPortConflicts(serviceName, currentServicePorts)
@@ -82,7 +82,7 @@ def main():
   def getExternalPorts(serviceName):
     externalPorts = []
     try:
-      yamlService = dockerComposeYaml[serviceName]
+      yamlService = dockerComposeServicesYaml[serviceName]
       if "ports" in yamlService:
         for (index, port) in enumerate(yamlService["ports"]):
           try:
@@ -97,7 +97,7 @@ def main():
   def checkPortConflicts(serviceName, currentPorts):
     portConflicts = []
     if not currentServiceName == serviceName:
-      yamlService = dockerComposeYaml[serviceName]
+      yamlService = dockerComposeServicesYaml[serviceName]
       servicePorts = getExternalPorts(serviceName)
       for (index, servicePort) in enumerate(servicePorts):
         for (index, currentPort) in enumerate(currentPorts):

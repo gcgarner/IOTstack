@@ -9,9 +9,8 @@
     volumes:
       - ./volumes/deconz/:/root/.local/share/dresden-elektronik/deCONZ
     devices:
-      #RaspBee:
-      - /dev/ttyAMA0
-      #alternatively - /dev/ttyS0
+      # This list is replaced during the build process. Modify the list in "hardware_list.yml" to change it.
+      - /dev/null
     environment:
       - DECONZ_VNC_MODE=1
       - DECONZ_VNC_PASSWORD=changeme
