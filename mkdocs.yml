@@ -1,10 +1,29 @@
 site_name: IOTstack
 site_description: 'Docker stack for getting started on IOT on the Raspberry PI'
+
+
+# Repository
+repo_url: https://github.com/SensorsIot/IOTstack
+repo_name: SensorsIot/IOTstack
+edit_uri: "https://github.com/SensorsIot/IOTstack/edit/master/"
+
 theme:
   name: material
-plugins:
-  - search
-# - awesome-pages
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    - tabs
+    - navigation.expand
+  plugins:
+    - search
+    - git-revision-date-localized
 markdown_extensions:
+  - admonition
   - pymdownx.superfences
-repo_url: https://github.com/SensorsIot/IOTstack
