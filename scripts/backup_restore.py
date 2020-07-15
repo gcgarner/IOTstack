@@ -56,7 +56,6 @@ def main():
     global needsRender
     backupRestoreSelectionInProgress = False
     needsRender = 1
-    print("Back to main menu")
     return True
 
   mainMenuList = [

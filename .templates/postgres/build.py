@@ -6,12 +6,30 @@ haltOnErrors = True
 
 # Main wrapper function. Required to make local vars work correctly
 def main():
+  import os
+  import time
+  import shutil
+  import sys
+  
+  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
   global currentServiceName # Name of the current service
   global issues # Returned issues dict
   global haltOnErrors # Turn on to allow erroring
+  global hideHelpText # Showing and hiding the help controls text
+  global serviceService
+
+  serviceService = servicesDirectory + currentServiceName
+  serviceTemplate = templatesDirectory + currentServiceName
+
+  try: # If not already set, then set it.
+    hideHelpText = hideHelpText
+  except:
+    hideHelpText = False
 
   # runtime vars
   portConflicts = []
@@ -65,6 +83,12 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    # Setup service directory
+    if not os.path.exists(serviceService):
+      os.makedirs(serviceService, exist_ok=True)
+
+    # Files copy
+    shutil.copy(r'%s/postgres.env' % serviceTemplate, r'%s/postgres.env' % serviceService)
     return True
 
   # #####################################
@@ -72,7 +96,25 @@ def main():
   # #####################################
 
   def checkForIssues():
-    return True
+    envFileIssues = checkEnvFiles()
+    if (len(envFileIssues) > 0):
+      issues["envFileIssues"] = envFileIssues
+    for (index, serviceName) in enumerate(dockerComposeServicesYaml):
+      if not currentServiceName == serviceName: # Skip self
+        currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
+        portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeServicesYaml)
+        if (len(portConflicts) > 0):
+          issues["portConflicts"] = portConflicts
+
+  def checkEnvFiles():
+    envFileIssues = []
+    if not os.path.exists(serviceTemplate + '/postgres.env'):
+      envFileIssues.append(serviceTemplate + '/postgres.env does not exist')
+    return envFileIssues
+
+  # #####################################
+  # End Supporting functions
+  # #####################################
 
   if haltOnErrors:
     eval(toRun)()

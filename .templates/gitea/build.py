@@ -16,7 +16,7 @@ def main():
   
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -131,45 +131,14 @@ def main():
     global needsRender
     selectionInProgress = False
     needsRender = 1
-    print("Back to build stack menu")
     return True
 
-  def enterPortNumber():
+  def enterPortNumberExec():
+    # global term
     global needsRender
     global dockerComposeServicesYaml
-    newPortNumber = ""
-    try:
-      print(term.move_y(hotzoneLocation[0]))
-      print(term.center("                                              "))
-      print(term.center("                                              "))
-      print(term.center("                                              "))
-      print(term.move_y(hotzoneLocation[0] + 1))
-      time.sleep(0.1) # Prevent loop
-      newPortNumber = input(term.center("Enter new port number: "))
-      # newPortNumber = sys.stdin.readline()
-      time.sleep(0.1) # Prevent loop
-      newPortNumber = int(str(newPortNumber))
-      if 1 <= newPortNumber <= 65535:
-        needsRender = 1
-        time.sleep(0.2) # Prevent loop
-        internalPort = getInternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
-        dockerComposeServicesYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
-          newExtPort = newPortNumber,
-          oldIntPort = internalPort
-        )
-        createMenu()
-        return True
-      else:
-        print(term.center('   {t.white_on_red} "{port}" {message} {t.normal} <-'.format(t=term, port=newPortNumber, message="is not a valid port")))
-        needsRender = 1
-        time.sleep(2) # Give time to read error
-        return False
-    except Exception as err: 
-      print(term.center('   {t.white_on_red} "{port}" {message} {t.normal} <-'.format(t=term, port=newPortNumber, message="is not a valid port")))
-      print(term.center('   {t.white_on_red} Error: {errorMsg} {t.normal} <-'.format(t=term, errorMsg=err)))
-      needsRender = 1
-      time.sleep(2.5) # Give time to read error
-      return False
+    enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, createMenu)
+    needsRender = 1
 
   def onResize(sig, action):
     global giteaBuildOptions
@@ -185,7 +154,7 @@ def main():
       portNumber = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
       giteaBuildOptions.append([
         "Change external WUI Port Number from: {port}".format(port=portNumber),
-        enterPortNumber
+        enterPortNumberExec
       ])
     except: # Error getting port
       pass
@@ -221,7 +190,7 @@ def main():
     if needsRender == 1:
       print(term.clear())
       print(term.move_y(term.height // 16))
-      print(term.black_on_cornsilk4(term.center('IOTstack Blynk Server Options')))
+      print(term.black_on_cornsilk4(term.center('IOTstack Gitea Options')))
       print("")
       print(term.center(commonTopBorder(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))

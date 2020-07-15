@@ -6,12 +6,30 @@ haltOnErrors = True
 
 # Main wrapper function. Required to make local vars work correctly
 def main():
+  import os
+  import time
+  import shutil
+  import sys
+  
+  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
   global buildHooks # Where to place the options menu result
   global currentServiceName # Name of the current service
   global issues # Returned issues dict
   global haltOnErrors # Turn on to allow erroring
+  global hideHelpText # Showing and hiding the help controls text
+  global serviceService
+
+  serviceService = servicesDirectory + currentServiceName
+  serviceTemplate = templatesDirectory + currentServiceName
+
+  try: # If not already set, then set it.
+    hideHelpText = hideHelpText
+  except:
+    hideHelpText = False
 
   # runtime vars
   portConflicts = []
@@ -56,7 +74,6 @@ def main():
   # This service will not check anything unless this is set
   # This function is optional, and will run each time the menu is rendered
   def runChecks():
-    checkForIssues()
     return []
 
   # This function is optional, and will run after the docker-compose.yml file is written to disk.
@@ -71,8 +88,11 @@ def main():
   # Supporting functions below
   # #####################################
 
-  def checkForIssues():
-    return True
+  # None
+
+  # #####################################
+  # End Supporting functions
+  # #####################################
 
   if haltOnErrors:
     eval(toRun)()

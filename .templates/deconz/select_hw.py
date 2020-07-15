@@ -44,7 +44,6 @@ def main():
     global needsRender
     dockerCommandsSelectionInProgress = False
     needsRender = 1
-    print("Back to main menu")
     return True
 
   mainMenuList = []

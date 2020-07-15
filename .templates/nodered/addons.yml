@@ -26,6 +26,7 @@ addons:
     - "node-red-contrib-config"
     - "node-red-contrib-grove"
     - "node-red-contrib-diode"
+    - "node-red-contrib-sunevents"
     - "node-red-contrib-bigtimer"
     - "node-red-contrib-esplogin"
     - "node-red-contrib-timeout"

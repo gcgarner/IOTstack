@@ -17,6 +17,8 @@ def main():
   global paginationSize
   global paginationStartIndex
   global hideHelpText
+  global activeMenuLocation
+  global lastSelection
 
   # Constants
   templateDirectory = './.templates'
@@ -35,6 +37,8 @@ def main():
   paginationToggle = [10, term.height - 21] # Top text + controls text
   paginationStartIndex = 0
   paginationSize = paginationToggle[0]
+  activeMenuLocation = 0
+  lastSelection = 0
   
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -137,62 +141,83 @@ def main():
     else:
       print(term.center(commonEmptyLine(renderMode)))
 
+    menuItemsActiveRow = term.get_location()[0]
+    if renderType == 2 or renderType == 1: # Rerender entire hotzone
+      for (index, menuItem) in enumerate(menu): # Menu loop
+        if "issues" in menuItem[1] and menuItem[1]["issues"]:
+          allIssues.append({ "serviceName": menuItem[0], "issues": menuItem[1]["issues"] })
 
-    for (index, menuItem) in enumerate(menu): # Menu loop
-      if "issues" in menuItem[1] and menuItem[1]["issues"]:
-        allIssues.append({ "serviceName": menuItem[0], "issues": menuItem[1]["issues"] })
+        if index >= paginationStartIndex and index < paginationStartIndex + paginationSize:
+          lineText = generateLineText(menuItem[0], paddingBefore=paddingBefore)
 
-      if index >= paginationStartIndex and index < paginationStartIndex + paginationSize:
-        lineText = generateLineText(menuItem[0], paddingBefore=paddingBefore)
+          # Menu highlight logic
+          if index == selection:
+            activeMenuLocation = term.get_location()[0]
+            formattedLineText = '-> {t.blue_on_green}{title}{t.normal} <-'.format(t=term, title=menuItem[0])
+            paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]) + selectedTextLength, paddingBefore=paddingBefore - selectedTextLength)
+            toPrint = paddedLineText
+          else:
+            toPrint = '{title}{t.normal}'.format(t=term, title=lineText)
+          # #####
 
-        # Menu highlight logic
-        if index == selection:
-          formattedLineText = '-> {t.blue_on_green}{title}{t.normal} <-'.format(t=term, title=menuItem[0])
-          paddedLineText = generateLineText(formattedLineText, textLength=len(menuItem[0]) + selectedTextLength, paddingBefore=paddingBefore - selectedTextLength)
-          toPrint = paddedLineText
-        else:
-          toPrint = '{title}{t.normal}'.format(t=term, title=lineText)
-        # #####
+          # Options and issues
+          if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
+            toPrint = toPrint + '{t.blue_on_black} {raf}{raf} {t.normal}'.format(t=term, raf=specialChars[renderMode]["rightArrowFull"])
+            toPrint = toPrint + ' {t.white_on_black} Options {t.normal}'.format(t=term)
+          else:
+            for i in range(optionsLength):
+              toPrint += " "
 
-        # Options and issues
-        if "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
-          toPrint = toPrint + '{t.blue_on_black} {raf}{raf} {t.normal}'.format(t=term, raf=specialChars[renderMode]["rightArrowFull"])
-          toPrint = toPrint + ' {t.white_on_black} Options {t.normal}'.format(t=term)
-        else:
-          for i in range(optionsLength):
+          for i in range(optionsIssuesSpace):
             toPrint += " "
 
-        for i in range(optionsIssuesSpace):
-          toPrint += " "
-
-        if "issues" in menuItem[1] and menuItem[1]["issues"]:
-          toPrint = toPrint + '{t.red_on_orange} !! {t.normal}'.format(t=term)
-          toPrint = toPrint + ' {t.orange_on_black} Issue {t.normal}'.format(t=term)
-        else:
-          if menuItem[1]["checked"]:
-            if not menuItem[1]["issues"] == None and len(menuItem[1]["issues"]) == 0:
-              toPrint = toPrint + '     {t.green_on_blue} Pass {t.normal} '.format(t=term)
+          if "issues" in menuItem[1] and menuItem[1]["issues"]:
+            toPrint = toPrint + '{t.red_on_orange} !! {t.normal}'.format(t=term)
+            toPrint = toPrint + ' {t.orange_on_black} Issue {t.normal}'.format(t=term)
+          else:
+            if menuItem[1]["checked"]:
+              if not menuItem[1]["issues"] == None and len(menuItem[1]["issues"]) == 0:
+                toPrint = toPrint + '     {t.green_on_blue} Pass {t.normal} '.format(t=term)
+              else:
+                for i in range(issuesLength):
+                  toPrint += " "
             else:
               for i in range(issuesLength):
                 toPrint += " "
+
+          for i in range(spaceAfterissues):
+            toPrint += " "
+          # #####
+
+          # Menu check render logic
+          if menuItem[1]["checked"]:
+            toPrint = "     (X) " + toPrint
           else:
-            for i in range(issuesLength):
-              toPrint += " "
+            toPrint = "     ( ) " + toPrint
 
-        for i in range(spaceAfterissues):
-          toPrint += " "
-        # #####
+          toPrint = "{bv} {toPrint}  {bv}".format(bv=specialChars[renderMode]["borderVertical"], toPrint=toPrint) # Generate border
+          toPrint = term.center(toPrint) # Center Text (All lines should have the same amount of printable characters)
+          # #####
+          print(toPrint)
 
-        # Menu check render logic
-        if menuItem[1]["checked"]:
-          toPrint = "     (X) " + toPrint
-        else:
-          toPrint = "     ( ) " + toPrint
 
-        toPrint = "{bv} {toPrint}  {bv}".format(bv=specialChars[renderMode]["borderVertical"], toPrint=toPrint) # Generate border
-        toPrint = term.center(toPrint) # Center Text (All lines should have the same amount of printable characters)
-        # #####
-        print(toPrint)
+    if renderType == 3: # Only partial rerender of hotzone (the unselected menu item, and the newly selected menu item rows)
+      global lastSelection
+      global renderOffsetLastSelection
+      global renderOffsetCurrentSelection
+      # TODO: Finish this, currently disabled. To enable, update the actions for UP and DOWN array keys below to assigned 3 to needsRender
+      renderOffsetLastSelection = lastSelection - paginationStartIndex
+      renderOffsetCurrentSelection = selection - paginationStartIndex
+      lineText = generateLineText(menu[lastSelection][0], paddingBefore=paddingBefore)
+      toPrint = '@@{title}{t.normal}'.format(t=term, title=lineText)
+      print('{t.move_y(lastSelection)}{title}'.format(t=term, title=toPrint))
+      # print(toPrint)
+      print(renderOffsetCurrentSelection, lastSelection, renderOffsetLastSelection)
+      lastSelection = selection
+      
+          # menuItemsActiveRow
+          # activeMenuLocation
+
 
     if paginationStartIndex + paginationSize < len(menu):
       print(term.center("{b}       {daf}      {daf}{daf}{daf}                                                   {dal}           {b}".format(
@@ -441,7 +466,6 @@ def main():
     menuItem = menu[selection]
     if menu[selection][1]["checked"] and "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
       buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
-      print(buildScriptPath)
       if os.path.exists(buildScriptPath):
         with open(buildScriptPath, "rb") as pythonDynamicImportFile:
           code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
@@ -506,6 +530,7 @@ def main():
   if __name__ == 'builtins':
     global results
     global signal
+    needsRender = 1
     signal.signal(signal.SIGWINCH, onResize)
     with term.fullscreen():
       selection = 0
@@ -518,15 +543,18 @@ def main():
           key = term.inkey()
           if key.is_sequence:
             if key.name == 'KEY_TAB':
+              needsRender = 1
               if paginationSize == paginationToggle[0]:
                 paginationSize = paginationToggle[1]
               else:
                 paginationSize = paginationToggle[0]
-              mainRender(menu, selection, 1)
+              mainRender(menu, selection, needsRender)
             if key.name == 'KEY_DOWN':
               selection += 1
+              needsRender = 2
             if key.name == 'KEY_UP':
               selection -= 1
+              needsRender = 2
             if key.name == 'KEY_RIGHT':
               executeServiceOptions()
             if key.name == 'KEY_ENTER':
@@ -543,19 +571,19 @@ def main():
               checkMenuItem(selection) # Update checked list
               setCheckedMenuItems() # Update UI memory
               checkForIssues()
-              mainRender(menu, selection, 1)
+              mainRender(menu, selection, needsRender)
             elif key == 'h': # H pressed
               if hideHelpText:
                 hideHelpText = False
               else:
                 hideHelpText = True
-              mainRender(menu, selection, 1)
+              mainRender(menu, selection, needsRender)
             else:
               time.sleep(0.1)
 
           selection = selection % len(menu)
 
-          mainRender(menu, selection, 2)
+          mainRender(menu, selection, needsRender)
 
 originalSignalHandler = signal.getsignal(signal.SIGINT)
 main()

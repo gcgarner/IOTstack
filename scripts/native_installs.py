@@ -64,7 +64,6 @@ def main():
     screenActive = False
     dockerCommandsSelectionInProgress = False
     needsRender = 1
-    print("Back to main menu")
     return True
 
   mainMenuList = [
