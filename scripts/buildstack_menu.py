@@ -69,7 +69,7 @@ def main():
 
       with open(r'%s' % dockerSavePathOutput, 'w') as outputFile:
         yaml.dump(menuStateFileYaml, outputFile, default_flow_style=False, sort_keys=False)
-      runPostbuildHook()
+      runPostBuildHook()
       return True
     except Exception as err: 
       print("Issue running build:")
@@ -227,9 +227,6 @@ def main():
       )))
     else:
       print(term.center(commonEmptyLine(renderMode)))
-
-
-
 
   def mainRender(menu, selection, renderType = 1):
     global paginationStartIndex
@@ -425,21 +422,25 @@ def main():
             "currentServiceName": checkedMenuItem
           }
           execLocals = locals()
-          exec(code, execGlobals, execLocals)
-          if "preBuildHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["preBuildHook"]:
-            execGlobals = {
-              "dockerComposeServicesYaml": dockerComposeServicesYaml,
-              "toRun": "preBuild",
-              "currentServiceName": checkedMenuItem
-            }
-            execLocals = locals()
+          try:
             exec(code, execGlobals, execLocals)
+            if "preBuildHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["preBuildHook"]:
+              execGlobals = {
+                "dockerComposeServicesYaml": dockerComposeServicesYaml,
+                "toRun": "preBuild",
+                "currentServiceName": checkedMenuItem
+              }
+              execLocals = locals()
+              exec(code, execGlobals, execLocals)
+          except Exception as err:
+            print("Error running PreBuildHook on '%s'" % checkedMenuItem)
+            print(err)
             try: # If the prebuild hook modified the docker-compose object, pull it from the script back to here.
               dockerComposeServicesYaml = execGlobals["dockerComposeServicesYaml"]
             except:
               pass
 
-  def runPostbuildHook():
+  def runPostBuildHook():
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
       buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
@@ -451,15 +452,19 @@ def main():
             "currentServiceName": checkedMenuItem
           }
           execLocals = locals()
-          exec(code, execGlobals, execLocals)
-          if "postBuildHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["postBuildHook"]:
-            execGlobals = {
-              "dockerComposeServicesYaml": dockerComposeServicesYaml,
-              "toRun": "postBuild",
-              "currentServiceName": checkedMenuItem
-            }
-            execLocals = locals()
+          try:
             exec(code, execGlobals, execLocals)
+            if "postBuildHook" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["postBuildHook"]:
+              execGlobals = {
+                "dockerComposeServicesYaml": dockerComposeServicesYaml,
+                "toRun": "postBuild",
+                "currentServiceName": checkedMenuItem
+              }
+              execLocals = locals()
+              exec(code, execGlobals, execLocals)
+          except Exception as err:
+            print("Error running PostBuildHook on '%s'" % checkedMenuItem)
+            print(err)
 
   def executeServiceOptions():
     global dockerComposeServicesYaml
@@ -548,7 +553,6 @@ def main():
                 paginationSize = paginationToggle[1]
               else:
                 paginationSize = paginationToggle[0]
-              mainRender(menu, selection, needsRender)
             if key.name == 'KEY_DOWN':
               selection += 1
               needsRender = 2
@@ -571,13 +575,12 @@ def main():
               checkMenuItem(selection) # Update checked list
               setCheckedMenuItems() # Update UI memory
               checkForIssues()
-              mainRender(menu, selection, needsRender)
+              needsRender = 1
             elif key == 'h': # H pressed
               if hideHelpText:
                 hideHelpText = False
               else:
                 hideHelpText = True
-              mainRender(menu, selection, needsRender)
             else:
               time.sleep(0.1)
 

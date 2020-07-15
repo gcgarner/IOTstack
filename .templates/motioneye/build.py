@@ -28,6 +28,7 @@ def main():
   global serviceService
 
   serviceService = servicesDirectory + currentServiceName
+  serviceTemplate = templatesDirectory + currentServiceName
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -89,9 +90,8 @@ def main():
     # Setup service directory
     if not os.path.exists(serviceService):
       os.makedirs(serviceService, exist_ok=True)
-
-    # Files copy
-    shutil.copy(r'%s/diyhue.env' % serviceTemplate, r'%s/diyhue.env' % serviceService)
+      os.makedirs(serviceService + '/etc_motioneye', exist_ok=True)
+      os.makedirs(serviceService + '/var_lib_motioneye', exist_ok=True)
     return True
 
   # #####################################

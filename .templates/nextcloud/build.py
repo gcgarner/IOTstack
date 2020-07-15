@@ -28,6 +28,7 @@ def main():
   global serviceService
 
   serviceService = servicesDirectory + currentServiceName
+  serviceTemplate = templatesDirectory + currentServiceName
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -90,8 +91,6 @@ def main():
     if not os.path.exists(serviceService):
       os.makedirs(serviceService, exist_ok=True)
 
-    # Files copy
-    shutil.copy(r'%s/diyhue.env' % serviceTemplate, r'%s/diyhue.env' % serviceService)
     return True
 
   # #####################################

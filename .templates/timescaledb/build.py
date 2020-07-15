@@ -108,7 +108,7 @@ def main():
 
   def checkEnvFiles():
     envFileIssues = []
-    if not os.path.exists(serviceTemplate + '/timescaledb.env.conf'):
+    if not os.path.exists(serviceTemplate + '/timescaledb.env'):
       envFileIssues.append(serviceTemplate + '/timescaledb.env does not exist')
     return envFileIssues
 
