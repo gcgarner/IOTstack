@@ -6,3 +6,5 @@
     env_file: ./services/homebridge/homebridge.env
     volumes:
       - ./volumes/homebridge:/homebridge
+    networks:
+      - hosts_nw

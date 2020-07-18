@@ -4,3 +4,5 @@
     restart: unless-stopped
     ports:
       - 9080:8080
+    networks:
+      - iotstack_nw

@@ -12,4 +12,6 @@
       - ./volumes/mosquitto/pwfile:/mosquitto/pwfile
       - ./services/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./services/mosquitto/filter.acl:/mosquitto/config/filter.acl
+    networks:
+      - iotstack_nw
 

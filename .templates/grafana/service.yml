@@ -10,3 +10,5 @@
     volumes:
       - ./volumes/grafana/data:/var/lib/grafana
       - ./volumes/grafana/log:/var/log/grafana
+    networks:
+      - iotstack_nw

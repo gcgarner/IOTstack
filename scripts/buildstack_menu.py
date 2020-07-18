@@ -27,6 +27,7 @@ def main():
   dockerPathOutput = './docker-compose.yml'
   dockerSavePathOutput = './services/docker-compose.save.yml'
   composeOverrideFile = './compose-override.yml'
+  envFile = './.templates/env.yml'
 
   # Runtime vars
   menu = []
@@ -56,6 +57,12 @@ def main():
       menuStateFileYaml["services"] = {}
       dockerFileYaml["services"] = dockerComposeServicesYaml
       menuStateFileYaml["services"] = dockerComposeServicesYaml
+
+      if os.path.exists(envFile):
+        with open(r'%s' % envFile) as fileEnv:
+          envSettings = yaml.load(fileEnv, Loader=yaml.SafeLoader)
+        mergedYaml = mergeYaml(envSettings, dockerFileYaml)
+        dockerFileYaml = mergedYaml
 
       if os.path.exists(composeOverrideFile):
         with open(r'%s' % composeOverrideFile) as fileOverride:

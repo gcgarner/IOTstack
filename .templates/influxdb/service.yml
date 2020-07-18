@@ -11,3 +11,5 @@
     volumes:
       - ./volumes/influxdb/data:/var/lib/influxdb
       - ./backups/influxdb/db:/var/lib/influxdb/backup
+    networks:
+      - iotstack_nw

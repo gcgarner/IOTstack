@@ -12,3 +12,5 @@
     volumes:
        - ./volumes/diyhue/:/opt/hue-emulator/export/
     restart: unless-stopped
+    networks:
+      - iotstack_nw

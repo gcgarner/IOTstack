@@ -8,3 +8,5 @@
       - 5432:5432
     volumes:
       - ./volumes/timescaledb/data:/var/lib/postgresql/data
+    networks:
+      - iotstack_nw

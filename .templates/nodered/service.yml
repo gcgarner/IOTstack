@@ -15,3 +15,5 @@
       - "/dev/ttyAMA0:/dev/ttyAMA0"
       - "/dev/vcio:/dev/vcio"
       - "/dev/gpiomem:/dev/gpiomem"
+    networks:
+      - iotstack_nw

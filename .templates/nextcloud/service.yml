@@ -10,6 +10,8 @@
       - nextcloud_db
     links:
       - nextcloud_db
+    networks:
+      - iotstack_nw
 
   nextcloud_db:
     image: linuxserver/mariadb
@@ -22,4 +24,5 @@
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
     restart: unless-stopped
-
+    networks:
+      - iotstack_nw

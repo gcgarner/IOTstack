@@ -2,7 +2,8 @@
     image: "openhab/openhab:2.4.0"
     container_name: openhab
     restart: unless-stopped
-    network_mode: host
+    networks:
+      - hosts_nw
 #    cap_add:
 #      - NET_ADMIN
 #      - NET_RAW

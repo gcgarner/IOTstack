@@ -20,3 +20,6 @@
     cap_add:
       - NET_ADMIN
     restart: unless-stopped
+    networks:
+      - iotstack_nw
+      - vpn_nw

@@ -1,7 +1,8 @@
   webthings_gateway:
     image: mozillaiot/gateway:latest
     container_name: webthings_gateway
-    network_mode: host
+    networks:
+      - hosts_nw
     #ports:
     # - 8080:8080
     # - 4443:4443

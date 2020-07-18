@@ -6,3 +6,5 @@
     depends_on:
       - influxdb
       - mosquitto
+    networks:
+      - iotstack_nw

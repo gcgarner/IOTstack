@@ -8,4 +8,6 @@
       - 9443:9443
     volumes:
       - ./volumes/blynk_server/data:/data
+    networks:
+      - iotstack_nw
 

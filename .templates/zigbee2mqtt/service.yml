@@ -7,4 +7,5 @@
       - /dev/ttyAMA0:/dev/ttyACM0
       #- /dev/ttyACM0:/dev/ttyACM0
     restart: unless-stopped
-    network_mode: host
+    networks:
+      - hosts_nw
