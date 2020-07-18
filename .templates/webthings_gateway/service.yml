@@ -1,5 +1,5 @@
   webthings_gateway:
-    image: mozillaiot/gateway:arm
+    image: mozillaiot/gateway:latest
     container_name: webthings_gateway
     network_mode: host
     #ports:

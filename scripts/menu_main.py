@@ -110,6 +110,7 @@ def buildStack():
   }
   execLocals = {}
   screenActive = False
+  print(term.clear())
   exec(code, execGlobals, execLocals)
   buildComplete = execGlobals["results"]["buildState"]
   signal.signal(signal.SIGWINCH, onResize)

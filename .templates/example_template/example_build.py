@@ -259,7 +259,7 @@ def main():
             mainRender(menuItemsExample, currentMenuItemIndex)
             needsRender = False
 
-          key = term.inkey()
+          key = term.inkey(esc_delay=0.05)
           if key.is_sequence:
             if key.name == 'KEY_TAB':
               menuNavigateDirection += 1

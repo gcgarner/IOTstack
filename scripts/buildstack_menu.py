@@ -538,6 +538,7 @@ def main():
     needsRender = 1
     signal.signal(signal.SIGWINCH, onResize)
     with term.fullscreen():
+      print('Loading...')
       selection = 0
       if loadCurrentConfigs():
         prepareMenuState()
@@ -545,7 +546,7 @@ def main():
       selectionInProgress = True
       with term.cbreak():
         while selectionInProgress:
-          key = term.inkey()
+          key = term.inkey(esc_delay=0.05)
           if key.is_sequence:
             if key.name == 'KEY_TAB':
               needsRender = 1
@@ -581,8 +582,9 @@ def main():
                 hideHelpText = False
               else:
                 hideHelpText = True
-            else:
-              time.sleep(0.1)
+          else:
+            print(key)
+            time.sleep(0.5)
 
           selection = selection % len(menu)
 

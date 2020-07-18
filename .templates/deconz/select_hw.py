@@ -271,7 +271,7 @@ def main():
             mainRender(needsRender, mainMenuList, currentMenuItemIndex)
             needsRender = 0
 
-          key = term.inkey()
+          key = term.inkey(esc_delay=0.05)
           if key.is_sequence:
             if key.name == 'KEY_TAB':
               if paginationSize == paginationToggle[0]:
