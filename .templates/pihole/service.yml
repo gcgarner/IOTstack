@@ -23,3 +23,7 @@
     networks:
       - iotstack_nw
       - vpn_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

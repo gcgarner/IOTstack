@@ -9,3 +9,7 @@
     # - /dev/ttyACM0:/dev/ttyACM0
     volumes:
       - ./volumes/webthings_gateway/share:/home/node/.mozilla-iot
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

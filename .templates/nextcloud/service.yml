@@ -12,6 +12,10 @@
       - nextcloud_db
     networks:
       - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
 
   nextcloud_db:
     image: linuxserver/mariadb
@@ -26,3 +30,7 @@
     restart: unless-stopped
     networks:
       - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

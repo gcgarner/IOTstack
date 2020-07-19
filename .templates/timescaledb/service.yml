@@ -10,3 +10,7 @@
       - ./volumes/timescaledb/data:/var/lib/postgresql/data
     networks:
       - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

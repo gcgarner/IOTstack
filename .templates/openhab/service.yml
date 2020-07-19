@@ -20,3 +20,7 @@
 #    # The command node is very important. It overrides
 #    # the "gosu openhab tini -s ./start.sh" command from Dockerfile and runs as root!
 #    command: "tini -s ./start.sh server"
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

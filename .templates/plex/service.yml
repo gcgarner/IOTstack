@@ -14,3 +14,7 @@
       #- ~/mnt/HDD/movies:/movies
       - ./volumes/plex/transcode:/transcode
     restart: unless-stopped
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

@@ -6,4 +6,8 @@
     devices:
       - /dev/bus/usb
     restart: unless-stopped
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
     

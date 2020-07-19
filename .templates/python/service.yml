@@ -6,3 +6,7 @@
       - hosts_nw
     volumes:
       - ./volumes/python/app:/usr/src/app
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

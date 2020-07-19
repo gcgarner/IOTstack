@@ -4,3 +4,7 @@
     network_mode: host
     privileged: true
     restart: unless-stopped
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
