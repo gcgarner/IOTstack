@@ -3,12 +3,9 @@
     container_name: webthings_gateway
     networks:
       - hosts_nw
-    #ports:
-    # - 8080:8080
-    # - 4443:4443
+    ports: # Changing this won't do anything. Change the port in local.json.
+    - 8084:8084
     #devices:
     # - /dev/ttyACM0:/dev/ttyACM0
     volumes:
       - ./volumes/webthings_gateway/share:/home/node/.mozilla-iot
-
-      

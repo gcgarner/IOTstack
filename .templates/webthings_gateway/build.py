@@ -74,6 +74,7 @@ def main():
   # This service will not check anything unless this is set
   # This function is optional, and will run each time the menu is rendered
   def runChecks():
+    checkForIssues()
     return []
 
   # This function is optional, and will run after the docker-compose.yml file is written to disk.
@@ -82,13 +83,39 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    # Setup service directory
+    if not os.path.exists(serviceService):
+      os.makedirs(serviceService, exist_ok=True)
+      os.makedirs(serviceService + '/share', exist_ok=True)
+      os.makedirs(serviceService + '/config', exist_ok=True)
+
+    # Files copy
+    shutil.copy(r'%s/local.json' % serviceTemplate, r'%s/config/local.json' % serviceService)
     return True
 
   # #####################################
   # Supporting functions below
   # #####################################
 
-  # None
+
+  def checkForIssues():
+    envFileIssues = checkEnvFiles()
+    if (len(envFileIssues) > 0):
+      issues["envFileIssues"] = envFileIssues
+
+    for (index, serviceName) in enumerate(dockerComposeServicesYaml):
+      if not currentServiceName == serviceName: # Skip self
+        currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
+        portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeServicesYaml)
+        if (len(portConflicts) > 0):
+          issues["portConflicts"] = portConflicts
+
+  def checkEnvFiles():
+    envFileIssues = []
+    if not os.path.exists(serviceTemplate + '/local.json'):
+      envFileIssues.append(serviceTemplate + '/local.json does not exist')
+    return envFileIssues
+
 
   # #####################################
   # End Supporting functions

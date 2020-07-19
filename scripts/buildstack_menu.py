@@ -521,6 +521,7 @@ def main():
   def loadCurrentConfigs():
     global dockerComposeServicesYaml
     if os.path.exists(dockerSavePathOutput):
+      print("Loading config fom: '%s'" % dockerSavePathOutput)
       with open(r'%s' % dockerSavePathOutput) as fileSavedConfigs:
         previousConfigs = yaml.load(fileSavedConfigs, Loader=yaml.SafeLoader)
         if not previousConfigs == None:
