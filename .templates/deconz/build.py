@@ -73,7 +73,7 @@ def main():
   # This function is REQUIRED.
   def checkForRunChecksHook():
     try:
-      buildHooks["runChecksHook"] = callable(checkForIssues)
+      buildHooks["runChecksHook"] = callable(runChecks)
     except:
       buildHooks["runChecksHook"] = False
       return buildHooks

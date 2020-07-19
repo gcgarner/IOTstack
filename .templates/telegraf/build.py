@@ -65,7 +65,7 @@ def main():
   # This function is REQUIRED.
   def checkForRunChecksHook():
     try:
-      buildHooks["runChecksHook"] = callable(checkForIssues)
+      buildHooks["runChecksHook"] = callable(runChecks)
     except:
       buildHooks["runChecksHook"] = False
       return buildHooks
@@ -99,6 +99,11 @@ def main():
     envFileIssues = checkEnvFiles()
     if (len(envFileIssues) > 0):
       issues["envFileIssues"] = envFileIssues
+
+    envReqServiceIssues = checkReqServices()
+    if (len(envReqServiceIssues) > 0):
+      issues["requiredService"] = envReqServiceIssues
+
     for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
@@ -111,6 +116,21 @@ def main():
     if not os.path.exists(serviceTemplate + '/telegraf.conf'):
       envFileIssues.append(serviceTemplate + '/telegraf.conf does not exist')
     return envFileIssues
+
+  def checkReqServices():
+    try:
+      envReqServicesIssues = []
+      if "depends_on" in dockerComposeServicesYaml[currentServiceName]:
+        reqServices = dockerComposeServicesYaml[currentServiceName]["depends_on"]
+        for (index, reqServiceName) in enumerate(reqServices):
+          if not reqServiceName in dockerComposeServicesYaml:
+            envReqServicesIssues.append(reqServiceName + ' service required')
+      
+      return envReqServicesIssues
+    except Exception as err:
+      print(err)
+      pass
+    return []
 
   # #####################################
   # End Supporting functions
