@@ -1,5 +1,5 @@
 servicesDirectory = './services/'
 templatesDirectory = './.templates/'
-volumesDirectory = './.volumes/'
+volumesDirectory = './volumes/'
 tempDirectory = './.tmp/'
 scriptsDirectory = './scripts/'
