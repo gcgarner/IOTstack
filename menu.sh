@@ -110,7 +110,7 @@ function install_python3_and_deps() {
 			PYYAML_VERSION_GOOD="true"
 			BLESSED_GOOD="true"
 		else
-			echo "Failed to install Python" >&2
+			echo "Failed to install PyYaml and Blessed" >&2
 			exit 1
 		fi
 	fi

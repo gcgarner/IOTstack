@@ -88,10 +88,10 @@ def main():
     if not os.path.exists(serviceVolume):
       os.makedirs(serviceVolume, exist_ok=True)
     os.makedirs(serviceVolume + '/share', exist_ok=True)
-    os.makedirs(serviceVolume + '/config', exist_ok=True)
+    os.makedirs(serviceVolume + '/share/config', exist_ok=True)
 
     # Files copy
-    shutil.copy(r'%s/local.json' % serviceTemplate, r'%s/config/local.json' % serviceVolume)
+    shutil.copy(r'%s/local.json' % serviceTemplate, r'%s/share/config/local.json' % serviceVolume)
     return True
 
   # #####################################
