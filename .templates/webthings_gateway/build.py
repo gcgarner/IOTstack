@@ -11,7 +11,7 @@ def main():
   import shutil
   import sys
   
-  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
@@ -23,6 +23,7 @@ def main():
   global hideHelpText # Showing and hiding the help controls text
   global serviceService
 
+  serviceVolume = volumesDirectory + currentServiceName
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
 
@@ -84,13 +85,13 @@ def main():
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
     # Setup service directory
-    if not os.path.exists(serviceService):
-      os.makedirs(serviceService, exist_ok=True)
-      os.makedirs(serviceService + '/share', exist_ok=True)
-      os.makedirs(serviceService + '/config', exist_ok=True)
+    if not os.path.exists(serviceVolume):
+      os.makedirs(serviceVolume, exist_ok=True)
+    os.makedirs(serviceVolume + '/share', exist_ok=True)
+    os.makedirs(serviceVolume + '/config', exist_ok=True)
 
     # Files copy
-    shutil.copy(r'%s/local.json' % serviceTemplate, r'%s/config/local.json' % serviceService)
+    shutil.copy(r'%s/local.json' % serviceTemplate, r'%s/config/local.json' % serviceVolume)
     return True
 
   # #####################################
