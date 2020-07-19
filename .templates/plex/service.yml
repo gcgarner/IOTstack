@@ -1,8 +1,9 @@
   plex:
     image: linuxserver/plex
     container_name: plex
-    networks:
-      - hosts_nw
+    network_mode: host
+    # networks:
+    #   - hosts_nw
     environment:
       - PUID=1000
       - PGID=1000

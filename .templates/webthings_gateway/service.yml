@@ -1,11 +1,12 @@
   webthings_gateway:
     image: mozillaiot/gateway:latest
     container_name: webthings_gateway
-    networks:
-      - hosts_nw
+    network_mode: host
+    # networks:
+    #   - hosts_nw
     ports: # Changing this won't do anything. Change the port in local.json.
-    - 8083:8083
-    - 8084:8084
+    - 6090:6090
+    - 6091:6091
     #devices:
     # - /dev/ttyACM0:/dev/ttyACM0
     volumes:

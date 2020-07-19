@@ -150,11 +150,11 @@ def main():
     if needsRender == 1:
       print(term.clear())
       print(term.move_y(term.height // 16))
-      print(term.black_on_cornsilk4(term.center('IOTstack NodeRed Addons')))
+      print(term.black_on_cornsilk4(term.center('IOTstack Node Red Addons')))
       print("")
       print(term.center(commonTopBorder(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))
-      print(term.center("{bv}      Select NodeRed Addons (npm) to install                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center("{bv}      Select NodeRed Addons (npm) to install on initial run                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
       print(term.center(commonEmptyLine(renderMode)))
 
     if needsRender >= 1:
