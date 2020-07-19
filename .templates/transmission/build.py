@@ -79,7 +79,7 @@ def main():
   def postBuild():
     if not os.path.exists(serviceVolume):
       try:
-        os.mkdir(serviceVolume)
+        os.makedirs(serviceVolume, exist_ok=True)
         print("Created", serviceVolume, "for", currentServiceName)
       except Exception as err: 
         print("Error creating directory", currentServiceName)
@@ -94,7 +94,7 @@ def main():
 
     if not os.path.exists(serviceVolume + "/watch"):
       try:
-        os.mkdir(serviceVolume + "/watch")
+        os.makedirs(serviceVolume + "/watch", exist_ok=True)
         print("Created", serviceVolume + "/watch", "for", currentServiceName)
       except Exception as err: 
         print("Error creating watch directory", currentServiceName)
@@ -102,7 +102,7 @@ def main():
 
     if not os.path.exists(serviceVolume + "/config"):
       try:
-        os.mkdir(serviceVolume + "/config")
+        os.makedirs(serviceVolume + "/config", exist_ok=True)
         print("Created", serviceVolume + "/config", "for", currentServiceName)
       except Exception as err: 
         print("Error creating config directory", currentServiceName)
