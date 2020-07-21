@@ -9,6 +9,7 @@ def main():
   import time
   import yaml
   import math
+  import sys
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from blessed import Terminal
   global signal
@@ -352,18 +353,27 @@ def main():
     return True
 
   def loadService(serviceName, reload = False):
-    global dockerComposeServicesYaml
-    if reload == False:
-      if not serviceName in dockerComposeServicesYaml:
+    try:
+      global dockerComposeServicesYaml
+      if reload == False:
+        if not serviceName in dockerComposeServicesYaml:
+          serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
+          with open(r'%s' % serviceFilePath) as yamlServiceFile:
+            dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
+      else:
+        print("reload!")
+        time.sleep(1)
         serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
         with open(r'%s' % serviceFilePath) as yamlServiceFile:
           dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
-    else:
-      print("reload!")
-      time.sleep(1)
-      serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
-      with open(r'%s' % serviceFilePath) as yamlServiceFile:
-        dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
+    except Exception as err:
+      print("Error running build menu:", err)
+      print("Check the following:")
+      print("* YAML service name matches the folder name")
+      print("* Error in YAML file")
+      print("* YAML file is unreadable")
+      print("* Buildstack script was modified")
+      sys.exit(1)
 
     return True
 

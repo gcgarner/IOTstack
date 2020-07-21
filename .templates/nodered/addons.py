@@ -169,6 +169,10 @@ def main():
           print(term.center(commonEmptyLine(renderMode)))
         else: 
           print(term.center(commonEmptyLine(renderMode)))
+          print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}      Note: After initial startup installation, you must use the Palettes menu  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}        in the NodeRed WUI to add or remove addons from NodeRed.                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center("{bv}                                                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
           print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
           print(term.center("{bv}      [Space] to select or deselect addon                                       {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
           print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
