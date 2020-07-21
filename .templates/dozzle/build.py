@@ -146,10 +146,10 @@ def main():
     try:
       dozzleBuildOptions = []
       portNumber = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
-      dozzleBuildOptions.append([
-        "Change external WUI Port Number from: {port}".format(port=portNumber),
-        enterPortNumberExec
-      ])
+      # dozzleBuildOptions.append([
+      #   "Change external WUI Port Number from: {port}".format(port=portNumber),
+      #   enterPortNumberExec
+      # ])
     except: # Error getting port
       pass
     dozzleBuildOptions.append(["Go back", goBack])

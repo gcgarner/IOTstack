@@ -242,7 +242,6 @@ def main():
     paddingBefore = 4
 
     allIssues = []
-    checkForOptions()
 
     if selection >= paginationStartIndex + paginationSize:
       paginationStartIndex = selection - (paginationSize - 1) + 1
@@ -254,6 +253,7 @@ def main():
 
     try:
       if (renderType == 1):
+        checkForOptions()
         print(term.clear())
         print(term.move_y(7 - hotzoneLocation[0]))
         print(term.black_on_cornsilk4(term.center('IOTstack Build Menu')))
