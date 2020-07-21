@@ -570,6 +570,7 @@ def main():
               needsRender = 1
               if paginationSize == paginationToggle[0]:
                 paginationSize = paginationToggle[1]
+                paginationStartIndex = 0
               else:
                 paginationSize = paginationToggle[0]
             if key.name == 'KEY_DOWN':
