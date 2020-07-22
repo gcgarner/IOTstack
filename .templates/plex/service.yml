@@ -2,6 +2,8 @@
     image: linuxserver/plex
     container_name: plex
     network_mode: host
+    # networks:
+    #   - hosts_nw
     environment:
       - PUID=1000
       - PGID=1000
@@ -13,3 +15,7 @@
       #- ~/mnt/HDD/movies:/movies
       - ./volumes/plex/transcode:/transcode
     restart: unless-stopped
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

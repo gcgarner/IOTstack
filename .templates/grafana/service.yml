@@ -10,3 +10,9 @@
     volumes:
       - ./volumes/grafana/data:/var/lib/grafana
       - ./volumes/grafana/log:/var/log/grafana
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

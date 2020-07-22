@@ -1,13 +1,17 @@
   webthings_gateway:
-    image: mozillaiot/gateway:arm
+    image: mozillaiot/gateway:latest
     container_name: webthings_gateway
     network_mode: host
-    #ports:
-    # - 8080:8080
-    # - 4443:4443
+    # networks:
+    #   - hosts_nw
+    ports: # Changing this won't do anything. Change the port in local.json. Ensure values are synced.
+    - 4060:4060
+    - 4061:4061
     #devices:
     # - /dev/ttyACM0:/dev/ttyACM0
     volumes:
       - ./volumes/webthings_gateway/share:/home/node/.mozilla-iot
-
-      
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

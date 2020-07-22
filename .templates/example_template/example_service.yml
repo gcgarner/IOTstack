@@ -1,0 +1,11 @@
+containerNameGoesHere:
+    container_name: containerNameGoesHere
+    restart: unless-stopped
+    image: example_template/core:latest
+    ports:
+      - "8070:80/tcp" # Always ensure the WUI port is first in the ports list.
+      - "1900:1900/udp"
+    env_file:
+      - ./services/example_template.env
+    volumes:
+       - ./volumes/example_template/:/opt/example_template/

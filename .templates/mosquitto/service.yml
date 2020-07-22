@@ -9,6 +9,13 @@
     volumes:
       - ./volumes/mosquitto/data:/mosquitto/data
       - ./volumes/mosquitto/log:/mosquitto/log
+      - ./volumes/mosquitto/pwfile:/mosquitto/pwfile
       - ./services/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./services/mosquitto/filter.acl:/mosquitto/config/filter.acl
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
 

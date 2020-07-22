@@ -8,3 +8,9 @@
       #- /dev/ttyACM0:/dev/ttyACM0
     restart: unless-stopped
     network_mode: host
+    # networks:
+    #   - hosts_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

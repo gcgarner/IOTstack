@@ -1,8 +1,7 @@
   gitea:
     container_name: gitea
-    image: kapdap/gitea-rpi
+    image: gitea/gitea:latest
     restart: unless-stopped
-    user: "0"
     ports:
       - "7920:3000/tcp"
       - "2222:22/tcp"
@@ -12,3 +11,12 @@
       - ./volumes/gitea/data:/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

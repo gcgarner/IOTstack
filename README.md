@@ -12,8 +12,14 @@ https://youtu.be/a6mjt8tWUws
 
 
 ## Installation
-1. On the (RPi) lite image you will need to install git first
+### Automatic
+1. Run the following command:
+```
+curl -fsSL https://raw.githubusercontent.com/SensorsIot/IOTstack/master/install.sh | sh
+```
 
+### Manual
+1. Install git
 ```
 sudo apt-get install git -y
 ```
@@ -23,16 +29,16 @@ sudo apt-get install git -y
 git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 ```
 
-Due to some script restraints, this project needs to be stored in ~/IOTstack
-
-3. To enter the directory and run menu for installation options:
+## Running
+1. To enter the directory and run menu for installation options:
 ```
-cd ~/IOTstack && bash ./menu.sh
+cd ~/IOTstack
+bash ./menu.sh
 ```
 
-4. Install docker with the menu, restart your system.
+2. Install docker with the menu, restart your system.
 
-5. Run menu again to select your build options, then start docker-compose with
+3. Run menu again to select your build options, then start docker-compose with
 ```
 docker-compose up -d
 ```
@@ -55,3 +61,8 @@ docker-compose down
 ./menu.sh
 docker-compose up -d
 ```
+
+## Need help? Have a feature suggestion? Discovered a bug?
+We have a Discord server setup for discussions: https://discord.gg/ZpKHnks
+
+You can also report bugs or suggestions to our Github: https://github.com/SensorsIot/IOTstack/issues

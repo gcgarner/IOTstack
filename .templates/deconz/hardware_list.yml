@@ -1,0 +1,9 @@
+version: 1
+application: "IOTstack"
+service: "deconz"
+comment: "Deconz hardware check list."
+hardwarePaths:
+  - "/dev/ttyUSB0"
+  - "/dev/ttyACM0"
+  - "/dev/ttyAMA0"
+  - "/dev/ttyS0"

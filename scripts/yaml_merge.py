@@ -27,13 +27,21 @@ try:
   pathOutput = sys.argv[3]
 
   def mergeYaml(priorityYaml, defaultYaml):
-    if isinstance(priorityYaml, dict) and isinstance(defaultYaml, dict):
-      for k, v in defaultYaml.iteritems():
-        if k not in priorityYaml:
-          priorityYaml[k] = v
+    finalYaml = {}
+    if isinstance(defaultYaml, dict):
+      for dk, dv in defaultYaml.items():
+        if dk in priorityYaml:
+          finalYaml[dk] = mergeYaml(priorityYaml[dk], dv)
         else:
-          priorityYaml[k] = mergeYaml(priorityYaml[k], v)
-    return defaultYaml
+          finalYaml[dk] = dv
+      for pk, pv in priorityYaml.items():
+        if pk in finalYaml:
+          finalYaml[pk] = mergeYaml(finalYaml[pk], pv)
+        else:
+          finalYaml[pk] = pv
+    else:
+      finalYaml = defaultYaml
+    return finalYaml
 
   with open(r'%s' % pathTempDockerCompose) as fileTempDockerCompose:
     yamlTempDockerCompose = yaml.load(fileTempDockerCompose, Loader=yaml.SafeLoader)

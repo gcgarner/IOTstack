@@ -3,7 +3,12 @@
 /volumes/
 /backups/
 /.tmp/*
+__pycache__
 docker-compose.yml
+compose-override.yml
+.project_outofdate
 .outofdate
+.docker_notinstalled
+.docker_outofdate
 
 !.gitkeep

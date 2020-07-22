@@ -8,4 +8,10 @@
     ports:
       - 3306:3306
     restart: unless-stopped
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
 

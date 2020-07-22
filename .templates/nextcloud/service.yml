@@ -10,6 +10,12 @@
       - nextcloud_db
     links:
       - nextcloud_db
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
 
   nextcloud_db:
     image: linuxserver/mariadb
@@ -22,4 +28,9 @@
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
     restart: unless-stopped
-
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

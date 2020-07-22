@@ -6,3 +6,12 @@
     env_file: ./services/homebridge/homebridge.env
     volumes:
       - ./volumes/homebridge:/homebridge
+    ports: # Changing this won't do anything. Change the port in homebridge.env. Ensure values are synced
+      - 4040:4040
+    network_mode: host
+    # networks:
+    #   - hosts_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
