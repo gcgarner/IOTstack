@@ -528,7 +528,7 @@ def main():
 
     return True
 
-  def loadCurrentConfigs():
+  def loadCurrentConfigs(templatesList):
     global dockerComposeServicesYaml
     if os.path.exists(dockerSavePathOutput):
       print("Loading config fom: '%s'" % dockerSavePathOutput)
@@ -536,7 +536,10 @@ def main():
         previousConfigs = yaml.load(fileSavedConfigs, Loader=yaml.SafeLoader)
         if not previousConfigs == None:
           if "services" in previousConfigs:
-            dockerComposeServicesYaml = previousConfigs["services"]
+            dockerComposeServicesYaml = {}
+            for (index, serviceName) in enumerate(previousConfigs["services"]):
+              if serviceName in templatesList: # This ensures every service loaded has a template directory
+                dockerComposeServicesYaml[serviceName] = previousConfigs["services"][serviceName]
             return True
     dockerComposeServicesYaml = {}
     return False
@@ -558,7 +561,7 @@ def main():
     with term.fullscreen():
       print('Loading...')
       selection = 0
-      if loadCurrentConfigs():
+      if loadCurrentConfigs(templatesList):
         prepareMenuState()
       mainRender(menu, selection, 1)
       selectionInProgress = True

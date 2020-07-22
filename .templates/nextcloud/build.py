@@ -87,9 +87,17 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    global dockerComposeServicesYaml
     # Setup service directory
     if not os.path.exists(serviceService):
       os.makedirs(serviceService, exist_ok=True)
+
+    # Multi-service:
+    with open(r'%s/service.yml' % serviceTemplate) as objServiceFile:
+      servicesListed = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+
+    for (index, serviceName) in enumerate(servicesListed):
+      dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
 
     return True
 

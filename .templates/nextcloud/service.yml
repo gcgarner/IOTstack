@@ -12,6 +12,7 @@
       - nextcloud_db
     networks:
       - iotstack_nw
+      - nextcloud_internal
     logging:
       options:
         max-size: "5m"
@@ -19,9 +20,10 @@
 
   nextcloud_db:
     image: linuxserver/mariadb
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     container_name: nextcloud_db
     volumes:
-      - ./volumes/nextcloud/db:/config
+      - ./volumes/nextcloud/db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_PASSWORD=password
@@ -29,7 +31,7 @@
       - MYSQL_USER=nextcloud
     restart: unless-stopped
     networks:
-      - iotstack_nw
+      - nextcloud_internal
     logging:
       options:
         max-size: "5m"
