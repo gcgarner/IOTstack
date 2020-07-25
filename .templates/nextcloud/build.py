@@ -12,11 +12,12 @@ def main():
   import signal
   import shutil
   import sys
+  import subprocess
   from blessed import Terminal
   
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
-  from deps.consts import servicesDirectory, templatesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+  from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildSettingsFileName, buildCache, servicesFileName
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber, generateRandomString
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -27,8 +28,10 @@ def main():
   global hideHelpText # Showing and hiding the help controls text
   global serviceService
 
+  serviceVolume = volumesDirectory + currentServiceName
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
+  buildSettings = serviceService + buildSettingsFileName
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -83,6 +86,9 @@ def main():
 
   # This function is optional, and will run after the docker-compose.yml file is written to disk.
   def postBuild():
+    commandToRun = "chmod -R 0770 %s" % serviceVolume + '/html'
+    print('[Nextcloud::postBuild]: %s' % commandToRun)
+    subprocess.call(commandToRun, shell=True)
     return True
 
   # This function is optional, and will run just before the build docker-compose.yml code.
@@ -92,12 +98,77 @@ def main():
     if not os.path.exists(serviceService):
       os.makedirs(serviceService, exist_ok=True)
 
+    os.makedirs(serviceVolume, exist_ok=True)
+    os.makedirs(serviceVolume + '/html', exist_ok=True)
+
     # Multi-service:
-    with open(r'%s/service.yml' % serviceTemplate) as objServiceFile:
+    with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
       servicesListed = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
 
-    for (index, serviceName) in enumerate(servicesListed):
-      dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
+    try:
+      with open(r'%s' % buildCache) as objBuildCache:
+        oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+    except:
+      pass
+
+    buildCacheServices = {}
+    if "services" in oldBuildCache:
+      buildCacheServices = oldBuildCache["services"]
+
+    if not os.path.exists(serviceService):
+      os.makedirs(serviceService, exist_ok=True)
+
+    if os.path.exists(buildSettings):
+
+      # Password randomisation
+      with open(r'%s' % buildSettings) as objBuildSettingsFile:
+        nextCloudYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+        if (
+          nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
+          or nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+        ):
+          mySqlPassword = generateRandomString()
+          mySqlRootPassword = generateRandomString()
+          for (index, serviceName) in enumerate(servicesListed):
+            dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
+            if "environment" in servicesListed[serviceName]:
+              for (envIndex, envName) in enumerate(servicesListed[serviceName]["environment"]):
+                envName = envName.replace("%randomMySqlPassword%", mySqlPassword)
+                dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName.replace("%randomPassword%", mySqlRootPassword)
+
+          # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
+          if (nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
+            nextCloudYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+            with open(buildSettings, 'w') as outputFile:
+              yaml.dump(nextCloudYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        else: # Do nothing - don't change password
+          for (index, serviceName) in enumerate(buildCacheServices):
+            if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
+              dockerComposeServicesYaml[serviceName] = buildCacheServices[serviceName]
+            else:
+              dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
+
+    else:
+      print("NextCloud Warning: Build settings file not found, defaulting to new instance")
+      time.sleep(1)
+      mySqlPassword = generateRandomString()
+      mySqlRootPassword = generateRandomString()
+      for (index, serviceName) in enumerate(servicesListed):
+        dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
+        if "environment" in servicesListed[serviceName]:
+          for (envIndex, envName) in enumerate(servicesListed[serviceName]["environment"]):
+            envName = envName.replace("%randomMySqlPassword%", mySqlPassword)
+            dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName.replace("%randomPassword%", mySqlRootPassword)
+        nextCloudYamlBuildOptions = {
+          "version": "1",
+          "application": "IOTstack",
+          "service": "NextCloud",
+          "comment": "NextCloud Build Options"
+        }
+
+      nextCloudYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+      with open(buildSettings, 'w') as outputFile:
+        yaml.dump(nextCloudYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
 
     return True
 
@@ -138,7 +209,6 @@ def main():
     global needsRender
     selectionInProgress = False
     needsRender = 1
-    print("Back to build stack menu")
     return True
 
   def enterPortNumberExec():
@@ -146,6 +216,23 @@ def main():
     global needsRender
     global dockerComposeServicesYaml
     enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, createMenu)
+    needsRender = 1
+
+  def setPasswordOptions():
+    global needsRender
+    global hasRebuiltAddons
+    passwordOptionsMenuFilePath = "./.templates/{currentService}/passwords.py".format(currentService=currentServiceName)
+    with open(passwordOptionsMenuFilePath, "rb") as pythonDynamicImportFile:
+      code = compile(pythonDynamicImportFile.read(), passwordOptionsMenuFilePath, "exec")
+    execGlobals = {
+      "currentServiceName": currentServiceName,
+      "renderMode": renderMode
+    }
+    execLocals = {}
+    screenActive = False
+    exec(code, execGlobals, execLocals)
+    signal.signal(signal.SIGWINCH, onResize)
+    screenActive = True
     needsRender = 1
 
   def onResize(sig, action):
@@ -166,6 +253,10 @@ def main():
       ])
     except: # Error getting port
       pass
+    nextCloudBuildOptions.append([
+      "Database Password Options",
+      setPasswordOptions
+    ])
     nextCloudBuildOptions.append(["Go back", goBack])
 
   def runOptionsMenu():

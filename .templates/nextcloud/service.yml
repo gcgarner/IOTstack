@@ -4,7 +4,7 @@
     ports:
       - 9321:80
     volumes:
-      - ./volumes/nextcloud/html:/var/www/html
+      - ./volumes/nextcloud/html:/var/www/html:rw
     restart: unless-stopped
     depends_on: 
       - nextcloud_db
@@ -13,6 +13,11 @@
     networks:
       - iotstack_nw
       - nextcloud_internal
+    environment:
+      - MYSQL_HOST=nextcloud_db
+      - MYSQL_PASSWORD=%randomMySqlPassword% # %randomMySqlPassword% is overwritten during preBuild hook
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
     logging:
       options:
         max-size: "5m"
@@ -20,13 +25,13 @@
 
   nextcloud_db:
     image: linuxserver/mariadb
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    # command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     container_name: nextcloud_db
     volumes:
       - ./volumes/nextcloud/db:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=%randomPassword% # %randomPassword% is overwritten during preBuild hook
+      - MYSQL_PASSWORD=%randomMySqlPassword% # %randomMySqlPassword% is overwritten during preBuild hook
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
     restart: unless-stopped

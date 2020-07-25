@@ -35,6 +35,7 @@ def main():
     print("")
     print("Stack Started")
     time.sleep(2)
+    needsRender = 1
     return True
   
   def restartStack():
@@ -44,6 +45,7 @@ def main():
     print("")
     print("Stack Restarted")
     time.sleep(2)
+    needsRender = 1
     return True
 
   def stopStack():
@@ -53,6 +55,7 @@ def main():
     print("")
     print("Stack Stopped")
     time.sleep(2)
+    needsRender = 1
     return True
 
   def stopAllStack():
@@ -62,6 +65,7 @@ def main():
     print("")
     print("Stack Stopped. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(2)
+    needsRender = 1
     return True
 
   def pruneVolumes():
@@ -71,6 +75,7 @@ def main():
     print("")
     print("Stack Stopped. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(2)
+    needsRender = 1
     return True
 
   def updateAllContainers():
@@ -89,6 +94,7 @@ def main():
     print("")
     print("Stack Updated. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
+    needsRender = 1
     return True
 
   def deleteAndPruneVolumes():
@@ -98,6 +104,7 @@ def main():
     print("")
     print("Volume pruning completed. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
+    needsRender = 1
     return True
 
   def deleteAndPruneImages():
@@ -107,6 +114,20 @@ def main():
     print("")
     print("Image pruning completed. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
+    needsRender = 1
+    return True
+
+  def monitorLogs():
+    print("Monitor Logs:")
+    print("Press CTRL+X or CTRL+C to exit.")
+    time.sleep(2)
+    print("")
+    print("docker-compose logs -f")
+    time.sleep(0.5)
+    subprocess.call("docker-compose logs -f", shell=True)
+    print("")
+    time.sleep(0.5)
+    needsRender = 1
     return True
 
   def goBack():
@@ -120,6 +141,7 @@ def main():
     ["Start stack", startStack],
     ["Restart stack", restartStack],
     ["Stop stack", stopStack],
+    ["Monitor Logs", monitorLogs],
     ["Stop ALL running docker containers", stopAllStack],
     ["Update all containers (may take a long time)", updateAllContainers],
     ["Delete all stopped containers and docker volumes (prune volumes)", deleteAndPruneVolumes],
@@ -236,6 +258,7 @@ def main():
             if key.name == 'KEY_UP':
               menuNavigateDirection -= 1
             if key.name == 'KEY_ENTER':
+              mainRender(1, mainMenuList, currentMenuItemIndex)
               runSelection(currentMenuItemIndex)
               if dockerCommandsSelectionInProgress == False:
                 return True

@@ -131,7 +131,6 @@ def main():
     global needsRender
     selectionInProgress = False
     needsRender = 1
-    print("Back to build stack menu")
     return True
 
   def enterPortNumberExec():

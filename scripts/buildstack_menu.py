@@ -11,6 +11,7 @@ def main():
   import math
   import sys
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
+  from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildCache, envFile, dockerPathOutput, servicesFileName, composeOverrideFile
   from blessed import Terminal
   global signal
   global renderMode
@@ -22,18 +23,13 @@ def main():
   global lastSelection
 
   # Constants
-  templateDirectory = './.templates'
-  serviceFile = 'service.yml'
   buildScriptFile = 'build.py'
-  dockerPathOutput = './docker-compose.yml'
-  dockerSavePathOutput = './services/docker-compose.save.yml'
-  composeOverrideFile = './compose-override.yml'
-  envFile = './.templates/env.yml'
+  dockerSavePathOutput = buildCache
 
   # Runtime vars
   menu = []
   dockerComposeServicesYaml = {}
-  templateDirectoryFolders = next(os.walk(templateDirectory))[1]
+  templatesDirectoryFolders = next(os.walk(templatesDirectory))[1]
   term = Terminal()
   hotzoneLocation = [7, 0] # Top text
   paginationToggle = [10, term.height - 21] # Top text + controls text
@@ -82,7 +78,7 @@ def main():
     except Exception as err: 
       print("Issue running build:")
       print(err)
-      time.sleep(3)
+      input("Press Enter to continue...")
       return False
 
   def mergeYaml(priorityYaml, defaultYaml):
@@ -102,11 +98,11 @@ def main():
       finalYaml = defaultYaml
     return finalYaml
 
-  def generateTemplateList(templateDirectoryFolders):
-    templateDirectoryFolders.sort()
+  def generateTemplateList(templatesDirectoryFolders):
+    templatesDirectoryFolders.sort()
     templateListDirectories = []
-    for directory in templateDirectoryFolders:
-      serviceFilePath = templateDirectory + '/' + directory + '/' + serviceFile
+    for directory in templatesDirectoryFolders:
+      serviceFilePath = templatesDirectory + '/' + directory + '/' + servicesFileName
       if os.path.exists(serviceFilePath):
         templateListDirectories.append(directory)
 
@@ -217,7 +213,7 @@ def main():
       renderOffsetLastSelection = lastSelection - paginationStartIndex
       renderOffsetCurrentSelection = selection - paginationStartIndex
       lineText = generateLineText(menu[lastSelection][0], paddingBefore=paddingBefore)
-      toPrint = '@@{title}{t.normal}'.format(t=term, title=lineText)
+      toPrint = '{title}{t.normal}'.format(t=term, title=lineText)
       print('{t.move_y(lastSelection)}{title}'.format(t=term, title=toPrint))
       # print(toPrint)
       print(renderOffsetCurrentSelection, lastSelection, renderOffsetLastSelection)
@@ -340,13 +336,13 @@ def main():
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
       if reload == False:
         if not checkedMenuItem in dockerComposeServicesYaml:
-          serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
+          serviceFilePath = templatesDirectory + '/' + checkedMenuItem + '/' + servicesFileName
           with open(r'%s' % serviceFilePath) as yamlServiceFile:
             dockerComposeServicesYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
       else:
         print("reload!")
         time.sleep(1)
-        serviceFilePath = templateDirectory + '/' + checkedMenuItem + '/' + serviceFile
+        serviceFilePath = templatesDirectory + '/' + checkedMenuItem + '/' + servicesFileName
         with open(r'%s' % serviceFilePath) as yamlServiceFile:
           dockerComposeServicesYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
 
@@ -357,13 +353,13 @@ def main():
       global dockerComposeServicesYaml
       if reload == False:
         if not serviceName in dockerComposeServicesYaml:
-          serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
+          serviceFilePath = templatesDirectory + '/' + serviceName + '/' + servicesFileName
           with open(r'%s' % serviceFilePath) as yamlServiceFile:
             dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
       else:
         print("reload!")
         time.sleep(1)
-        serviceFilePath = templateDirectory + '/' + serviceName + '/' + serviceFile
+        servicesFileNamePath = templatesDirectory + '/' + serviceName + '/' + servicesFileName
         with open(r'%s' % serviceFilePath) as yamlServiceFile:
           dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
     except Exception as err:
@@ -380,8 +376,9 @@ def main():
   def checkForIssues():
     global dockerComposeServicesYaml
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
-      buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
+      buildScriptPath = templatesDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
+        try:
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
           execGlobals = {
@@ -398,19 +395,30 @@ def main():
               "currentServiceName": checkedMenuItem
             }
             execLocals = locals()
-            exec(code, execGlobals, execLocals)
-            if "issues" in execGlobals and len(execGlobals["issues"]) > 0:
-              menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = execGlobals["issues"]
-            else:
-              menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = []
+            try:
+              exec(code, execGlobals, execLocals)
+              if "issues" in execGlobals and len(execGlobals["issues"]) > 0:
+                menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = execGlobals["issues"]
+              else:
+                menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = []
+            except Exception as err:
+              print("Error running checkForIssues on '%s'" % checkedMenuItem)
+              print(err)
+              input("Press Enter to continue...")
           else:
             menu[getMenuItemIndexByService(checkedMenuItem)][1]["issues"] = []
+        except Exception as err:
+          print("Error running checkForIssues on '%s'" % checkedMenuItem)
+          print(err)
+          input("Press any key to exit...")
+          sys.exit(1)
 
   def checkForOptions():
     global dockerComposeServicesYaml
     for (index, menuItem) in enumerate(menu):
-      buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
+      buildScriptPath = templatesDirectory + '/' + menuItem[0] + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
+        try:
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
           execGlobals = {
@@ -425,11 +433,16 @@ def main():
             menu[getMenuItemIndexByService(menuItem[0])][1]["buildHooks"] = {}
           if "options" in execGlobals["buildHooks"] and execGlobals["buildHooks"]["options"]:
             menu[getMenuItemIndexByService(menuItem[0])][1]["buildHooks"]["options"] = True
+        except Exception as err:
+          print("Error running checkForOptions on '%s'" % menuItem[0])
+          print(err)
+          input("Press any key to exit...")
+          sys.exit(1)
 
   def runPrebuildHook():
     global dockerComposeServicesYaml
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
-      buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
+      buildScriptPath = templatesDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
@@ -452,6 +465,7 @@ def main():
           except Exception as err:
             print("Error running PreBuildHook on '%s'" % checkedMenuItem)
             print(err)
+            input("Press Enter to continue...")
             try: # If the prebuild hook modified the docker-compose object, pull it from the script back to here.
               dockerComposeServicesYaml = execGlobals["dockerComposeServicesYaml"]
             except:
@@ -459,7 +473,7 @@ def main():
 
   def runPostBuildHook():
     for (index, checkedMenuItem) in enumerate(checkedMenuItems):
-      buildScriptPath = templateDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
+      buildScriptPath = templatesDirectory + '/' + checkedMenuItem + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
           with open(buildScriptPath, "rb") as pythonDynamicImportFile:
             code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
@@ -482,12 +496,13 @@ def main():
           except Exception as err:
             print("Error running PostBuildHook on '%s'" % checkedMenuItem)
             print(err)
+            input("Press Enter to continue...")
 
   def executeServiceOptions():
     global dockerComposeServicesYaml
     menuItem = menu[selection]
     if menu[selection][1]["checked"] and "buildHooks" in menuItem[1] and "options" in menuItem[1]["buildHooks"] and menuItem[1]["buildHooks"]["options"]:
-      buildScriptPath = templateDirectory + '/' + menuItem[0] + '/' + buildScriptFile
+      buildScriptPath = templatesDirectory + '/' + menuItem[0] + '/' + buildScriptFile
       if os.path.exists(buildScriptPath):
         with open(buildScriptPath, "rb") as pythonDynamicImportFile:
           code = compile(pythonDynamicImportFile.read(), buildScriptPath, "exec")
@@ -549,7 +564,7 @@ def main():
     paginationToggle = [10, term.height - 25]
     mainRender(menu, selection, 1)
 
-  templatesList = generateTemplateList(templateDirectoryFolders)
+  templatesList = generateTemplateList(templatesDirectoryFolders)
   for directory in templatesList:
     menu.append([directory, { "checked": False, "issues": None }])
 

@@ -1,4 +1,11 @@
 import time
+import string
+import random
+
+def generateRandomString(size = 0, chars = string.ascii_uppercase + string.ascii_lowercase + string.digits):
+  if size == 0:
+    size = random.randint(16, 24)
+  return ''.join(random.choice(chars) for _ in range(size))
 
 def getExternalPorts(serviceName, dockerComposeServicesYaml):
   externalPorts = []
