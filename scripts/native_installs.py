@@ -30,7 +30,7 @@ def main():
       mainRender(1, mainMenuList, currentMenuItemIndex)
 
   def installHassIo():
-    print("Install Hass.IO")
+    print("Install Home Assistant Supervisor")
     print("./.native/hassio.sh")
     subprocess.call("./.native/hassio.sh", shell=True)
     print("")
@@ -67,7 +67,7 @@ def main():
     return True
 
   mainMenuList = [
-    ["Hass.io", installHassIo],
+    ["Hass.io (Supervisor)", installHassIo],
     ["RTL_433", installRtl433],
     ["RPIEasy", installRpiEasy],
     ["Back", goBack]
