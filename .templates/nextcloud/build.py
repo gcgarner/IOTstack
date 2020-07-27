@@ -105,6 +105,7 @@ def main():
     with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
       servicesListed = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
 
+    oldBuildCache = {}
     try:
       with open(r'%s' % buildCache) as objBuildCache:
         oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)

@@ -12,6 +12,7 @@ def main():
   import sys
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildCache, envFile, dockerPathOutput, servicesFileName, composeOverrideFile
+  from deps.yaml_merge import mergeYaml
   from blessed import Terminal
   global signal
   global renderMode
@@ -80,23 +81,6 @@ def main():
       print(err)
       input("Press Enter to continue...")
       return False
-
-  def mergeYaml(priorityYaml, defaultYaml):
-    finalYaml = {}
-    if isinstance(defaultYaml, dict):
-      for dk, dv in defaultYaml.items():
-        if dk in priorityYaml:
-          finalYaml[dk] = mergeYaml(priorityYaml[dk], dv)
-        else:
-          finalYaml[dk] = dv
-      for pk, pv in priorityYaml.items():
-        if pk in finalYaml:
-          finalYaml[pk] = mergeYaml(finalYaml[pk], pv)
-        else:
-          finalYaml[pk] = pv
-    else:
-      finalYaml = defaultYaml
-    return finalYaml
 
   def generateTemplateList(templatesDirectoryFolders):
     templatesDirectoryFolders.sort()
