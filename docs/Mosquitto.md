@@ -11,6 +11,7 @@
 - `docker-compose.yml` ⇒ ~/IOTstack/docker-compose.yml
 - `mosquitto.conf` ⇒ ~/IOTstack/services/mosquitto/mosquitto.conf
 - `mosquitto.log` ⇒ ~/IOTstack/volumes/mosquitto/log/mosquitto.log
+- `service.yml` ⇒ ~/IOTstack/.templates/mosquitto/service.yml
 - `volumes/mosquitto` ⇒ ~/IOTstack/volumes/mosquitto/
 
 ## Logging
@@ -166,3 +167,46 @@ If you have a use-case that needs Mosquitto to run with root privileges:
 	```
 	
 > <small>A clean install of Mosquitto via the IOTstack menu sets everything in `volumes/mosquitto` to user and group 1883. That permission structure will still work if you change Mosquitto to run with root privileges. However, running as root **may** have the side effect of changing privilege levels within `volumes/mosquitto`. Keep this in mind if you decide to switch back to running Mosquitto as user 1883 because it is less likely to work.</small>
+
+## Port 9001
+
+In earlier versions of IOTstack, `service.yml` included two port mappings which were included in `docker-compose.yml` when Mosquitto was chosen in the menu:
+
+```
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+```
+
+[Issue 67](https://github.com/SensorsIot/IOTstack/issues/67) explored the topic of port 9001 and showed that:
+
+* The base image for mosquitto did not expose port 9001; and
+* The running container was not listening to port 9001.
+
+On that basis, the mapping for port 9001 was removed from `service.yml`.
+
+If you have a use-case that needs port 9001, you can re-enable support by:
+
+1. Inserting the port mapping under the `mosquitto` definition in `docker-compose.yml`:
+
+	```
+	       - "9001:9001"
+	```
+
+2. Inserting the following lines in `mosquitto.conf`:
+
+	```
+	listener 1883
+	listener 9001
+	```
+	
+	You need **both** lines. If you omit 1883 then mosquitto will stop listening to port 1883 and will only listen to port 9001.
+
+3. Restarting the container:
+
+	```
+	$ cd ~/IOTstack
+	$ docker-compose up -d
+	```
+
+Please consider raising an issue to document your use-case. If you think your use-case has general application then please also consider creating a pull request to make the changes permanent.
