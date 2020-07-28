@@ -31,8 +31,8 @@ def main():
 
   def installHassIo():
     print("Install Home Assistant Supervisor")
-    print("./.native/hassio.sh")
-    subprocess.call("./.native/hassio.sh", shell=True)
+    print("./.native/hassio_supervisor.sh")
+    subprocess.call("./.native/hassio_supervisor.sh", shell=True)
     print("")
     print("Preinstallation complete. Your system may run slow for a few hours as Hass.io installs its services.")
     print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
