@@ -44,3 +44,5 @@ addons:
     - "node-red-contrib-heater-controller"
     - "node-red-contrib-deconz"
     - "node-red-contrib-generic-ble"
+    - "node-red-contrib-zigbee2mqtt"
+    - "node-red-contrib-themes/midnight-red"
