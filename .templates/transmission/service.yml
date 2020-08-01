@@ -4,7 +4,7 @@
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Europe/Rome
+      - TZ=Etc/UTC
     volumes:
       - ./volumes/transmission/config:/config
       - ./volumes/transmission/downloads:/downloads

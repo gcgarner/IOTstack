@@ -10,7 +10,6 @@ def main():
   import time
   import yaml
   import signal
-  import shutil
   import sys
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
@@ -101,9 +100,6 @@ def main():
     # Setup service directory
     if not os.path.exists(serviceService):
       os.makedirs(serviceService, exist_ok=True)
-
-    # Files copy
-    shutil.copy(r'%s/nodered.env' % serviceTemplate, r'%s/nodered.env' % serviceService)
 
     # Other prebuild steps
     print("Starting NodeRed Build script")

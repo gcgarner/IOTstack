@@ -8,7 +8,6 @@ haltOnErrors = True
 def main():
   import os
   import time
-  from shutil import copyfile
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory
@@ -77,20 +76,6 @@ def main():
 
   # This function is optional, and will run after the docker-compose.yml file is written to disk.
   def postBuild():
-    if not os.path.exists(serviceService):
-      try:
-        os.mkdir(serviceService)
-        print("Created", serviceService, "for", currentServiceName)
-      except Exception as err: 
-        print("Error creating directory", currentServiceName)
-        print(err)
-    if not os.path.exists(serviceService + '/grafana.env'):
-      try:
-        copyfile(serviceTemplate + '/grafana.env', serviceService + '/grafana.env')
-      except Exception as err: 
-        print("Error copying file for", currentServiceName)
-        print(err)
-        time.sleep(5)
     return True
 
   # This function is optional, and will run just before the build docker-compose.yml code.
@@ -102,22 +87,12 @@ def main():
   # #####################################
 
   def checkForIssues():
-    envFileIssues = checkEnvFiles()
-    if (len(envFileIssues) > 0):
-      issues["envFileIssues"] = envFileIssues
-
     for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
         portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeServicesYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
-
-  def checkEnvFiles():
-    envFileIssues = []
-    if not os.path.exists(serviceTemplate + '/grafana.env'):
-      envFileIssues.append(serviceTemplate + '/grafana.env does not exist')
-    return envFileIssues
 
   ############################
   # Menu Logic

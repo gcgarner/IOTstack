@@ -2,7 +2,7 @@
     image: nextcloud
     container_name: nextcloud
     ports:
-      - 9321:80
+      - "9321:80"
     volumes:
       - ./volumes/nextcloud/html:/var/www/html:rw
     restart: unless-stopped

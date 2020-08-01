@@ -5,7 +5,7 @@ import signal
 def main():
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
-  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName
   import time
   import subprocess
   import yaml
@@ -37,7 +37,7 @@ def main():
 
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
-  hardwareListFile = serviceTemplate + "/hardware_list.yml"
+  hardwareListFileSource = serviceTemplate + '/hardware_list.yml'
   
   def goBack():
     global dockerCommandsSelectionInProgress
@@ -195,12 +195,12 @@ def main():
 
   def loadAddonsMenu():
     global mainMenuList
-    if os.path.exists(hardwareListFile):
-      with open(r'%s' % hardwareListFile) as objHardwareListFile:
+    if os.path.exists(hardwareListFileSource):
+      with open(r'%s' % hardwareListFileSource) as objHardwareListFile:
         hardwareKnown = yaml.load(objHardwareListFile, Loader=yaml.SafeLoader)
         knownHardwareList = hardwareKnown["hardwarePaths"]
-        if os.path.exists(serviceService + '/hardware_selected.yml'):
-          with open(r'%s' % serviceService + '/hardware_selected.yml') as objSavedHardwareListFile:
+        if os.path.exists("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)):
+          with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objSavedHardwareListFile:
             savedHardwareList = yaml.load(objSavedHardwareListFile, Loader=yaml.SafeLoader)
             savedHardware = savedHardwareList["hardware"]
  
@@ -218,7 +218,8 @@ def main():
               mainMenuList.append([hardwarePath, { "checked": False }])
 
     else:
-      print("Error: '{hardwareListFile}' file doesn't exist.".format(hardwareListFile=hardwareListFile))
+      print("Error: '{hardwareListFile}' file doesn't exist.".format(hardwareListFile=hardwareListFileSource))
+      input("Press Enter to continue...")
 
   def checkMenuItem(selection):
     global mainMenuList
@@ -235,14 +236,14 @@ def main():
         "version": "1",
         "application": "IOTstack",
         "service": "deconz",
-        "comment": "Selected DeConz hardware",
+        "comment": "Build Settings",
         "hardware": []
       }
       for (index, addon) in enumerate(mainMenuList):
         if addon[1]["checked"]:
           deconzYamlHardwareList["hardware"].append(addon[0])
 
-      with open(r'%s/hardware_selected.yml' % serviceService, 'w') as outputFile:
+      with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName), 'w') as outputFile:
         yaml.dump(deconzYamlHardwareList, outputFile, default_flow_style=False, sort_keys=False)
 
     except Exception as err: 

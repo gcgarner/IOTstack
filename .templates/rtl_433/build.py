@@ -89,7 +89,6 @@ def main():
 
     # Files copy
     shutil.copy(r'%s/Dockerfile' % serviceTemplate, r'%s/Dockerfile' % serviceService)
-    shutil.copy(r'%s/rtl_433.env' % serviceTemplate, r'%s/rtl_433.env' % serviceService)
 
     # TODO: Do directoryfix.sh in python.
     return True
@@ -99,21 +98,12 @@ def main():
   # #####################################
 
   def checkForIssues():
-    envFileIssues = checkEnvFiles()
-    if (len(envFileIssues) > 0):
-      issues["envFileIssues"] = envFileIssues
     for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
         portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeServicesYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
-
-  def checkEnvFiles():
-    envFileIssues = []
-    if not os.path.exists(serviceTemplate + '/rtl_433.env'):
-      envFileIssues.append(serviceTemplate + '/rtl_433.env does not exist')
-    return envFileIssues
 
   # #####################################
   # End Supporting functions

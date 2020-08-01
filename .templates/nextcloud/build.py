@@ -10,7 +10,6 @@ def main():
   import time
   import yaml
   import signal
-  import shutil
   import sys
   import subprocess
   from blessed import Terminal

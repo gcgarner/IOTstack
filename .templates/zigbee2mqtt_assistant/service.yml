@@ -2,10 +2,13 @@ zigbee2mqtt_assistant:
   container_name: zigbee2mqtt_assistant
   image: carldebilly/zigbee2mqttassistant
   restart: unless-stopped
-  env_file:
-    - ./services/zigbee2mqtt_assistant/zigbee2mqtt_assistant.env
+  environment:
+    # - TZ=Etc/UTC
+    - Z2MA_SETTINGS__MQTTSERVER=mosquitto
+    # - Z2MA_SETTINGS__MQTTUSERNAME=MQTTUSER
+    # - Z2MA_SETTINGS__MQTTPASSWORD=MQTTPASS
   ports:
-    - 8880:80
+    - "8880:80"
   environment:
     - VIRTUAL_HOST=~^zigbee2mqtt_assistant\..*\.xip\.io
     - VIRTUAL_PORT=8880

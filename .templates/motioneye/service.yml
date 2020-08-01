@@ -3,8 +3,8 @@
     container_name: "motioneye"
     restart: unless-stopped
     ports:
-      - 8765:8765 
-      - 8081:8081
+      - "8765:8765"
+      - "8081:8081"
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./volumes/motioneye/etc_motioneye:/etc/motioneye

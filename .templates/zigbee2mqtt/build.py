@@ -8,7 +8,6 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import shutil
   import sys
   
   from deps.consts import servicesDirectory, templatesDirectory

@@ -1,12 +1,18 @@
   mariadb:
     image: linuxserver/mariadb
     container_name: mariadb
-    env_file:
-      - ./services/mariadb/mariadb.env
+    environment:
+      - TZ=Etc/UTC
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=ROOT_ACCESS_PASSWORD
+      # - MYSQL_DATABASE=USER_DB_NAME
+      # - MYSQL_USER=MYSQL_USER
+      # - MYSQL_PASSWORD=DATABASE_PASSWORD
     volumes:
       - ./volumes/mariadb/config:/config
     ports:
-      - 3306:3306
+      - "3306:3306"
     restart: unless-stopped
     networks:
       - iotstack_nw

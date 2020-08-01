@@ -8,7 +8,6 @@ haltOnErrors = True
 def main():
   import os
   import time
-  from shutil import copyfile
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory

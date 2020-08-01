@@ -5,8 +5,8 @@
     # networks:
     #   - hosts_nw
     ports: # Changing this won't do anything. Change the port in local.json. Ensure values are synced.
-    - 4060:4060
-    - 4061:4061
+    - "4060:4060"
+    - "4061:4061"
     #devices:
     # - /dev/ttyACM0:/dev/ttyACM0
     volumes:

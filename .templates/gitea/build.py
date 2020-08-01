@@ -10,7 +10,6 @@ def main():
   import time
   import yaml
   import signal
-  import shutil
   import sys
   from blessed import Terminal
   
@@ -87,12 +86,6 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
-    # Setup service directory
-    if not os.path.exists(serviceService):
-      os.makedirs(serviceService, exist_ok=True)
-
-    # Files copy
-    shutil.copy(r'%s/gitea.env' % serviceTemplate, r'%s/gitea.env' % serviceService)
     return True
 
   # #####################################

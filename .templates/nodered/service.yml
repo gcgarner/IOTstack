@@ -4,9 +4,10 @@
     restart: unless-stopped
     user: "0"
     privileged: true
-    env_file: ./services/nodered/nodered.env
+    environment:
+      - TZ=Etc/UTC
     ports:
-      - 1880:1880
+      - "1880:1880"
     volumes:
       - ./volumes/nodered/data:/data
       - /var/run/docker.sock:/var/run/docker.sock

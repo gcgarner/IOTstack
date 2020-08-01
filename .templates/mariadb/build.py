@@ -8,7 +8,6 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import shutil
   import sys
   
   from deps.consts import servicesDirectory, templatesDirectory
@@ -83,12 +82,6 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
-    # Setup service directory
-    if not os.path.exists(serviceService):
-      os.makedirs(serviceService, exist_ok=True)
-
-    # Files copy
-    shutil.copy(r'%s/mariadb.env' % serviceTemplate, r'%s/mariadb.env' % serviceService)
     return True
 
   # #####################################
@@ -96,21 +89,12 @@ def main():
   # #####################################
 
   def checkForIssues():
-    envFileIssues = checkEnvFiles()
-    if (len(envFileIssues) > 0):
-      issues["envFileIssues"] = envFileIssues
     for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
         portConflicts = checkPortConflicts(serviceName, currentServicePorts, dockerComposeServicesYaml)
         if (len(portConflicts) > 0):
           issues["portConflicts"] = portConflicts
-
-  def checkEnvFiles():
-    envFileIssues = []
-    if not os.path.exists(serviceTemplate + '/mariadb.env'):
-      envFileIssues.append(serviceTemplate + '/mariadb.env does not exist')
-    return envFileIssues
 
   # #####################################
   # End Supporting functions

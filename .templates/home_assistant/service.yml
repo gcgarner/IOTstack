@@ -3,7 +3,7 @@ home_assistant:
   image: homeassistant/home-assistant:stable
   restart: unless-stopped
   ports:
-    - 8123:8123
+    - "8123:8123"
   volumes:
     - /etc/localtime:/etc/localtime:ro
     - ./volumes/home_assistant:/config

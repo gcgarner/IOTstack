@@ -10,12 +10,11 @@ def main():
   import time
   import yaml
   import signal
-  import shutil
   import sys
   from blessed import Terminal
   
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
-  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
@@ -92,7 +91,7 @@ def main():
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
     global dockerComposeServicesYaml
-    with open(r'%s/hardware_selected.yml' % serviceService) as objHardwareListFile:
+    with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objHardwareListFile:
       hardwareList = yaml.load(objHardwareListFile, Loader=yaml.SafeLoader)
     try:
       if "deconz" in dockerComposeServicesYaml:
@@ -120,8 +119,8 @@ def main():
 
   def checkFiles():
     fileIssues = []
-    if not os.path.exists(serviceService + '/hardware_selected.yml'):
-      fileIssues.append(serviceService + '/hardware_selected.yml does not exist. Select hardware in options to fix.')
+    if not os.path.exists("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)):
+      fileIssues.append(serviceService + '/build_settings.yml does not exist. Select hardware in options to fix.')
     return fileIssues
 
   # #####################################
@@ -202,7 +201,7 @@ def main():
       pass
 
     
-    if os.path.exists(serviceService + '/hardware_selected.yml'):
+    if os.path.exists("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)):
       deconzBuildOptions.insert(0, ["Change selected hardware", selectDeconzHardware])
     else:
       deconzBuildOptions.insert(0, ["Select hardware", selectDeconzHardware])
@@ -251,13 +250,13 @@ def main():
       renderHotZone(term, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      if os.path.exists(serviceService + '/hardware_selected.yml'):
+      if os.path.exists("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)):
         if hasRebuiltHardwareSelection:
           print(term.center(commonEmptyLine(renderMode)))
-          print(term.center('{bv}     {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}                    {bv}'.format(t=term, text="Hardware list has been rebuilt: hardware_selected.yml", bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center('{bv}      {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}                      {bv}'.format(t=term, text="Hardware list has been rebuilt: build_settings.yml", bv=specialChars[renderMode]["borderVertical"])))
         else:
           print(term.center(commonEmptyLine(renderMode)))
-          print(term.center('{bv}     {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}           {bv}'.format(t=term, text="Using existing hardware_selected.yml for hardware installation", bv=specialChars[renderMode]["borderVertical"])))
+          print(term.center('{bv}      {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}             {bv}'.format(t=term, text="Using existing build_settings.yml for hardware installation", bv=specialChars[renderMode]["borderVertical"])))
       else:
         print(term.center(commonEmptyLine(renderMode)))
         print(term.center(commonEmptyLine(renderMode)))
