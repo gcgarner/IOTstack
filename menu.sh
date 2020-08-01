@@ -36,6 +36,20 @@ function minimum_version_check() {
 	
 	VERSION_GOOD="Unknown"
 
+	NUMB_REG='^[0-9]+$'
+	if ! [[ $CURR_VERSION_MAJOR =~ $NUMB_REG ]] ; then
+		echo "$VERSION_GOOD"
+		return 1
+	fi
+	if ! [[ $CURR_VERSION_MINOR =~ $NUMB_REG ]] ; then
+		echo "$VERSION_GOOD"
+		return 1
+	fi
+	if ! [[ $CURR_VERSION_BUILD =~ $NUMB_REG ]] ; then
+		echo "$VERSION_GOOD"
+		return 1
+	fi
+
 	if [ -z "$CURR_VERSION_MAJOR" ]; then
 		echo "$VERSION_GOOD"
 		return 1
@@ -135,18 +149,18 @@ function do_python3_checks() {
 	BLESSED_GOOD="false"
 
 	if command_exists $PYTHON_CMD && command_exists pip3; then
-		PYTHON_VERSION=$($PYTHON_CMD --version)
+		PYTHON_VERSION=$($PYTHON_CMD --version 2>/dev/null)
 		PYTHON_VERSION_MAJOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
 		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d'.' -f 2)
 		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d'.' -f 3)
 
-		PYYAML_VERSION=$($VGET_CMD --pyyaml-version)
+		PYYAML_VERSION=$($VGET_CMD --pyyaml-version 2>/dev/null)
 		PYYAML_VERSION="${PYYAML_VERSION:-Unknown}"
 		PYYAML_VERSION_MAJOR=$(echo "$PYYAML_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
 		PYYAML_VERSION_MINOR=$(echo "$PYYAML_VERSION"| cut -d'.' -f 2)
 		PYYAML_VERSION_BUILD=$(echo "$PYYAML_VERSION"| cut -d'.' -f 3)
 
-		BLESSED_VERSION=$($VGET_CMD --blessed-version)
+		BLESSED_VERSION=$($VGET_CMD --blessed-version 2>/dev/null)
 		BLESSED_VERSION="${BLESSED_VERSION:-Unknown}"
 		BLESSED_VERSION_MAJOR=$(echo "$BLESSED_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
 		BLESSED_VERSION_MINOR=$(echo "$BLESSED_VERSION"| cut -d'.' -f 2)
@@ -211,10 +225,20 @@ function do_env_setup() {
 function do_docker_checks() {
 	if command_exists docker; then
 		DOCKER_VERSION_GOOD="false"
-		DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
-		if [ ! -z "$DOCKER_VERSION" ]; then
+		DOCKER_VERSION=$(docker version -f "{{.Server.Version}}" 2>&1)
+
+		if [[ "$DOCKER_VERSION" == *"Cannot connect to the Docker daemon"* ]]; then
+			echo "Error getting docker version. Error when connecting to docker daemon. Check that docker is running."
+			if (whiptail --title "Docker and Docker-Compose" --yesno "Error getting docker version. Error when connecting to docker daemon. Check that docker is running.\n\nExit?" 20 78); then
+				exit 1
+			fi
+			return 0
+		fi
+		
+		if [[ -z "$DOCKER_VERSION" ]]; then
 			echo "Error getting docker version. Error when running docker command. Check that docker is installed correctly."
 		fi
+		
 		DOCKER_VERSION_MAJOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 1)
 		DOCKER_VERSION_MINOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 2)
 		DOCKER_VERSION_BUILD=$(echo "$DOCKER_VERSION"| cut -d'.' -f 3)
