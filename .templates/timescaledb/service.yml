@@ -7,7 +7,7 @@
       POSTGRES_PASSWORD=postpassword
       POSTGRES_DB=postdb
     ports:
-      - 5432:5432
+      - "5432:5432"
     volumes:
       - ./volumes/timescaledb/data:/var/lib/postgresql/data
     networks:

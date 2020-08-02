@@ -114,6 +114,15 @@ def checkPortConflicts(serviceName, currentPorts, dockerComposeServicesYaml):
         portConflicts.append([servicePort, serviceName])
   return portConflicts
 
+def checkDependsOn(serviceName, dockerComposeServicesYaml):
+  missingServices = []
+  yamlService = dockerComposeServicesYaml[serviceName]
+  if "depends_on" in yamlService:
+    for (index, dependsOnName) in enumerate(yamlService["depends_on"]):
+      if not dependsOnName in dockerComposeServicesYaml:
+        missingServices.append([dependsOnName, serviceName])
+  return missingServices
+
 def enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, createMenuFn):
   newPortNumber = ""
   try:

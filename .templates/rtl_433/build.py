@@ -12,7 +12,7 @@ def main():
   import sys
   
   from deps.consts import servicesDirectory, templatesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber, checkDependsOn
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -98,6 +98,9 @@ def main():
   # #####################################
 
   def checkForIssues():
+    dependsOnListMissing = checkDependsOn(currentServiceName, dockerComposeServicesYaml)
+    if (len(dependsOnListMissing) > 0):
+      issues["dependsOn"] = dependsOnListMissing
     for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)

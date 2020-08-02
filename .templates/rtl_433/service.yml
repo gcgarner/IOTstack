@@ -1,6 +1,8 @@
   rtl_433:
     container_name: rtl_433
     build: ./services/rtl_433/.
+    depends_on: 
+      - mosquitto
     environment:
       - TZ=Etc/UTC
       - MQTT_ADDRESS=mosquitto
