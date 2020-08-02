@@ -15,7 +15,7 @@ def main():
   
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber, getNetworkDetails
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -86,6 +86,20 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    global dockerComposeServicesYaml
+    try:
+      if "diyhue" in dockerComposeServicesYaml:
+        networkDetails = getNetworkDetails()
+        if "environment" in dockerComposeServicesYaml["diyhue"]:
+          for (envIndex, envName) in enumerate(dockerComposeServicesYaml["diyhue"]["environment"]):
+            ipAddressSet = envName.replace("%LAN_IP_Address%", networkDetails["ip"])
+            macAddressSet = ipAddressSet.replace("%LAN_MAC_Address%", networkDetails["mac"])
+            dockerComposeServicesYaml["diyhue"]["environment"][envIndex] = macAddressSet
+    except Exception as err:
+      print("Error setting diyhue network details: ", err)
+      input("Press any key to continue...")
+      return False
+
     return True
 
   # #####################################

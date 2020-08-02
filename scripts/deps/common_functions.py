@@ -1,11 +1,78 @@
 import time
 import string
 import random
+import sys
+import os
+import subprocess
+from deps.consts import ifCheckList
 
 def generateRandomString(size = 0, chars = string.ascii_uppercase + string.ascii_lowercase + string.digits):
   if size == 0:
     size = random.randint(16, 24)
   return ''.join(random.choice(chars) for _ in range(size))
+
+def getNetworkDetails(inputList = None):
+  ifList = inputList
+  if (inputList == None):
+    ifList = ifCheckList
+
+  results = {
+    "name": "",
+    "mac": "",
+    "ip": ""
+  }
+
+  for (index, ifName) in enumerate(ifList):
+    try:
+      ip = getIpAddress(ifName)
+      mac = getMacAddress(ifName)
+      results["name"] = ifName
+      results["ip"] = ip
+      results["mac"] = mac
+      if (results["ip"] == "" or results["mac"] == ""):
+        continue
+      break
+    except:
+      continue
+      # pass
+
+  return results
+
+def getMacAddress(ifName = None):
+  if (ifName == None):
+    print("getMacAddress: Need interface name")
+    return ""
+
+  mac = ""
+
+  if sys.platform == 'win32':
+    print("getMacAddress: Linux support only")
+  else:
+    FNULL = open(os.devnull, 'w')
+    ipRes = subprocess.Popen("/sbin/ifconfig %s" % ifName, shell=True, stdout=subprocess.PIPE, stderr=FNULL).communicate()
+    for line in ipRes[0].decode('utf-8').splitlines():
+      if line.find('Ethernet') > -1:
+        mac = line.split()[1]
+        break
+  return mac
+
+def getIpAddress(ifName = None):
+  if (ifName == None):
+    print("getIpAddress: Need interface name")
+    return ""
+
+  ip = ""
+
+  if sys.platform == 'win32':
+    print("getIpAddress: Linux support only")
+  else:
+    FNULL = open(os.devnull, 'w')
+    ipRes = subprocess.Popen("/sbin/ifconfig %s" % ifName, shell=True, stdout=subprocess.PIPE, stderr=FNULL).communicate()
+    for line in ipRes[0].decode('utf-8').splitlines():
+      if line.find('inet') > -1:
+        ip = line.split()[1]
+        break
+  return ip
 
 def getExternalPorts(serviceName, dockerComposeServicesYaml):
   externalPorts = []

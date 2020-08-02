@@ -16,9 +16,9 @@ if [ "$1" == "install" ]; then
   if command_exists docker; then
     echo "Docker already installed" >&2
   else
-    RESTART_REQUIRED="true"
     echo "Install Docker" >&2
     curl -fsSL https://get.docker.com | sh
+    RESTART_REQUIRED="true"
     usermod -aG docker $USER
   fi
 

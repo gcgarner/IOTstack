@@ -9,3 +9,4 @@ composeOverrideFile = './compose-override.yml'
 envFile = templatesDirectory + 'env.yml'
 dockerPathOutput = './docker-compose.yml'
 servicesFileName = 'service.yml'
+ifCheckList = ['eth0', 'wlan0']
