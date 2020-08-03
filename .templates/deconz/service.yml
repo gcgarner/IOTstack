@@ -13,7 +13,7 @@
       - /dev/null
     environment:
       - DECONZ_VNC_MODE=1
-      - DECONZ_VNC_PASSWORD=changeme
+      - DECONZ_VNC_PASSWORD=%randomPassword% # %randomPassword% is overwritten during preBuild hook
       - DEBUG_INFO=1
       - DEBUG_APS=0
       - DEBUG_ZCL=0

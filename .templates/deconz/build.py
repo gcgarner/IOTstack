@@ -14,8 +14,8 @@ def main():
   from blessed import Terminal
   
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
-  from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+  from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName, buildCache, servicesFileName
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber, generateRandomString
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -30,6 +30,7 @@ def main():
 
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
+  buildSettings = serviceService + buildSettingsFileName
 
   hasRebuiltHardwareSelection = False
   
@@ -91,14 +92,52 @@ def main():
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
     global dockerComposeServicesYaml
+    global currentServiceName
     with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objHardwareListFile:
-      hardwareList = yaml.load(objHardwareListFile, Loader=yaml.SafeLoader)
+      deconzYamlBuildOptions = yaml.load(objHardwareListFile, Loader=yaml.SafeLoader)
     try:
       if "deconz" in dockerComposeServicesYaml:
-        dockerComposeServicesYaml["deconz"]["devices"] = hardwareList["hardware"]
+        dockerComposeServicesYaml["deconz"]["devices"] = deconzYamlBuildOptions["hardware"]
     except Exception as err:
       print("Error setting deconz hardware: ", err)
       return False
+
+    # Password randomisation
+    
+    oldBuildCache = {}
+    try:
+      with open(r'%s' % buildCache) as objBuildCache:
+        oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+    except:
+      pass
+
+    buildCacheServices = {}
+    if "services" in oldBuildCache:
+      buildCacheServices = oldBuildCache["services"]
+
+    if (
+      deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
+      or deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+    ):
+      with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
+        serviceFile = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+      if "environment" in serviceFile[currentServiceName]:
+        newPassword = generateRandomString()
+        for (envIndex, envName) in enumerate(serviceFile[currentServiceName]["environment"]):
+          # Load default values from service.yml and update compose file
+          dockerComposeServicesYaml[currentServiceName]["environment"][envIndex] = serviceFile[currentServiceName]["environment"][envIndex].replace("%randomPassword%", newPassword)
+
+      # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
+      if (deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
+        deconzYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+        with open(buildSettings, 'w') as outputFile:
+          yaml.dump(deconzYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+    else: # Do nothing - don't change password
+      for (index, currentServiceName) in enumerate(buildCacheServices):
+        if currentServiceName in buildCacheServices: # Load service from cache if exists (to maintain password)
+          dockerComposeServicesYaml[currentServiceName] = buildCacheServices[currentServiceName]
+        else:
+          dockerComposeServicesYaml[currentServiceName] = dockerComposeServicesYaml[currentServiceName]
 
     return True
 
@@ -180,6 +219,23 @@ def main():
     enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, createMenu)
     needsRender = 1
 
+  def setPasswordOptions():
+    global needsRender
+    global hasRebuiltAddons
+    passwordOptionsMenuFilePath = "./.templates/{currentService}/passwords.py".format(currentService=currentServiceName)
+    with open(passwordOptionsMenuFilePath, "rb") as pythonDynamicImportFile:
+      code = compile(pythonDynamicImportFile.read(), passwordOptionsMenuFilePath, "exec")
+    execGlobals = {
+      "currentServiceName": currentServiceName,
+      "renderMode": renderMode
+    }
+    execLocals = {}
+    screenActive = False
+    exec(code, execGlobals, execLocals)
+    signal.signal(signal.SIGWINCH, onResize)
+    screenActive = True
+    needsRender = 1
+
   def onResize(sig, action):
     global deconzBuildOptions
     global currentMenuItemIndex
@@ -201,10 +257,14 @@ def main():
       pass
 
     
-    if os.path.exists("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)):
+    if os.path.exists("{buildSettings}".format(buildSettings=buildSettings)):
       deconzBuildOptions.insert(0, ["Change selected hardware", selectDeconzHardware])
     else:
       deconzBuildOptions.insert(0, ["Select hardware", selectDeconzHardware])
+    deconzBuildOptions.append([
+      "Database Password Options",
+      setPasswordOptions
+    ])
 
     deconzBuildOptions.append(["Go back", goBack])
 
@@ -250,7 +310,7 @@ def main():
       renderHotZone(term, menu, selection, hotzoneLocation)
 
     if needsRender == 1:
-      if os.path.exists("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)):
+      if os.path.exists("{buildSettings}".format(buildSettings=buildSettings)):
         if hasRebuiltHardwareSelection:
           print(term.center(commonEmptyLine(renderMode)))
           print(term.center('{bv}      {t.grey_on_blue4} {text} {t.normal}{t.white_on_black}{t.normal}                      {bv}'.format(t=term, text="Hardware list has been rebuilt: build_settings.yml", bv=specialChars[renderMode]["borderVertical"])))
