@@ -14,7 +14,7 @@ def main():
   from blessed import Terminal
   
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
-  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.consts import servicesDirectory, templatesDirectory, servicesFileName
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
@@ -86,6 +86,15 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    global dockerComposeServicesYaml
+    global currentServiceName
+    with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
+      serviceFile = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+    if "environment" in serviceFile[currentServiceName]:
+      wuiPort = getInternalPorts(currentServiceName, serviceFile)[0]
+      for (envIndex, envName) in enumerate(serviceFile[currentServiceName]["environment"]):
+          # Load default values from service.yml and update compose file
+          dockerComposeServicesYaml[currentServiceName]["environment"][envIndex] = serviceFile[currentServiceName]["environment"][envIndex].replace("%WUIPort%", wuiPort)
     return True
 
   # #####################################
