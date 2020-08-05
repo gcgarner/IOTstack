@@ -262,7 +262,7 @@ def main():
     else:
       deconzBuildOptions.insert(0, ["Select hardware", selectDeconzHardware])
     deconzBuildOptions.append([
-      "Database Password Options",
+      "DeConz Password Options",
       setPasswordOptions
     ])
 

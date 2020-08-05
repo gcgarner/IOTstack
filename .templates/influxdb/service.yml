@@ -12,14 +12,14 @@
       - INFLUXDB_REPORTING_DISABLED=false
       # - INFLUXDB_HTTP_AUTH_ENABLED=true
       - INFLUXDB_ADMIN_ENABLED=true
-      # - INFLUXDB_ADMIN_USER=myadminuser
-      # - INFLUXDB_ADMIN_PASSWORD=myadminpassword
-      - INFLUXDB_USER=nodered
-      - INFLUXDB_USER_PASSWORD=nodered
-      # - INFLUXDB_READ_USER=myreaduser
-      # - INFLUXDB_READ_USER_PASSWORD=myreadpassword
-      # - INFLUXDB_WRITE_USER=mywriteuser
-      # - INFLUXDB_WRITE_USER_PASSWORD=mywritepassword
+      - INFLUXDB_ADMIN_USER=influxadminuser
+      - INFLUXDB_ADMIN_PASSWORD=%randomAdminPassword% # %randomAdminPassword% is overwritten during preBuild hook
+      - INFLUXDB_USER=influxuser
+      - INFLUXDB_USER_PASSWORD=%randomPassword% # %randomPassword% is overwritten during preBuild hook
+      - INFLUXDB_READ_USER=influxreaduser
+      - INFLUXDB_READ_USER_PASSWORD=%randomReadPassword% # %randomReadPassword% is overwritten during preBuild hook
+      - INFLUXDB_WRITE_USER=influxwriteuser
+      - INFLUXDB_WRITE_USER_PASSWORD=%randomWritePassword% # %randomWritePassword% is overwritten during preBuild hook
     volumes:
       - ./volumes/influxdb/data:/var/lib/influxdb
       - ./backups/influxdb/db:/var/lib/influxdb/backup
