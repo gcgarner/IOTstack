@@ -5,10 +5,10 @@
       - TZ=Etc/UTC
       - PUID=1000
       - PGID=1000
-      - MYSQL_ROOT_PASSWORD=ROOT_ACCESS_PASSWORD
-      # - MYSQL_DATABASE=USER_DB_NAME
-      # - MYSQL_USER=MYSQL_USER
-      # - MYSQL_PASSWORD=DATABASE_PASSWORD
+      - MYSQL_ROOT_PASSWORD=%randomAdminPassword%
+      - MYSQL_DATABASE=default
+      - MYSQL_USER=mariadbuser
+      - MYSQL_PASSWORD=%randomPassword%
     volumes:
       - ./volumes/mariadb/config:/config
     ports:

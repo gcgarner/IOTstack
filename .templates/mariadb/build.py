@@ -9,9 +9,14 @@ def main():
   import os
   import time
   import sys
-  
-  from deps.consts import servicesDirectory, templatesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+  import yaml
+  import signal
+  import subprocess
+  from blessed import Terminal
+
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
+  from deps.consts import servicesDirectory, templatesDirectory, servicesFileName, buildSettingsFileName
+  from deps.common_functions import getExternalPorts, checkPortConflicts, generateRandomString
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -24,6 +29,7 @@ def main():
 
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
+  buildSettings = serviceService + buildSettingsFileName
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -82,6 +88,81 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    # Multi-service:
+    with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
+      serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+
+    oldBuildCache = {}
+    try:
+      with open(r'%s' % buildCache) as objBuildCache:
+        oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+    except:
+      pass
+
+    buildCacheServices = {}
+    if "services" in oldBuildCache:
+      buildCacheServices = oldBuildCache["services"]
+
+    if not os.path.exists(serviceService):
+      os.makedirs(serviceService, exist_ok=True)
+
+    if os.path.exists(buildSettings):
+      # Password randomisation
+      with open(r'%s' % buildSettings) as objBuildSettingsFile:
+        mariaDbYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+        if (
+          mariaDbYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
+          or mariaDbYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+        ):
+          randomAdminPassword = generateRandomString()
+          randomPassword = generateRandomString()
+          randomReadPassword = generateRandomString()
+          randomWritePassword = generateRandomString()
+          for (index, serviceName) in enumerate(serviceYamlTemplate):
+            dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+            if "environment" in serviceYamlTemplate[serviceName]:
+              for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
+                envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
+                envName = envName.replace("%randomPassword%", randomPassword)
+                dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
+
+          # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
+          if (mariaDbYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
+            mariaDbYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+            with open(buildSettings, 'w') as outputFile:
+              yaml.dump(mariaDbYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        else: # Do nothing - don't change password
+          for (index, serviceName) in enumerate(buildCacheServices):
+            if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
+              dockerComposeServicesYaml[serviceName] = buildCacheServices[serviceName]
+            else:
+              dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+
+    else:
+      print("MariaDB Warning: Build settings file not found, defaulting to new instance")
+      time.sleep(1)
+      randomAdminPassword = generateRandomString()
+      randomPassword = generateRandomString()
+      randomReadPassword = generateRandomString()
+      randomWritePassword = generateRandomString()
+      for (index, serviceName) in enumerate(serviceYamlTemplate):
+        dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+        if "environment" in serviceYamlTemplate[serviceName]:
+          for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
+            envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
+            envName = envName.replace("%randomPassword%", randomPassword)
+            dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
+        mariaDbYamlBuildOptions = {
+          "version": "1",
+          "application": "IOTstack",
+          "service": "MariaDB",
+          "comment": "MariaDB Build Options"
+        }
+
+      mariaDbYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+      with open(buildSettings, 'w') as outputFile:
+        yaml.dump(mariaDbYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+
     return True
 
   # #####################################
@@ -99,6 +180,190 @@ def main():
   # #####################################
   # End Supporting functions
   # #####################################
+
+  ############################
+  # Menu Logic
+  ############################
+
+  global currentMenuItemIndex
+  global selectionInProgress
+  global menuNavigateDirection
+  global needsRender
+
+  selectionInProgress = True
+  currentMenuItemIndex = 0
+  menuNavigateDirection = 0
+  needsRender = 1
+  term = Terminal()
+  hotzoneLocation = [((term.height // 16) + 6), 0]
+
+  def goBack():
+    global selectionInProgress
+    global needsRender
+    selectionInProgress = False
+    needsRender = 1
+    return True
+
+  def setPasswordOptions():
+    global needsRender
+    global hasRebuiltAddons
+    passwordOptionsMenuFilePath = "./.templates/{currentService}/passwords.py".format(currentService=currentServiceName)
+    with open(passwordOptionsMenuFilePath, "rb") as pythonDynamicImportFile:
+      code = compile(pythonDynamicImportFile.read(), passwordOptionsMenuFilePath, "exec")
+    execGlobals = {
+      "currentServiceName": currentServiceName,
+      "renderMode": renderMode
+    }
+    execLocals = {}
+    screenActive = False
+    exec(code, execGlobals, execLocals)
+    signal.signal(signal.SIGWINCH, onResize)
+    screenActive = True
+    needsRender = 1
+
+  def onResize(sig, action):
+    global mariaDbBuildOptions
+    global currentMenuItemIndex
+    mainRender(1, mariaDbBuildOptions, currentMenuItemIndex)
+
+  mariaDbBuildOptions = []
+
+  def createMenu():
+    global mariaDbBuildOptions
+    global serviceService
+
+    mariaDbBuildOptions = []
+    mariaDbBuildOptions.append([
+      "MariaDB Password Options",
+      setPasswordOptions
+    ])
+
+    mariaDbBuildOptions.append(["Go back", goBack])
+
+  def runOptionsMenu():
+    createMenu()
+    menuEntryPoint()
+    return True
+
+  def renderHotZone(term, menu, selection, hotzoneLocation):
+    lineLengthAtTextStart = 71
+    print(term.move(hotzoneLocation[0], hotzoneLocation[1]))
+    for (index, menuItem) in enumerate(menu):
+      toPrint = ""
+      if index == selection:
+        toPrint += ('{bv} -> {t.blue_on_green} {title} {t.normal} <-'.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
+      else:
+        toPrint += ('{bv}    {t.normal} {title}    '.format(t=term, title=menuItem[0], bv=specialChars[renderMode]["borderVertical"]))
+
+      for i in range(lineLengthAtTextStart - len(menuItem[0])):
+        toPrint += " "
+
+      toPrint += "{bv}".format(bv=specialChars[renderMode]["borderVertical"])
+
+      toPrint = term.center(toPrint)
+
+      print(toPrint)
+
+  def mainRender(needsRender, menu, selection):
+    term = Terminal()
+    
+    if needsRender == 1:
+      print(term.clear())
+      print(term.move_y(term.height // 16))
+      print(term.black_on_cornsilk4(term.center('IOTstack MariaDB Options')))
+      print("")
+      print(term.center(commonTopBorder(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center("{bv}      Select Option to configure                                                {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+      print(term.center(commonEmptyLine(renderMode)))
+
+    if needsRender >= 1:
+      renderHotZone(term, menu, selection, hotzoneLocation)
+
+    if needsRender == 1:
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      if not hideHelpText:
+        print(term.center(commonEmptyLine(renderMode)))
+        print(term.center("{bv}      Controls:                                                                 {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Up] and [Down] to move selection cursor                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Enter] to run command or save input                                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+        print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonEmptyLine(renderMode)))
+      print(term.center(commonBottomBorder(renderMode)))
+
+  def runSelection(selection):
+    import types
+    global mariaDbBuildOptions
+    if len(mariaDbBuildOptions[selection]) > 1 and isinstance(mariaDbBuildOptions[selection][1], types.FunctionType):
+      mariaDbBuildOptions[selection][1]()
+    else:
+      print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(nodeRedBuildOptions[selection][0])))
+
+  def isMenuItemSelectable(menu, index):
+    if len(menu) > index:
+      if len(menu[index]) > 2:
+        if menu[index][2]["skip"] == True:
+          return False
+    return True
+
+  def menuEntryPoint():
+    # These need to be reglobalised due to eval()
+    global currentMenuItemIndex
+    global selectionInProgress
+    global menuNavigateDirection
+    global needsRender
+    global hideHelpText
+    global mariaDbBuildOptions
+    term = Terminal()
+    with term.fullscreen():
+      menuNavigateDirection = 0
+      mainRender(needsRender, mariaDbBuildOptions, currentMenuItemIndex)
+      selectionInProgress = True
+      with term.cbreak():
+        while selectionInProgress:
+          menuNavigateDirection = 0
+
+          if needsRender: # Only rerender when changed to prevent flickering
+            mainRender(needsRender, mariaDbBuildOptions, currentMenuItemIndex)
+            needsRender = 0
+
+          key = term.inkey(esc_delay=0.05)
+          if key.is_sequence:
+            if key.name == 'KEY_TAB':
+              menuNavigateDirection += 1
+            if key.name == 'KEY_DOWN':
+              menuNavigateDirection += 1
+            if key.name == 'KEY_UP':
+              menuNavigateDirection -= 1
+            if key.name == 'KEY_ENTER':
+              runSelection(currentMenuItemIndex)
+            if key.name == 'KEY_ESCAPE':
+              return True
+          elif key:
+            if key == 'h': # H pressed
+              if hideHelpText:
+                hideHelpText = False
+              else:
+                hideHelpText = True
+              mainRender(1, mariaDbBuildOptions, currentMenuItemIndex)
+
+          if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
+            currentMenuItemIndex += menuNavigateDirection
+            currentMenuItemIndex = currentMenuItemIndex % len(mariaDbBuildOptions)
+            needsRender = 2
+
+            while not isMenuItemSelectable(mariaDbBuildOptions, currentMenuItemIndex):
+              currentMenuItemIndex += menuNavigateDirection
+              currentMenuItemIndex = currentMenuItemIndex % len(mariaDbBuildOptions)
+    return True
+
+  ####################
+  # End menu section
+  ####################
+
 
   if haltOnErrors:
     eval(toRun)()

@@ -13,10 +13,10 @@ def main():
   import sys
   import subprocess
   from blessed import Terminal
-  
+
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, servicesFileName, buildSettingsFileName
-  from deps.common_functions import generateRandomString
+  from deps.common_functions import getExternalPorts, checkPortConflicts, generateRandomString
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -88,7 +88,6 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
-    
     # Multi-service:
     with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
       serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
