@@ -86,6 +86,13 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    global dockerComposeServicesYaml
+    global currentServiceName
+    if os.path.exists('/dev/video0'):
+      dockerComposeServicesYaml[currentServiceName]["devices"] = [
+        '/dev/video0'
+      ]
+
     # Setup service directory
     if not os.path.exists(serviceService):
       os.makedirs(serviceService, exist_ok=True)
