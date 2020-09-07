@@ -86,4 +86,4 @@ if currentServiceName == 'adminer': # Make sure you update this.
 else:
   print("Error. '{}' Tried to run 'adminer' config".format(currentServiceName))
 ```
-This code doesn't have any port conflicting checking or menu code in it, and just allows the service to be built as is. See the advanced sections on adding menus and checking for issues for services.
+This code doesn't have any port conflicting checking or menu code in it, and just allows the service to be built as is. The best way to learn on extending the functionality of the service's build script is to look at the other services' build scripts. You can also check out the advanced sections on adding menus and checking for issues for services though for a deeper explanation of specific situations.
