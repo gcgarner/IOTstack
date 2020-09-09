@@ -154,3 +154,30 @@ def enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzone
     print(term.center('   {t.white_on_red} Error: {errorMsg} {t.normal} <-'.format(t=term, errorMsg=err)))
     time.sleep(2.5) # Give time to read error
     return False
+
+def enterPortNumberWithWhiptail(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, defaultPort):
+  newPortNumber = ""
+  try:
+    portProcess = subprocess.Popen(['./scripts/deps/portWhiptail.sh', defaultPort, currentServiceName], stdout=subprocess.PIPE)
+    portResult = portProcess.communicate()[0]
+    portResult = portResult.decode("utf-8").split(",")
+    newPortNumber = portResult[0]
+    returnCode = portResult[1]
+    time.sleep(0.1) # Prevent loop
+    
+    if not returnCode == "0":
+      return -1
+    
+    newPortNumber = int(str(newPortNumber))
+    if 1 <= newPortNumber <= 65535:
+      time.sleep(0.2) # Prevent loop
+      return newPortNumber
+    else:
+      print(term.center('   {t.white_on_red} "{port}" {message} {t.normal} <-'.format(t=term, port=newPortNumber, message="is not a valid port")))
+      time.sleep(2) # Give time to read error
+      return -1
+  except Exception as err: 
+    print(term.center('   {t.white_on_red} "{port}" {message} {t.normal} <-'.format(t=term, port=newPortNumber, message="is not a valid port")))
+    print(term.center('   {t.white_on_red} Error: {errorMsg} {t.normal} <-'.format(t=term, errorMsg=err)))
+    time.sleep(2.5) # Give time to read error
+    return -1

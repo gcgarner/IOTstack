@@ -8,6 +8,7 @@ haltOnErrors = True
 def main():
   import os
   import time
+  import signal
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory
@@ -80,7 +81,75 @@ def main():
 
   # This function is optional, and will run just before the build docker-compose.yml code.
   def preBuild():
+    # Multi-service:
+    with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
+      serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+
+    oldBuildCache = {}
+    try:
+      with open(r'%s' % buildCache) as objBuildCache:
+        oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+    except:
+      pass
+
+    buildCacheServices = {}
+    if "services" in oldBuildCache:
+      buildCacheServices = oldBuildCache["services"]
+
+    if not os.path.exists(serviceService):
+      os.makedirs(serviceService, exist_ok=True)
+
+    if os.path.exists(buildSettings):
+      # Password randomisation
+      with open(r'%s' % buildSettings) as objBuildSettingsFile:
+        piHoleYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+        if (
+          piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
+          or piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+        ):
+          randomAdminPassword = generateRandomString()
+          for (index, serviceName) in enumerate(serviceYamlTemplate):
+            dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+            if "environment" in serviceYamlTemplate[serviceName]:
+              for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
+                envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
+                dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
+
+          # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
+          if (piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
+            piHoleYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+            with open(buildSettings, 'w') as outputFile:
+              yaml.dump(piHoleYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        else: # Do nothing - don't change password
+          for (index, serviceName) in enumerate(buildCacheServices):
+            if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
+              dockerComposeServicesYaml[serviceName] = buildCacheServices[serviceName]
+            else:
+              dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+
+    else:
+      print("PiHole Warning: Build settings file not found, defaulting to new instance")
+      time.sleep(1)
+      randomAdminPassword = generateRandomString()
+      for (index, serviceName) in enumerate(serviceYamlTemplate):
+        dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+        if "environment" in serviceYamlTemplate[serviceName]:
+          for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
+            envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
+            dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
+        piHoleYamlBuildOptions = {
+          "version": "1",
+          "application": "IOTstack",
+          "service": "PiHole",
+          "comment": "PiHole Build Options"
+        }
+
+      piHoleYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+      with open(buildSettings, 'w') as outputFile:
+        yaml.dump(piHoleYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+
     return True
+
 
   # #####################################
   # Supporting functions below
@@ -117,6 +186,23 @@ def main():
     needsRender = 1
     return True
 
+  def setPasswordOptions():
+    global needsRender
+    global hasRebuiltAddons
+    passwordOptionsMenuFilePath = "./.templates/{currentService}/passwords.py".format(currentService=currentServiceName)
+    with open(passwordOptionsMenuFilePath, "rb") as pythonDynamicImportFile:
+      code = compile(pythonDynamicImportFile.read(), passwordOptionsMenuFilePath, "exec")
+    execGlobals = {
+      "currentServiceName": currentServiceName,
+      "renderMode": renderMode
+    }
+    execLocals = {}
+    screenActive = False
+    exec(code, execGlobals, execLocals)
+    signal.signal(signal.SIGWINCH, onResize)
+    screenActive = True
+    needsRender = 1
+
   def enterPortNumberExec():
     # global term
     global needsRender
@@ -142,6 +228,12 @@ def main():
       ])
     except: # Error getting port
       pass
+
+    piHoleBuildOptions.append([
+      "PiHole Password Options",
+      setPasswordOptions
+    ])
+
     piHoleBuildOptions.append(["Go back", goBack])
 
   def runOptionsMenu():

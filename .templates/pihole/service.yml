@@ -9,7 +9,7 @@
       # - "443:443/tcp"
     environment:
       # - TZ=Etc/UTC
-      - WEBPASSWORD=pihole
+      - WEBPASSWORD=%randomAdminPassword%
       # - DNS1=8.8.8.8
       # - DNS2=8.8.4.4
       # - DNSSEC=false
