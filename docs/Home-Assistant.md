@@ -12,7 +12,7 @@ Hass.io now has a seperate installation in the menu. The old version was incorre
 You will be asked to select you device type during the installation. Hass.io is no longer dependant on the IOTstack, it has its own service for maintaining its uptime.
 
 ## Installation
-If not already installed, install the network manager with: `sudo apt-get install network-manage` before running the hass.io installation to avoid any potential errors.
+If not already installed, install the network manager with: `sudo apt-get install network-manager` before running the hass.io installation to avoid any potential errors.
 
 The installation of Hass.io takes up to 20 minutes (depending on your internet connection). Refrain from restarting your Pi until it had come online and you are able to create a user account 
 
