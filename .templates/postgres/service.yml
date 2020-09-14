@@ -4,7 +4,7 @@
     restart: unless-stopped
     environment:
       - POSTGRES_USER=postuser
-      - POSTGRES_PASSWORD=postpassword
+      - POSTGRES_PASSWORD=%randomPassword%
       - POSTGRES_DB=postdb
     ports:
       - "5432:5432"

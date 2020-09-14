@@ -12,7 +12,7 @@ def main():
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -106,13 +106,18 @@ def main():
         if (
           piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
           or piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+          or piHoleYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
-          randomAdminPassword = generateRandomString()
+          if nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
+            newAdminPassword = "nod3RedP1Hol3"
+          else:
+           newAdminPassword = generateRandomString()
+
           for (index, serviceName) in enumerate(serviceYamlTemplate):
             dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
             if "environment" in serviceYamlTemplate[serviceName]:
               for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
-                envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
+                envName = envName.replace("%randomAdminPassword%", newAdminPassword)
                 dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
 
           # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
@@ -128,14 +133,14 @@ def main():
               dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
 
     else:
-      print("PiHole Warning: Build settings file not found, defaulting to new instance")
+      print("PiHole Warning: Build settings file not found, using default password")
       time.sleep(1)
-      randomAdminPassword = generateRandomString()
+      newAdminPassword = "nod3RedP1Hol3"
       for (index, serviceName) in enumerate(serviceYamlTemplate):
         dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
         if "environment" in serviceYamlTemplate[serviceName]:
           for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
-            envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
+            envName = envName.replace("%randomAdminPassword%", newAdminPassword)
             dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
         piHoleYamlBuildOptions = {
           "version": "1",
@@ -207,7 +212,16 @@ def main():
     # global term
     global needsRender
     global dockerComposeServicesYaml
-    enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, createMenu)
+    externalPort = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+    internalPort = getInternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+    newPortNumber = enterPortNumberWithWhiptail(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, externalPort)
+
+    if newPortNumber > 0:
+      dockerComposeServicesYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
+        newExtPort = newPortNumber,
+        oldIntPort = internalPort
+      )
+      createMenu()
     needsRender = 1
 
   def onResize(sig, action):

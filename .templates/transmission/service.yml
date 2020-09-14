@@ -10,8 +10,8 @@
       - ./volumes/transmission/downloads:/downloads
       - ./volumes/transmission/watch:/watch
     ports:
-      - "9091:9091"""
-      - "51413:51413
+      - "9091:9091"
+      - "51413:51413"
       - "51413:51413/udp"
     restart: unless-stopped
     networks:

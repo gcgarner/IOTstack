@@ -16,7 +16,7 @@ def main():
   
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildSettingsFileName, buildCache, servicesFileName
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber, generateRandomString
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail, generateRandomString
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -126,9 +126,15 @@ def main():
         if (
           nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
           or nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+          or nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
-          mySqlPassword = generateRandomString()
-          mySqlRootPassword = generateRandomString()
+          if nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
+            mySqlRootPassword = "nod3RedToorMySqlDb"
+            mySqlPassword = "mySqlDbPw"
+          else:
+            mySqlPassword = generateRandomString()
+            mySqlRootPassword = generateRandomString()
+
           for (index, serviceName) in enumerate(servicesListed):
             dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
             if "environment" in servicesListed[serviceName]:
@@ -149,10 +155,10 @@ def main():
               dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
 
     else:
-      print("NextCloud Warning: Build settings file not found, defaulting to new instance")
+      print("NextCloud Warning: Build settings file not found, using default password")
       time.sleep(1)
-      mySqlPassword = generateRandomString()
-      mySqlRootPassword = generateRandomString()
+      mySqlRootPassword = "nod3RedToorMySqlDb"
+      mySqlPassword = "mySqlDbPw"
       for (index, serviceName) in enumerate(servicesListed):
         dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
         if "environment" in servicesListed[serviceName]:
@@ -215,7 +221,16 @@ def main():
     # global term
     global needsRender
     global dockerComposeServicesYaml
-    enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, createMenu)
+    externalPort = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+    internalPort = getInternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+    newPortNumber = enterPortNumberWithWhiptail(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, externalPort)
+
+    if newPortNumber > 0:
+      dockerComposeServicesYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
+        newExtPort = newPortNumber,
+        oldIntPort = internalPort
+      )
+      createMenu()
     needsRender = 1
 
   def setPasswordOptions():

@@ -1,11 +1,11 @@
-# Buid Stack Random Services Passowrd
+# Build Stack Random Services Passowrd
 
 This page explains how to have a service generate a random password during build time. This will require that your service have a working options menu.
 
 Keep in mind that updating strings in a service's yaml config isn't limited to passwords.
 
 ## A word of caution
-Many services often set a password on their initial spin up and store it internally. That means if if the password is changed by the menu, it may not be reflected in the service.
+Many services often set a password on their initial spin up and store it internally. That means if if the password is changed by the menu afterwards, it may not be reflected in the service. By default the password specified in the documentation should be used, unless the user specifically selected to use a randomly generated one. In the future, the feature to specify a password manually may be added in, much like how ports can be customised.
 
 ## A basic example
 Inside the service's `service.yml` file, a special string can be added in for the build script to find and replace. Commonly the string is `%randomPassword%`, but technically any string can be used. The same string can be used multiple times for the same password to be used multiple times, and/or multiple difference strings can be used for multiple passwords.
@@ -26,7 +26,7 @@ These strings will be updated during the Prebuild Hook stage when building. The 
 This code can basically be copy-pasted into your service's `build.py` file. You are welcome to expand upon it if required. It will probably be refactored into a utils function in the future to adear to DRY (Don't Repeat Yourself) practices.
 ```
 def preBuild():
-  # Multi-service load. Most services only include a single service. The exception being NexCloud where the database information needs to match between NextCloud and MariaDB (as defined in NextCloud's 'service.yml' file, not IOTstack's MariaDB).
+  # Multi-service load. Most services only include a single service. The exception being NextCloud where the database information needs to match between NextCloud and MariaDB (as defined in NextCloud's 'service.yml' file, not IOTstack's MariaDB).
   with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
     serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
 
@@ -52,18 +52,24 @@ def preBuild():
       if (
         piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
         or piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+        or deconzYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
       ):
-        # Generate our passwords
-        randomAdminPassword = generateRandomString()
-        randomPassword = generateRandomString()
-
+      
+        if deconzYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
+          newAdminPassword = "######" # Update to what's specified in your documentation
+          newPassword = "######" # Update to what's specified in your documentation
+        else:
+          # Generate our passwords
+          newAdminPassword = generateRandomString()
+          newPassword = generateRandomString()
+        
         # Here we loop through each service included in the current service's `service.yml` file and update the password strings.
         for (index, serviceName) in enumerate(serviceYamlTemplate):
           dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
           if "environment" in serviceYamlTemplate[serviceName]:
             for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
-              envName = envName.replace("%randomPassword%", randomPassword)
-              envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
+              envName = envName.replace("%randomPassword%", newPassword)
+              envName = envName.replace("%randomAdminPassword%", newAdminPassword)
               dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
 
         # If the user had selected to only update the password once, ensure the build options file is updated.
@@ -78,18 +84,18 @@ def preBuild():
           else:
             dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
 
-  # Build options file didn't exist, so create one, and also generate a password (default action).
+  # Build options file didn't exist, so create one, and also use default password (default action).
   else:
-    print("PiHole Warning: Build settings file not found, defaulting to new instance")
+    print("PiHole Warning: Build settings file not found, using default password")
     time.sleep(1)
-        randomAdminPassword = generateRandomString()
-        randomPassword = generateRandomString()
+    newAdminPassword = "######" # Update to what's specified in your documentation
+    newPassword = "######" # Update to what's specified in your documentation
     for (index, serviceName) in enumerate(serviceYamlTemplate):
       dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
       if "environment" in serviceYamlTemplate[serviceName]:
         for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
-          envName = envName.replace("%randomPassword%", randomPassword)
-          envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
+          envName = envName.replace("%randomPassword%", newPassword)
+          envName = envName.replace("%randomAdminPassword%", newAdminPassword)
           dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
       piHoleYamlBuildOptions = {
         "version": "1",
@@ -345,7 +351,8 @@ def main():
 
   def loadOptionsMenu():
     global mainMenuList
-    mainMenuList.append(["Randomise database password for this build", { "checked": True }])
+    mainMenuList.append(["Use default password for this build", { "checked": True }])
+    mainMenuList.append(["Randomise database password for this build", { "checked": False }])
     mainMenuList.append(["Randomise database password every build", { "checked": False }])
     mainMenuList.append(["Do nothing", { "checked": False }])
 

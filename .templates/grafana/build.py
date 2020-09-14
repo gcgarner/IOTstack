@@ -11,7 +11,7 @@ def main():
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -121,7 +121,16 @@ def main():
     # global term
     global needsRender
     global dockerComposeServicesYaml
-    enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, createMenu)
+    externalPort = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+    internalPort = getInternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+    newPortNumber = enterPortNumberWithWhiptail(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, externalPort)
+
+    if newPortNumber > 0:
+      dockerComposeServicesYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
+        newExtPort = newPortNumber,
+        oldIntPort = internalPort
+      )
+      createMenu()
     needsRender = 1
 
   def onResize(sig, action):

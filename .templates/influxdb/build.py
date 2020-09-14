@@ -113,11 +113,19 @@ def main():
         if (
           influxDbYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
           or influxDbYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+          or influxDbYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
-          randomAdminPassword = generateRandomString()
-          randomPassword = generateRandomString()
-          randomReadPassword = generateRandomString()
-          randomWritePassword = generateRandomString()
+          if influxDbYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
+            randomAdminPassword = "nod3RedAdmin"
+            randomPassword = "nod3RedInfluX"
+            randomReadPassword = "nod3RedReadOnly"
+            randomWritePassword = "nod3RedWriteOnly"
+          else:
+            newPassword = generateRandomString()
+            randomAdminPassword = generateRandomString()
+            randomPassword = generateRandomString()
+            randomReadPassword = generateRandomString()
+            randomWritePassword = generateRandomString()
           for (index, serviceName) in enumerate(serviceYamlTemplate):
             dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
             if "environment" in serviceYamlTemplate[serviceName]:
@@ -141,12 +149,12 @@ def main():
               dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
 
     else:
-      print("InfluxDB Warning: Build settings file not found, defaulting to new instance")
+      print("InfluxDB Warning: Build settings file not found, using default password")
       time.sleep(1)
-      randomAdminPassword = generateRandomString()
-      randomPassword = generateRandomString()
-      randomReadPassword = generateRandomString()
-      randomWritePassword = generateRandomString()
+      randomAdminPassword = "nod3RedAdmin"
+      randomPassword = "nod3RedInfluX"
+      randomReadPassword = "nod3RedReadOnly"
+      randomWritePassword = "nod3RedWriteOnly"
       for (index, serviceName) in enumerate(serviceYamlTemplate):
         dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
         if "environment" in serviceYamlTemplate[serviceName]:

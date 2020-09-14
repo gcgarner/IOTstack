@@ -11,7 +11,7 @@ def main():
   import sys
   
   from deps.consts import servicesDirectory, templatesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed

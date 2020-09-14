@@ -192,7 +192,8 @@ def main():
 
   def loadOptionsMenu():
     global mainMenuList
-    mainMenuList.append(["Randomise database password for this build", { "checked": True }])
+    mainMenuList.append(["Use default password for this build", { "checked": True }])
+    mainMenuList.append(["Randomise password for this build", { "checked": False }])
     # mainMenuList.append(["Randomise database password every build", { "checked": False }])
     mainMenuList.append(["Do nothing", { "checked": False }])
 

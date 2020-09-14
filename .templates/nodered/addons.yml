@@ -31,6 +31,7 @@ addons:
     - "node-red-contrib-esplogin"
     - "node-red-contrib-timeout"
     - "node-red-contrib-moment"
+    - "node-red-contrib-telegrambot"
     - "node-red-contrib-particle"
     - "node-red-contrib-web-worldmap"
     - "node-red-contrib-ramp-thermostat"

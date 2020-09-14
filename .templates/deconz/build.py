@@ -15,7 +15,7 @@ def main():
   
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName, buildCache, servicesFileName
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumber, generateRandomString
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail, generateRandomString
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -118,11 +118,15 @@ def main():
     if (
       deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
       or deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+      or deconzYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
     ):
       with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
         serviceFile = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
       if "environment" in serviceFile[currentServiceName]:
-        newPassword = generateRandomString()
+        if deconzYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
+          newPassword = "nod3RedDec0nZ"
+        else:
+          newPassword = generateRandomString()
         for (envIndex, envName) in enumerate(serviceFile[currentServiceName]["environment"]):
           # Load default values from service.yml and update compose file
           dockerComposeServicesYaml[currentServiceName]["environment"][envIndex] = serviceFile[currentServiceName]["environment"][envIndex].replace("%randomPassword%", newPassword)
@@ -216,7 +220,16 @@ def main():
     # global term
     global needsRender
     global dockerComposeServicesYaml
-    enterPortNumber(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, createMenu)
+    externalPort = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+    internalPort = getInternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
+    newPortNumber = enterPortNumberWithWhiptail(term, dockerComposeServicesYaml, currentServiceName, hotzoneLocation, externalPort)
+
+    if newPortNumber > 0:
+      dockerComposeServicesYaml[currentServiceName]["ports"][0] = "{newExtPort}:{oldIntPort}".format(
+        newExtPort = newPortNumber,
+        oldIntPort = internalPort
+      )
+      createMenu()
     needsRender = 1
 
   def setPasswordOptions():
