@@ -31,12 +31,12 @@ Do note that the ports listed are not all of the ports containers use. They are 
 | pihole       | *none* | nod3RedP1Hol3 | 8089 | No |
 | plex         | *none* | *none*     | *none* | No |
 | portainer    | *none* | *none*     | 9000 | No |
-| postgres     | postuser | *none*   | *none* | No | - To complete here down for build refactoring
+| postgres     | postuser | nod3RedpostgresDbPw   | *none* | Yes |
 | python       | *none* | *none*     | *none* | No |
 | rtl_433      | *none* | *none*     | *none* | No |
 | tasmoadmin   | *none* | *none*     | 8088 | No |
 | telegraf     | *none* | *none*     | *none* | No |
-| timescaledb  | postuser | nod3RedTim3Scale | *none* | No |
+| timescaledb  | timescaleuser | nod3RedTim3Scale | *none* | No | - To complete here down for build refactoring
 | transmission | *none* | *none*     | 9091 | No |
 | webthings_gateway | *none* | *none* | 4060 | No |
 | zigbee2mqtt  | *none* | *none*     | *none* | No |
