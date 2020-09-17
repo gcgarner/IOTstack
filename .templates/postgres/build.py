@@ -15,7 +15,7 @@ def main():
   from blessed import Terminal
 
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
-  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName, servicesFileName
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
@@ -340,6 +340,8 @@ def main():
               menuNavigateDirection += 1
             if key.name == 'KEY_UP':
               menuNavigateDirection -= 1
+            if key.name == 'KEY_LEFT':
+              goBack()
             if key.name == 'KEY_ENTER':
               runSelection(currentMenuItemIndex)
             if key.name == 'KEY_ESCAPE':

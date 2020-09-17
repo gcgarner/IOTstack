@@ -261,6 +261,8 @@ def main():
               menuNavigateDirection += 1
             if key.name == 'KEY_UP':
               menuNavigateDirection -= 1
+            if key.name == 'KEY_LEFT':
+              goBack()
             if key.name == 'KEY_ENTER':
               runSelection(currentMenuItemIndex)
             if key.name == 'KEY_ESCAPE':

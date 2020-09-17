@@ -248,7 +248,6 @@ def main():
           if needsRender: # Only rerender when changed to prevent flickering
             mainRender(needsRender, adminerBuildOptions, currentMenuItemIndex)
             needsRender = 0
-
           key = term.inkey(esc_delay=0.05)
           if key.is_sequence:
             if key.name == 'KEY_TAB':
@@ -257,6 +256,8 @@ def main():
               menuNavigateDirection += 1
             if key.name == 'KEY_UP':
               menuNavigateDirection -= 1
+            if key.name == 'KEY_LEFT':
+              goBack()
             if key.name == 'KEY_ENTER':
               runSelection(currentMenuItemIndex)
             if key.name == 'KEY_ESCAPE':

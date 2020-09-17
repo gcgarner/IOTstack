@@ -8,11 +8,15 @@ haltOnErrors = True
 def main():
   import os
   import time
+  import yaml
   import signal
+  import sys
+  import subprocess
+
   from blessed import Terminal
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
-  from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory
-  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail
+  from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, servicesFileName, buildSettingsFileName
+  from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail, generateRandomString
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -26,6 +30,7 @@ def main():
   serviceVolume = volumesDirectory + currentServiceName
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
+  buildSettings = serviceService + buildSettingsFileName
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -108,7 +113,7 @@ def main():
           or piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
           or piHoleYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
-          if nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
+          if piHoleYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
             newAdminPassword = "nod3RedP1Hol3"
           else:
            newAdminPassword = generateRandomString()
@@ -348,6 +353,8 @@ def main():
               menuNavigateDirection += 1
             if key.name == 'KEY_UP':
               menuNavigateDirection -= 1
+            if key.name == 'KEY_LEFT':
+              goBack()
             if key.name == 'KEY_ENTER':
               runSelection(currentMenuItemIndex)
             if key.name == 'KEY_ESCAPE':

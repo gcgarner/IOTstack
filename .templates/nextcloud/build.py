@@ -12,8 +12,8 @@ def main():
   import signal
   import sys
   import subprocess
+
   from blessed import Terminal
-  
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildSettingsFileName, buildCache, servicesFileName
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail, generateRandomString
@@ -372,6 +372,8 @@ def main():
               menuNavigateDirection += 1
             if key.name == 'KEY_UP':
               menuNavigateDirection -= 1
+            if key.name == 'KEY_LEFT':
+              goBack()
             if key.name == 'KEY_ENTER':
               runSelection(currentMenuItemIndex)
             if key.name == 'KEY_ESCAPE':
