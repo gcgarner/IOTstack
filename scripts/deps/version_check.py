@@ -19,7 +19,8 @@ def checkVersion(requiredVersion, currentVersion):
   try:
     currentMajor = int(currentSplit[0])
     currentMinor = int(currentSplit[1])
-    currentBuild = int(currentSplit[2])
+    currentBuild = currentSplit[2].split("-")[0]
+    currentBuild = int(currentBuild)
   except:
     return False, 'Invalid Current Version', currentVersion
 

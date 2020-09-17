@@ -1,7 +1,5 @@
 #!/bin/bash
 
-pushd ~/IOTstack > /dev/null 2>&1
-
 CURRENT_BRANCH=$(git name-rev --name-only HEAD)
 
 # Minimum Software Versions
@@ -108,6 +106,23 @@ function user_in_group()
 	fi
 }
 
+function check_git_updates()
+{
+	UPSTREAM=${1:-'@{u}'}
+	LOCAL=$(git rev-parse @)
+	REMOTE=$(git rev-parse "$UPSTREAM")
+	BASE=$(git merge-base @ "$UPSTREAM")
+
+	if [ $LOCAL = $REMOTE ]; then
+			echo "Up-to-date"
+	elif [ $LOCAL = $BASE ]; then
+			echo "Need to pull"
+	elif [ $REMOTE = $BASE ]; then
+			echo "Need to push"
+	else
+			echo "Diverged"
+	fi
+}
 function install_python3_and_deps() {
 	CURR_PYTHON_VER="${1:-Unknown}"
 	CURR_PYYAML_VER="${2:-Unknown}"
@@ -241,7 +256,7 @@ function do_docker_checks() {
 		
 		DOCKER_VERSION_MAJOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 1)
 		DOCKER_VERSION_MINOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 2)
-		
+
 		DOCKER_VERSION_BUILD=$(echo "$DOCKER_VERSION"| cut -d'.' -f 3)
 		DOCKER_VERSION_BUILD=$(echo "$DOCKER_VERSION_BUILD"| cut -f1 -d"-")
 
@@ -277,10 +292,7 @@ function do_project_checks() {
 	echo "Checking for project update" >&2
 	git fetch origin $CURRENT_BRANCH
 
-	if [ $(git status | grep -c "Your branch is up to date") -eq 1 ]; then
-		[ -f .project_outofdate ] && rm .project_outofdate
-		echo "Project is up to date" >&2
-	else
+	if [[ "$(check_git_updates)" == "Need to pull" ]]; then
 		echo "An update is available for IOTstack" >&2
 		if [ ! -f .project_outofdate ]; then
 			if (whiptail --title "Project update" --yesno "An update is available for IOTstack\nYou will not be reminded again until after you update.\nYou can upgrade manually by typing:\n  git pull origin $CURRENT_BRANCH \n\n\nWould you like to update now?" 14 78); then
@@ -289,6 +301,9 @@ function do_project_checks() {
 				touch .project_outofdate
 			fi
 		fi
+	else
+		[ -f .project_outofdate ] && rm .project_outofdate
+		echo "Project is up to date" >&2
 	fi
 }
 

@@ -92,10 +92,6 @@ def exitMenu():
   print("Exiting IOTstack menu.")
   sys.exit(0)
 
-def updateProject():
-  print("Update Project")
-  sys.exit(0)
-
 def buildStack():
   global buildComplete
   global needsRender
@@ -224,7 +220,7 @@ def deletePromptFiles():
   promptFiles = False
   currentMenuItemIndex = 0
 
-def installDocker(): # TODO: Fix shell issues
+def installDocker():
   print("Install Docker: curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker $USER")
   installDockerProcess = subprocess.Popen(['sudo', 'bash', './install_docker.sh', 'install'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   installDockerProcess.wait()
@@ -233,7 +229,7 @@ def installDocker(): # TODO: Fix shell issues
 
   return installDockerResult
 
-def upgradeDocker(): # TODO: Fix shell issues
+def upgradeDocker():
   print("Upgrade Docker: sudo apt upgrade docker docker-compose")
   upgradeDockerProcess = subprocess.Popen(['sudo', 'bash', './install_docker.sh', 'upgrade'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   upgradeDockerProcess.wait()
@@ -346,23 +342,23 @@ def doPotentialMenuCheck(projectStatus, dockerVersion=True, promptFiles=False):
   else:
     removeMenuItemByLabel("deletePromptFiles")
 
-  if (projectStatus.poll() == None):
-    addPotentialMenuItem("updatesCheck", False)
-    needsRender = 2
-  else:
-    removeMenuItemByLabel("updatesCheck")
+  # if (projectStatus.poll() == None):
+  #   addPotentialMenuItem("updatesCheck", False)
+  #   needsRender = 2
+  # else:
+  #   removeMenuItemByLabel("updatesCheck")
 
-  if (projectStatus.poll() == 1):
-    added = addPotentialMenuItem("projectUpdate")
-    projectStatusPollRateRefresh = None
-    if (added):
-      needsRender = 1
+  # if (projectStatus.poll() == 1):
+  #   added = addPotentialMenuItem("projectUpdate")
+  #   projectStatusPollRateRefresh = None
+  #   if (added):
+  #     needsRender = 1
 
-  if (projectStatus.poll() == 0):
-    added = addPotentialMenuItem("noProjectUpdate")
-    projectStatusPollRateRefresh = None
-    if (added):
-      needsRender = 1
+  # if (projectStatus.poll() == 0):
+  #   added = addPotentialMenuItem("noProjectUpdate")
+  #   projectStatusPollRateRefresh = None
+  #   if (added):
+  #     needsRender = 1
 
   if (dockerVersion == False):
     added = addPotentialMenuItem("dockerNotUpdated")
