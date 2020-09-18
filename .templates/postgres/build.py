@@ -116,8 +116,8 @@ def main():
           or postgresDbYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
           if postgresDbYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
-            newAdminPassword = "nod3RedToorPostgr3sDb"
-            newPassword = "nod3RedpostgresDbPw"
+            newAdminPassword = "IOtSt4ckToorPostgr3sDb"
+            newPassword = "IOtSt4ckpostgresDbPw"
           else:
             newAdminPassword = generateRandomString()
             newPassword = generateRandomString()
@@ -144,8 +144,8 @@ def main():
     else:
       print("Postgres Warning: Build settings file not found, using default password")
       time.sleep(1)
-      newAdminPassword = "nod3RedToorPostgr3sDb"
-      newPassword = "nod3RedpostgresDbPw"
+      newAdminPassword = "IOtSt4ckToorPostgr3sDb"
+      newPassword = "IOtSt4ckpostgresDbPw"
       for (index, serviceName) in enumerate(serviceYamlTemplate):
         dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
         if "environment" in serviceYamlTemplate[serviceName]:

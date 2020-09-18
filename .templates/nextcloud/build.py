@@ -129,8 +129,8 @@ def main():
           or nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
           if nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
-            mySqlRootPassword = "nod3RedToorMySqlDb"
-            mySqlPassword = "mySqlDbPw"
+            mySqlRootPassword = "IOtSt4ckToorMySqlDb"
+            mySqlPassword = "IOtSt4ckmySqlDbPw"
           else:
             mySqlPassword = generateRandomString()
             mySqlRootPassword = generateRandomString()
@@ -157,8 +157,8 @@ def main():
     else:
       print("NextCloud Warning: Build settings file not found, using default password")
       time.sleep(1)
-      mySqlRootPassword = "nod3RedToorMySqlDb"
-      mySqlPassword = "mySqlDbPw"
+      mySqlRootPassword = "IOtSt4ckToorMySqlDb"
+      mySqlPassword = "IOtSt4ckmySqlDbPw"
       for (index, serviceName) in enumerate(servicesListed):
         dockerComposeServicesYaml[serviceName] = servicesListed[serviceName]
         if "environment" in servicesListed[serviceName]:

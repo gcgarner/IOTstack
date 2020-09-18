@@ -116,8 +116,8 @@ def main():
           or mariaDbYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
           if mariaDbYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
-            newAdminPassword = "nod3RedToorMariaDb"
-            newPassword = "nod3RedmariaDbPw"
+            newAdminPassword = "IOtSt4ckToorMariaDb"
+            newPassword = "IOtSt4ckmariaDbPw"
           else:
             newAdminPassword = generateRandomString()
             newPassword = generateRandomString()
@@ -144,8 +144,8 @@ def main():
     else:
       print("MariaDB Warning: Build settings file not found, using default password")
       time.sleep(1)
-      newAdminPassword = "nod3RedToorMariaDb"
-      newPassword = "nod3RedmariaDbPw"
+      newAdminPassword = "IOtSt4ckToorMariaDb"
+      newPassword = "IOtSt4ckmariaDbPw"
       for (index, serviceName) in enumerate(serviceYamlTemplate):
         dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
         if "environment" in serviceYamlTemplate[serviceName]:

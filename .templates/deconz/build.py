@@ -103,7 +103,10 @@ def main():
       return False
 
     # Password randomisation
-    
+    # Multi-service:
+    with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
+      serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+
     oldBuildCache = {}
     try:
       with open(r'%s' % buildCache) as objBuildCache:
@@ -115,33 +118,76 @@ def main():
     if "services" in oldBuildCache:
       buildCacheServices = oldBuildCache["services"]
 
-    if (
-      deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
-      or deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
-      or deconzYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
-    ):
-      with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
-        serviceFile = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
-      if "environment" in serviceFile[currentServiceName]:
-        if deconzYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
-          newPassword = "nod3RedDec0nZ"
-        else:
-          newPassword = generateRandomString()
-        for (envIndex, envName) in enumerate(serviceFile[currentServiceName]["environment"]):
-          # Load default values from service.yml and update compose file
-          dockerComposeServicesYaml[currentServiceName]["environment"][envIndex] = serviceFile[currentServiceName]["environment"][envIndex].replace("%randomPassword%", newPassword)
+    if not os.path.exists(serviceService):
+      os.makedirs(serviceService, exist_ok=True)
 
-      # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
-      if (deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
-        deconzYamlBuildOptions["databasePasswordOption"] = "Do nothing"
-        with open(buildSettings, 'w') as outputFile:
-          yaml.dump(deconzYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
-    else: # Do nothing - don't change password
-      for (index, currentServiceName) in enumerate(buildCacheServices):
-        if currentServiceName in buildCacheServices: # Load service from cache if exists (to maintain password)
-          dockerComposeServicesYaml[currentServiceName] = buildCacheServices[currentServiceName]
+    if os.path.exists(buildSettings):
+      # Password randomisation
+      with open(r'%s' % buildSettings) as objBuildSettingsFile:
+        deconzYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+        if "databasePasswordOption" in deconzYamlBuildOptions:
+          if (
+            deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
+            or deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
+            or deconzYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
+          ):
+            if deconzYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
+              newPassword = "IOtSt4ckDec0nZ"
+            else:
+              newPassword = generateRandomString()
+            for (index, serviceName) in enumerate(serviceYamlTemplate):
+              dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+              if "environment" in serviceYamlTemplate[serviceName]:
+                for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
+                  envName = envName.replace("%randomPassword%", newPassword)
+                  dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
+
+            # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
+            if (deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
+              deconzYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+              with open(buildSettings, 'w') as outputFile:
+                yaml.dump(deconzYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+          else: # Do nothing - don't change password
+            for (index, serviceName) in enumerate(buildCacheServices):
+              if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
+                dockerComposeServicesYaml[serviceName] = buildCacheServices[serviceName]
+              else:
+                dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
         else:
-          dockerComposeServicesYaml[currentServiceName] = dockerComposeServicesYaml[currentServiceName]
+          print("Deconz Warning: Build settings file not found, using default password")
+          time.sleep(1)
+          newPassword = "IOtSt4ckDec0nZ"
+          for (index, serviceName) in enumerate(serviceYamlTemplate):
+            dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+            if "environment" in serviceYamlTemplate[serviceName]:
+              for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
+                envName = envName.replace("%randomPassword%", newPassword)
+                dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
+
+      deconzYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+      with open(buildSettings, 'w') as outputFile:
+        yaml.dump(deconzYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+
+    else:
+      print("Deconz Warning: Build settings file not found, using default password")
+      time.sleep(1)
+      newPassword = "IOtSt4ckDec0nZ"
+      for (index, serviceName) in enumerate(serviceYamlTemplate):
+        dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
+        if "environment" in serviceYamlTemplate[serviceName]:
+          for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
+            envName = envName.replace("%randomPassword%", newPassword)
+            dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
+        deconzYamlBuildOptions = {
+          "version": "1",
+          "application": "IOTstack",
+          "service": "Deconz",
+          "comment": "Deconz Build Options"
+        }
+
+      deconzYamlBuildOptions["databasePasswordOption"] = "Do nothing"
+      with open(buildSettings, 'w') as outputFile:
+        yaml.dump(deconzYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
 
     return True
 

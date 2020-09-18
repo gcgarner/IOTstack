@@ -114,7 +114,7 @@ def main():
           or piHoleYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
           if piHoleYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
-            newAdminPassword = "nod3RedP1Hol3"
+            newAdminPassword = "IOtSt4ckP1Hol3"
           else:
            newAdminPassword = generateRandomString()
 
@@ -140,7 +140,7 @@ def main():
     else:
       print("PiHole Warning: Build settings file not found, using default password")
       time.sleep(1)
-      newAdminPassword = "nod3RedP1Hol3"
+      newAdminPassword = "IOtSt4ckP1Hol3"
       for (index, serviceName) in enumerate(serviceYamlTemplate):
         dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
         if "environment" in serviceYamlTemplate[serviceName]:

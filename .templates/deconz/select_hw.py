@@ -202,8 +202,14 @@ def main():
         if os.path.exists("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)):
           with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objSavedHardwareListFile:
             savedHardwareList = yaml.load(objSavedHardwareListFile, Loader=yaml.SafeLoader)
-            savedHardware = savedHardwareList["hardware"]
- 
+            savedHardware = []
+
+            try:
+              savedHardware = savedHardwareList["hardware"]
+            except:
+              print("Error: Loading saved hardware selection. Please resave your selection.")
+              input("Press Enter to continue...")
+
             for (index, hardwarePath) in enumerate(knownHardwareList):
               if hardwarePath in savedHardware:
                 mainMenuList.append([hardwarePath, { "checked": True }])
@@ -216,6 +222,7 @@ def main():
               mainMenuList.append([hardwarePath, { "checked": True }])
             else:
               mainMenuList.append([hardwarePath, { "checked": False }])
+
 
     else:
       print("Error: '{hardwareListFile}' file doesn't exist.".format(hardwareListFile=hardwareListFileSource))
