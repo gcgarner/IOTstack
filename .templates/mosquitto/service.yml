@@ -4,11 +4,11 @@
     restart: unless-stopped
     user: "1883"
     ports:
-      - 1883:1883
-      - 9001:9001
+      - "1883:1883"
     volumes:
       - ./volumes/mosquitto/data:/mosquitto/data
       - ./volumes/mosquitto/log:/mosquitto/log
+      - ./volumes/mosquitto/pwfile:/mosquitto/pwfile
       - ./services/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./services/mosquitto/filter.acl:/mosquitto/config/filter.acl
 

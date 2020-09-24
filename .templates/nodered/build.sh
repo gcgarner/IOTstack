@@ -6,7 +6,13 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 	"Use the [SPACEBAR] to select the nodes you want preinstalled" 20 78 12 -- \
 	"node-red-node-pi-gpiod" " " "ON" \
 	"node-red-dashboard" " " "ON" \
+	"node-red-contrib-influxdb" " " "ON" \
+	"node-red-contrib-boolean-logic" " " "ON" \
+	"node-red-node-rbe" " " "ON" \
+	"node-red-configurable-ping" " " "ON" \
 	"node-red-node-openweathermap" " " "OFF" \
+	"node-red-contrib-discord" " " "OFF" \
+	"node-red-node-email" " " "on" \
 	"node-red-node-google" " " "OFF" \
 	"node-red-node-emoncms" " " "OFF" \
 	"node-red-node-geofence" " " "OFF" \
@@ -15,7 +21,6 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 	"node-red-node-smooth" " " "OFF" \
 	"node-red-node-darksky" " " "OFF" \
 	"node-red-node-sqlite" " " "OFF" \
-	"node-red-contrib-influxdb" " " "ON" \
 	"node-red-contrib-config" " " "OFF" \
 	"node-red-contrib-grove" " " "OFF" \
 	"node-red-contrib-diode" " " "OFF" \
@@ -29,12 +34,12 @@ node_selection=$(whiptail --title "Node-RED nodes" --checklist --separate-output
 	"node-red-contrib-isonline" " " "OFF" \
 	"node-red-contrib-npm" " " "OFF" \
 	"node-red-contrib-file-function" " " "OFF" \
-	"node-red-contrib-boolean-logic" " " "OFF" \
 	"node-red-contrib-home-assistant-websocket" " " "OFF" \
 	"node-red-contrib-blynk-ws" " " "OFF" \
 	"node-red-contrib-owntracks" " " "OFF" \
 	"node-red-contrib-alexa-local" " " "OFF" \
 	"node-red-contrib-heater-controller" " " "OFF" \
+	"node-red-contrib-deconz" " " "OFF" \
 	3>&1 1>&2 2>&3)
 
 ##echo "$check_selection"
