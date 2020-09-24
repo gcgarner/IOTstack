@@ -15,7 +15,7 @@
       - PEERDNS=auto #optional
       - INTERNAL_SUBNET=100.64.0.0/24 #optional
     volumes:
-      - ./volumes/wireguard/config:/config
+      - ./services/wireguard/config:/config
       - /lib/modules:/lib/modules
     ports:
       - 51820:51820/udp
