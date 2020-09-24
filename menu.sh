@@ -18,6 +18,7 @@ REQ_PYYAML_VERSION=5.3.1
 
 declare -A cont_array=(
 	[portainer]="Portainer"
+	[portainer_agent]="Portainer agent"
 	[nodered]="Node-RED"
 	[influxdb]="InfluxDB"
 	[telegraf]="Telegraf (Requires InfluxDB and Mosquitto)"
@@ -45,12 +46,16 @@ declare -A cont_array=(
 	[homebridge]="Homebridge"
 	[python]="Python 3"
 	[gitea]="Gitea"
+	[qbittorrent]="qbittorrent"
+	[domoticz]="Domoticz"
 	[dozzle]="Dozzle"
 	[wireguard]="Wireguard"
+	# add yours here
 )
 
 declare -a armhf_keys=(
 	"portainer"
+	"portainer_agent"
 	"nodered"
 	"influxdb"
 	"grafana"
@@ -63,7 +68,7 @@ declare -a armhf_keys=(
 	"adminer"
 	"openhab"
 	"zigbee2mqtt"
-  "deconz"
+  	"deconz"
 	"pihole"
 	"plex"
 	"tasmoadmin"
@@ -77,6 +82,8 @@ declare -a armhf_keys=(
 	"homebridge"
 	"python"
 	"gitea"
+	"qbittorrent"
+	"domoticz"
 	"dozzle"
 	"wireguard"
 	# add yours here
