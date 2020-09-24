@@ -49,11 +49,13 @@ declare -A cont_array=(
 	[qbittorrent]="qbittorrent"
 	[domoticz]="Domoticz"
 	[dozzle]="Dozzle"
+	[wireguard]="Wireguard"
 	# add yours here
 )
 
 declare -a armhf_keys=(
 	"portainer"
+	"portainer_agent"
 	"nodered"
 	"influxdb"
 	"grafana"
@@ -83,7 +85,7 @@ declare -a armhf_keys=(
 	"qbittorrent"
 	"domoticz"
 	"dozzle"
-	"portainer_agent"
+	"wireguard"
 	# add yours here
 )
 sys_arch=$(uname -m)
@@ -360,7 +362,7 @@ mainmenu_selection=$(whiptail --title "Main Menu" --menu --notags \
 	"" 20 78 12 -- \
 	"install" "Install Docker" \
 	"build" "Build Stack" \
-	"hassio" "Install Hass.io (Requires Docker)" \
+	"hassio" "Install Home Assistant (Requires Docker)" \
 	"native" "Native Installs" \
 	"commands" "Docker commands" \
 	"backup" "Backup options" \
