@@ -45,6 +45,7 @@ declare -A cont_array=(
 	[homebridge]="Homebridge"
 	[python]="Python 3"
 	[gitea]="Gitea"
+	[domoticz]="Domoticz"
 	[dozzle]="Dozzle"
 )
 
@@ -76,6 +77,7 @@ declare -a armhf_keys=(
 	"homebridge"
 	"python"
 	"gitea"
+	"domoticz"
 	"dozzle"
 	# add yours here
 )
