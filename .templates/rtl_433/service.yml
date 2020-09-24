@@ -6,4 +6,3 @@
     devices:
       - /dev/bus/usb
     restart: unless-stopped
-    

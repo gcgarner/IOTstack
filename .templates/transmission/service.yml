@@ -10,7 +10,7 @@
       - transm_download_volume:/downloads
       - transm_watch_volume:/watch
     ports:
-      - 9091:9091
-      - 51413:51413
-      - 51413:51413/udp
+      - "9091:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
     restart: unless-stopped
