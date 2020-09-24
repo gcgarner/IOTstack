@@ -6,6 +6,5 @@
     volumes:
       - ./volumes/mariadb/config:/config
     ports:
-      - 3306:3306
+      - "3306:3306"
     restart: unless-stopped
-
