@@ -6,13 +6,26 @@
 Hass.io is a home automation platform running on Python 3. It is able to track and control all devices at home and offer a platform for automating control. Port binding is `8123`.
 Hass.io is exposed to your hosts' network in order to discover devices on your LAN. That means that it does not sit inside docker's network.
 
+## To avoid confusion
+There are 2 versions of Home Assistant: Hass.io and Home Assistant Docker. Hass.io uses its own orchastration with 3 docker images: `hassio_supervisor`, `hassio_dns` and `homeassistant`. Home Assistant Docker runs inside a single docker image, and doesn't support all the features that Hass.io does (such as add-ons). IOTstack currently only has Hass.io and we can only offer limited configuration of it since it is its own platform. [More info on versions](https://www.home-assistant.io/docs/installation/#recommended). Both Hass.io and Home Assistant Docker can be found on the `experimental` branch of IOTstack.
+
 ## Menu installation
 Hass.io now has a seperate installation in the menu. The old version was incorrect and should be removed. Be sure to update you project and install the correct version.
 
 You will be asked to select you device type during the installation. Hass.io is no longer dependant on the IOTstack, it has its own service for maintaining its uptime.
 
 ## Installation
-The installation of Hass.io takes up to 20 minutes (depending on your internet connection). Refrain from restarting your Pi until it had come online and you are able to create a user account 
+Ensure your system is up to date with:
+```
+sudo apt update
+```
+If not already installed, install the network manager with:
+```
+sudo apt-get install network-manager apparmor-utils
+```
+before running the hass.io installation to avoid any potential errors.
+
+The installation of Hass.io takes up to 20 minutes (depending on your internet connection). Refrain from restarting your machine until it has come online and you are able to create a user account.
 
 ## Removal
 

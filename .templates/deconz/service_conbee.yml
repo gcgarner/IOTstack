@@ -1,0 +1,21 @@
+  deconz:
+    image: marthoc/deconz
+    container_name: deconz
+    restart: unless-stopped
+    ports:
+      - '8090:80'
+      - '443:443'
+      - '5901:5900'
+    volumes:
+      - ./volumes/deconz/:/root/.local/share/dresden-elektronik/deCONZ
+    devices:
+      #ConBee:
+      - /dev/ttyUSB0
+    environment:
+      - DECONZ_VNC_MODE=1
+      - DECONZ_VNC_PASSWORD=changeme
+      - DEBUG_INFO=1
+      - DEBUG_APS=0
+      - DEBUG_ZCL=0
+      - DEBUG_ZDP=0
+      - DEBUG_OTAU=0
