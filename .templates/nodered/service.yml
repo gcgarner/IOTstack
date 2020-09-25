@@ -6,7 +6,7 @@
     privileged: true
     env_file: ./services/nodered/nodered.env
     ports:
-      - 1880:1880
+      - "1880:1880"
     volumes:
       - ./volumes/nodered/data:/data
       - /var/run/docker.sock:/var/run/docker.sock

@@ -18,12 +18,14 @@ REQ_PYYAML_VERSION=5.3.1
 
 declare -A cont_array=(
 	[portainer]="Portainer"
+	[portainer_agent]="Portainer agent"
 	[nodered]="Node-RED"
 	[influxdb]="InfluxDB"
 	[telegraf]="Telegraf (Requires InfluxDB and Mosquitto)"
 	[transmission]="transmission"
 	[grafana]="Grafana"
 	[mosquitto]="Eclipse-Mosquitto"
+	[prometheus]="Prometheus"
 	[postgres]="Postgres"
 	[timescaledb]="Timescaledb"
 	[mariadb]="MariaDB (MySQL fork)"
@@ -45,16 +47,22 @@ declare -A cont_array=(
 	[homebridge]="Homebridge"
 	[python]="Python 3"
 	[gitea]="Gitea"
+	[qbittorrent]="qbittorrent"
+	[domoticz]="Domoticz"
 	[dozzle]="Dozzle"
+	[wireguard]="Wireguard"
+	# add yours here
 )
 
 declare -a armhf_keys=(
 	"portainer"
+	"portainer_agent"
 	"nodered"
 	"influxdb"
 	"grafana"
 	"mosquitto"
 	"telegraf"
+	"prometheus"
 	"mariadb"
 	"postgres"
 	"timescaledb"
@@ -76,7 +84,10 @@ declare -a armhf_keys=(
 	"homebridge"
 	"python"
 	"gitea"
+	"qbittorrent"
+	"domoticz"
 	"dozzle"
+	"wireguard"
 	# add yours here
 )
 sys_arch=$(uname -m)
@@ -386,7 +397,7 @@ mainmenu_selection=$(whiptail --title "Main Menu" --menu --notags \
 	"" 20 78 12 -- \
 	"install" "Install Docker" \
 	"build" "Build Stack" \
-	"hassio" "Install Hass.io (Requires Docker)" \
+	"hassio" "Install Home Assistant (Requires Docker)" \
 	"native" "Native Installs" \
 	"commands" "Docker commands" \
 	"backup" "Backup options" \
