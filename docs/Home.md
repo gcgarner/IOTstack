@@ -18,6 +18,7 @@ The README is moving to the Wiki, It's easier to add content and example to the 
 
 # Containers
 * [Portainer](https://sensorsiot.github.io/IOTstack/Containers/Portainer)
+* [Portainer-ce](https://sensorsiot.github.io/IOTstack/Containers/Portainer-ce)
 * [Portainer Agent](https://sensorsiot.github.io/IOTstack/Containers/Portainer-agent)
 * [Node-RED](https://sensorsiot.github.io/IOTstack/Containers/Node-RED)
 * [Grafana](https://sensorsiot.github.io/IOTstack/Containers/Grafana)
