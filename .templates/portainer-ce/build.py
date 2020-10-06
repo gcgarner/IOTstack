@@ -89,7 +89,6 @@ def main():
   # #####################################
 
   def checkForIssues():
-    issues["deprecation"] = 'Portainer is deprecated and may be removed from IOTstack at any time. Use Portainer-CE instead.'
     for (index, serviceName) in enumerate(dockerComposeServicesYaml):
       if not currentServiceName == serviceName: # Skip self
         currentServicePorts = getExternalPorts(currentServiceName, dockerComposeServicesYaml)
@@ -141,24 +140,24 @@ def main():
     needsRender = 1
 
   def onResize(sig, action):
-    global portainerBuildOptions
+    global portainerCeBuildOptions
     global currentMenuItemIndex
-    mainRender(1, portainerBuildOptions, currentMenuItemIndex)
+    mainRender(1, portainerCeBuildOptions, currentMenuItemIndex)
 
-  portainerBuildOptions = []
+  portainerCeBuildOptions = []
 
   def createMenu():
-    global portainerBuildOptions
+    global portainerCeBuildOptions
     try:
-      portainerBuildOptions = []
+      portainerCeBuildOptions = []
       portNumber = getExternalPorts(currentServiceName, dockerComposeServicesYaml)[0]
-      portainerBuildOptions.append([
+      portainerCeBuildOptions.append([
         "Change external WUI Port Number from: {port}".format(port=portNumber),
         enterPortNumberExec
       ])
     except: # Error getting port
       pass
-    portainerBuildOptions.append(["Go back", goBack])
+    portainerCeBuildOptions.append(["Go back", goBack])
 
   def runOptionsMenu():
     createMenu()
@@ -190,7 +189,7 @@ def main():
     if needsRender == 1:
       print(term.clear())
       print(term.move_y(term.height // 16))
-      print(term.black_on_cornsilk4(term.center('IOTstack Portainer Options')))
+      print(term.black_on_cornsilk4(term.center('IOTstack Portainer-CE Options')))
       print("")
       print(term.center(commonTopBorder(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))
@@ -216,9 +215,9 @@ def main():
 
   def runSelection(selection):
     import types
-    global portainerBuildOptions
-    if len(portainerBuildOptions[selection]) > 1 and isinstance(portainerBuildOptions[selection][1], types.FunctionType):
-      portainerBuildOptions[selection][1]()
+    global portainerCeBuildOptions
+    if len(portainerCeBuildOptions[selection]) > 1 and isinstance(portainerCeBuildOptions[selection][1], types.FunctionType):
+      portainerCeBuildOptions[selection][1]()
     else:
       print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(nodeRedBuildOptions[selection][0])))
 
@@ -236,18 +235,18 @@ def main():
     global menuNavigateDirection
     global needsRender
     global hideHelpText
-    global portainerBuildOptions
+    global portainerCeBuildOptions
     term = Terminal()
     with term.fullscreen():
       menuNavigateDirection = 0
-      mainRender(needsRender, portainerBuildOptions, currentMenuItemIndex)
+      mainRender(needsRender, portainerCeBuildOptions, currentMenuItemIndex)
       selectionInProgress = True
       with term.cbreak():
         while selectionInProgress:
           menuNavigateDirection = 0
 
           if needsRender: # Only rerender when changed to prevent flickering
-            mainRender(needsRender, portainerBuildOptions, currentMenuItemIndex)
+            mainRender(needsRender, portainerCeBuildOptions, currentMenuItemIndex)
             needsRender = 0
 
           key = term.inkey(esc_delay=0.05)
@@ -270,16 +269,16 @@ def main():
                 hideHelpText = False
               else:
                 hideHelpText = True
-              mainRender(1, portainerBuildOptions, currentMenuItemIndex)
+              mainRender(1, portainerCeBuildOptions, currentMenuItemIndex)
 
           if menuNavigateDirection != 0: # If a direction was pressed, find next selectable item
             currentMenuItemIndex += menuNavigateDirection
-            currentMenuItemIndex = currentMenuItemIndex % len(portainerBuildOptions)
+            currentMenuItemIndex = currentMenuItemIndex % len(portainerCeBuildOptions)
             needsRender = 2
 
-            while not isMenuItemSelectable(portainerBuildOptions, currentMenuItemIndex):
+            while not isMenuItemSelectable(portainerCeBuildOptions, currentMenuItemIndex):
               currentMenuItemIndex += menuNavigateDirection
-              currentMenuItemIndex = currentMenuItemIndex % len(portainerBuildOptions)
+              currentMenuItemIndex = currentMenuItemIndex % len(portainerCeBuildOptions)
     return True
 
   ####################
@@ -297,7 +296,7 @@ def main():
 
 # This check isn't required, but placed here for debugging purposes
 global currentServiceName # Name of the current service
-if currentServiceName == 'portainer':
+if currentServiceName == 'portainer-ce':
   main()
 else:
-  print("Error. '{}' Tried to run 'portainer' config".format(currentServiceName))
+  print("Error. '{}' Tried to run 'portainer-ce' config".format(currentServiceName))
