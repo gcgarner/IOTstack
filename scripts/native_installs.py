@@ -32,11 +32,16 @@ def main():
   def installHassIo():
     print("Install Home Assistant Supervisor")
     print("./.native/hassio_supervisor.sh")
-    subprocess.call("./.native/hassio_supervisor.sh", shell=True)
+    res = subprocess.call("./.native/hassio_supervisor.sh", shell=True)
     print("")
-    print("Preinstallation complete. Your system may run slow for a few hours as Hass.io installs its services.")
-    print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    if res == 0:
+      print("Preinstallation complete. Your system may run slow for a few hours as Hass.io installs its services.")
+      print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    else:
+      print("Preinstallation not completed.")
+      print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
+    mainRender(2, mainMenuList, currentMenuItemIndex)
     return True
 
   def installRtl433():
@@ -46,6 +51,7 @@ def main():
     print("")
     print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
+    mainRender(2, mainMenuList, currentMenuItemIndex)
     return True
 
   def installRpiEasy():
@@ -55,6 +61,7 @@ def main():
     print("")
     print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
+    mainRender(2, mainMenuList, currentMenuItemIndex)
     return True
 
   def goBack():
