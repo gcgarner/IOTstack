@@ -43,7 +43,7 @@ The "volumes" directory contains all the persistent data necessary to recreate t
 
 ## Added your Dropbox token incorrectly or aborted the install at the token screen
 
-Make sure you are running the latest version of the project [link](https://github.com/gcgarner/IOTstack/wiki/Updating-the-Project).
+Make sure you are running the latest version of the project [link](https://sensorsiot.github.io/IOTstack/Updating-the-Project/).
 
 Run `~/Dropbox-Uploader/dropbox_uploader.sh unlink` and if you have added it key then it will prompt you to confirm its removal. If no key was found it will ask you for a new key.
 
