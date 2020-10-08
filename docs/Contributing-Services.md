@@ -12,7 +12,8 @@ Services will grow over time, we may split up the buildstack menu into subsectio
 * Ensure [Default Configs](https://sensorsiot.github.io/IOTstack/Default-Configs) is updated with WUI port and username/password.
 * Must detect port confilicts with other services on [BuildStack](https://sensorsiot.github.io/IOTstack/Menu-System) Menu.
 * `Pre` and `Post` hooks work with no errors. 
-* Does not require user to edit config files in order to get the service running
+* Does not require user to edit config files in order to get the service running.
+* Ensure that your service can be backed up and restored without errors or data loss.
 * Any configs that are required before getting the service running should be configured in the service's options menu (and a BuildStack menu Issue should be displayed if not).
 * Fork the repo and push the changes to your fork. Create a cross repo PR for the mods to review. We may request additional changes from you.
 
