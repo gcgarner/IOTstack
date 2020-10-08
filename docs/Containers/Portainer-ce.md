@@ -141,6 +141,34 @@ As soon as you are happy that *Portainer CE* meets your needs, you can dispense 
 	$ sudo rm -rf ./volumes/portainer
 	```
 	
+## Setting the Public IP address for your end-point
+
+If you click on a "Published Port" in the "Containers" list, your browser may return an error saying something like "can't connect to server" associated with an IP address of "0.0.0.0".
+
+To fix that problem, proceed as shown below:
+
+![Set Public IP address](./images/portainer-ce-set-public-ip.png)
+
+1. Click "Endpoints" in the left hand panel.
+2. Click the name "local" in the list of Endpoints.
+3. Click in the "Public IP" field. Enter one of the following:
+	- The multicast DNS (MDNS) name of your Raspberry Pi (eg `iot-hub.local`)
+	- The fully-qualified domain name (FQDN) of your Raspberry Pi (eg `iot-hub.mydomain.com`)
+	- The IP address of your Raspberry Pi (eg `192.168.1.10`)
+4. Click "Update endpoint".
+
+> To remove the Public IP address, repeat the above steps but clear the "Public IP" field in step 3.
+
+The reason why you have to tell *Portainer CE* which Public IP address to use is because an instance of *Portainer CE* does not necessarily have to be running on the **same** Raspberry Pi as the Docker containers it is managing.
+
+Keep in mind that clicking on a "Published Port" does not guarantee that your browser can open a connection. For example:
+
+* Port 1883 for Mosquitto expects MQTT packets. It will not respond to HTTP, so any attempt will fail.
+* Port 8089 for PiHole will respond to HTTP but PiHole may reject or mis-handle your attempt.
+* Port 1880 for NodeRed will respond normally.
+
+> All things considered, you will get more consistent behaviour if you simply bookmark the URLs you want to use for your IOTstack services.
+
 ## If you forget your password
 
 If you forget the password you created for *Portainer CE*, you can recover by doing the following:
