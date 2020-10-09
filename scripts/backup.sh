@@ -89,6 +89,7 @@ echo "./volumes/" >> $BACKUPLIST
 [ -f "./compose-override.yml" ] && echo "./compose-override.yml" >> $BACKUPLIST
 [ -f "./extra" ] && echo "./extra" >> $BACKUPLIST
 [ -f "./.tmp/databases_backup" ] && echo "./.tmp/databases_backup" >> $BACKUPLIST
+[ -f "./postbuild.sh" ] && echo "./postbuild.sh" >> $BACKUPLIST
 
 sudo tar -czf \
 	$TMPBACKUPFILE \
@@ -121,6 +122,11 @@ echo "" >> $LOGFILE
 
 echo "Items backed up:" >> $LOGFILE
 cat $BACKUPLIST >> $LOGFILE 2>&1
+
+echo "" >> $LOGFILE
+echo "Items Excluded:" >> $LOGFILE
+echo "./volumes/influxdb/*" >> $LOGFILE 2>&1
+echo "./volumes/nextcloud/*" >> $LOGFILE 2>&1
 
 rm -rf $BACKUPLIST >> $LOGFILE 2>&1
 rm -rf $TMPBACKUPFILE >> $LOGFILE 2>&1

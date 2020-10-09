@@ -6,6 +6,7 @@
 __pycache__
 docker-compose.yml
 compose-override.yml
+postbuild.sh
 .project_outofdate
 .outofdate
 .docker_notinstalled

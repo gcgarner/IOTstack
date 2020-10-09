@@ -10,6 +10,7 @@ def main():
   import yaml
   import math
   import sys
+  import subprocess
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildCache, envFile, dockerPathOutput, servicesFileName, composeOverrideFile
   from deps.yaml_merge import mergeYaml
@@ -75,6 +76,13 @@ def main():
       with open(r'%s' % dockerSavePathOutput, 'w') as outputFile:
         yaml.dump(menuStateFileYaml, outputFile, default_flow_style=False, sort_keys=False)
       runPostBuildHook()
+
+      if os.path.exists('./postbuild.sh'):
+        servicesList = ""
+        for (index, serviceName) in enumerate(dockerComposeServicesYaml):
+          servicesList += " " + serviceName
+        subprocess.call("./postbuild.sh" + servicesList, shell=True)
+
       return True
     except Exception as err: 
       print("Issue running build:")
@@ -263,6 +271,7 @@ def main():
             print(term.center("{bv}      [Right] for options for containers that support them                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
             print(term.center("{bv}      [Tab] Expand or collapse build menu size                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
             print(term.center("{bv}      [H] Show/hide this text                                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            # print(term.center("{bv}      [F] Filter options                                                        {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
             print(term.center("{bv}      [Enter] to begin build                                                    {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
             print(term.center("{bv}      [Escape] to cancel build                                                  {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
             print(term.center(commonEmptyLine(renderMode)))
@@ -603,6 +612,7 @@ def main():
                 hideHelpText = False
               else:
                 hideHelpText = True
+              needsRender = 1
           else:
             print(key)
             time.sleep(0.5)

@@ -24,7 +24,7 @@ def main():
   
   def setSwapinessTo0():
     print("Set swapiness to 0:")
-    subprocess.call(".scripts/disable_swap.sh disableswap", shell=True)
+    subprocess.call("./scripts/disable_swap.sh disableswap", shell=True)
     print("")
     time.sleep(1)
     return True
@@ -33,7 +33,7 @@ def main():
     print("Disabling swap...")
     setSwapinessTo0()
     print("Uninstall Swapfile:")
-    subprocess.call(".scripts/disable_swap.sh uninstallswap", shell=True)
+    subprocess.call("./scripts/disable_swap.sh uninstallswap", shell=True)
     print("")
     time.sleep(1)
     return True

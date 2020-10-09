@@ -87,3 +87,4 @@ The selected services' yaml configuration is already loaded into memory before t
 4. If it exists merge the `./compose-override.yml` file into memory
 5. Write the docker-compose in memory yaml structure to disk.
 6. Run postbuildHooks.
+7. Run `postbuild.sh` if it exists, with the list of services built.

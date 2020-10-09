@@ -21,7 +21,16 @@ def main():
     hideHelpText = False
 
   term = Terminal()
-  
+
+  def runBackup():
+    print("Execute Backup:")
+    subprocess.call("./scripts/backup.sh", shell=True)
+    print("")
+    print("Backup completed.")
+    print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(1)
+    return True
+
   def dropboxInstall():
     print("Install Dropbox:")
     subprocess.call("git clone https://github.com/andreafabrizi/Dropbox-Uploader.git ~/Dropbox-Uploader", shell=True)
@@ -32,7 +41,7 @@ def main():
     print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
     return True
-  
+
   def rcloneInstall():
     print("Install rClone:")
     print("sudo apt install -y rclone")
@@ -51,6 +60,16 @@ def main():
     time.sleep(1)
     return True
 
+  def runRestore():
+    print("Execute Restore:")
+    # subprocess.call("./scripts/restore.sh", shell=True)
+    print("")
+    print("Not yet implemented")
+    # print("Restore completed.")
+    print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(1)
+    return True
+
   def goBack():
     global backupRestoreSelectionInProgress
     global needsRender
@@ -59,9 +78,11 @@ def main():
     return True
 
   mainMenuList = [
+    ["Run backup", runBackup],
     ["Install Dropbox", dropboxInstall],
     ["Install rclone", rcloneInstall],
     ["Setup rclone (must be installed first)", rCloneSetup],
+    ["Restore from backup", runRestore],
     ["Back", goBack]
   ]
 
@@ -138,6 +159,7 @@ def main():
       print(term.center(commonBottomBorder(renderMode)))
 
   def runSelection(selection):
+    mainRender(1, mainMenuList, currentMenuItemIndex)
     import types
     if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
       mainMenuList[selection][1]()
