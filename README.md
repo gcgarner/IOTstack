@@ -1,15 +1,19 @@
 # IOT Stack
+
 IOTstack is a builder for docker-compose to easily make and maintain IoT stacks on the Raspberry Pi.
 
+## Getting started
 
-## Documentation for the project: 
+See [Getting Started](https://sensorsiot.github.io/IOTstack/Getting-Started) in the Wiki. It includes:
 
-https://sensorsiot.github.io/IOTstack/
+* A link to Andreas Spiess video #295.
+* How to download the project (including constraints you need to observe).
+* Running the menu to install Docker and set up your containers.
+* Useful Docker commands (start \& stop the stack, manage containers).
 
+See also the [documentation home page](https://sensorsiot.github.io/IOTstack/).
 
-## Video
-https://youtu.be/a6mjt8tWUws
-
+## Migrating from the old repo?
 
 ## Installation
 ### Automatic
@@ -21,13 +25,16 @@ curl -fsSL https://raw.githubusercontent.com/SensorsIot/IOTstack/master/install.
 ### Manual
 1. Install git
 ```
-sudo apt-get install git -y
+$ cd ~/IOTstack
+$ git remote set-url origin https://github.com/SensorsIot/IOTstack.git
+$ git pull origin master
+$ git checkout master
+$ docker-compose down
+$ ./menu.sh
+$ docker-compose up -d
 ```
 
-2. Download the repository with:
-```
-git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
-```
+## Experimental Features
 
 ## Running
 1. To enter the directory and run menu for installation options:
@@ -40,17 +47,27 @@ bash ./menu.sh
 
 3. Run menu again to select your build options, then start docker-compose with
 ```
-docker-compose up -d
+$ cd ~/IOTstack
+$ git pull origin master
+$ git checkout master
+$ ./menu.sh
 ```
 
-## Experimental Features
 Want to have the latest and greatest features? Switch to the experimental branch:
+
 ```
-git pull && git checkout experimental
-./menu.sh
+$ cd ~/IOTstack
+$ git pull origin master
+$ git checkout experimental
+$ ./menu.sh
 ```
 
-Do note that the experimental branch may be broken, or may break your setup, so ensure you have a good backup, and please report any issues.
+Do note that the experimental branch may be broken, or may break your setup, so ensure you have a good backup, and please report any issues. The way back is:
+
+
+## Contributions
+
+Please use the [issues](https://github.com/SensorsIot/IOTstack/issues) tab to report issues.
 
 ## Migrating from the old repo?
 ```
@@ -63,6 +80,8 @@ docker-compose up -d
 ```
 
 ## Need help? Have a feature suggestion? Discovered a bug?
-We have a Discord server setup for discussions: https://discord.gg/ZpKHnks
+We have a Discord server setup for discussions: [IOTstack Discord channel](https://discord.gg/ZpKHnks) if you want to comment on features, suggest new container types, or ask the IOTstack community for help.
 
 You can also report bugs or suggestions to our Github: https://github.com/SensorsIot/IOTstack/issues
+
+If you use some of the tools in the project please consider donating or contributing on their projects. It doesn't have to be monetary. Reporting bugs and creating Pull Requests helps improve the projects for everyone.
