@@ -21,6 +21,18 @@ function command_exists() {
 	command -v "$@" > /dev/null 2>&1
 }
 
+function user_in_group()
+{
+    # see if the group exists
+    grep -q "^$1:" /etc/group;
+
+    # sense that the group does not exist
+    if [ $? -ne 0 ]; then return 0; fi
+
+    # group exists - now check that the user is a member
+    groups | grep -q "\b$1\b"
+}
+
 function minimum_version_check() {
 	# Usage: minimum_version_check required_version current_major current_minor current_build
 	# Example: minimum_version_check "1.2.3" 1 2 3
