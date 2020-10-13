@@ -72,7 +72,7 @@ declare -a armhf_keys=(
 	"adminer"
 	"openhab"
 	"zigbee2mqtt"
-  	"deconz"
+	"deconz"
 	"pihole"
 	"plex"
 	"tasmoadmin"
@@ -131,6 +131,18 @@ password_dialog() {
 
 function command_exists() {
 	command -v "$@" > /dev/null 2>&1
+}
+
+function user_in_group()
+{
+    # see if the group exists
+    grep -q "^$1:" /etc/group;
+
+    # sense that the group does not exist
+    if [ $? -ne 0 ]; then return 0; fi
+
+    # group exists - now check that the user is a member
+    groups | grep -q "\b$1\b"
 }
 
 function minimum_version_check() {
@@ -355,8 +367,29 @@ if command_exists docker; then
 			sudo apt upgrade docker docker-compose
 		fi
 	fi
+	
+	requestRebootflag=0
+
+	for G in docker bluetooth ; do
+
+		if user_in_group $G ; then
+			echo "checked membership of $G group."
+		else
+			echo "user is NOT a member of the $G group. Setting it now."
+			sudo usermod -G $G -a $USER
+			requestRebootflag=1
+		fi
+
+	done
+
+	if [ $requestRebootflag = 1 ] ; then
+		if (whiptail --title "Restart Required" --yesno "It is recommended that you restart your device now. Select yes to do so now" 20 78); then
+			sudo reboot
+		fi
+	fi
+	
 else
-	echo "docker not installed"
+	echo "docker not installed - you must choose Install Docker"
 fi
 
 #---------------------------------------------------------------------------------------------------
@@ -384,7 +417,8 @@ case $mainmenu_selection in
 	else
 		echo "Install Docker"
 		curl -fsSL https://get.docker.com | sh
-		sudo usermod -aG docker $USER
+		sudo usermod -G docker -a $USER
+		sudo usermod -G bluetooth -a $USER
 	fi
 
 	if command_exists docker-compose; then
