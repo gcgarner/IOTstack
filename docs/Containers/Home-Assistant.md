@@ -10,7 +10,7 @@ Hass.io is exposed to your hosts' network in order to discover devices on your L
 There are 2 versions of Home Assistant: Hass.io and Home Assistant Docker. Hass.io uses its own orchastration with 3 docker images: `hassio_supervisor`, `hassio_dns` and `homeassistant`. Home Assistant Docker runs inside a single docker image, and doesn't support all the features that Hass.io does (such as add-ons). IOTstack allows installing either, but we can only offer limited configuration of Hass.io since it is its own platform. [More info on versions](https://www.home-assistant.io/docs/installation/#recommended)
 
 ## Menu installation
-Hass.io installation can be found inside the `Navtive Installs` menu on the main menu. Home Assistant can be found in the `Build Stack` menu.
+Hass.io installation can be found inside the `Native Installs` menu on the main menu. Home Assistant can be found in the `Build Stack` menu.
 
 You will be asked to select you device type during the installation. Hass.io is no longer dependant on the IOTstack, it has its own service for maintaining its uptime.
 
