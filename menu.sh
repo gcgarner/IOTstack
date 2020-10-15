@@ -138,7 +138,8 @@ function check_git_updates()
 function install_python3_and_deps() {
 	CURR_PYTHON_VER="${1:-Unknown}"
 	CURR_PYYAML_VER="${2:-Unknown}"
-	if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER), PyYaml 5.3.1 or later (Current = $CURR_PYYAML_VER), blessed and pip3 are required for the main menu and compose-overrides.yml file to merge into the docker-compose.yml file. Install these now?" 20 78); then
+	if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER), PyYaml 5.3.1 or later (Current = $CURR_PYYAML_VER), blessed and pip3 are required for IOTstack to function correctly. Install these now?" 20 78); then
+		sudo apt update
 		sudo apt install -y python3-pip python3-dev
 		if [ $? -eq 0 ]; then
 			PYTHON_VERSION_GOOD="true"
