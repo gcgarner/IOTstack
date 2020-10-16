@@ -90,6 +90,7 @@ def onResize(sig, action):
 # Menu Functions
 def exitMenu():
   print("Exiting IOTstack menu.")
+  print(term.clear())
   sys.exit(0)
 
 def buildStack():
