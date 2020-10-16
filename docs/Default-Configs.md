@@ -9,35 +9,36 @@ Do note that the ports listed are not all of the ports containers use. They are 
 
 ## List of defaults
 
-| Service Name | Default Username | Default Password | Default External HTTP/S Port | Multiple Passwords |
-| ------------ | ---------------- | ---------------- | ---------------------------- | ------------------ |
-| adminer      | *none*    | *none*     | 9080   | No |
-| blynk_server | *none*    | *none*     | 8180   | No |
-| deconz       | *none*    | IOtSt4ckDec0nZ | 8090 | No |
-| diyhue       | *none*    | *none*     | 8070   | No |
-| dozzle       | *none*    | *none*     | 8080   | No |
-| espruinohub  | *none*    | *none*     | *none* | No |
-| gitea        | *none*    | *none*     | 7920   | No |
-| grafana      | *none*    | *none*     | 3000   | No |
-| home_assistant | *none*  | *none*     | 8123   | No |
-| homebridge   | *none*    | *none*     | 4040   | No |
-| influxdb     | influxuser | IOtSt4ckInfluX | *none* | Yes |
-| mariadb      | mariadbuser | IOtSt4ckmariaDbPw | *none* | Yes |
-| mosquitto    | *none*    | *none*     | *none* | No |
-| motioneye    | *none*    | *none*     | 8765   | No |
-| nextcloud    | *none*    | *none*     | 9321   | No |
-| nodered      | nodered   | nodered    | 1880   | No |
-| openhab      | *none*    | *none*     | 4050   | No |
-| pihole       | *none*    | IOtSt4ckP1Hol3 | 8089 | No |
-| plex         | *none*    | *none*     | *none* | No |
-| portainer    | *none*    | *none*     | 9000   | No |
-| postgres     | postuser  | IOtSt4ckpostgresDbPw   | *none* | Yes |
-| python       | *none*    | *none*     | *none* | No |
-| rtl_433      | *none*    | *none*     | *none* | No |
-| tasmoadmin   | *none*    | *none*     | 8088   | No |
-| telegraf     | *none*    | *none*     | *none* | No |
-| timescaledb  | timescaleuser | IOtSt4ckTim3Scale | *none* | No |
-| transmission | *none*    | *none*     | 9091   | No |
+| Service Name   | Default Username | Default Password | Default External HTTP/S WUI Port | Multiple Passwords |
+| -------------- | ---------------- | ---------------- | -------------------------------- | ------------------ |
+| adminer        | *none*    | *none*     | 9080   | No |
+| blynk_server   | *none*    | *none*     | 8180   | No |
+| deconz         | *none*    | IOtSt4ckDec0nZ | 8090 | No |
+| diyhue         | *none*    | *none*     | 8070   | No |
+| dozzle         | *none*    | *none*     | 8080   | No |
+| espruinohub    | *none*    | *none*     | *none* | No |
+| gitea          | *none*    | *none*     | 7920   | No |
+| grafana        | *none*    | *none*     | 3000   | No |
+| home_assistant | *none*    | *none*     | 8123   | No |
+| homebridge     | *none*    | *none*     | 4040   | No |
+| influxdb       | influxuser | IOtSt4ckInfluX | *none* | Yes |
+| mariadb        | mariadbuser | IOtSt4ckmariaDbPw | *none* | Yes |
+| mosquitto      | *none*    | *none*     | *none* | No |
+| motioneye      | *none*    | *none*     | 8765   | No |
+| nextcloud      | *none*    | *none*     | 9321   | No |
+| nodered        | nodered   | nodered    | 1880   | No |
+| openhab        | *none*    | *none*     | 4050   | No |
+| pihole         | *none*    | IOtSt4ckP1Hol3 | 8089 | No |
+| plex           | *none*    | *none*     | *none* | No |
+| portainer      | *none*    | *none*     | 9002   | No |
+| portainer-ce   | *none*    | *none*     | 9001   | No |
+| postgres       | postuser  | IOtSt4ckpostgresDbPw   | *none* | Yes |
+| python         | *none*    | *none*     | *none* | No |
+| rtl_433        | *none*    | *none*     | *none* | No |
+| tasmoadmin     | *none*    | *none*     | 8088   | No |
+| telegraf       | *none*    | *none*     | *none* | No |
+| timescaledb    | timescaleuser | IOtSt4ckTim3Scale | *none* | No |
+| transmission   | *none*    | *none*     | 9091   | No |
 | webthings_gateway | *none* | *none*   | 4060   | No |
-| zigbee2mqtt  | *none*    | *none*     | *none* | No |
+| zigbee2mqtt    | *none*    | *none*     | *none* | No |
 | zigbee2mqtt_assistant | *none*        | *none* | *none* | No |
