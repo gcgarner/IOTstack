@@ -240,12 +240,14 @@ function do_env_setup() {
 	if [[ ! "$(user_in_group bluetooth)" == "notgroup" ]] && [[ ! "$(user_in_group bluetooth)" == "true" ]]; then
     echo "User is NOT in 'bluetooth' group. Adding:" >&2
     echo "sudo usermod -G bluetooth -a $USER" >&2
+		echo "You will need to restart your system before the changes take effect."
 		sudo usermod -G "bluetooth" -a $USER
 	fi
 
 	if [ ! "$(user_in_group docker)" == "true" ]; then
     echo "User is NOT in 'docker' group. Adding:" >&2
     echo "sudo usermod -G docker -a $USER" >&2
+		echo "You will need to restart your system before the changes take effect."
 		sudo usermod -G "docker" -a $USER
 	fi
 }
@@ -258,6 +260,11 @@ function do_docker_checks() {
 		if [[ "$DOCKER_VERSION" == *"Cannot connect to the Docker daemon"* ]]; then
 			echo "Error getting docker version. Error when connecting to docker daemon. Check that docker is running."
 			if (whiptail --title "Docker and Docker-Compose" --yesno "Error getting docker version. Error when connecting to docker daemon. Check that docker is running.\n\nExit?" 20 78); then
+				exit 1
+			fi
+		elif [[ "$DOCKER_VERSION" == *" permission denied"* ]]; then
+			echo "Error getting docker version. Received permission denied error. Try running with: ./menu.sh --run-env-setup"
+			if (whiptail --title "Docker and Docker-Compose" --yesno "Error getting docker version. Received permission denied error.\n\nTry rerunning the menu with: ./menu.sh --run-env-setup\n\nExit?" 20 78); then
 				exit 1
 			fi
 			return 0
