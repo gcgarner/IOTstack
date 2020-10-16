@@ -49,3 +49,7 @@ addons:
     - "node-red-contrib-zigbee2mqtt"
     - "node-red-contrib-vcgencmd"
     - "node-red-contrib-themes/midnight-red"
+    - "node-red-contrib-tf-function"
+    - "node-red-contrib-tf-model"
+    - "node-red-contrib-post-object-detection"
+    - "node-red-contrib-bert-tokenizer"
