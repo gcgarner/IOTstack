@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Minimum Software Versions
 REQ_DOCKER_VERSION=18.2.0
 REQ_PYTHON_VERSION=3.6.9
@@ -21,7 +23,7 @@ do
 done
 
 echo "IOTstack Installation"
-if [ "$EUID" -eq 0 ]; then
+if [ "$EUID" -eq "0" ]; then
   echo "Please do not run as root"
   exit
 fi

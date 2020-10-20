@@ -19,7 +19,7 @@ See also the [documentation home page](https://sensorsiot.github.io/IOTstack/).
 ### Automatic
 1. Run the following command:
 ```
-curl -fsSL https://raw.githubusercontent.com/SensorsIot/IOTstack/master/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/SensorsIot/IOTstack/master/install.sh | bash
 ```
 
 ### Manual
