@@ -28,6 +28,7 @@ if [ "$1" == "install" ]; then
     RESTART_REQUIRED="true"
     echo "Install docker-compose" >&2
     apt install -y docker-compose
+    usermod -aG docker $USER
   fi
 
   if [ "$RESTART_REQUIRED" == "true" ]; then

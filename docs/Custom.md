@@ -113,6 +113,20 @@ services:
       - ./services/mosquitto/filter.acl:/mosquitto/config/filter.acl
 ```
 
+### Using env files instead of docker-compose variables
+
+If you need or prefer to use *.env files for docker-compose environment variables in a separate file instead of using overrides, you can do so like this:
+
+```
+services:
+  grafana:
+    env_file:
+      - ./services/grafana/grafana.env
+    environment:
+```
+
+This will remove the default environment variables set in the template, and tell docker-compose to use the variables specified in your file. It is not mandatory that the *.env file be placed in the service's service directory, but is strongly suggested. Keep in mind the [PostBuild Script](https://sensorsiot.github.io/IOTstack/PostBuild-Script) functionality to automatically copy your *.env files into their directories on successful build if you need to.
+
 ### Adding custom services
 
 Custom services can be added in a similar way to overriding default settings for standard services. Lets add a Minecraft and rcon server to IOTstack.

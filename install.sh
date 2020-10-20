@@ -275,7 +275,7 @@ function do_env_checks() {
 echo "Enter in the sudo password when prompted, to install dependencies"
 
 sudo apt-get install git -y
-git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
+git clone https://github.com/SensorsIot/IOTstack.git
 
 do_python3_checks
 do_docker_checks

@@ -7,6 +7,8 @@ __pycache__
 docker-compose.yml
 compose-override.yml
 postbuild.sh
+pre_backup.sh
+post_backup.sh
 .project_outofdate
 .outofdate
 .docker_notinstalled
