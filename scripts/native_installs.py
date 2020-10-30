@@ -64,6 +64,28 @@ def main():
     mainRender(2, mainMenuList, currentMenuItemIndex)
     return True
 
+  def installDockerAndCompose():
+    print("Install docker")
+    print("Install docker-compose")
+    print("./scripts/install_docker.sh install")
+    subprocess.call("./scripts/install_docker.sh install", shell=True)
+    print("")
+    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(0.5)
+    mainRender(2, mainMenuList, currentMenuItemIndex)
+    return True
+
+  def upgradeDockerAndCompose():
+    print("Install docker")
+    print("Install docker-compose")
+    print("./scripts/install_docker.sh upgrade")
+    subprocess.call("./scripts/install_docker.sh upgrade", shell=True)
+    print("")
+    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(0.5)
+    mainRender(2, mainMenuList, currentMenuItemIndex)
+    return True
+
   def goBack():
     global dockerCommandsSelectionInProgress
     global needsRender
@@ -77,6 +99,8 @@ def main():
     ["Hass.io (Supervisor)", installHassIo],
     ["RTL_433", installRtl433],
     ["RPIEasy", installRpiEasy],
+    ["Upgrade Docker and Docker-Compose", upgradeDockerAndCompose],
+    ["Install Docker and Docker-Compose", installDockerAndCompose],
     ["Back", goBack]
   ]
 
