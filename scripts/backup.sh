@@ -81,11 +81,12 @@ if [[ "$BACKUPTYPE" -eq "2" || "$BACKUPTYPE" -eq "3" ]]; then
   echo "Rolling File: $ROLLING" >> $LOGFILE
 fi
 
+echo "" > $BACKUPLIST
+
 echo "" > $LOGFILE
 echo "Executing prebackup scripts" > $LOGFILE
 bash ./scripts/backup_restore/pre_backup_complete.sh >> $LOGFILE 2>&1
 
-echo "" > $BACKUPLIST
 echo "./docker-compose.yml" >> $BACKUPLIST
 echo "./services/" >> $BACKUPLIST
 echo "./volumes/" >> $BACKUPLIST
