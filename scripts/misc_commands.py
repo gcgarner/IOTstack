@@ -26,6 +26,7 @@ def main():
     print("Set swapiness to 0:")
     subprocess.call("./scripts/disable_swap.sh disableswap", shell=True)
     print("")
+    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
     return True
   
@@ -35,6 +36,7 @@ def main():
     print("Uninstall Swapfile:")
     subprocess.call("./scripts/disable_swap.sh uninstallswap", shell=True)
     print("")
+    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
     return True
 
@@ -42,6 +44,15 @@ def main():
     print("Install log2ram:")
     subprocess.call("bash disable_swap.sh", shell=True)
     print("")
+    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    time.sleep(1)
+    return True
+
+  def installGithubSshKeys():
+    print("Install Github SSH Keys:")
+    subprocess.call("bash ./scripts/install_ssh_keys.sh", shell=True)
+    print("")
+    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
     return True
 
@@ -56,6 +67,7 @@ def main():
     ["Set swapiness to 0 (Disables swap until restart)", setSwapinessTo0],
     ["Uninstall Swapfile (Disables swap)", uninstallSwapfile],
     ["Install log2ram", installLog2Ram],
+    ["Install SSH keys from your Github", installGithubSshKeys],
     ["Back", goBack]
   ]
 
