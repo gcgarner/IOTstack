@@ -87,7 +87,6 @@ echo "" >> $LOGFILE
 echo "Executing prebackup scripts" >> $LOGFILE
 bash ./scripts/backup_restore/pre_backup_complete.sh >> $LOGFILE 2>&1
 
-echo "./docker-compose.yml" >> $BACKUPLIST
 echo "./services/" >> $BACKUPLIST
 echo "./volumes/" >> $BACKUPLIST
 [ -f "./docker-compose.yml" ] && echo "./docker-compose.yml" >> $BACKUPLIST
@@ -143,7 +142,7 @@ if [[ -f "$TMPBACKUPFILE" ]]; then
   rm -rf $BACKUPLIST >> $LOGFILE 2>&1
   rm -rf $TMPBACKUPFILE >> $LOGFILE 2>&1
 else
-  echo "Something went wrong backing up. The backup file doesn't exist. Temporary files were not removed"
+  echo "Something went wrong backing up. The temporary backup file doesn't exist. No temporary files were removed"
   echo "Files: "
   echo "  $BACKUPLIST"
 fi
