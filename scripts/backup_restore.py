@@ -62,10 +62,9 @@ def main():
 
   def runRestore():
     print("Execute Restore:")
-    # subprocess.call("./scripts/restore.sh", shell=True)
+    subprocess.call("./scripts/restore.sh", shell=True)
     print("")
-    print("Not yet implemented")
-    # print("Restore completed.")
+    print("Restore completed.")
     print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
     return True
