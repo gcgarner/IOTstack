@@ -46,8 +46,8 @@ def main():
 
   def installRtl433():
     print("Install RTL_433")
-    print("./.native/rtl_433.sh")
-    subprocess.call("./.native/rtl_433.sh", shell=True)
+    print("bash ./.native/rtl_433.sh")
+    subprocess.call("bash ./.native/rtl_433.sh", shell=True)
     print("")
     print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
@@ -56,8 +56,8 @@ def main():
 
   def installRpiEasy():
     print("Install RPIEasy")
-    print("./.native/rpieasy.sh")
-    subprocess.call("./.native/rpieasy.sh", shell=True)
+    print("bash ./.native/rpieasy.sh")
+    subprocess.call("bash ./.native/rpieasy.sh", shell=True)
     print("")
     print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
@@ -67,8 +67,8 @@ def main():
   def installDockerAndCompose():
     print("Install docker")
     print("Install docker-compose")
-    print("./scripts/install_docker.sh install")
-    subprocess.call("./scripts/install_docker.sh install", shell=True)
+    print("bash ./scripts/install_docker.sh install")
+    subprocess.call("bash ./scripts/install_docker.sh install", shell=True)
     print("")
     print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)
@@ -78,8 +78,8 @@ def main():
   def upgradeDockerAndCompose():
     print("Install docker")
     print("Install docker-compose")
-    print("./scripts/install_docker.sh upgrade")
-    subprocess.call("./scripts/install_docker.sh upgrade", shell=True)
+    print("bash ./scripts/install_docker.sh upgrade")
+    subprocess.call("bash ./scripts/install_docker.sh upgrade", shell=True)
     print("")
     print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(0.5)

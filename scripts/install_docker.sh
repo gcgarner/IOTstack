@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ -z "$1" ]; then
   echo "You must specify whether to install or upgrade docker."
   exit
