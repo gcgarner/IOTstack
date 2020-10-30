@@ -81,10 +81,10 @@ if [[ "$BACKUPTYPE" -eq "2" || "$BACKUPTYPE" -eq "3" ]]; then
   echo "Rolling File: $ROLLING" >> $LOGFILE
 fi
 
-echo "" > $BACKUPLIST
+echo "" >> $BACKUPLIST
 
-echo "" > $LOGFILE
-echo "Executing prebackup scripts" > $LOGFILE
+echo "" >> $LOGFILE
+echo "Executing prebackup scripts" >> $LOGFILE
 bash ./scripts/backup_restore/pre_backup_complete.sh >> $LOGFILE 2>&1
 
 echo "./docker-compose.yml" >> $BACKUPLIST
@@ -124,11 +124,11 @@ if [[ "$BACKUPTYPE" -eq "2" || "$BACKUPTYPE" -eq "3" ]]; then
 fi
 
 echo "Backup Size (bytes): $(stat --printf="%s" $TMPBACKUPFILE)" >> $LOGFILE
-echo "" > $LOGFILE
+echo "" >> $LOGFILE
 
-echo "Executing postbackup scripts" > $LOGFILE
+echo "Executing postbackup scripts" >> $LOGFILE
 bash ./scripts/backup_restore/post_backup_complete.sh >> $LOGFILE 2>&1
-echo "" > $LOGFILE
+echo "" >> $LOGFILE
 
 echo "Finished At: $(date +"%Y-%m-%dT%H-%M-%S")" >> $LOGFILE
 echo "" >> $LOGFILE

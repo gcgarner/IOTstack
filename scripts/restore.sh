@@ -75,9 +75,9 @@ sudo rm -rf ./post_restore.sh >> $LOGFILE 2>&1
 sudo tar -zxvf \
 	$RESTOREFILE >> $LOGFILE 2>&1
 
-echo "" > $LOGFILE
+echo "" >> $LOGFILE
 
-echo "Executing post restore scripts" > $LOGFILE
+echo "Executing post restore scripts" >> $LOGFILE
 bash ./scripts/backup_restore/post_restore_complete.sh >> $LOGFILE 2>&1
 echo "" > $LOGFILE
 
