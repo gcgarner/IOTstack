@@ -133,16 +133,20 @@ echo "" >> $LOGFILE
 echo "Finished At: $(date +"%Y-%m-%dT%H-%M-%S")" >> $LOGFILE
 echo "" >> $LOGFILE
 
-echo "Items backed up:" >> $LOGFILE
-cat $BACKUPLIST >> $LOGFILE 2>&1
-
-echo "" >> $LOGFILE
-echo "Items Excluded:" >> $LOGFILE
-echo "./volumes/influxdb/*" >> $LOGFILE 2>&1
-echo "./volumes/nextcloud/*" >> $LOGFILE 2>&1
-
-rm -rf $BACKUPLIST >> $LOGFILE 2>&1
-rm -rf $TMPBACKUPFILE >> $LOGFILE 2>&1
+if [[ -f "$TMPBACKUPFILE" ]]; then
+  echo "Items backed up:" >> $LOGFILE
+  cat $BACKUPLIST >> $LOGFILE 2>&1
+  echo "" >> $LOGFILE
+  echo "Items Excluded:" >> $LOGFILE
+  echo "./volumes/influxdb/*" >> $LOGFILE 2>&1
+  echo "./volumes/nextcloud/*" >> $LOGFILE 2>&1
+  rm -rf $BACKUPLIST >> $LOGFILE 2>&1
+  rm -rf $TMPBACKUPFILE >> $LOGFILE 2>&1
+else
+  echo "Something went wrong backing up. The backup file doesn't exist. Temporary files were not removed"
+  echo "Files: "
+  echo "  $BACKUPLIST"
+fi
 
 echo "" >> $LOGFILE
 echo "### End of log ###" >> $LOGFILE
