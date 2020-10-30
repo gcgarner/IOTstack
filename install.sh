@@ -150,15 +150,18 @@ function install_docker() {
   else
     echo "Install Docker" >&2
     curl -fsSL https://get.docker.com | sh
-    usermod -aG docker $USER
+    sudo usermod -aG docker $USER
   fi
 
   if command_exists docker-compose; then
     echo "docker-compose already installed" >&2
   else
     echo "Install docker-compose" >&2
-    apt install -y docker-compose
+    sudo apt install -y docker-compose
   fi
+
+	echo "" >&2
+	echo "You should now restart your system" >&2
 }
 
 function update_docker() {

@@ -256,10 +256,10 @@ function do_docker_checks() {
 	if command_exists docker; then
 		DOCKER_VERSION_GOOD="false"
 		DOCKER_VERSION=$(docker version -f "{{.Server.Version}}" 2>&1)
-
+		echo "Command: docker version -f \"{{.Server.Version}}\""
 		if [[ "$DOCKER_VERSION" == *"Cannot connect to the Docker daemon"* ]]; then
 			echo "Error getting docker version. Error when connecting to docker daemon. Check that docker is running."
-			if (whiptail --title "Docker and Docker-Compose" --yesno "Error getting docker version. Error when connecting to docker daemon. Check that docker is running.\n\nExit?" 20 78); then
+			if (whiptail --title "Docker and Docker-Compose" --yesno "Error getting docker version. Error when connecting to docker daemon. Check that docker is running.\n\nCommand: docker version -f \"{{.Server.Version}}\"\n\nExit?" 20 78); then
 				exit 1
 			fi
 		elif [[ "$DOCKER_VERSION" == *" permission denied"* ]]; then
