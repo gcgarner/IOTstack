@@ -23,15 +23,18 @@ def main():
   term = Terminal()
 
   def runBackup():
+    global needsRender
     print("Execute Backup:")
     subprocess.call("./scripts/backup.sh", shell=True)
     print("")
     print("Backup completed.")
     print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
+    needsRender = 1
     return True
 
   def dropboxInstall():
+    global needsRender
     print("Install Dropbox:")
     subprocess.call("git clone https://github.com/andreafabrizi/Dropbox-Uploader.git ~/Dropbox-Uploader", shell=True)
     subprocess.call("chmod +x ~/Dropbox-Uploader/dropbox_uploader.sh", shell=True)
@@ -40,9 +43,11 @@ def main():
     print("Dropbox install finished")
     print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
+    needsRender = 1
     return True
 
   def rcloneInstall():
+    global needsRender
     print("Install rClone:")
     print("sudo apt install -y rclone")
     subprocess.call("sudo apt install -y rclone", shell=True)
@@ -50,23 +55,28 @@ def main():
     print("rClone install finished")
     print("Please run 'rclone config' to configure the rclone google drive backup")
     print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    needsRender = 1
     return True
 
   def rCloneSetup():
+    global needsRender
     print("Setup rclone:")
     subprocess.call("rclone config", shell=True)
     print("")
     print("rclone setup completed. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
+    needsRender = 1
     return True
 
   def runRestore():
+    global needsRender
     print("Execute Restore:")
     subprocess.call("./scripts/restore.sh", shell=True)
     print("")
     print("Restore completed.")
     print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     time.sleep(1)
+    needsRender = 1
     return True
 
   def goBack():

@@ -97,11 +97,7 @@ echo "./volumes/" >> $BACKUPLIST
 [ -f "./post_backup.sh" ] && echo "./post_backup.sh" >> $BACKUPLIST
 [ -f "./pre_backup.sh" ] && echo "./pre_backup.sh" >> $BACKUPLIST
 
-sudo tar -czf \
-	$TMPBACKUPFILE \
-	--exclude=./volumes/influxdb/* \
-	--exclude=./volumes/nextcloud/* \
-	-T $BACKUPLIST >> $LOGFILE 2>&1
+sudo tar -czf $TMPBACKUPFILE -T $BACKUPLIST >> $LOGFILE 2>&1
 
 [ -f "$ROLLING" ] && ROLLINGOVERWRITTEN=1 && rm -rf $ROLLING
 
@@ -137,8 +133,7 @@ if [[ -f "$TMPBACKUPFILE" ]]; then
   cat $BACKUPLIST >> $LOGFILE 2>&1
   echo "" >> $LOGFILE
   echo "Items Excluded:" >> $LOGFILE
-  echo "./volumes/influxdb/*" >> $LOGFILE 2>&1
-  echo "./volumes/nextcloud/*" >> $LOGFILE 2>&1
+  echo " - No items" >> $LOGFILE 2>&1
   rm -rf $BACKUPLIST >> $LOGFILE 2>&1
   rm -rf $TMPBACKUPFILE >> $LOGFILE 2>&1
 else
