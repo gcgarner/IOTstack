@@ -61,7 +61,7 @@ There are 2 ways to run a restore:
 
 ### Arguments
 ```
-./scripts/backup.sh {FILENAME=backup.tar.gz} {noask}
+./scripts/restore.sh {FILENAME=backup.tar.gz} {noask}
 ```
 The restore script takes 2 arguments:
 * Filename: The name of the backup file. The file must be present in the `./backups/` directory, or a subfolder in it. That means it should be moved from `./backups/backup` to `./backups/`, or that you need to specify the `backup` portion of the directory (see examples)
