@@ -30,7 +30,7 @@ def main():
 
   def startStack():
     print("Start Stack:")
-    print("docker-compose up -d")
+    print("docker-compose up -d --remove-orphans")
     subprocess.call("docker-compose up -d", shell=True)
     print("")
     print("Stack Started")
@@ -39,9 +39,16 @@ def main():
     return True
   
   def restartStack():
-    print("Restart Stack:")
-    print("docker-compose restart")
-    subprocess.call("docker-compose restart", shell=True)
+    print("Restarting Stack...")
+    print("Stop Stack:")
+    print("docker-compose down")
+    subprocess.call("docker-compose down", shell=True)
+    print("")
+    print("Start Stack:")
+    print("docker-compose up -d --remove-orphans")
+    subprocess.call("docker-compose up -d", shell=True)
+    # print("docker-compose restart")
+    # subprocess.call("docker-compose restart", shell=True)
     print("")
     print("Stack Restarted")
     time.sleep(2)

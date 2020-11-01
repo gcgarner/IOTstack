@@ -17,7 +17,7 @@ The command that's run from the command line can also be executed from a cronjob
 
 The current directory of bash must be in IOTstack's directory, to ensure that it can find the relative paths of the files it's meant to back up. In the example above, it's assume that it's inside the `pi` user's home directory.
 
-### Arguements
+### Arguments
 ```
 ./scripts/backup.sh {TYPE=3} {USER=$(whoami)}
 ```
@@ -58,6 +58,14 @@ There are 2 ways to run a restore:
 **Important**: The restore script assumes that the IOTstack directory is fresh, as if it was just cloned. If it is not fresh, errors may occur, or your data may not correctly be restored even if no errors are apparent.
 
 *Note*: It is suggested that you test that your backups can be restored after initially setting up, and anytime you add or remove a service. Major updates to services can also break backups.
+
+### Arguments
+```
+./scripts/backup.sh {FILENAME=backup.tar.gz} {noask}
+```
+The restore script takes 2 arguments:
+* Filename: The name of the backup file. The file must be present in the `./backups/` directory, or a subfolder in it. That means it should be moved from `./backups/backup` to `./backups/`, or that you need to specify the `backup` portion of the directory (see examples)
+* NoAsk: If a second parameter is present, is acts as setting the no ask flag to true. 
 
 ## Pre and post script hooks
 The script checks if there are any pre and post back up hooks to execute commands. Both of these files will be included in the backup, and have also been added to the `.gitignore` file, so that they will not be touched when IOTstack updates.

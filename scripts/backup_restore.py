@@ -168,12 +168,14 @@ def main():
       print(term.center(commonBottomBorder(renderMode)))
 
   def runSelection(selection):
+    global needsRender
     mainRender(1, mainMenuList, currentMenuItemIndex)
     import types
     if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
       mainMenuList[selection][1]()
     else:
       print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(mainMenuList[selection][0])))
+    needsRender = 1
 
   def isMenuItemSelectable(menu, index):
     if len(menu) > index:
