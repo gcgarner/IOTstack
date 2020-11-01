@@ -84,3 +84,21 @@ To use it, simple create a `./post_backup.sh` file in IOTstack's main directory.
 The post restore hook script is executed after all files have been extracted and written to disk. It can be used to apply permissions that your custom services may require.
 
 To use it, simple create a `./post_restore.sh` file in IOTstack's main directory. It will be executed after a restore happens.
+
+## Third party integration
+This section explains how to backup your files with 3rd party software.
+
+### Dropbox
+Coming soon.
+
+### Google Drive
+Coming soon.
+
+### rsync
+Coming soon.
+
+### Duplicati
+Coming soon.
+
+### SFTP
+Coming soon.
