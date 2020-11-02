@@ -1,6 +1,7 @@
   telegraf:
     container_name: telegraf
     image: telegraf
+    restart: unless-stopped
     volumes:
       - ./services/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
     depends_on:
