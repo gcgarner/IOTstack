@@ -9,3 +9,7 @@ compose-override.yml
 .outofdate
 
 !.gitkeep
+
+.vscode
+*.code-workspace
+
