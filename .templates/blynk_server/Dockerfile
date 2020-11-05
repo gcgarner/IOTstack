@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11
+FROM adoptopenjdk/openjdk14
 MAINTAINER 877dev <877dev@gmail.com>
 
 #RUN apt-get update 
@@ -23,4 +23,3 @@ EXPOSE 8080 9443
 
 WORKDIR /data
 ENTRYPOINT ["java", "-jar", "/blynk/server.jar", "-dataFolder", "/data", "-serverConfig", "/config/server.properties", "-mailConfig", "/config/mail.properties"]
-
