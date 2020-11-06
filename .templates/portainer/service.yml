@@ -1,6 +1,6 @@
   portainer:
     container_name: portainer
-    image: portainer/portainer
+    image: portainer/portainer-ce
     restart: unless-stopped
     ports:
       - 9000:9000
