@@ -11,4 +11,9 @@
       - ./services/domoticz/domoticz.env      
     restart: unless-stopped
     network_mode: bridge
+    environment:
+      PUID=1000
+      PGID=1000
+      #TZ=
+      #WEBROOT=domoticz #optional
     

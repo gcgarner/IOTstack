@@ -9,9 +9,10 @@ def main():
   import os
   import time
   import shutil
+  import subprocess
   import sys
   
-  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
@@ -25,6 +26,7 @@ def main():
 
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
+  serviceVolume = volumesDirectory + currentServiceName
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -89,9 +91,12 @@ def main():
 
     # Files copy
     shutil.copy(r'%s/Dockerfile' % serviceTemplate, r'%s/Dockerfile' % serviceService)
-    shutil.copy(r'%s/requirements.txt' % serviceTemplate, r'%s/requirements.txt' % serviceService)
 
-    # TODO: Do directoryfix.sh in python.
+    print("sudo mkdir -p " + serviceVolume + "/app ")
+    subprocess.call("user=$(whoami) && sudo mkdir -p " + serviceVolume + "/app && sudo chown -R $user:$user " + serviceVolume, shell=True)
+    print("sudo chown -R $user:$user ./volumes/python")
+    shutil.copy(r'%s/app/requirements.txt' % serviceTemplate, r'%s/app/requirements.txt' % serviceVolume)
+    shutil.copy(r'%s/app/app.py' % serviceTemplate, r'%s/app/app.py' % serviceVolume)
     return True
 
   # #####################################
@@ -111,8 +116,10 @@ def main():
 
   def checkEnvFiles():
     envFileIssues = []
-    if not os.path.exists(serviceTemplate + '/requirements.txt'):
-      envFileIssues.append(serviceTemplate + '/requirements.txt does not exist')
+    if not os.path.exists(serviceTemplate + '/app/requirements.txt'):
+      envFileIssues.append(serviceTemplate + '/app/requirements.txt does not exist')
+    if not os.path.exists(serviceTemplate + '/app/app.py'):
+      envFileIssues.append(serviceTemplate + '/app/app.py does not exist')
     return envFileIssues
 
   # #####################################

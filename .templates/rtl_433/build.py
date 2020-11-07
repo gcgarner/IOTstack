@@ -89,8 +89,6 @@ def main():
 
     # Files copy
     shutil.copy(r'%s/Dockerfile' % serviceTemplate, r'%s/Dockerfile' % serviceService)
-
-    # TODO: Do directoryfix.sh in python.
     return True
 
   # #####################################

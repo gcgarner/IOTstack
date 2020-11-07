@@ -8,10 +8,11 @@ haltOnErrors = True
 def main():
   import os
   import time
+  import subprocess
   import shutil
   import sys
   
-  from deps.consts import servicesDirectory, templatesDirectory
+  from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
@@ -25,6 +26,7 @@ def main():
 
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
+  serviceVolume = volumesDirectory + currentServiceName
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -91,7 +93,35 @@ def main():
     shutil.copy(r'%s/mosquitto.conf' % serviceTemplate, r'%s/mosquitto.conf' % serviceService)
     shutil.copy(r'%s/filter.acl' % serviceTemplate, r'%s/filter.acl' % serviceService)
 
-    # TODO: Do directoryfix.sh in python.
+    # Setup volumes directory
+    if not os.path.exists(serviceVolume):
+      os.makedirs(serviceVolume, exist_ok=True)
+
+    needPermissionsApplied = False
+
+    if not os.path.exists(serviceVolume + '/data'):
+      os.makedirs(serviceVolume + '/data', exist_ok=True)
+      needPermissionsApplied = True
+    if not os.path.exists(serviceVolume + '/log'):
+      os.makedirs(serviceVolume + '/log', exist_ok=True)
+      needPermissionsApplied = True
+    if not os.path.exists(serviceVolume + '/pwfile'):
+      os.makedirs(serviceVolume + '/pwfile', exist_ok=True)
+      needPermissionsApplied = True
+
+    # Directory ownership fix:
+    if (needPermissionsApplied):
+      print("Need to set owner on mosquitto directories with command: chown -R 1883:1883 " + serviceVolume)
+      applyOwner = input("Set user 1883 on " + serviceVolume + " (Y/n): ").lower()
+      print("")
+      if (applyOwner) == '' or (applyOwner) == 'y':
+        print("sudo chown -R 1883:1883 " + serviceVolume)
+        subprocess.call("sudo chown -R 1883:1883 " + serviceVolume, shell=True)
+      else:
+        print("Permissions not set")
+        time.sleep(1)
+
+
     return True
 
   # #####################################

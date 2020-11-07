@@ -15,9 +15,6 @@
       - ./volumes/gitea/data:/data
       - /etc/timezone:/etc/timezone:ro
       # - /etc/localtime:/etc/localtime:ro
-    # environment:
-    #   - USER_UID=1000
-    #   - USER_GID=1000
     networks:
       - iotstack_nw
     logging:
