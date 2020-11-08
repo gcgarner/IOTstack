@@ -275,6 +275,7 @@ function do_env_checks() {
 	fi
 }
 
+touch .new_install
 echo "Enter in the sudo password when prompted, to install dependencies"
 
 sudo apt-get install git -y

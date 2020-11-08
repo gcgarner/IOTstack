@@ -388,7 +388,21 @@ do
     shift
 done
 
+# This section is temporary, it's just for notifying people of potential breaking changes.
+if [[ -f .new_install ]]; then
+	echo "Existing installation detected."
+else
+	if [[ -f docker-compose.yml ]]; then
+		echo "Warning: Please ensure to read the following prompt"
+		sleep 1
+		if (whiptail --title "Project update" --yesno "There has been a large update to IOTstack, and there may be breaking changes to your current setup. Would you like to switch to the older branch by having the command:\ngit checkout old-menu\n\nrun for you?\n\nIt's suggested that you backup your existing IOTstack instance if you select No\n\nIf you run into problems, please open an issue: https://github.com/SensorsIot/IOTstack/issues\n\nOr Discord: https://discord.gg/ZpKHnks\n\nRelease Notes: https://github.com/SensorsIot/IOTstack/blob/master/docs/New-Menu-Release-Notes.md" 24 95); then
+			echo "Running command: git checkout old-menu"
+			git checkout old-menu
+			sleep 2
+		fi
+	fi
+	touch .new_install
+fi
+
 # Hand control to new menu
 $PYTHON_CMD ./scripts/menu_main.py $ENCODING_TYPE
-
-popd > /dev/null 2>&1

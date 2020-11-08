@@ -14,5 +14,6 @@ post_restore.sh
 .outofdate
 .docker_notinstalled
 .docker_outofdate
+.new_install
 
 !.gitkeep
