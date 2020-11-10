@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Create config files for Blynk custom server
-# 877dev
 
 #current user
 u=$(whoami)
@@ -15,10 +14,10 @@ if [ ! -d ./volumes/blynk_server/data/config ]; then
 	#cd ~/IOTstack/volumes/blynk_server/data/config
     sudo touch ./volumes/blynk_server/data/config/server.properties
     sudo touch ./volumes/blynk_server/data/config/mail.properties
-
+    
     #Give permissions:
     sudo chown -R $u:$u ./volumes/blynk_server/data/config
-
+    
     #Populate the server.properties file:
     sudo echo "hardware.mqtt.port=8440
     http.port=8080
@@ -76,6 +75,16 @@ if [ ! -d ./volumes/blynk_server/data/config ]; then
     echo "Sample properties files created in ~/IOTstack/volumes/blynk_server/data/config"
     echo "Make sure you edit the files with your details, and restart the container to take effect."
 
-
+	
 
 fi
+
+
+
+
+
+
+
+
+
+
