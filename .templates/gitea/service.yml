@@ -9,8 +9,6 @@
     environment:
       - USER_UID=1000
       - USER_GID=1000
-    env_file:
-      - ./services/gitea/gitea.env
     volumes:
       - ./volumes/gitea/data:/data
       - /etc/timezone:/etc/timezone:ro

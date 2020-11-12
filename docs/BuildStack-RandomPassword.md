@@ -28,12 +28,12 @@ This code can basically be copy-pasted into your service's `build.py` file. You 
 def preBuild():
   # Multi-service load. Most services only include a single service. The exception being NextCloud where the database information needs to match between NextCloud and MariaDB (as defined in NextCloud's 'service.yml' file, not IOTstack's MariaDB).
   with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
-    serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+    serviceYamlTemplate = yaml.load(objServiceFile)
 
   oldBuildCache = {}
   try:
     with open(r'%s' % buildCache) as objBuildCache: # Load previous build, if it exists
-      oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+      oldBuildCache = yaml.load(objBuildCache)
   except:
     pass
 
@@ -48,7 +48,7 @@ def preBuild():
   if os.path.exists(buildSettings):
     # Password randomisation
     with open(r'%s' % buildSettings) as objBuildSettingsFile:
-      piHoleYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+      piHoleYamlBuildOptions = yaml.load(objBuildSettingsFile)
       if (
         piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
         or piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
@@ -76,7 +76,7 @@ def preBuild():
         if (piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
           piHoleYamlBuildOptions["databasePasswordOption"] = "Do nothing"
           with open(buildSettings, 'w') as outputFile:
-            yaml.dump(piHoleYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+            yaml.dump(piHoleYamlBuildOptions, outputFile)
       else: # Do nothing - don't change password
         for (index, serviceName) in enumerate(buildCacheServices):
           if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
@@ -106,7 +106,7 @@ def preBuild():
 
     piHoleYamlBuildOptions["databasePasswordOption"] = "Do nothing"
     with open(buildSettings, 'w') as outputFile:
-      yaml.dump(piHoleYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+      yaml.dump(piHoleYamlBuildOptions, outputFile)
 
   return True
 ```
@@ -167,7 +167,7 @@ def main():
   from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName
   import time
   import subprocess
-  import yaml
+  import ruamel.yamls
   import os
 
   global signal
@@ -179,6 +179,9 @@ def main():
   global paginationSize
   global paginationStartIndex
   global hideHelpText
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -370,7 +373,7 @@ def main():
 
       if os.path.exists(buildSettings):
         with open(r'%s' % buildSettings) as objBuildSettingsFile:
-          yourServicesYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+          yourServicesYamlBuildOptions = yaml.load(objBuildSettingsFile)
       else:
         yourServices = {
           "version": "1",
@@ -387,7 +390,7 @@ def main():
           break
 
       with open(buildSettings, 'w') as outputFile:
-        yaml.dump(yourServices, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(yourServices, outputFile)
 
     except Exception as err: 
       print("Error saving Your Services Password options", currentServiceName)
@@ -404,7 +407,7 @@ def main():
 
       if os.path.exists(buildSettings):
         with open(r'%s' % buildSettings) as objBuildSettingsFile:
-          yourServicesYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+          yourServicesYamlBuildOptions = yaml.load(objBuildSettingsFile)
 
         for (index, menuOption) in enumerate(mainMenuList):
           if menuOption[0] == yourServicesYamlBuildOptions["databasePasswordOption"]:

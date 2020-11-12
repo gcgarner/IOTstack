@@ -8,7 +8,7 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import yaml
+  import ruamel.yaml
   import signal
   import sys
   import subprocess
@@ -17,6 +17,9 @@ def main():
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildSettingsFileName, buildCache, servicesFileName
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail, generateRandomString
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -102,12 +105,12 @@ def main():
 
     # Multi-service:
     with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
-      servicesListed = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+      servicesListed = yaml.load(objServiceFile)
 
     oldBuildCache = {}
     try:
       with open(r'%s' % buildCache) as objBuildCache:
-        oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+        oldBuildCache = yaml.load(objBuildCache)
     except:
       pass
 
@@ -122,7 +125,7 @@ def main():
 
       # Password randomisation
       with open(r'%s' % buildSettings) as objBuildSettingsFile:
-        nextCloudYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+        nextCloudYamlBuildOptions = yaml.load(objBuildSettingsFile)
         if (
           nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
           or nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
@@ -146,7 +149,7 @@ def main():
           if (nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
             nextCloudYamlBuildOptions["databasePasswordOption"] = "Do nothing"
             with open(buildSettings, 'w') as outputFile:
-              yaml.dump(nextCloudYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+              yaml.dump(nextCloudYamlBuildOptions, outputFile)
         else: # Do nothing - don't change password
           for (index, serviceName) in enumerate(buildCacheServices):
             if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
@@ -174,7 +177,7 @@ def main():
 
       nextCloudYamlBuildOptions["databasePasswordOption"] = "Do nothing"
       with open(buildSettings, 'w') as outputFile:
-        yaml.dump(nextCloudYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(nextCloudYamlBuildOptions, outputFile)
 
     return True
 

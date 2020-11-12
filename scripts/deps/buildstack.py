@@ -1,9 +1,12 @@
 import os
-import yaml
+import ruamel.yaml
 import math
 import sys
 from deps.yaml_merge import mergeYaml
 from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildCache, envFile, dockerPathOutput, servicesFileName, composeOverrideFile
+
+yaml = ruamel.yaml.YAML()
+yaml.preserve_quotes = True
 
 buildScriptFile = 'build.py'
 
@@ -20,22 +23,22 @@ def buildServices(dockerComposeServicesYaml):
 
     if os.path.exists(envFile):
       with open(r'%s' % envFile) as fileEnv:
-        envSettings = yaml.load(fileEnv, Loader=yaml.SafeLoader)
+        envSettings = yaml.load(fileEnv)
       mergedYaml = mergeYaml(envSettings, dockerFileYaml)
       dockerFileYaml = mergedYaml
 
     if os.path.exists(composeOverrideFile):
       with open(r'%s' % composeOverrideFile) as fileOverride:
-        yamlOverride = yaml.load(fileOverride, Loader=yaml.SafeLoader)
+        yamlOverride = yaml.load(fileOverride)
 
       mergedYaml = mergeYaml(yamlOverride, dockerFileYaml)
       dockerFileYaml = mergedYaml
 
     with open(r'%s' % dockerPathOutput, 'w') as outputFile:
-      yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
+      yaml.dump(dockerFileYaml, outputFile, explicit_start=True, default_style='"')
 
     with open(r'%s' % buildCache, 'w') as outputFile:
-      yaml.dump(menuStateFileYaml, outputFile, default_flow_style=False, sort_keys=False)
+      yaml.dump(menuStateFileYaml, outputFile, explicit_start=True, default_style='"')
     runPostBuildHook()
     return True
   except Exception as err: 

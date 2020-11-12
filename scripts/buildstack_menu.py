@@ -7,7 +7,7 @@ results = {}
 def main():
   import os
   import time
-  import yaml
+  import ruamel.yaml
   import math
   import sys
   import subprocess
@@ -23,6 +23,9 @@ def main():
   global hideHelpText
   global activeMenuLocation
   global lastSelection
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   # Constants
   buildScriptFile = 'build.py'
@@ -59,22 +62,22 @@ def main():
 
       if os.path.exists(envFile):
         with open(r'%s' % envFile) as fileEnv:
-          envSettings = yaml.load(fileEnv, Loader=yaml.SafeLoader)
+          envSettings = yaml.load(fileEnv)
         mergedYaml = mergeYaml(envSettings, dockerFileYaml)
         dockerFileYaml = mergedYaml
 
       if os.path.exists(composeOverrideFile):
         with open(r'%s' % composeOverrideFile) as fileOverride:
-          yamlOverride = yaml.load(fileOverride, Loader=yaml.SafeLoader)
+          yamlOverride = yaml.load(fileOverride)
 
         mergedYaml = mergeYaml(yamlOverride, dockerFileYaml)
         dockerFileYaml = mergedYaml
 
       with open(r'%s' % dockerPathOutput, 'w') as outputFile:
-        yaml.dump(dockerFileYaml, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(dockerFileYaml, outputFile)
 
       with open(r'%s' % dockerSavePathOutput, 'w') as outputFile:
-        yaml.dump(menuStateFileYaml, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(menuStateFileYaml, outputFile)
       runPostBuildHook()
 
       if os.path.exists('./postbuild.sh'):
@@ -331,13 +334,13 @@ def main():
         if not checkedMenuItem in dockerComposeServicesYaml:
           serviceFilePath = templatesDirectory + '/' + checkedMenuItem + '/' + servicesFileName
           with open(r'%s' % serviceFilePath) as yamlServiceFile:
-            dockerComposeServicesYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
+            dockerComposeServicesYaml[checkedMenuItem] = yaml.load(yamlServiceFile)[checkedMenuItem]
       else:
         print("reload!")
         time.sleep(1)
         serviceFilePath = templatesDirectory + '/' + checkedMenuItem + '/' + servicesFileName
         with open(r'%s' % serviceFilePath) as yamlServiceFile:
-          dockerComposeServicesYaml[checkedMenuItem] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[checkedMenuItem]
+          dockerComposeServicesYaml[checkedMenuItem] = yaml.load(yamlServiceFile)[checkedMenuItem]
 
     return True
 
@@ -348,13 +351,13 @@ def main():
         if not serviceName in dockerComposeServicesYaml:
           serviceFilePath = templatesDirectory + '/' + serviceName + '/' + servicesFileName
           with open(r'%s' % serviceFilePath) as yamlServiceFile:
-            dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
+            dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile)[serviceName]
       else:
         print("reload!")
         time.sleep(1)
         servicesFileNamePath = templatesDirectory + '/' + serviceName + '/' + servicesFileName
         with open(r'%s' % serviceFilePath) as yamlServiceFile:
-          dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile, Loader=yaml.SafeLoader)[serviceName]
+          dockerComposeServicesYaml[serviceName] = yaml.load(yamlServiceFile)[serviceName]
     except Exception as err:
       print("Error running build menu:", err)
       print("Check the following:")
@@ -541,7 +544,7 @@ def main():
     if os.path.exists(dockerSavePathOutput):
       print("Loading config fom: '%s'" % dockerSavePathOutput)
       with open(r'%s' % dockerSavePathOutput) as fileSavedConfigs:
-        previousConfigs = yaml.load(fileSavedConfigs, Loader=yaml.SafeLoader)
+        previousConfigs = yaml.load(fileSavedConfigs)
         if not previousConfigs == None:
           if "services" in previousConfigs:
             dockerComposeServicesYaml = {}

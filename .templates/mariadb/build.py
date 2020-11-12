@@ -9,7 +9,7 @@ def main():
   import os
   import time
   import sys
-  import yaml
+  import ruamel.yaml
   import signal
   import subprocess
   from blessed import Terminal
@@ -17,6 +17,9 @@ def main():
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, servicesFileName, buildSettingsFileName
   from deps.common_functions import getExternalPorts, checkPortConflicts, generateRandomString
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -90,12 +93,12 @@ def main():
   def preBuild():
     # Multi-service:
     with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
-      serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+      serviceYamlTemplate = yaml.load(objServiceFile)
 
     oldBuildCache = {}
     try:
       with open(r'%s' % buildCache) as objBuildCache:
-        oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+        oldBuildCache = yaml.load(objBuildCache)
     except:
       pass
 
@@ -109,7 +112,7 @@ def main():
     if os.path.exists(buildSettings):
       # Password randomisation
       with open(r'%s' % buildSettings) as objBuildSettingsFile:
-        mariaDbYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+        mariaDbYamlBuildOptions = yaml.load(objBuildSettingsFile)
         if (
           mariaDbYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
           or mariaDbYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
@@ -133,7 +136,7 @@ def main():
           if (mariaDbYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
             mariaDbYamlBuildOptions["databasePasswordOption"] = "Do nothing"
             with open(buildSettings, 'w') as outputFile:
-              yaml.dump(mariaDbYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+              yaml.dump(mariaDbYamlBuildOptions, outputFile)
         else: # Do nothing - don't change password
           for (index, serviceName) in enumerate(buildCacheServices):
             if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
@@ -162,7 +165,7 @@ def main():
 
       mariaDbYamlBuildOptions["databasePasswordOption"] = "Do nothing"
       with open(buildSettings, 'w') as outputFile:
-        yaml.dump(mariaDbYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(mariaDbYamlBuildOptions, outputFile)
 
     return True
 

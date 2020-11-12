@@ -8,7 +8,7 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import yaml
+  import ruamel.yaml
   import signal
   import sys
   from blessed import Terminal
@@ -16,6 +16,9 @@ def main():
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName, buildCache, servicesFileName
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail, generateRandomString
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -94,7 +97,7 @@ def main():
     global dockerComposeServicesYaml
     global currentServiceName
     with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objHardwareListFile:
-      deconzYamlBuildOptions = yaml.load(objHardwareListFile, Loader=yaml.SafeLoader)
+      deconzYamlBuildOptions = yaml.load(objHardwareListFile)
     try:
       if "deconz" in dockerComposeServicesYaml:
         dockerComposeServicesYaml["deconz"]["devices"] = deconzYamlBuildOptions["hardware"]
@@ -105,12 +108,12 @@ def main():
     # Password randomisation
     # Multi-service:
     with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
-      serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+      serviceYamlTemplate = yaml.load(objServiceFile)
 
     oldBuildCache = {}
     try:
       with open(r'%s' % buildCache) as objBuildCache:
-        oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+        oldBuildCache = yaml.load(objBuildCache)
     except:
       pass
 
@@ -124,7 +127,7 @@ def main():
     if os.path.exists(buildSettings):
       # Password randomisation
       with open(r'%s' % buildSettings) as objBuildSettingsFile:
-        deconzYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+        deconzYamlBuildOptions = yaml.load(objBuildSettingsFile)
         if "databasePasswordOption" in deconzYamlBuildOptions:
           if (
             deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
@@ -146,7 +149,7 @@ def main():
             if (deconzYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
               deconzYamlBuildOptions["databasePasswordOption"] = "Do nothing"
               with open(buildSettings, 'w') as outputFile:
-                yaml.dump(deconzYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+                yaml.dump(deconzYamlBuildOptions, outputFile)
           else: # Do nothing - don't change password
             for (index, serviceName) in enumerate(buildCacheServices):
               if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
@@ -166,7 +169,7 @@ def main():
 
       deconzYamlBuildOptions["databasePasswordOption"] = "Do nothing"
       with open(buildSettings, 'w') as outputFile:
-        yaml.dump(deconzYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(deconzYamlBuildOptions, outputFile)
 
     else:
       print("Deconz Warning: Build settings file not found, using default password")
@@ -187,7 +190,7 @@ def main():
 
       deconzYamlBuildOptions["databasePasswordOption"] = "Do nothing"
       with open(buildSettings, 'w') as outputFile:
-        yaml.dump(deconzYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(deconzYamlBuildOptions, outputFile)
 
     return True
 

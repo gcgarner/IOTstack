@@ -23,37 +23,38 @@ def main():
   term = Terminal()
   
   def setSwapinessTo0():
+    print(term.clear())
     print("Set swapiness to 0:")
     subprocess.call("./scripts/disable_swap.sh disableswap", shell=True)
     print("")
-    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(1)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     return True
   
   def uninstallSwapfile():
+    print(term.clear())
     print("Disabling swap...")
     setSwapinessTo0()
     print("Uninstall Swapfile:")
     subprocess.call("./scripts/disable_swap.sh uninstallswap", shell=True)
     print("")
-    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(1)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     return True
 
   def installLog2Ram():
+    print(term.clear())
     print("Install log2ram:")
     subprocess.call("bash disable_swap.sh", shell=True)
     print("")
-    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(1)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     return True
 
   def installGithubSshKeys():
+    print(term.clear())
     print("Install Github SSH Keys:")
+    print("bash ./scripts/install_ssh_keys.sh")
     subprocess.call("bash ./scripts/install_ssh_keys.sh", shell=True)
     print("")
-    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(1)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     return True
 
   def goBack():
@@ -147,6 +148,7 @@ def main():
     import types
     if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
       mainMenuList[selection][1]()
+      mainRender(1, mainMenuList, currentMenuItemIndex)
     else:
       print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(mainMenuList[selection][0])))
 

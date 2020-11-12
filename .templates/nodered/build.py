@@ -8,7 +8,7 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import yaml
+  import ruamel.yaml
   import signal
   import sys
   from blessed import Terminal
@@ -34,6 +34,8 @@ def main():
   except:
     hideHelpText = False
 
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   # runtime vars
   portConflicts = []
@@ -108,7 +110,7 @@ def main():
       templateData = dockerTemplate.read()
 
     with open(r'%s' % addonsFile) as objAddonsFile:
-      addonsSelected = yaml.load(objAddonsFile, Loader=yaml.SafeLoader)
+      addonsSelected = yaml.load(objAddonsFile)
 
     addonsInstallCommands = ""
     if os.path.exists(addonsFile):
@@ -144,8 +146,6 @@ def main():
 
   def checkFiles():
     fileIssues = []
-    if not os.path.exists(serviceTemplate + '/nodered.env'):
-      fileIssues.append(serviceTemplate + '/nodered.env does not exist')
     if not os.path.exists(serviceService + '/addons_list.yml'):
       fileIssues.append(serviceService + '/addons_list.yml does not exist. Build addons file to fix.')
     return fileIssues

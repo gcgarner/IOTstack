@@ -181,3 +181,10 @@ def enterPortNumberWithWhiptail(term, dockerComposeServicesYaml, currentServiceN
     print(term.center('   {t.white_on_red} Error: {errorMsg} {t.normal} <-'.format(t=term, errorMsg=err)))
     time.sleep(2.5) # Give time to read error
     return -1
+
+def literalPresenter(dumper, data):
+  if isinstance(data, str) and "\n" in data:
+    return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='|')
+  # if isinstance(data, None):
+  #   return self.represent_scalar('tag:yaml.org,2002:null', u'')
+  return dumper.represent_scalar('tag:yaml.org,2002:str', data, style='"')

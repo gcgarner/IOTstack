@@ -8,7 +8,7 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import yaml
+  import ruamel.yaml
   import signal
   import shutil
   import sys
@@ -17,6 +17,9 @@ def main():
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed

@@ -8,7 +8,7 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import yaml
+  import ruamel.yaml
   import signal
   import sys
   from blessed import Terminal
@@ -24,6 +24,9 @@ def main():
   global issues # Returned issues dict
   global haltOnErrors # Turn on to allow erroring
   global hideHelpText # Showing and hiding the help controls text
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText

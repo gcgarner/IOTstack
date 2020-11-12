@@ -8,7 +8,7 @@ def main():
   from deps.consts import servicesDirectory, templatesDirectory
   import time
   import subprocess
-  import yaml
+  import ruamel.yaml
   import os
 
   global signal
@@ -23,6 +23,9 @@ def main():
   global hideHelpText
 
   global installCommand
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -204,7 +207,7 @@ def main():
     global installCommand
     if os.path.exists(addonsFile):
       with open(r'%s' % addonsFile) as objAddonsFile:
-        addonsLoaded = yaml.load(objAddonsFile, Loader=yaml.SafeLoader)
+        addonsLoaded = yaml.load(objAddonsFile)
         installCommand = addonsLoaded["dockerFileInstallCommand"]
         defaultOnAddons = addonsLoaded["addons"]["default_on"]
         defaultOffAddons = addonsLoaded["addons"]["default_off"]
@@ -218,7 +221,7 @@ def main():
             mainMenuList.append([addonName, { "checked": False }])
         else:
           with open(r'%s' % serviceService + '/addons_list.yml') as objSavedAddonsFile:
-            savedAddonsFile = yaml.load(objSavedAddonsFile, Loader=yaml.SafeLoader)
+            savedAddonsFile = yaml.load(objSavedAddonsFile)
             savedAddons = savedAddonsFile["addons"]
             savedAddons.sort()
             for (index, addonName) in enumerate(savedAddons):
@@ -261,7 +264,7 @@ def main():
           nodeRedYamlAddonsList["addons"].append(addon[0])
 
       with open(r'%s/addons_list.yml' % serviceService, 'w') as outputFile:
-        yaml.dump(nodeRedYamlAddonsList, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(nodeRedYamlAddonsList, outputFile)
 
     except Exception as err: 
       print("Error saving NodeRed Addons list", currentServiceName)

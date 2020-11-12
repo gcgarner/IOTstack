@@ -8,7 +8,7 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import yaml
+  import ruamel.yaml
   import signal
   import sys
   from blessed import Terminal
@@ -16,6 +16,9 @@ def main():
   from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
   from deps.consts import servicesDirectory, templatesDirectory, servicesFileName
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   global dockerComposeServicesYaml # The loaded memory YAML of all checked services
   global toRun # Switch for which function to run when executed
@@ -89,7 +92,7 @@ def main():
     global dockerComposeServicesYaml
     global currentServiceName
     with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
-      serviceFile = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+      serviceFile = yaml.load(objServiceFile)
     if "environment" in serviceFile[currentServiceName]:
       wuiPort = getInternalPorts(currentServiceName, serviceFile)[0]
       for (envIndex, envName) in enumerate(serviceFile[currentServiceName]["environment"]):

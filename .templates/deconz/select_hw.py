@@ -8,7 +8,7 @@ def main():
   from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName
   import time
   import subprocess
-  import yaml
+  import ruamel.yaml
   import os
 
   global signal
@@ -23,6 +23,9 @@ def main():
   global hideHelpText
 
   global installCommand
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -197,11 +200,11 @@ def main():
     global mainMenuList
     if os.path.exists(hardwareListFileSource):
       with open(r'%s' % hardwareListFileSource) as objHardwareListFile:
-        hardwareKnown = yaml.load(objHardwareListFile, Loader=yaml.SafeLoader)
+        hardwareKnown = yaml.load(objHardwareListFile)
         knownHardwareList = hardwareKnown["hardwarePaths"]
         if os.path.exists("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)):
           with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName)) as objSavedHardwareListFile:
-            savedHardwareList = yaml.load(objSavedHardwareListFile, Loader=yaml.SafeLoader)
+            savedHardwareList = yaml.load(objSavedHardwareListFile)
             savedHardware = []
 
             try:
@@ -251,7 +254,7 @@ def main():
           deconzYamlHardwareList["hardware"].append(addon[0])
 
       with open("{serviceDir}{buildSettings}".format(serviceDir=serviceService, buildSettings=buildSettingsFileName), 'w') as outputFile:
-        yaml.dump(deconzYamlHardwareList, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(deconzYamlHardwareList, outputFile)
 
     except Exception as err: 
       print("Error saving DeConz Hardware list", currentServiceName)

@@ -1,6 +1,9 @@
 import sys
 import traceback
-import yaml
+import ruamel.yaml
+
+yaml = ruamel.yaml.YAML()
+yaml.preserve_quotes = True
 
 if sys.argv[1] == "--pyyaml-version":
   try:
@@ -44,15 +47,15 @@ try:
     return finalYaml
 
   with open(r'%s' % pathTempDockerCompose) as fileTempDockerCompose:
-    yamlTempDockerCompose = yaml.load(fileTempDockerCompose, Loader=yaml.SafeLoader)
+    yamlTempDockerCompose = yaml.load(fileTempDockerCompose)
 
   with open(r'%s' % pathOverride) as fileOverride:
-    yamlOverride = yaml.load(fileOverride, Loader=yaml.SafeLoader)
+    yamlOverride = yaml.load(fileOverride)
 
   mergedYaml = mergeYaml(yamlOverride, yamlTempDockerCompose)
 
   with open(r'%s' % pathOutput, 'w') as outputFile:
-    yaml.dump(mergedYaml, outputFile, default_flow_style=False, sort_keys=False)
+    yaml.dump(mergedYaml, outputFile, explicit_start=True, default_style='"')
 
   sys.exit(0)
 except SystemExit:

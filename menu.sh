@@ -6,7 +6,7 @@ CURRENT_BRANCH=$(git name-rev --name-only HEAD)
 REQ_DOCKER_VERSION=18.2.0
 REQ_PYTHON_VERSION=3.6.9
 REQ_PIP_VERSION=3.6.9
-REQ_PYYAML_VERSION=5.3.1
+REQ_PYAML_VERSION=0.16.12
 REQ_BLESSED_VERSION=1.17.5
 
 PYTHON_CMD=python3
@@ -137,8 +137,8 @@ function check_git_updates()
 }
 function install_python3_and_deps() {
 	CURR_PYTHON_VER="${1:-Unknown}"
-	CURR_PYYAML_VER="${2:-Unknown}"
-	if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER), PyYaml 5.3.1 or later (Current = $CURR_PYYAML_VER), blessed and pip3 are required for IOTstack to function correctly. Install these now?" 20 78); then
+	CURR_PYAML_VER="${2:-Unknown}"
+	if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER), ruamel.yaml 0.16.12 or later (Current = $CURR_PYAML_VER), blessed and pip3 are required for IOTstack to function correctly. Install these now?" 20 78); then
 		sudo apt update
 		sudo apt install -y python3-pip python3-dev
 		if [ $? -eq 0 ]; then
@@ -147,12 +147,12 @@ function install_python3_and_deps() {
 			echo "Failed to install Python" >&2
 			exit 1
 		fi
-		pip3 install -U pyyaml==5.3.1 blessed
+		pip3 install -U ruamel.yaml==0.16.12 blessed
 		if [ $? -eq 0 ]; then
-			PYYAML_VERSION_GOOD="true"
+			PYAML_VERSION_GOOD="true"
 			BLESSED_GOOD="true"
 		else
-			echo "Failed to install PyYaml and Blessed" >&2
+			echo "Failed to install ruamel.yaml and Blessed" >&2
 			exit 1
 		fi
 	fi
@@ -173,26 +173,26 @@ function update_project() {
 
 function do_python3_checks() {
 	PYTHON_VERSION_GOOD="false"
-	PYYAML_VERSION_GOOD="false"
+	PYAML_VERSION_GOOD="false"
 	BLESSED_GOOD="false"
 
 	if command_exists $PYTHON_CMD && command_exists pip3; then
 		PYTHON_VERSION=$($PYTHON_CMD --version 2>/dev/null)
-		PYTHON_VERSION_MAJOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
-		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d'.' -f 2)
-		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d'.' -f 3)
+		PYTHON_VERSION_MAJOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d' ' -f 2 | cut -d'.' -f 1)
+		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 2)
+		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 3)
 
-		PYYAML_VERSION=$($VGET_CMD --pyyaml-version 2>/dev/null)
-		PYYAML_VERSION="${PYYAML_VERSION:-Unknown}"
-		PYYAML_VERSION_MAJOR=$(echo "$PYYAML_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
-		PYYAML_VERSION_MINOR=$(echo "$PYYAML_VERSION"| cut -d'.' -f 2)
-		PYYAML_VERSION_BUILD=$(echo "$PYYAML_VERSION"| cut -d'.' -f 3)
+		PYAML_VERSION=$($VGET_CMD --pyaml-version 2>/dev/null)
+		PYAML_VERSION="${PYAML_VERSION:-Unknown}"
+		PYAML_VERSION_MAJOR=$(echo "$PYAML_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
+		PYAML_VERSION_MINOR=$(echo "$PYAML_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 2)
+		PYAML_VERSION_BUILD=$(echo "$PYAML_VERSION"| cut -d' ' -f 2 |cut -d'.' -f 3)
 
 		BLESSED_VERSION=$($VGET_CMD --blessed-version 2>/dev/null)
 		BLESSED_VERSION="${BLESSED_VERSION:-Unknown}"
 		BLESSED_VERSION_MAJOR=$(echo "$BLESSED_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
-		BLESSED_VERSION_MINOR=$(echo "$BLESSED_VERSION"| cut -d'.' -f 2)
-		BLESSED_VERSION_BUILD=$(echo "$BLESSED_VERSION"| cut -d'.' -f 3)
+		BLESSED_VERSION_MINOR=$(echo "$BLESSED_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 2)
+		BLESSED_VERSION_BUILD=$(echo "$BLESSED_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 3)
 
 		printf "Python Version: '${PYTHON_VERSION:-Unknown}'. "
 		if [ "$(minimum_version_check $REQ_PYTHON_VERSION $PYTHON_VERSION_MAJOR $PYTHON_VERSION_MINOR $PYTHON_VERSION_BUILD)" == "true" ]; then
@@ -200,17 +200,17 @@ function do_python3_checks() {
 			echo "Python is up to date." >&2
 		else
 			echo "Python is outdated." >&2
-			install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYYAML_VERSION_MAJOR.$PYYAML_VERSION_MINOR.$PYYAML_VERSION_BUILD"
+			install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYAML_VERSION_MAJOR.$PYAML_VERSION_MINOR.$PYAML_VERSION_BUILD"
 			return 1
 		fi
-		printf "PyYAML Version: '$PYYAML_VERSION'. "
-		if [ "$(minimum_version_check $REQ_PYYAML_VERSION $PYYAML_VERSION_MAJOR $PYYAML_VERSION_MINOR $PYYAML_VERSION_BUILD)" == "true" ]; then
-			PYYAML_VERSION_GOOD="true"
-			echo "PyYAML is up to date." >&2
+		printf "ruamel.yaml Version: '$PYAML_VERSION'. "
+		if [ "$(minimum_version_check $REQ_PYAML_VERSION $PYAML_VERSION_MAJOR $PYAML_VERSION_MINOR $PYAML_VERSION_BUILD)" == "true" ]; then
+			PYAML_VERSION_GOOD="true"
+			echo "ruamel.yaml is up to date." >&2
 		else
-			echo "PyYAML is outdated." >&2
-			if [ "$PYYAML_VERSION" != "Unknown" ]; then
-				install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYYAML_VERSION_MAJOR.$PYYAML_VERSION_MINOR.$PYYAML_VERSION_BUILD"
+			echo "ruamel.yaml is outdated." >&2
+			if [ "$PYAML_VERSION" != "Unknown" ]; then
+				install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYAML_VERSION_MAJOR.$PYAML_VERSION_MINOR.$PYAML_VERSION_BUILD"
 			else
 				install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD"
 			fi
@@ -223,7 +223,7 @@ function do_python3_checks() {
 		else
 			echo "Blessed is outdated." >&2
 			if [ "$BLESSED_VERSION" != "Unknown" ]; then
-				install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYYAML_VERSION_MAJOR.$PYYAML_VERSION_MINOR.$PYYAML_VERSION_BUILD"
+				install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYAML_VERSION_MAJOR.$PYAML_VERSION_MINOR.$PYAML_VERSION_BUILD"
 			else
 				install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD"
 			fi
@@ -359,7 +359,7 @@ else
 
 	if [[ "$DOCKER_VERSION_GOOD" == "true" ]] && \
 		[[ "$PYTHON_VERSION_GOOD" == "true" ]] && \
-		[[ "$PYYAML_VERSION_GOOD" == "true" ]] && \
+		[[ "$PYAML_VERSION_GOOD" == "true" ]] && \
 		[[ "$BLESSED_GOOD" == "true" ]]; then
 		echo "Project dependencies up to date"
 		echo ""

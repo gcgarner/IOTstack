@@ -34,7 +34,7 @@ def main():
     subprocess.call("docker-compose up -d", shell=True)
     print("")
     print("Stack Started")
-    time.sleep(2)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
   
@@ -51,7 +51,7 @@ def main():
     # subprocess.call("docker-compose restart", shell=True)
     print("")
     print("Stack Restarted")
-    time.sleep(2)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
 
@@ -61,7 +61,7 @@ def main():
     subprocess.call("docker-compose down", shell=True)
     print("")
     print("Stack Stopped")
-    time.sleep(2)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
 
@@ -70,8 +70,7 @@ def main():
     print("docker container stop $(docker container ls -aq)")
     subprocess.call("docker container stop $(docker container ls -aq)", shell=True)
     print("")
-    print("Stack Stopped. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(2)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
 
@@ -80,8 +79,7 @@ def main():
     print("docker container stop $(docker container ls -aq)")
     subprocess.call("docker container stop $(docker container ls -aq)", shell=True)
     print("")
-    print("Stack Stopped. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(2)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
 
@@ -99,8 +97,7 @@ def main():
     print("docker-compose up -d")
     subprocess.call("docker-compose up -d", shell=True)
     print("")
-    print("Stack Updated. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(0.5)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
 
@@ -109,8 +106,7 @@ def main():
     print("docker system prune --volumes")
     subprocess.call("docker system prune --volumes", shell=True)
     print("")
-    print("Volume pruning completed. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(0.5)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
 
@@ -119,8 +115,7 @@ def main():
     print("docker image prune -a")
     subprocess.call("docker image prune -a", shell=True)
     print("")
-    print("Image pruning completed. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(0.5)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
 
@@ -134,6 +129,7 @@ def main():
     subprocess.call("docker-compose logs -f", shell=True)
     print("")
     time.sleep(0.5)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
     return True
 
@@ -231,6 +227,7 @@ def main():
     import types
     if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
       mainMenuList[selection][1]()
+      mainRender(1, mainMenuList, currentMenuItemIndex)
     else:
       print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(mainMenuList[selection][0])))
 

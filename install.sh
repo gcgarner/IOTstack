@@ -4,7 +4,7 @@
 REQ_DOCKER_VERSION=18.2.0
 REQ_PYTHON_VERSION=3.6.9
 REQ_PIP_VERSION=3.6.9
-REQ_PYYAML_VERSION=5.3.1
+REQ_PYAML_VERSION=0.16.12
 REQ_BLESSED_VERSION=1.17.5
 
 PYTHON_CMD=python3
@@ -114,17 +114,17 @@ function install_python3_and_deps() {
       echo "Failed to install Python" >&2
       exit 1
     fi
-    echo "Installing pyyaml and blessed"
-    pip3 install -U pyyaml==5.3.1 blessed
+    echo "Installing ruamel.yaml and blessed"
+    pip3 install -U ruamel.yaml==0.16.12 blessed
     if [ $? -eq 0 ]; then
-      PYYAML_VERSION_GOOD="true"
+      PYAML_VERSION_GOOD="true"
       BLESSED_GOOD="true"
     else
-      echo "Failed to install PyYaml and Blessed" >&2
+      echo "Failed to install ruamel.yaml and Blessed" >&2
       exit 1
     fi
   else
-    if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER), PyYaml 5.3.1 or later, blessed and pip3 are required for the main menu and compose-overrides.yml file to merge into the docker-compose.yml file. Install these now?" 20 78); then
+    if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER), ruamel.yaml 0.16.12 or later, blessed and pip3 are required for the main menu and compose-overrides.yml file to merge into the docker-compose.yml file. Install these now?" 20 78); then
       sudo apt install -y python3-pip python3-dev
       if [ $? -eq 0 ]; then
         PYTHON_VERSION_GOOD="true"
@@ -132,12 +132,12 @@ function install_python3_and_deps() {
         echo "Failed to install Python" >&2
         exit 1
       fi
-      pip3 install -U pyyaml==5.3.1 blessed
+      pip3 install -U ruamel.yaml==0.16.12 blessed
       if [ $? -eq 0 ]; then
-        PYYAML_VERSION_GOOD="true"
+        PYAML_VERSION_GOOD="true"
         BLESSED_GOOD="true"
       else
-        echo "Failed to install PyYaml and Blessed" >&2
+        echo "Failed to install ruamel.yaml and Blessed" >&2
         exit 1
       fi
     fi
@@ -170,14 +170,14 @@ function update_docker() {
 
 function do_python3_checks() {
 	PYTHON_VERSION_GOOD="false"
-	PYYAML_VERSION_GOOD="false"
+	PYAML_VERSION_GOOD="false"
 	BLESSED_GOOD="false"
 
 	if command_exists $PYTHON_CMD && command_exists pip3; then
 		PYTHON_VERSION=$($PYTHON_CMD --version)
 		PYTHON_VERSION_MAJOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
-		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d'.' -f 2)
-		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d'.' -f 3)
+		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 2)
+		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 3)
 
 		printf "Python Version: '${PYTHON_VERSION:-Unknown}'. "
 		if [ "$(minimum_version_check $REQ_PYTHON_VERSION $PYTHON_VERSION_MAJOR $PYTHON_VERSION_MINOR $PYTHON_VERSION_BUILD)" == "true" ]; then
@@ -185,7 +185,7 @@ function do_python3_checks() {
 			echo "Python is up to date." >&2
 		else
 			echo "Python is outdated." >&2
-			install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYYAML_VERSION_MAJOR.$PYYAML_VERSION_MINOR.$PYYAML_VERSION_BUILD"
+			install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYAML_VERSION_MAJOR.$PYAML_VERSION_MINOR.$PYAML_VERSION_BUILD"
 			return 1
 		fi
 	else

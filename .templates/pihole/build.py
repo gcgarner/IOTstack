@@ -8,7 +8,7 @@ haltOnErrors = True
 def main():
   import os
   import time
-  import yaml
+  import ruamel.yaml
   import signal
   import sys
   import subprocess
@@ -31,6 +31,9 @@ def main():
   serviceService = servicesDirectory + currentServiceName
   serviceTemplate = templatesDirectory + currentServiceName
   buildSettings = serviceService + buildSettingsFileName
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -88,12 +91,12 @@ def main():
   def preBuild():
     # Multi-service:
     with open((r'%s/' % serviceTemplate) + servicesFileName) as objServiceFile:
-      serviceYamlTemplate = yaml.load(objServiceFile, Loader=yaml.SafeLoader)
+      serviceYamlTemplate = yaml.load(objServiceFile)
 
     oldBuildCache = {}
     try:
       with open(r'%s' % buildCache) as objBuildCache:
-        oldBuildCache = yaml.load(objBuildCache, Loader=yaml.SafeLoader)
+        oldBuildCache = yaml.load(objBuildCache)
     except:
       pass
 
@@ -107,7 +110,7 @@ def main():
     if os.path.exists(buildSettings):
       # Password randomisation
       with open(r'%s' % buildSettings) as objBuildSettingsFile:
-        piHoleYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+        piHoleYamlBuildOptions = yaml.load(objBuildSettingsFile)
         if (
           piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
           or piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
@@ -129,7 +132,7 @@ def main():
           if (piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
             piHoleYamlBuildOptions["databasePasswordOption"] = "Do nothing"
             with open(buildSettings, 'w') as outputFile:
-              yaml.dump(piHoleYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+              yaml.dump(piHoleYamlBuildOptions, outputFile)
         else: # Do nothing - don't change password
           for (index, serviceName) in enumerate(buildCacheServices):
             if serviceName in buildCacheServices: # Load service from cache if exists (to maintain password)
@@ -156,7 +159,7 @@ def main():
 
       piHoleYamlBuildOptions["databasePasswordOption"] = "Do nothing"
       with open(buildSettings, 'w') as outputFile:
-        yaml.dump(piHoleYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(piHoleYamlBuildOptions, outputFile)
 
     return True
 

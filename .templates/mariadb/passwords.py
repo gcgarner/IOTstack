@@ -8,7 +8,7 @@ def main():
   from deps.consts import servicesDirectory, templatesDirectory, buildSettingsFileName
   import time
   import subprocess
-  import yaml
+  import ruamel.yaml
   import os
 
   global signal
@@ -20,6 +20,9 @@ def main():
   global paginationSize
   global paginationStartIndex
   global hideHelpText
+
+  yaml = ruamel.yaml.YAML()
+  yaml.preserve_quotes = True
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -211,7 +214,7 @@ def main():
 
       if os.path.exists(buildSettings):
         with open(r'%s' % buildSettings) as objBuildSettingsFile:
-          mariaDbYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+          mariaDbYamlBuildOptions = yaml.load(objBuildSettingsFile)
       else:
         mariaDbYamlBuildOptions = {
           "version": "1",
@@ -228,7 +231,7 @@ def main():
           break
 
       with open(buildSettings, 'w') as outputFile:
-        yaml.dump(mariaDbYamlBuildOptions, outputFile, default_flow_style=False, sort_keys=False)
+        yaml.dump(mariaDbYamlBuildOptions, outputFile)
 
     except Exception as err: 
       print("Error saving MariaDB Password options", currentServiceName)
@@ -243,7 +246,7 @@ def main():
 
       if os.path.exists(buildSettings):
         with open(r'%s' % buildSettings) as objBuildSettingsFile:
-          mariaDbYamlBuildOptions = yaml.load(objBuildSettingsFile, Loader=yaml.SafeLoader)
+          mariaDbYamlBuildOptions = yaml.load(objBuildSettingsFile)
 
         for (index, menuOption) in enumerate(mainMenuList):
           if menuOption[0] == mariaDbYamlBuildOptions["databasePasswordOption"]:

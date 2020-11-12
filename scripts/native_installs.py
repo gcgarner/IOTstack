@@ -14,6 +14,7 @@ def main():
   global currentMenuItemIndex
   global screenActive
   global hideHelpText
+  global needsRender
 
   try: # If not already set, then set it.
     hideHelpText = hideHelpText
@@ -30,6 +31,7 @@ def main():
       mainRender(1, mainMenuList, currentMenuItemIndex)
 
   def installHassIo():
+    print(term.clear())
     print("Install Home Assistant Supervisor")
     print("./.native/hassio_supervisor.sh")
     res = subprocess.call("./.native/hassio_supervisor.sh", shell=True)
@@ -39,51 +41,46 @@ def main():
       print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
     else:
       print("Preinstallation not completed.")
-      print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
+    input("Process terminated. Press [Enter] to show menu and continue.")
     time.sleep(0.5)
-    mainRender(2, mainMenuList, currentMenuItemIndex)
     return True
 
   def installRtl433():
+    print(term.clear())
     print("Install RTL_433")
     print("bash ./.native/rtl_433.sh")
     subprocess.call("bash ./.native/rtl_433.sh", shell=True)
     print("")
-    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(0.5)
-    mainRender(2, mainMenuList, currentMenuItemIndex)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     return True
 
   def installRpiEasy():
+    print(term.clear())
     print("Install RPIEasy")
     print("bash ./.native/rpieasy.sh")
     subprocess.call("bash ./.native/rpieasy.sh", shell=True)
     print("")
-    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(0.5)
-    mainRender(2, mainMenuList, currentMenuItemIndex)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     return True
 
   def installDockerAndCompose():
+    print(term.clear())
     print("Install docker")
     print("Install docker-compose")
     print("bash ./scripts/install_docker.sh install")
     subprocess.call("bash ./scripts/install_docker.sh install", shell=True)
     print("")
-    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(0.5)
-    mainRender(2, mainMenuList, currentMenuItemIndex)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     return True
 
   def upgradeDockerAndCompose():
+    print(term.clear())
     print("Install docker")
     print("Install docker-compose")
     print("bash ./scripts/install_docker.sh upgrade")
     subprocess.call("bash ./scripts/install_docker.sh upgrade", shell=True)
     print("")
-    print("Installation complete. Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    time.sleep(0.5)
-    mainRender(2, mainMenuList, currentMenuItemIndex)
+    input("Process terminated. Press [Enter] to show menu and continue.")
     return True
 
   def goBack():
@@ -174,9 +171,11 @@ def main():
 
 
   def runSelection(selection):
+    global needsRender
     import types
     if len(mainMenuList[selection]) > 1 and isinstance(mainMenuList[selection][1], types.FunctionType):
       mainMenuList[selection][1]()
+      needsRender = 1
     else:
       print(term.green_reverse('IOTstack Error: No function assigned to menu item: "{}"'.format(mainMenuList[selection][0])))
 
@@ -217,6 +216,7 @@ def main():
               if dockerCommandsSelectionInProgress == False:
                 screenActive = False
                 return True
+              mainRender(1, mainMenuList, currentMenuItemIndex)
             if key.name == 'KEY_ESCAPE':
               screenActive = False
               dockerCommandsSelectionInProgress = False
