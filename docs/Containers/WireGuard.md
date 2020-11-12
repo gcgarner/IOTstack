@@ -23,12 +23,31 @@ services:
       - PGID=1000                                     
       - TZ=America/Los_Angeles                  
       - SERVERURL=<Your-DuckDNS-account>.duckdns.org #optional 
+      - SERVERPORT=51820 #optional
       - PEERS=3 #optional                       
       - PEERDNS=auto #optional
       - INTERNAL_SUBNET=100.64.0.0/24 #optional
 ```
 
-The values you will probably want to change are `TZ` to your own timezone, `SERVERURL` to your own DuckDNS address and `PEERS` to set the number of devices you plan to connect to your VPN. If you customize other containers, just make sure the file only says `services:` once at the beginning of the file. Once you are done, you can run `./menu.sh` to build your stack. Finally, check that your changes were successfully integrated by running:
+The values you will probably want to change are `TZ` to your own timezone, `SERVERURL` to your own DuckDNS address and `PEERS` to set the number of devices you plan to connect to your VPN. If you also decide to edit the `SERVERPORT` value, you will also need to include a matching value in the `ports:` section as follows:
+
+```
+services:
+  wireguard:
+    environment:
+      - PUID=1000                                       
+      - PGID=1000                                     
+      - TZ=America/Los_Angeles                  
+      - SERVERURL=<Your-DuckDNS-account>.duckdns.org #optional 
+      - SERVERPORT=55555 #optional
+      - PEERS=3 #optional                       
+      - PEERDNS=auto #optional
+      - INTERNAL_SUBNET=100.64.0.0/24 #optional
+    ports:
+      - 55555:55555/udp
+```
+
+If you customize other containers, just make sure the file only says `services:` once at the beginning of the file. Once you are done, you can run `./menu.sh` to build your stack. Finally, check that your changes were successfully integrated by running:
 
 `$ cat docker-compose.yml`
 
@@ -92,7 +111,7 @@ To copy the files from a Raspberry Pi onto another Linux machine for example, yo
 ```
 $ sudo scp pi@<Rpi-ip-address>:/home/pi/IOTstack/services/wireguard/config/peer1/peer1.png ~/peer1.png
 ```
-(Hint: you can use the `scp -i` flag to specify and IdentityFile or better yet, `scp -F` flag if you have your device configured in `.ssh/config`)
+(Hint: you can use the `scp -i` flag to specify an IdentityFile or better yet, `scp -F` flag if you have your device configured in `.ssh/config`)
 
 You can repeat this step for each peer's QR code `.png` file and then scan the QR codes in the mobile app on your devices. The devices should now be configured and able to connect to your VPN.
 
