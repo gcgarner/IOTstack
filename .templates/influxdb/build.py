@@ -119,24 +119,14 @@ def main():
           or influxDbYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
           if influxDbYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
-            randomAdminPassword = "IOtSt4ckAdmin"
             randomPassword = "IOtSt4ckInfluX"
-            randomReadPassword = "IOtSt4ckReadOnly"
-            randomWritePassword = "IOtSt4ckWriteOnly"
           else:
-            newPassword = generateRandomString()
-            randomAdminPassword = generateRandomString()
             randomPassword = generateRandomString()
-            randomReadPassword = generateRandomString()
-            randomWritePassword = generateRandomString()
           for (index, serviceName) in enumerate(serviceYamlTemplate):
             dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
             if "environment" in serviceYamlTemplate[serviceName]:
               for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
-                envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
                 envName = envName.replace("%randomPassword%", randomPassword)
-                envName = envName.replace("%randomReadPassword%", randomReadPassword)
-                envName = envName.replace("%randomWritePassword%", randomWritePassword)
                 dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
 
           # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
@@ -154,18 +144,12 @@ def main():
     else:
       print("InfluxDB Warning: Build settings file not found, using default password")
       time.sleep(1)
-      randomAdminPassword = "IOtSt4ckAdmin"
       randomPassword = "IOtSt4ckInfluX"
-      randomReadPassword = "IOtSt4ckReadOnly"
-      randomWritePassword = "IOtSt4ckWriteOnly"
       for (index, serviceName) in enumerate(serviceYamlTemplate):
         dockerComposeServicesYaml[serviceName] = serviceYamlTemplate[serviceName]
         if "environment" in serviceYamlTemplate[serviceName]:
           for (envIndex, envName) in enumerate(serviceYamlTemplate[serviceName]["environment"]):
-            envName = envName.replace("%randomAdminPassword%", randomAdminPassword)
             envName = envName.replace("%randomPassword%", randomPassword)
-            envName = envName.replace("%randomReadPassword%", randomReadPassword)
-            envName = envName.replace("%randomWritePassword%", randomWritePassword)
             dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
         influxDbYamlBuildOptions = {
           "version": "1",
