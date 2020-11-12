@@ -10,7 +10,7 @@
       - ./volumes/qbittorrent/config:/config
       - ./volumes/qbittorrent/downloads:/downloads
     ports:
-      - 6881:6881
-      - 6881:6881/udp
-      - 15080:15080
-      - 1080:1080
+      - "6881:6881"
+      - "6881:6881/udp"
+      - "15080:15080"
+      - "1080:1080"
