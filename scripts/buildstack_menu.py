@@ -11,7 +11,7 @@ def main():
   import math
   import sys
   import subprocess
-  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine, padText
   from deps.consts import servicesDirectory, templatesDirectory, volumesDirectory, buildCache, envFile, dockerPathOutput, servicesFileName, composeOverrideFile
   from deps.yaml_merge import mergeYaml
   from blessed import Terminal
@@ -37,7 +37,7 @@ def main():
   templatesDirectoryFolders = next(os.walk(templatesDirectory))[1]
   term = Terminal()
   hotzoneLocation = [7, 0] # Top text
-  paginationToggle = [10, term.height - 21] # Top text + controls text
+  paginationToggle = [10, term.height - 22] # Top text + controls text
   paginationStartIndex = 0
   paginationSize = paginationToggle[0]
   activeMenuLocation = 0
@@ -262,9 +262,11 @@ def main():
       if (renderType == 1):
         print(term.center(commonEmptyLine(renderMode)))
         if not hideHelpText:
-          if term.height < 30:
+          room = term.height - (28 + len(allIssues) + paginationSize)
+          if room < 0:
+            allIssues.append({ "serviceName": "BuildStack Menu", "issues": { "screenSize": 'Not enough scren height to render correctly (t-height = ' + str(term.height) + ' v-lines = ' + str(room) + ')' } })
             print(term.center(commonEmptyLine(renderMode)))
-            print(term.center("{bv}      Not enough vertical room to render controls help text                     {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}      Not enough vertical room to render controls help text ({th}, {rm})          {bv}".format(bv=specialChars[renderMode]["borderVertical"], th=padText(str(term.height), 3), rm=padText(str(room), 3))))
             print(term.center(commonEmptyLine(renderMode)))
           else: 
             print(term.center(commonEmptyLine(renderMode)))

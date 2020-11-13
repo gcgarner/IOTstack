@@ -234,10 +234,10 @@ def main():
     global serviceService
 
     influxDbBuildOptions = []
-    influxDbBuildOptions.append([
-      "InfluxDB Password Options",
-      setPasswordOptions
-    ])
+    # influxDbBuildOptions.append([
+    #   "InfluxDB Password Options",
+    #   setPasswordOptions
+    # ])
 
     influxDbBuildOptions.append(["Go back", goBack])
 
