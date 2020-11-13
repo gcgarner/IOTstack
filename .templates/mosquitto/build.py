@@ -33,6 +33,8 @@ def main():
   except:
     hideHelpText = False
 
+  # documentationHint = 'https://sensorsiot.github.io/IOTstack/Containers/Mosquitto'
+
   # runtime vars
   portConflicts = []
 

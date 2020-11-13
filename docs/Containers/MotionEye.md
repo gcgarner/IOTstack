@@ -1,4 +1,4 @@
-# MotionQye
+# MotionEye
 ## References
 
 * [Website](https://github.com/ccrisan/motioneye/wiki/Install-In-Docker)

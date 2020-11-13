@@ -12,7 +12,7 @@ def main():
   import signal
   import sys
   from blessed import Terminal
-  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine
+  from deps.chars import specialChars, commonTopBorder, commonBottomBorder, commonEmptyLine, padText
   from deps.consts import servicesDirectory, templatesDirectory
   from deps.common_functions import getExternalPorts, getInternalPorts, checkPortConflicts, enterPortNumberWithWhiptail
 
@@ -33,6 +33,8 @@ def main():
     hideHelpText = hideHelpText
   except:
     hideHelpText = False
+
+  documentationHint = 'https://sensorsiot.github.io/IOTstack/Containers/Node-RED'
 
   yaml = ruamel.yaml.YAML()
   yaml.preserve_quotes = True
@@ -296,6 +298,15 @@ def main():
         print(term.center("{bv}      [Enter] to run command or save input                                      {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center("{bv}      [Escape] to go back to build stack menu                                   {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
         print(term.center(commonEmptyLine(renderMode)))
+        if len(documentationHint) > 1:
+          if len(documentationHint) > 56:
+            documentationAndPadding = padText(documentationHint, 71)
+            print(term.center("{bv}      Documentation:                                                            {bv}".format(bv=specialChars[renderMode]["borderVertical"])))
+            print(term.center("{bv}        {dap} {bv}".format(bv=specialChars[renderMode]["borderVertical"], dap=documentationAndPadding)))
+          else:
+            documentationAndPadding = padText(documentationHint, 56)
+            print(term.center("{bv}        Documentation: {dap} {bv}".format(bv=specialChars[renderMode]["borderVertical"], dap=documentationAndPadding)))
+          print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonEmptyLine(renderMode)))
       print(term.center(commonBottomBorder(renderMode)))
 
