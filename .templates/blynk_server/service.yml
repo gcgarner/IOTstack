@@ -8,6 +8,7 @@
       - "9443:9443"
     volumes:
       - ./volumes/blynk_server/data:/data
+      - ./volumes/blynk_server/config:/config
     networks:
       - iotstack_nw
     logging:

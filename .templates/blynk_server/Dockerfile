@@ -1,11 +1,11 @@
-FROM adoptopenjdk/openjdk11
-MAINTAINER Graham Garner <garner.gc@gmail.com>
+FROM adoptopenjdk/openjdk14
+MAINTAINER 877dev <877dev@gmail.com>
 
-#RUN apt-get update 
+#RUN apt-get update
 #RUN apt-get install -y apt-utils
 #RUN apt-get install -y default-jdk curl
 
-ENV BLYNK_SERVER_VERSION 0.41.10
+ENV BLYNK_SERVER_VERSION 0.41.14
 RUN mkdir /blynk
 RUN curl -L https://github.com/blynkkk/blynk-server/releases/download/v${BLYNK_SERVER_VERSION}/server-${BLYNK_SERVER_VERSION}.jar > /blynk/server.jar
 
@@ -22,4 +22,4 @@ VOLUME ["/config", "/data/backup"]
 EXPOSE 8080 9443
 
 WORKDIR /data
-ENTRYPOINT ["java", "-jar", "/blynk/server.jar", "-dataFolder", "/data", "-serverConfig", "/config/server.properties"]
+ENTRYPOINT ["java", "-jar", "/blynk/server.jar", "-dataFolder", "/data", "-serverConfig", "/config/server.properties", "-mailConfig", "/config/mail.properties"]
