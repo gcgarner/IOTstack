@@ -283,4 +283,18 @@ git clone https://github.com/SensorsIot/IOTstack.git
 
 do_python3_checks
 do_docker_checks
+echo "Setting up environment:"
+if [[ ! "$(user_in_group bluetooth)" == "notgroup" ]] && [[ ! "$(user_in_group bluetooth)" == "true" ]]; then
+	echo "User is NOT in 'bluetooth' group. Adding:" >&2
+	echo "sudo usermod -G bluetooth -a $USER" >&2
+	echo "You will need to restart your system before the changes take effect."
+	sudo usermod -G "bluetooth" -a $USER
+fi
+
+if [ ! "$(user_in_group docker)" == "true" ]; then
+	echo "User is NOT in 'docker' group. Adding:" >&2
+	echo "sudo usermod -G docker -a $USER" >&2
+	echo "You will need to restart your system before the changes take effect."
+	sudo usermod -G "docker" -a $USER
+fi
 do_env_checks

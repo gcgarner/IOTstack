@@ -299,7 +299,20 @@ function do_docker_checks() {
 		if [ ! -f .docker_notinstalled ]; then
 			if (whiptail --title "Docker and Docker-Compose" --yesno "Docker is not currently installed, and is required to run IOTstack. Would you like to install docker and docker-compose now?\nYou will not be prompted again." 20 78); then
 					[ -f .docker_notinstalled ] && rm .docker_notinstalled
-					do_env_setup
+					echo "Setting up environment:"
+					if [[ ! "$(user_in_group bluetooth)" == "notgroup" ]] && [[ ! "$(user_in_group bluetooth)" == "true" ]]; then
+						echo "User is NOT in 'bluetooth' group. Adding:" >&2
+						echo "sudo usermod -G bluetooth -a $USER" >&2
+						echo "You will need to restart your system before the changes take effect."
+						sudo usermod -G "bluetooth" -a $USER
+					fi
+
+					if [ ! "$(user_in_group docker)" == "true" ]; then
+						echo "User is NOT in 'docker' group. Adding:" >&2
+						echo "sudo usermod -G docker -a $USER" >&2
+						echo "You will need to restart your system before the changes take effect."
+						sudo usermod -G "docker" -a $USER
+					fi
 					install_docker
 				else
 					touch .docker_notinstalled
@@ -355,6 +368,7 @@ else
 	do_project_checks
 	do_env_checks
 	do_python3_checks
+	sudo echo "Please enter sudo pasword if prompted"
 	do_docker_checks
 
 	if [[ "$DOCKER_VERSION_GOOD" == "true" ]] && \
@@ -373,19 +387,33 @@ fi
 
 while test $# -gt 0
 do
-    case "$1" in
-        --branch) CURRENT_BRANCH=${2:-$(git name-rev --name-only HEAD)}
-            ;;
-        --no-check) echo ""
-            ;;
-        --run-env-setup) do_env_setup
-            ;;
-        --encoding) ENCODING_TYPE=$2
-            ;;
-        --*) echo "bad option $1"
-            ;;
-    esac
-    shift
+	case "$1" in
+		--branch) CURRENT_BRANCH=${2:-$(git name-rev --name-only HEAD)}
+			;;
+		--no-check) echo ""
+			;;
+		--run-env-setup) # Sudo cannot be run from inside functions.
+				echo "Setting up environment:"
+				if [[ ! "$(user_in_group bluetooth)" == "notgroup" ]] && [[ ! "$(user_in_group bluetooth)" == "true" ]]; then
+					echo "User is NOT in 'bluetooth' group. Adding:" >&2
+					echo "sudo usermod -G bluetooth -a $USER" >&2
+					echo "You will need to restart your system before the changes take effect."
+					sudo usermod -G "bluetooth" -a $USER
+				fi
+
+				if [ ! "$(user_in_group docker)" == "true" ]; then
+					echo "User is NOT in 'docker' group. Adding:" >&2
+					echo "sudo usermod -G docker -a $USER" >&2
+					echo "You will need to restart your system before the changes take effect."
+					sudo usermod -G "docker" -a $USER
+				fi
+			;;
+		--encoding) ENCODING_TYPE=$2
+			;;
+		--*) echo "bad option $1"
+			;;
+	esac
+	shift
 done
 
 # This section is temporary, it's just for notifying people of potential breaking changes.
