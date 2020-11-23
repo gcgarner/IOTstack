@@ -6,7 +6,7 @@ IOTstack is a builder for docker-compose to easily make and maintain IoT stacks 
 
 See [Getting Started](https://sensorsiot.github.io/IOTstack/Getting-Started) in the Wiki. It includes:
 
-* A link to Andreas Spiess video #295.
+* A link to Andreas Spiess video #295 and #352.
 * How to download the project (including constraints you need to observe).
 * Running the menu to install Docker and set up your containers.
 * Useful Docker commands (start \& stop the stack, manage containers).
