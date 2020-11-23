@@ -280,6 +280,14 @@ echo "Enter in the sudo password when prompted, to install dependencies"
 
 sudo apt-get install git -y
 git clone https://github.com/SensorsIot/IOTstack.git
+cd IOTstack
+
+if [ $? -eq 0 ]; then
+  echo "IOTstack cloned"
+else
+  echo "Could not find IOTstack directory"
+	exit 5
+fi
 
 do_python3_checks
 do_docker_checks
