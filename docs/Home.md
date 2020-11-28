@@ -39,6 +39,7 @@ The README is moving to the Wiki, It's easier to add content and example to the 
 * [Blynk Server](https://sensorsiot.github.io/IOTstack/Containers/Blynk_server)
 * [diyHue](https://sensorsiot.github.io/IOTstack/Containers/diyHue)
 * [Python](https://sensorsiot.github.io/IOTstack/Containers/Python)
+* [Heimdall](https://sensorsiot.github.io/IOTstack/Containers/Heimdall)
 * [Custom containers](https://sensorsiot.github.io/IOTstack/Containers/Custom)
 
 ***

@@ -1,0 +1,11 @@
+  heimdall:
+    image: ghcr.io/linuxserver/heimdall
+    container_name: heimdall
+    env_file:
+      - ./services/heimdall/heimdall.env
+    volumes:
+      - ./volumes/heimdall/config:/config
+    ports:
+      - 8880:80
+      - 8883:443
+    restart: unless-stopped
