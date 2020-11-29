@@ -1,0 +1,10 @@
+  homer:
+    image: b4bz/homer:latest
+    container_name: homer
+    env_file:
+      - ./services/homer/homer.env
+    volumes:
+      - ./volumes/homer/assets:/www/assets
+    ports:
+      - 8881:8080
+    restart: unless-stopped
