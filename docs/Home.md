@@ -40,6 +40,7 @@ The README is moving to the Wiki, It's easier to add content and example to the 
 * [diyHue](https://sensorsiot.github.io/IOTstack/Containers/diyHue)
 * [Python](https://sensorsiot.github.io/IOTstack/Containers/Python)
 * [Heimdall](https://sensorsiot.github.io/IOTstack/Containers/Heimdall)
+* [DashMachine](https://sensorsiot.github.io/IOTstack/Containers/DashMachine)
 * [Custom containers](https://sensorsiot.github.io/IOTstack/Containers/Custom)
 
 ***

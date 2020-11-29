@@ -53,6 +53,7 @@ declare -A cont_array=(
 	[dozzle]="Dozzle"
 	[wireguard]="Wireguard"
 	[heimdall]="Heimdall Application Dashboard"
+	[dashmachine]="DashMachine"
 	# add yours here
 )
 
@@ -92,6 +93,7 @@ declare -a armhf_keys=(
 	"dozzle"
 	"wireguard"
 	"heimdall"
+	"dashmachine"
 	# add yours here
 )
 sys_arch=$(uname -m)
