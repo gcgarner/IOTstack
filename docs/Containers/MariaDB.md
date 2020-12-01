@@ -20,4 +20,4 @@ The env file has three commented fields for credentials, either **all three** mu
 
 ## Terminal
 
-A terminal is provided to access mariadb by the cli. execute `./services/maraidb/terminal.sh`. You will need to run `mysql -uroot -p` to enter mariadbs interface
+A terminal is provided to access mariadb by the cli. execute `./services/mariadb/terminal.sh`. You will need to run `mysql -uroot -p` to enter mariadbs interface
