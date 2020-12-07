@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# should not run as root
+[ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
+
 #first move the contents of the old backup out and clear the directory
 echo "Moving old influxdb backups if they exist"
 [ -d ~/IOTstack/backups/influxdb/db_old ] || sudo mkdir ~/IOTstack/backups/influxdb/db_old
