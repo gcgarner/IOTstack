@@ -63,12 +63,12 @@ if [ -f ./backups/dropbox ]; then
 
 	#upload new backup to dropbox
 	echo "uploading to dropbox"
-	$dropboxuploader upload ./backups/$backupfile $backupfile
+	$dropboxuploader upload ./backups/$backupfile $dropboxfolder/$backupfile
 
-	#list older files to be deleted from cloud (exludes last 7)
-	#to change dropbox backups retained, change below -7 to whatever you want
+	#list older files to be deleted from cloud (exludes last 30)
+	#to change dropbox backups retained, change below -30 to whatever you want
 	echo "checking for old backups on dropbox"
-	files=$($dropboxuploader list $dropboxfolder | awk {' print $3 '} | tail -n +2 | head -n -7)
+	files=$($dropboxuploader list $dropboxfolder | awk {' print $3 '} | tail -n +2 | head -n -30)
 
 	#write files to be deleted to dropbox logfile
 	sudo touch $dropboxlog
@@ -76,10 +76,10 @@ if [ -f ./backups/dropbox ]; then
 	echo $files | tr " " "\n" >$dropboxlog
 
 	#delete files from dropbox as per logfile
-	echo "deleting old backups from dropbox if they exist - last 7 files are kept"
+	echo "deleting old backups from dropbox if they exist - last 30 files are kept"
 
 	#check older files exist on dropbox, if yes then delete them
-	if [ $( echo "$files" | grep -c "backup") -ne 0 ] ; then	
+	if [ $( echo "$files" | grep -c "backup") -ne 0 ] ; then
 		input=$dropboxlog
 		while IFS= read -r file
 		do
