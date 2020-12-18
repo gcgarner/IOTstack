@@ -39,6 +39,9 @@ The README is moving to the Wiki, It's easier to add content and example to the 
 * [Blynk Server](https://sensorsiot.github.io/IOTstack/Containers/Blynk_server)
 * [diyHue](https://sensorsiot.github.io/IOTstack/Containers/diyHue)
 * [Python](https://sensorsiot.github.io/IOTstack/Containers/Python)
+* [Heimdall](https://sensorsiot.github.io/IOTstack/Containers/Heimdall)
+* [DashMachine](https://sensorsiot.github.io/IOTstack/Containers/DashMachine)
+* [Homer](https://sensorsiot.github.io/IOTstack/Containers/Homer)
 * [Custom containers](https://sensorsiot.github.io/IOTstack/Containers/Custom)
 
 ***
