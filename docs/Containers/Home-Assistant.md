@@ -15,6 +15,9 @@ Hass.io now has a seperate installation in the menu. The old version was incorre
 You will be asked to select you device type during the installation. Hass.io is no longer dependant on the IOTstack, it has its own service for maintaining its uptime.
 
 ## Installation
+Due to the behaviour of Network Manager, it is strongly recomended to connect the Pi over a wired internet connection, rather than WiFi.
+If you ignore the advice about connecting via Ethernet and install Network Manager while your session is connected via WiFi, your connection will freeze part way through the installation (when Network Manager starts running and unconditionally changes your Raspberry Pi's WiFi MAC address).
+
 Ensure your system is up to date with:
 ```
 sudo apt update
