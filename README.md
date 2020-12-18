@@ -13,9 +13,7 @@ See [Getting Started](https://sensorsiot.github.io/IOTstack/Getting-Started) in 
 
 See also the [documentation home page](https://sensorsiot.github.io/IOTstack/).
 
-## Migrating from the old repo?
-
-## Installation
+## New Installation
 ### Automatic
 1. Run the following command:
 ```
@@ -32,6 +30,13 @@ $ git checkout master
 $ docker-compose down
 $ ./menu.sh
 $ docker-compose up -d
+```
+
+## Need the old menu back?
+```
+cd ~/IOTstack/
+git pull
+git checkout old-menu
 ```
 
 ## Experimental Features
@@ -68,16 +73,6 @@ Do note that the experimental branch may be broken, or may break your setup, so 
 ## Contributions
 
 Please use the [issues](https://github.com/SensorsIot/IOTstack/issues) tab to report issues.
-
-## Migrating from the old repo?
-```
-cd ~/IOTstack/
-git remote set-url origin https://github.com/SensorsIot/IOTstack.git
-git pull origin master
-docker-compose down
-./menu.sh
-docker-compose up -d
-```
 
 ## Need help? Have a feature suggestion? Discovered a bug?
 We have a Discord server setup for discussions: [IOTstack Discord channel](https://discord.gg/ZpKHnks) if you want to comment on features, suggest new container types, or ask the IOTstack community for help.
