@@ -4,7 +4,8 @@
     restart: unless-stopped
     user: "0"
     privileged: true
-    env_file: ./services/nodered/nodered.env
+    environment:
+      - TZ=Etc/UTC
     ports:
       - "1880:1880"
     volumes:
@@ -15,3 +16,9 @@
       - "/dev/ttyAMA0:/dev/ttyAMA0"
       - "/dev/vcio:/dev/vcio"
       - "/dev/gpiomem:/dev/gpiomem"
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

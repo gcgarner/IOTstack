@@ -2,7 +2,20 @@
     container_name: homebridge
     image: oznu/homebridge:no-avahi-arm32v6
     restart: unless-stopped
-    network_mode: host
-    env_file: ./services/homebridge/homebridge.env
+    environment:
+      - TZ=Etc/UTC
+      - PGID=1000
+      - PUID=1000
+      - HOMEBRIDGE_CONFIG_UI=1
+      - HOMEBRIDGE_CONFIG_UI_PORT=%WUIPort% # This is updated with the first internal port during preBuild hook.
     volumes:
       - ./volumes/homebridge:/homebridge
+    ports: # Ensure Internal and external ports are synced (nwMode: host). This is just used to check for conflicts.
+      - "4040:4040"
+    network_mode: host
+    # networks:
+    #   - hosts_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

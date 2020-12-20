@@ -1,11 +1,16 @@
   openhab:
-    image: "openhab/openhab:2.4.0"
+    image: "openhab/openhab:latest"
     container_name: openhab
     restart: unless-stopped
     network_mode: host
+    # networks:
+    #   - hosts_nw
 #    cap_add:
 #      - NET_ADMIN
 #      - NET_RAW
+    ports: # Changing this won't do anything. Change the port below under environment. Ensure values are synced
+    - "4050:4050"
+    - "4051:4051"
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
@@ -13,9 +18,13 @@
       - "./volumes/openhab/conf:/openhab/conf"
       - "./volumes/openhab/userdata:/openhab/userdata"
     environment:
-      OPENHAB_HTTP_PORT: "8080"
-      OPENHAB_HTTPS_PORT: "8443"
-      EXTRA_JAVA_OPTS: "-Duser.timezone=Europe/Berlin"
+      - OPENHAB_HTTP_PORT=4050
+      - OPENHAB_HTTPS_PORT=4051
+      - EXTRA_JAVA_OPTS=-Duser.timezone=Etc/UTC"
 #    # The command node is very important. It overrides
 #    # the "gosu openhab tini -s ./start.sh" command from Dockerfile and runs as root!
 #    command: "tini -s ./start.sh server"
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

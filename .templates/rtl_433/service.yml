@@ -1,8 +1,20 @@
   rtl_433:
     container_name: rtl_433
     build: ./services/rtl_433/.
-    env_file:
-      - ./services/rtl_433/rtl_433.env
+    depends_on: 
+      - mosquitto
+    environment:
+      - TZ=Etc/UTC
+      - MQTT_ADDRESS=mosquitto
+      - MQTT_PORT=1883
+      # - MQTT_USER=""
+      # - MQTT_PASSWORD=""
+      - MQTT_TOPIC=RTL_433
     devices:
       - /dev/bus/usb
     restart: unless-stopped
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
+    

@@ -3,5 +3,11 @@
     build: ./services/python/.
     restart: unless-stopped
     network_mode: host
+    # networks:
+    #   - hosts_nw
     volumes:
       - ./volumes/python/app:/usr/src/app
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

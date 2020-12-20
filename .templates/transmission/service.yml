@@ -4,7 +4,7 @@
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Europe/Rome
+      - TZ=Etc/UTC
     volumes:
       - ./volumes/transmission/config:/config
       - ./volumes/transmission/downloads:/downloads
@@ -14,3 +14,9 @@
       - "51413:51413"
       - "51413:51413/udp"
     restart: unless-stopped
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"

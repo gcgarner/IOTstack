@@ -1,10 +1,12 @@
 # Getting started
 
-## Introduction to IOTstack - video
+## Introduction to IOTstack - videos
 
-Andreas Spiess video #295
+Andreas Spiess Video #295: Raspberry Pi Server based on Docker, with VPN, Dropbox backup, Influx, Grafana, etc: IOTstack
+[![#295 Raspberry Pi Server based on Docker, with VPN, Dropbox backup, Influx, Grafana, etc: IOTstack](http://img.youtube.com/vi/a6mjt8tWUws/0.jpg)](https://www.youtube.com/watch?v=a6mjt8tWUws)
 
-[![#295 Raspberry Pi Server](http://img.youtube.com/vi/a6mjt8tWUws/0.jpg)](https://www.youtube.com/watch?v=a6mjt8tWUws)
+Andreas Spiess Video #352: Raspberry Pi4 Home Automation Server (incl. Docker, OpenHAB, HASSIO, NextCloud)
+[![#352 Raspberry Pi4 Home Automation Server (incl. Docker, OpenHAB, HASSIO, NextCloud)](http://img.youtube.com/vi/KJRMjUzlHI8/0.jpg)](https://www.youtube.com/watch?v=KJRMjUzlHI8)
 
 ## A word about the `sudo` command
 
@@ -71,7 +73,7 @@ IOTstack makes the following assumptions (the first three are Raspberry Pi defau
 3. The home directory for user "pi" is `/home/pi/`
 4. IOTstack is installed at `/home/pi/IOTstack` (with that exact spelling)
 
-Download IOTstack like this:
+Download IOTstack manually like this:
 
 ```
 $ cd
@@ -127,17 +129,9 @@ Be patient (and ignore the huge number of warnings).
 
 The commands in this menu execute shell scripts in the root of the project.
 
-It is not necessary to run the scripts from the menu. You can also look inside:
-
-```
-~/IOTstack/scripts
-```
-
-and examine the files to see what they do.
-
 ### Menu item: Miscellaneous commands
 
-Some helpful commands have been added like disabling swap.
+Some helpful commands have been added like disabling swap, or installing SSH keys from github.
 
 ## Useful commands: docker \& docker-compose
 
@@ -302,26 +296,7 @@ $ sudo mkdir -p ./volumes/influxdb/data
 
 When InfluxDB starts, it sees that the folder on right-hand-side of the volumes mapping (`/var/lib/influxdb`) is empty and initialises new databases.
 
-This is how **most** containers behave. But there are exceptions. A good example of an exception is Mosquitto. You can work out whether a container might be an exception by inspecting its services directory, like this:
-
-```
-$ ls ~/IOTstack/services/mosquitto
-directoryfix.sh  filter.acl  mosquitto.conf  service.yml  terminal.sh
-$
-```
-
-The presence of `directoryfix.sh` is an *indication* that you *may* need to do a bit more than just erase a volumes directory. In the case of Mosquitto, simply running the `directoryfix.sh` will suffice, as in:
-
-```
-$ cd ~/IOTstack
-$ docker-compose stop mosquitto
-$ sudo rm -rf ./volumes/mosquitto
-$ ./services/mosquitto/directoryfix.sh
-$ docker-compose up -d mosquitto
-```
-
-`directoryfix.sh` recreates the folder structure expected by Mosquitto and gives it the correct permissions and ownership.
-
+This is how **most** containers behave. But there are exceptions. A good example of an exception is Mosquitto.
 ### Sharing files between the Pi and containers
 
 Have a look a the [Wiki](https://sensorsiot.github.io/IOTstack/Containers/Node-RED/#sharing-files-between-node-red-and-the-host) on how to share files between Node-RED and the Pi.
@@ -438,4 +413,4 @@ $ cd ~/IOTstack
 $ sudo git clean -d -x -f
 ```
 
-This is probably the **only** time you should ever need to use `sudo` in conjunction with `git` for IOTstack.
+This is probably the **only** time you should ever need to use `sudo` in conjunction with `git` for IOTstack. This is not recoverable!

@@ -4,7 +4,7 @@
     restart: unless-stopped
     ports:
       - "8000:8000"
-      - "9002:9000"
+      - "9000:9000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./volumes/portainer-ce/data:/data

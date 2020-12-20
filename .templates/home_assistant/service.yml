@@ -1,0 +1,14 @@
+home_assistant:
+  container_name: home_assistant
+  image: homeassistant/home-assistant:stable
+  restart: unless-stopped
+  ports:
+    - "8123:8123"
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - ./volumes/home_assistant:/config
+  network_mode: host
+  logging:
+    options:
+      max-size: "5m"
+      max-file: "3"

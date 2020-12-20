@@ -1,0 +1,12 @@
+servicesDirectory = './services/'
+templatesDirectory = './.templates/'
+volumesDirectory = './volumes/'
+tempDirectory = './.tmp/'
+scriptsDirectory = './scripts/'
+buildSettingsFileName = '/build_settings.yml'
+buildCache = servicesDirectory + 'docker-compose.save.yml'
+composeOverrideFile = './compose-override.yml'
+envFile = templatesDirectory + 'env.yml'
+dockerPathOutput = './docker-compose.yml'
+servicesFileName = 'service.yml'
+ifCheckList = ['eth0', 'wlan0']

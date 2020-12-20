@@ -8,4 +8,11 @@
       - "9443:9443"
     volumes:
       - ./volumes/blynk_server/data:/data
-      - ./volumes/blynk_server/data/config:/config
+      - ./volumes/blynk_server/config:/config
+    networks:
+      - iotstack_nw
+    logging:
+      options:
+        max-size: "5m"
+        max-file: "3"
+
