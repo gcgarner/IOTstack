@@ -76,6 +76,9 @@ def main():
       with open(r'%s' % dockerPathOutput, 'w') as outputFile:
         yaml.dump(dockerFileYaml, outputFile)
 
+      if not os.path.exists(servicesDirectory):
+        os.makedirs(servicesDirectory, exist_ok=True)
+
       with open(r'%s' % dockerSavePathOutput, 'w') as outputFile:
         yaml.dump(menuStateFileYaml, outputFile)
       runPostBuildHook()
