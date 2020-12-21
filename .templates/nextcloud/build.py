@@ -129,11 +129,11 @@ def main():
       with open(r'%s' % buildSettings) as objBuildSettingsFile:
         nextCloudYamlBuildOptions = yaml.load(objBuildSettingsFile)
         if (
-          nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
-          or nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
-          or nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
+          nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database passwords for this build"
+          or nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database passwords every build"
+          or nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default passwords for this build"
         ):
-          if nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default password for this build":
+          if nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default passwords for this build":
             mySqlRootPassword = "IOtSt4ckToorMySqlDb"
             mySqlPassword = "IOtSt4ckmySqlDbPw"
           else:
@@ -148,7 +148,7 @@ def main():
                 dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName.replace("%randomPassword%", mySqlRootPassword)
 
           # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
-          if (nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
+          if (nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database passwords for this build"):
             nextCloudYamlBuildOptions["databasePasswordOption"] = "Do nothing"
             with open(buildSettings, 'w') as outputFile:
               yaml.dump(nextCloudYamlBuildOptions, outputFile)
@@ -180,6 +180,7 @@ def main():
       nextCloudYamlBuildOptions["databasePasswordOption"] = "Do nothing"
       with open(buildSettings, 'w') as outputFile:
         yaml.dump(nextCloudYamlBuildOptions, outputFile)
+
 
     return True
 
