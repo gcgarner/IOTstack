@@ -114,7 +114,7 @@ def main():
       with open(r'%s' % buildSettings) as objBuildSettingsFile:
         piHoleYamlBuildOptions = yaml.load(objBuildSettingsFile)
         if (
-          piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"
+          piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise password for this build"
           or piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password every build"
           or piHoleYamlBuildOptions["databasePasswordOption"] == "Use default password for this build"
         ):
@@ -131,7 +131,7 @@ def main():
                 dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName
 
           # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
-          if (piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise database password for this build"):
+          if (piHoleYamlBuildOptions["databasePasswordOption"] == "Randomise password for this build"):
             piHoleYamlBuildOptions["databasePasswordOption"] = "Do nothing"
             with open(buildSettings, 'w') as outputFile:
               yaml.dump(piHoleYamlBuildOptions, outputFile)
