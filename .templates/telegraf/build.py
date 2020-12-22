@@ -88,7 +88,8 @@ def main():
       os.makedirs(serviceService, exist_ok=True)
 
     # Files copy
-    shutil.copy(r'%s/telegraf.conf' % serviceTemplate, r'%s/telegraf.conf' % serviceService)
+    if not os.path.exists(serviceTemplate + '/telegraf.conf'):
+      shutil.copy(r'%s/telegraf.conf' % serviceTemplate, r'%s/telegraf.conf' % serviceService)
     return True
 
   # #####################################

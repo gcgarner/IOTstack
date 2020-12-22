@@ -66,6 +66,12 @@ $ sudo apt install -y git curl
 
 > It does no harm to re-install a package that is already installed. The command either behaves as an update or does nothing, as appropriate.
 
+### Streamlined Installation:
+You can use the installer directly from github to install IOTstack locally with:
+```
+curl -fsSL https://raw.githubusercontent.com/SensorsIot/IOTstack/master/install.sh | bash
+```
+
 IOTstack makes the following assumptions (the first three are Raspberry Pi defaults on a clean installation):
 
 1. You are logged-in as the user "pi"
@@ -73,6 +79,7 @@ IOTstack makes the following assumptions (the first three are Raspberry Pi defau
 3. The home directory for user "pi" is `/home/pi/`
 4. IOTstack is installed at `/home/pi/IOTstack` (with that exact spelling)
 
+### Manual installation:
 Download IOTstack manually like this:
 
 ```
@@ -88,12 +95,13 @@ The menu is used to install Docker and then build the `docker-compose.yml` file 
 
 ### Menu item: Install Docker
 
-Please do **not** try to install `docker` and `docker-compose` via `sudo apt install`. There's more to it than that. Docker needs to be installed by `menu.sh`, like this:
+Please do **not** try to install `docker` and `docker-compose` via `sudo apt install`. There's more to it than that. Docker needs to be installed by `menu.sh`. The menu will prompt you to install docker if it detects that docker is not already installed. You can manually install it from within the `Native Installs` menu:
 
 ```
 $ cd ~/IOTstack
 $ ./menu.sh
-Select "Install Docker"
+Select "Native Installs"
+Select "Install Docker and Docker-Compose"
 ```
 
 Follow the prompts. The process finishes by asking you to reboot. Do that!
