@@ -370,6 +370,7 @@ def main():
       print("* Error in YAML file")
       print("* YAML file is unreadable")
       print("* Buildstack script was modified")
+      time.sleep(1)
       sys.exit(1)
 
     return True
@@ -533,6 +534,7 @@ def main():
       del dockerComposeServicesYaml[menu[selection][0]]
     else:
       menu[selection][1]["checked"] = True
+      print(menu[selection][0])
       loadService(menu[selection][0])
 
   def prepareMenuState():
