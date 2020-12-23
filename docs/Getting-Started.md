@@ -159,6 +159,27 @@ $ docker-compose up -d
 
 Once the stack has been brought up, it will stay up until you take it down. This includes shutdowns and reboots of your Raspberry Pi. If you do not want the stack to start automatically after a reboot, you need to stop the stack before you issue the reboot command.
 
+#### Logging Journald Errors
+
+If you get docker logging error like `Cannot create container for service [service name here]: unknown log opt 'max-file' for journald log driver` run the following command:
+```
+sudo nano /etc/docker/daemon.json
+```
+and change:
+```
+"log-driver": "journald",
+```
+To:
+```
+"log-driver": "json-file",
+```
+
+Logging limits were added to prevent Docker using up lots of RAM if log2ram is enabled, or SD cards being filled with log data and degraded from unnecessary IO.
+
+Docker Logging configurations: https://docs.docker.com/config/containers/logging/configure/
+
+You can also turn logging off or set it to use another option for any service by using the IOTstack `docker-compose-override.yml` file mentioned here: https://sensorsiot.github.io/IOTstack/Custom/
+
 ### Stopping your IOTstack
 
 Stopping aka "downing" the stack stops and deletes all containers, and removes the internal network:
