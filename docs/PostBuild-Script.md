@@ -10,7 +10,7 @@ The `postbuild.sh` file has been added to gitignore, so it won't be updated by I
 ## Example `postbuild.sh` script
 The following script will print out each of the services built, and a custom message for nodered. If it was the first time the script was executed, it'll also output "Fresh Install" at the end, using a `.install_tainted` file for knowing.
 ```
-#!/bin.bash
+#!/bin/bash
 
 for iotstackService in "$@"
 do
