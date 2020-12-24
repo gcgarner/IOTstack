@@ -4,7 +4,7 @@
     restart: unless-stopped
     user: "0"
     ports:
-      - 9090:9090
+      - "9090:9090"
     volumes:
       - ./services/prometheus/config.yml:/etc/prometheus/config.yml
       - ./volumes/prometheus/data:/data

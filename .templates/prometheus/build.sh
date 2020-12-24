@@ -3,6 +3,8 @@
 DOCKER_COMPOSE_PATH=./.tmp/docker-compose.tmp.yml
 TEMPLATE_PATH=./.templates/prometheus
 
+# TODO: Prometheus needs to have a build.py file created before this bash script is executed.
+
 if [[ ! -f $DOCKER_COMPOSE_PATH ]]; then
   echo "[Prometheus] Warning: $DOCKER_COMPOSE_PATH does not exist."
 fi
