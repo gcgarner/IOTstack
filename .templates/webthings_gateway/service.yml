@@ -1,6 +1,6 @@
-  webthings_gateway:
-    image: mozillaiot/gateway:latest
-    container_name: webthings_gateway
+  webthingsio_gateway:
+    image: webthingsio/gateway:latest
+    container_name: webthingsio_gateway
     network_mode: host
     # networks:
     #   - hosts_nw
@@ -10,7 +10,7 @@
     #devices:
     # - /dev/ttyACM0:/dev/ttyACM0
     volumes:
-      - ./volumes/webthings_gateway/share:/home/node/.mozilla-iot
+      - ./volumes/webthingsio_gateway/share:/home/node/.mozilla-iot
     logging:
       options:
         max-size: "5m"

@@ -39,6 +39,6 @@ Do note that the ports listed are not all of the ports containers use. They are 
 | telegraf       | *none*           | *none*     | *none* | No |
 | timescaledb    | timescaleuser    | IOtSt4ckTim3Scale | *none* | No |
 | transmission   | *none*           | *none*     | 9091   | No |
-| webthings_gateway | *none*        | *none*   | 4060   | No |
+| webthingsio_gateway | *none*      | *none*     | 4060   | No |
 | zigbee2mqtt    | *none*           | *none*     | *none* | No |
 | zigbee2mqtt_assistant | *none*    | *none* | *none* | No |

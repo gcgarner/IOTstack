@@ -132,7 +132,7 @@ def main():
 
 # This check isn't required, but placed here for debugging purposes
 global currentServiceName # Name of the current service
-if currentServiceName == 'webthings_gateway':
+if currentServiceName == 'webthingsio_gateway':
   main()
 else:
-  print("Error. '{}' Tried to run 'webthings_gateway' config".format(currentServiceName))
+  print("Error. '{}' Tried to run 'webthingsio_gateway' config".format(currentServiceName))

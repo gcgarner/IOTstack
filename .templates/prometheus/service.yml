@@ -5,9 +5,6 @@
     user: "0"
     ports:
       - 9090:9090
-    env_file:
-      - ./services/prometheus/prometheus.env
-    depends_on:
     volumes:
       - ./services/prometheus/config.yml:/etc/prometheus/config.yml
       - ./volumes/prometheus/data:/data
