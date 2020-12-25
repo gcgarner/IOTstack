@@ -368,7 +368,7 @@ else
 	do_project_checks
 	do_env_checks
 	do_python3_checks
-	sudo echo "Please enter sudo pasword if prompted"
+	echo "Please enter sudo pasword if prompted"
 	do_docker_checks
 
 	if [[ "$DOCKER_VERSION_GOOD" == "true" ]] && \

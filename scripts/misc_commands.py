@@ -43,7 +43,7 @@ def main():
   def installLog2Ram():
     print(term.clear())
     print("Install log2ram:")
-    subprocess.call("bash disable_swap.sh", shell=True)
+    subprocess.call("./scripts/install_log2ram.sh", shell=True)
     print("")
     input("Process terminated. Press [Enter] to show menu and continue.")
     return True
