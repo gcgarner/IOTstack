@@ -149,7 +149,7 @@ def main():
   def checkFiles():
     fileIssues = []
     if not os.path.exists(serviceService + '/addons_list.yml'):
-      fileIssues.append(serviceService + '/addons_list.yml does not exist. Build addons file to fix.')
+      fileIssues.append('/addons_list.yml does not exist. Build addons file in options to fix. This is optional')
     return fileIssues
 
   ############################
