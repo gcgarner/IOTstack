@@ -1,4 +1,4 @@
-# Zigbe2MQTT
+# Zigbee2MQTT
 * [Web Guide](https://www.zigbee2mqtt.io/information/docker.html)
 
 ## First startup
@@ -23,7 +23,7 @@ to
 
 and run docker-compose up -d again
 
-If the container starts then run `docker logs zigbe2mqtt` so see the log output and if your device is recognised. You may need to reset the device for docker to see it.
+If the container starts then run `docker logs zigbee2mqtt` so see the log output and if your device is recognised. You may need to reset the device for docker to see it.
 
 To edit the configuration file `sudo nano volumes/zigbee2mqtt/data/configuration.yaml` you many need to restart the container for changes to take affect `docker-compose restart zigbee2mqtt`
 
