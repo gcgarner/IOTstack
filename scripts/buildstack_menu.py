@@ -370,7 +370,7 @@ def main():
       print("* Error in YAML file")
       print("* YAML file is unreadable")
       print("* Buildstack script was modified")
-      time.sleep(1)
+      input("Press Enter to exit...")
       sys.exit(1)
 
     return True
