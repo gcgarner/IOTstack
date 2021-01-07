@@ -1,21 +1,15 @@
-  gitea:
-    container_name: gitea
-    image: "kunde21/gitea-arm:latest"
-    # image: "gitea/gitea" # x64
-    restart: unless-stopped
-    ports:
-      - "7920:3000/tcp"
-      - "2222:22/tcp"
-    environment:
-      - USER_UID=1000
-      - USER_GID=1000
-    volumes:
-      - ./volumes/gitea/data:/data
-      - /etc/timezone:/etc/timezone:ro
-      # - /etc/localtime:/etc/localtime:ro
-    networks:
-      - iotstack_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+gitea:
+  container_name: gitea
+  image: "kunde21/gitea-arm:latest"
+  restart: unless-stopped
+  ports:
+    - "7920:3000/tcp"
+    - "2222:22/tcp"
+  environment:
+    - USER_UID=1000
+    - USER_GID=1000
+  volumes:
+    - ./volumes/gitea/data:/data
+    - /etc/timezone:/etc/timezone:ro
+  networks:
+    - iotstack_nw

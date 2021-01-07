@@ -1,16 +1,9 @@
-  zigbee2mqtt:
-    container_name: zigbee2mqtt
-    image: koenkk/zigbee2mqtt
-    volumes:
-      - ./volumes/zigbee2mqtt/data:/app/data
-    devices:
-      - /dev/ttyAMA0:/dev/ttyACM0
-      #- /dev/ttyACM0:/dev/ttyACM0
-    restart: unless-stopped
-    network_mode: host
-    # networks:
-    #   - hosts_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+zigbee2mqtt:
+  container_name: zigbee2mqtt
+  image: koenkk/zigbee2mqtt
+  volumes:
+    - ./volumes/zigbee2mqtt/data:/app/data
+  devices:
+    - /dev/ttyAMA0:/dev/ttyACM0
+  restart: unless-stopped
+  network_mode: host

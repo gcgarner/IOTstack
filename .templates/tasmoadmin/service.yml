@@ -1,14 +1,11 @@
-  tasmoadmin:
-    container_name: tasmoadmin
-    image: raymondmm/tasmoadmin
-    restart: unless-stopped
-    ports:
-      - "8088:80"
-    volumes:
-      - ./volumes/tasmoadmin/data:/data
-    networks:
-      - iotstack_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+tasmoadmin:
+  container_name: tasmoadmin
+  image: raymondmm/tasmoadmin
+  restart: unless-stopped
+  ports:
+    - "8088:80"
+  volumes:
+    - ./volumes/tasmoadmin/data:/data
+  networks:
+    - iotstack_nw
+

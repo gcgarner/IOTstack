@@ -1,14 +1,13 @@
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus:latest
-    restart: unless-stopped
-    user: "0"
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./services/prometheus/config.yml:/etc/prometheus/config.yml
-      - ./volumes/prometheus/data:/data
-    command:
-      - '--config.file=/etc/prometheus/config.yml'
-      - '--storage.tsdb.path=/data'
-
+prometheus:
+  container_name: prometheus
+  image: prom/prometheus:latest
+  restart: unless-stopped
+  user: "0"
+  ports:
+    - "9090:9090"
+  volumes:
+    - ./services/prometheus/config.yml:/etc/prometheus/config.yml
+    - ./volumes/prometheus/data:/data
+  command:
+    - '--config.file=/etc/prometheus/config.yml'
+    - '--storage.tsdb.path=/data'

@@ -1,44 +1,26 @@
-  pihole:
-    container_name: pihole
-    image: pihole/pihole:latest
-    ports:
-      - "8089:80/tcp"
-      - "53:53/tcp"
-      - "53:53/udp"
-      - "67:67/udp"
-      # - "443:443/tcp"
-    environment:
-      # - TZ=Etc/UTC
-      - WEBPASSWORD=%randomAdminPassword%
-      # - DNS1=8.8.8.8
-      # - DNS2=8.8.4.4
-      # - DNSSEC=false
-      # - DNS_BOGUS_PRIV=True
-      # - CONDITIONAL_FORWARDING=False
-      # - CONDITIONAL_FORWARDING_IP=your_router_ip_here (only if CONDITIONAL_FORWARDING=true)
-      # - CONDITIONAL_FORWARDING_DOMAIN=optional
-      # - CONDITIONAL_FORWARDING_REVERSE=optional
-      # - ServerIP=your_Pi's_IP_here  << recommended
-      # - ServerIPv6= your_Pi's_ipv6_here << Required if using ipv6
-      # - VIRTUAL_HOST=$ServerIP
-      # - IPv6=True
-      - INTERFACE=eth0
-      # - DNSMASQ_LISTENING=local
-    volumes:
-       - ./volumes/pihole/etc-pihole/:/etc/pihole/
-       - ./volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
-    dns:
-      - 127.0.0.1
-      - 1.1.1.1
-    # Recommended but not required (DHCP needs NET_ADMIN)
-    #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
-    cap_add:
-      - NET_ADMIN
-    restart: unless-stopped
-    networks:
-      - iotstack_nw
-      - vpn_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+pihole:
+  container_name: pihole
+  image: pihole/pihole:latest
+  ports:
+    - "8089:80/tcp"
+    - "53:53/tcp"
+    - "53:53/udp"
+    - "67:67/udp"
+  environment:
+    - WEBPASSWORD=%randomAdminPassword%
+    - INTERFACE=eth0
+  volumes:
+      - ./volumes/pihole/etc-pihole/:/etc/pihole/
+      - ./volumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+  dns:
+    - 127.0.0.1
+    - 1.1.1.1
+  cap_add:
+    - NET_ADMIN
+  restart: unless-stopped
+  networks:
+    - iotstack_nw
+    - vpn_nw
+
+# Recommended but not required (DHCP needs NET_ADMIN)
+#   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities

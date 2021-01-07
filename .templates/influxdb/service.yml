@@ -1,26 +1,23 @@
-  influxdb:
-    container_name: influxdb
-    image: "influxdb:latest"
-    restart: unless-stopped
-    ports:
-      - "8086:8086"
-      - "8083:8083"
-      - "2003:2003"
-    environment:
-      - INFLUXDB_HTTP_FLUX_ENABLED=false
-      - INFLUXDB_REPORTING_DISABLED=false
-      - INFLUXDB_HTTP_AUTH_ENABLED=false
-      - INFLUX_USERNAME=dba
-      - INFLUX_PASSWORD=supremo
-      - INFLUXDB_UDP_ENABLED=false
-      - INFLUXDB_UDP_BIND_ADDRESS=0.0.0.0:8086
-      - INFLUXDB_UDP_DATABASE=udp
-    volumes:
-      - ./volumes/influxdb/data:/var/lib/influxdb
-      - ./backups/influxdb/db:/var/lib/influxdb/backup
-    networks:
-      - iotstack_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+influxdb:
+  container_name: influxdb
+  image: "influxdb:latest"
+  restart: unless-stopped
+  ports:
+    - "8086:8086"
+    - "8083:8083"
+    - "2003:2003"
+  environment:
+    - INFLUXDB_HTTP_FLUX_ENABLED=false
+    - INFLUXDB_REPORTING_DISABLED=false
+    - INFLUXDB_HTTP_AUTH_ENABLED=false
+    - INFLUX_USERNAME=dba
+    - INFLUX_PASSWORD=supremo
+    - INFLUXDB_UDP_ENABLED=false
+    - INFLUXDB_UDP_BIND_ADDRESS=0.0.0.0:8086
+    - INFLUXDB_UDP_DATABASE=udp
+  volumes:
+    - ./volumes/influxdb/data:/var/lib/influxdb
+    - ./backups/influxdb/db:/var/lib/influxdb/backup
+  networks:
+    - iotstack_nw
+

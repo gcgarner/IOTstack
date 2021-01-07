@@ -8,7 +8,4 @@ home_assistant:
     - /etc/localtime:/etc/localtime:ro
     - ./volumes/home_assistant:/config
   network_mode: host
-  logging:
-    options:
-      max-size: "5m"
-      max-file: "3"
+

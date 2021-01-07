@@ -1,28 +1,16 @@
-  grafana:
-    container_name: grafana
-    image: grafana/grafana
-    restart: unless-stopped
-    user: "0"
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_PATHS_DATA=/var/lib/grafana
-      - GF_PATHS_LOGS=/var/log/grafana
-      # - TZ=Etc/UTC
-      ## [SERVER]
-      # - GF_SERVER_ROOT_URL=http://localhost:3000/grafana
-      # - GF_SERVER_SERVE_FROM_SUB_PATH=true
-      ## [SECURITY]
-      # - GF_SECURITY_ADMIN_USER=admin
-      # - GF_SECURITY_ADMIN_PASSWORD=admin
-      # - GF_SECURITY_ALLOW_EMBEDDING=true # Allows embedding externally
-      # - GF_AUTH_ANONYMOUS_ENABLED=true # Allows public read access to graphs
-    volumes:
-      - ./volumes/grafana/data:/var/lib/grafana
-      - ./volumes/grafana/log:/var/log/grafana
-    networks:
-      - iotstack_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+grafana:
+  container_name: grafana
+  image: grafana/grafana
+  restart: unless-stopped
+  user: "0"
+  ports:
+    - "3000:3000"
+  environment:
+    - GF_PATHS_DATA=/var/lib/grafana
+    - GF_PATHS_LOGS=/var/log/grafana
+  volumes:
+    - ./volumes/grafana/data:/var/lib/grafana
+    - ./volumes/grafana/log:/var/log/grafana
+  networks:
+    - iotstack_nw
+

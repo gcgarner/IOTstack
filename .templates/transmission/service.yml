@@ -1,22 +1,18 @@
-  transmission:
-    image: linuxserver/transmission
-    container_name: transmission
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - ./volumes/transmission/config:/config
-      - ./volumes/transmission/downloads:/downloads
-      - ./volumes/transmission/watch:/watch
-    ports:
-      - "9091:9091"
-      - "51413:51413"
-      - "51413:51413/udp"
-    restart: unless-stopped
-    networks:
-      - iotstack_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+transmission:
+  image: linuxserver/transmission
+  container_name: transmission
+  environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Etc/UTC
+  volumes:
+    - ./volumes/transmission/config:/config
+    - ./volumes/transmission/downloads:/downloads
+    - ./volumes/transmission/watch:/watch
+  ports:
+    - "9091:9091"
+    - "51413:51413"
+    - "51413:51413/udp"
+  restart: unless-stopped
+  networks:
+    - iotstack_nw

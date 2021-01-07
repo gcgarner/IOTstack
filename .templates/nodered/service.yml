@@ -1,24 +1,20 @@
-  nodered:
-    container_name: nodered
-    build: ./services/nodered/.
-    restart: unless-stopped
-    user: "0"
-    privileged: true
-    environment:
-      - TZ=Etc/UTC
-    ports:
-      - "1880:1880"
-    volumes:
-      - ./volumes/nodered/data:/data
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
-    devices:
-      - "/dev/ttyAMA0:/dev/ttyAMA0"
-      - "/dev/vcio:/dev/vcio"
-      - "/dev/gpiomem:/dev/gpiomem"
-    networks:
-      - iotstack_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+nodered:
+  container_name: nodered
+  build: ./services/nodered/.
+  restart: unless-stopped
+  user: "0"
+  privileged: true
+  environment:
+    - TZ=Etc/UTC
+  ports:
+    - "1880:1880"
+  volumes:
+    - ./volumes/nodered/data:/data
+    - /var/run/docker.sock:/var/run/docker.sock
+    - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+  devices:
+    - "/dev/ttyAMA0:/dev/ttyAMA0"
+    - "/dev/vcio:/dev/vcio"
+    - "/dev/gpiomem:/dev/gpiomem"
+  networks:
+    - iotstack_nw

@@ -1,12 +1,8 @@
-  adminer:
-    container_name: adminer
-    image: adminer
-    restart: unless-stopped
-    ports:
-      - "9080:8080"
-    networks:
-      - iotstack_nw
-    logging:
-      options:
-        max-size: "5m"
-        max-file: "3"
+adminer:
+  container_name: adminer
+  image: adminer
+  restart: unless-stopped
+  ports:
+    - "9080:8080"
+  networks:
+    - iotstack_nw
