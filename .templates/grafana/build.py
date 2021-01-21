@@ -31,7 +31,7 @@ def main():
   except:
     hideHelpText = False
 
-  documentationHint = 'https://sensorsiot.github.io/IOTstack/Containers/Adminer'
+  documentationHint = 'https://sensorsiot.github.io/IOTstack/Containers/Grafana'
 
   # This lets the menu know whether to put " >> Options " or not
   # This function is REQUIRED.
