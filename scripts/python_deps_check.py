@@ -1,10 +1,8 @@
 import sys
-import yaml
-import blessed
-import ruamel.yaml
 
 if sys.argv[1] == "--pyyaml-version":
   try:
+    import yaml
     print("pyyaml", yaml.__version__)
     sys.exit(0)
   except SystemExit:
@@ -15,6 +13,7 @@ if sys.argv[1] == "--pyyaml-version":
 
 if sys.argv[1] == "--pyaml-version":
   try:
+    import ruamel.yaml
     print("ruamel.yaml", ruamel.yaml.__version__)
     sys.exit(0)
   except SystemExit:
@@ -25,6 +24,7 @@ if sys.argv[1] == "--pyaml-version":
 
 if sys.argv[1] == "--blessed-version":
   try:
+    import blessed
     print("blessed", blessed.__version__)
     sys.exit(0)
   except SystemExit:
