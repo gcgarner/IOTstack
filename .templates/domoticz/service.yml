@@ -7,8 +7,6 @@ domoticz:
     - "1443:1443"
   volumes:
     - ./volumes/domoticz/data:/config
-  env_file:
-    - ./services/domoticz/domoticz.env      
   restart: unless-stopped
   network_mode: bridge
   environment:
