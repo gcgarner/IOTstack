@@ -1,8 +1,10 @@
 heimdall:
   image: ghcr.io/linuxserver/heimdall
   container_name: heimdall
-  env_file:
-    - ./services/heimdall/heimdall.env
+  environment:
+    - PUID=1000
+    - PGID=1000
+    - TZ=Europe/Paris
   volumes:
     - ./volumes/heimdall/config:/config
   ports:
