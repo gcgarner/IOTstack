@@ -4,8 +4,6 @@ influxdb:
   restart: unless-stopped
   ports:
     - "8086:8086"
-    - "8083:8083"
-    - "2003:2003"
   environment:
     - INFLUXDB_HTTP_FLUX_ENABLED=false
     - INFLUXDB_REPORTING_DISABLED=false
