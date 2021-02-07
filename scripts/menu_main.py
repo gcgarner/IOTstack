@@ -1,5 +1,4 @@
-#!/usr/bin/env python3
-
+#!/usr/bin/python3
 from blessed import Terminal
 import sys
 import subprocess
@@ -299,6 +298,7 @@ def checkDockerVersion():
     currentDockerVersion = currentDockerVersion.decode("utf-8").rstrip().replace('"', '')
   except Exception as err:
     print("Error attempting to run docker command:", err)
+    currentDockerVersion = ""
 
   return checkVersion(requiredDockerVersion, currentDockerVersion)
 

@@ -23,7 +23,7 @@ nextcloud_db:
   image: linuxserver/mariadb
   container_name: nextcloud_db
   volumes:
-    - ./volumes/nextcloud/db:/var/lib/mysql
+    - ./volumes/nextcloud/db:/config
   environment:
     - MYSQL_ROOT_PASSWORD=%randomPassword%
     - MYSQL_PASSWORD=%randomMySqlPassword%

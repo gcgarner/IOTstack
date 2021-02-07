@@ -10,4 +10,6 @@ rtl_433:
     - MQTT_TOPIC=RTL_433
   devices:
     - /dev/bus/usb
+  networks:
+    - iotstack_nw
   restart: unless-stopped

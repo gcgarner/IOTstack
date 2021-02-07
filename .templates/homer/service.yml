@@ -1,8 +1,9 @@
 homer:
   image: b4bz/homer:latest
   container_name: homer
-  env_file:
-    - ./services/homer/homer.env
+  environment:
+    - UID=1000
+    - GID=1000
   volumes:
     - ./volumes/homer/assets:/www/assets
   ports:
