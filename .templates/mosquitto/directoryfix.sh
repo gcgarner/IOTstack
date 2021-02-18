@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# should not run as root
+[ "$EUID" -eq 0 ] && echo "This script should NOT be run using sudo" && exit -1
+
+# expects to run from IOTstack
+[ $(basename "$PWD") = "IOTstack" ] || echo -e \
+"Warning: This script expects to be run from ~/IOTstack.\n" \
+"        The script will continue but may produce unexpected results."
+
 [ -d ./volumes/mosquitto ] || sudo mkdir -p ./volumes/mosquitto
 
 #check user 1883
