@@ -18,6 +18,11 @@ $ ./menu.sh
 $ docker-compose up -d
 ```
 
+If you have questions about migrating your current stack, or why the migration occured, please ask on the Discord:
+https://discord.gg/ZpKHnks
+
+Any PRs created, or issues raised on this repo may not be answered.
+
 ***
 
 ***
