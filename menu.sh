@@ -189,6 +189,14 @@ else
 	fi
 fi
 
+
+if [ ! -f .migrated ]; then
+  if (whiptail --title "Project migration" --yesno "Project has been migrated to another repository.\n\nPlease see readme.md\n\nDo you want to exit? Choosing no will hide this prompt in the future.\n\nReadme:\nhttps://github.com/gcgarner/IOTstack/blob/master/README.md\n\n\nMigrated Project Repo:\nhttps://github.com/SensorsIot/IOTstack" 20 78); then
+    exit
+  fi
+  touch .migrated
+fi
+
 #---------------------------------------------------------------------------------------------------
 # Menu system starts here
 # Display main menu
