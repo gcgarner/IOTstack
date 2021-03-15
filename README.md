@@ -1,51 +1,32 @@
 # IOTStack
 
+This project has been migrated. Please find the maintained version at: https://github.com/SensorsIot/IOTstack
+
+## Announcements !! Migrated !!
+
+This project has been migrated. Please find the maintained version at: https://github.com/SensorsIot/IOTstack
+
+To migrate your current IOTstack version, you can run:
+
+```
+$ cd ~/IOTstack
+$ git remote set-url origin https://github.com/SensorsIot/IOTstack.git
+$ git pull origin master
+$ git checkout master
+$ docker-compose down
+$ ./menu.sh
+$ docker-compose up -d
+```
+
+***
+
+***
+
+## Old Readme:
+
 IOTstack is a builder for docker-compose to easily make and maintain IoT stacks on the Raspberry Pi
 
-## Announcements
-
 The bulk of the README has moved to the Wiki. Please check it out [here](https://github.com/gcgarner/IOTstack/wiki)
-
-* 2019-12-19 Added python container, tweaked update script
-* 2019-12-12 modified zigbee2mqtt template file
-* 2019-12-12 Added Function to add custom containers to the stack
-* 2019-12-12 PR cmskedgell: Added Homebridge
-* 2019-12-12 PR 877dev: Added trimming of online backups
-* 2019-12-03 BUGFIX Mosquitto: Fixed issue where mosquitto failed to start as a result of 11-28 change
-* 2019-12-03 Added terminal for postgres, temporarily removed setfacl from menu
-* 2019-11-28 PR @stfnhmplr added diyHue
-* 2019-11-28 Fixed update notification on menu
-* 2019-11-28 Fixed mosquitto logs and database not mapping correctly to volumes. Pull new template to fix
-* 2019-11-28 added the option to disable swapfile by setting swappiness to 0
-* 2019-11-28 PR @stfnhmplr fixed incorrect shegang on MariaDB terminal.sh
-* 2019-11-28 Added native install for RPIEasy
-* 2019-11-27 Additions: NextCloud, MariaDB, MotionEye, Mozilla Webthings, blynk-server (fixed issue with selection.txt)
-* 2019-11-22 BUGFIX selection.txt failed on fresh install, added pushd IOTstack to menu to ensure correct path
-* 2019-11-22 Added notification into menu if project update is available
-* 2019-11-20 BUGFIX influxdb backup: Placing docker_backup in crontab caused influxdb backup not to execute correctly
-* 2019-11-20 BUGFIX disable swap: swapfile recreation on reboot fixed. Re-run from menu to fix.
-* Node-RED: serial port. New template adds privileged which allows acces to serial devices
-* EspurinoHub: is available for testing see wiki entry
-
-***
-
-## Highlighted topics
-
-* [Bluetooth and Node-RED](https://github.com/gcgarner/IOTstack/wiki/Node-RED#using-bluetooth)
-* [Saving files to disk inside containers](https://github.com/gcgarner/IOTstack/wiki/Node-RED#sharing-files-between-node-red-and-the-host)
-* [Updating the Project](https://github.com/gcgarner/IOTstack/wiki/Updating-the-Project)
-
- ***
-
-## Coming soon
-
-* reverse proxy is now next on the list, I cant keep up with the ports
-* Detection of arhcitecture for seperate stack options for amd64, armhf, i386
-* autocleanup of backups on cloud
-* Gitea (in testing branch)
-* OwnCloud
-
-***
 
 ## About
 
