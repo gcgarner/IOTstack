@@ -11,12 +11,14 @@ To migrate your current IOTstack version, you can run:
 ```
 $ cd ~/IOTstack
 $ git remote set-url origin https://github.com/SensorsIot/IOTstack.git
-$ git pull origin master
-$ git checkout master
+$ git fetch origin master
+$ git reset --hard origin/master
 $ docker-compose down
 $ ./menu.sh
 $ docker-compose up -d
 ```
+
+This will override any changes you've made locally on files git tracks.
 
 If you have questions about migrating your current stack, or why the migration occured, please ask on the Discord:
 https://discord.gg/ZpKHnks
