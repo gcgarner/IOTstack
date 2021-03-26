@@ -7,6 +7,7 @@
     devices:
       - /dev/ttyAMA0:/dev/ttyACM0
       #- /dev/ttyACM0:/dev/ttyACM0
+      #- /dev/ttyUSB0:/dev/ttyACM0 # Electrolama zig-a-zig-ah! (zzh!) maybe other as well
     restart: always
     network_mode: host
     privileged: true
