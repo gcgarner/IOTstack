@@ -17,7 +17,7 @@ first test the script to make sure it works `sudo ~/IOTstack/duck/duck.sh` then 
 Create a cron job by running the following command `crontab -e`
 
 You will be asked to use an editor option 1 for nano should be fine
-paste the following in the editor `*/5 * * * * sudo ~/IOTstack/duck/duck.sh >/dev/null 2>&1` then ctrl+s and ctrl+x to save
+paste the following in the editor `*/5 * * * * ~/IOTstack/duck/duck.sh` then ctrl+s and ctrl+x to save
 
 Your Public IP should be updated every five minutes
 
