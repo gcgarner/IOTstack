@@ -3,9 +3,9 @@ openhab:
   container_name: openhab
   restart: unless-stopped
   network_mode: host
-  ports:
-  - "4050:4050"
-  - "4051:4051"
+  #ports:
+  #- "4050:4050"
+  #- "4051:4051"
   volumes:
     - "/etc/localtime:/etc/localtime:ro"
     - "/etc/timezone:/etc/timezone:ro"
