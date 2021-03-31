@@ -10,6 +10,6 @@ homebridge:
     - HOMEBRIDGE_CONFIG_UI_PORT=%WUIPort%
   volumes:
     - ./volumes/homebridge:/homebridge
-  ports:
-    - "4040:4040"
+  #ports:
+  #  - "4040:4040"
   network_mode: host

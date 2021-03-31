@@ -7,5 +7,5 @@ home_assistant:
   volumes:
     - /etc/localtime:/etc/localtime:ro
     - ./volumes/home_assistant:/config
-  network_mode: host
+  #network_mode: host
 
