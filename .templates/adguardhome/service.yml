@@ -1,0 +1,35 @@
+adguardhome:
+  container_name: adguardhome
+  image: adguard/adguardhome
+  restart: unless-stopped
+  environment:
+    - TZ=Etc/UTC
+  # enable host mode to activate DHCP server on ports 67/udp & 68/tcp+udp
+  # note that you must also disable all other ports if you enable host mode
+  # network_mode: host
+  ports:
+    # regular DNS
+    - "53:53/tcp"
+    - "53:53/udp"
+    # administration port (http)
+    # note: external and internal ports MUST be the same
+    #       not active until defined via setup port
+    - "8089:8089/tcp"
+    # HTTPS/DNS-over-HTTPS
+    # - "443:443/tcp"
+    # DNS-over-QUIC
+    # - "784:784/udp"
+    # DNS-over-TLS
+    # - "853:853/tcp"
+    # setup (http)
+    # note: only active until port 8089 becomes active
+    - "3001:3000/tcp"
+    # DNSCrypt
+    # - "5443:5443/tcp"
+    # - "5443:5443/udp"
+  volumes:
+     - ./volumes/adguardhome/workdir:/opt/adguardhome/work
+     - ./volumes/adguardhome/confdir:/opt/adguardhome/conf
+  networks:
+    - iotstack_nw
+    - vpn_nw
