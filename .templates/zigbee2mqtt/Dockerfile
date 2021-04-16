@@ -6,7 +6,7 @@ FROM koenkk/zigbee2mqtt
 # 2. enable the web front end on port 8080
 RUN sed -i.bak \
    -e 's/mqtt:\/\/localhost/mqtt:\/\/mosquitto/' \
-   -e '$s/$/\n\nfrontend:\n  port: 8080\n/' \
+   -e '$s/$/\n\nfrontend:\n  port: 8080\n# auth_token: PASSWORD\n/' \
    /app/configuration.yaml
 
 # EOF
