@@ -21,7 +21,7 @@ IOTstack makes the following assumptions:
 	$ sudo apt update
 	$ sudo apt upgrade -y
 	```
-	
+
 3. You are logged-in as the user "pi"
 4. User "pi" has the user ID 1000
 5. The home directory for user "pi" is `/home/pi/`
