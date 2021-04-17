@@ -4,3 +4,5 @@
     restart: unless-stopped
     expose:
       - 9100
+    networks:
+      - iotstack_nw

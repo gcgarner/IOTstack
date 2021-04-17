@@ -11,3 +11,5 @@ prometheus:
   command:
     - '--config.file=/etc/prometheus/config.yml'
     - '--storage.tsdb.path=/data'
+  networks:
+    - iotstack_nw
