@@ -21,7 +21,7 @@ IOTstack makes the following assumptions:
 	$ sudo apt update
 	$ sudo apt upgrade -y
 	```
-	
+
 3. You are logged-in as the user "pi"
 4. User "pi" has the user ID 1000
 5. The home directory for user "pi" is `/home/pi/`
@@ -40,7 +40,7 @@ The first five assumptions are Raspberry Pi defaults on a clean installation. Th
 	```
 	$ sudo apt install -y curl
 	```
- 
+
 2. Run the following command:
 
 	```
@@ -53,7 +53,7 @@ The first five assumptions are Raspberry Pi defaults on a clean installation. Th
 	$ cd ~/IOTstack
 	$ ./menu.sh
 	```
-		
+
 4. Bring up your stack:
 
 	```
@@ -68,7 +68,7 @@ The first five assumptions are Raspberry Pi defaults on a clean installation. Th
 	```
 	$ sudo apt install -y git
 	```
-	
+
 2. Clone IOTstack:
 
 	* If you want "new menu":
@@ -76,31 +76,31 @@ The first five assumptions are Raspberry Pi defaults on a clean installation. Th
 		```
 		$ git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 		```
-		
+
 	* If you prefer "old menu":
 
 		```
 		$ git clone -b old-menu https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 		```
-	
+
 3. Run the menu and choose your containers:
 
 	```
 	$ cd ~/IOTstack
 	$ ./menu.sh
 	```
-	
+
 	Note:
-	
+
 	* If you are running "old menu" for the first time, you will be guided to "Install Docker". That will end in a reboot, after which you should re-enter the menu and choose your containers.
-	
+
 4. Bring up your stack:
 
 	```
 	$ cd ~/IOTstack
 	$ docker-compose up -d
 	```
-	
+
 ### <a name="scriptedInstall"> scripted </a>
 
 If you prefer to automate your installations using scripts, see:
@@ -161,9 +161,9 @@ Please try to minimise your use of `sudo` when you are working with IOTstack. He
 	$ grep -c 'sudo' ~/IOTstack/menu.sh
 	28
 	```
-	
+
 	There are numerous uses of `sudo` within `menu.sh`. That means the designer thought about when `sudo` was needed.
-	
+
 2. Did the command you **just executed** work without `sudo`? Note the emphasis on the past tense. If yes, then your work is done. If no, and the error suggests elevated privileges are necessary, then re-execute the last command like this:
 
 	```
@@ -336,14 +336,15 @@ To start the stack:
 $ cd ~/IOTstack
 $ docker-compose up -d «container»
 ```
+
 ### <a name="downIOTstack"> stopping your IOTstack </a>
 
 Stopping aka "downing" the stack stops and deletes all containers, and removes the internal network:
- 
+
 ```
 $ cd ~/IOTstack
 $ docker-compose down
-``` 
+```
 
 To stop the stack without removing containers, run:
 
@@ -361,7 +362,7 @@ $ cd ~/IOTstack
 $ docker-compose stop «container»
 ```
 
-This puts the container in a kind of suspended animation. You can resume the container with 
+This puts the container in a kind of suspended animation. You can resume the container with
 
 ```
 $ cd ~/IOTstack
@@ -479,13 +480,13 @@ the change is mirrored **outside** the container at the same relative path withi
 
 ```
 ~/IOTstack/volumes/nodered/data
-``` 
+```
 
 The same is true in reverse. Any change made to any file or folder **outside** the container within:
 
 ```
 ~/IOTstack/volumes/nodered/data
-``` 
+```
 
 is mirrored at the same relative path **inside** the container at:
 
@@ -553,7 +554,7 @@ There are two kinds of images used in IOTstack:
 The easiest way to work out which type of image you are looking at is to inspect the container's service definition in your `docker-compose.yml` file. If the service definition contains the:
 
 * `image:` keyword then the image is **not** built using a Dockerfile.
-* `build:` keyword then the image **is** built using a Dockerfile. 
+* `build:` keyword then the image **is** built using a Dockerfile.
 
 #### <a name="updateNonDockerfile"> updating images not built from Dockerfiles </a>
 
@@ -588,7 +589,7 @@ Node-RED also provides a good example of why your Dockerfile might change: if yo
 
 Note:
 
-* You can also add nodes to Node-RED using Manage Palette. 
+* You can also add nodes to Node-RED using Manage Palette.
 
 ##### <a name="buildDockerfile"> when Dockerfile changes (*local* image only) </a>
 
