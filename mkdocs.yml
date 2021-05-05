@@ -6,4 +6,4 @@ theme:
     - tabs
   plugins:
     - search
-    - awsome-pages
+    - awesome-pages
