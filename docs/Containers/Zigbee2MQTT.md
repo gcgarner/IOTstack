@@ -203,6 +203,47 @@ $ docker exec -it zigbee2mqtt ash
 
 When you want to leave the container, either type `exit` and press return, or press Control-D.
 
+## Setting a password for the web interface
+
+By default, the web interface is unprotected. If you want to set a password:
+
+1. Use `sudo` to edit the active configuration file at the path:
+
+	```
+	~/IOTstack/volumes/zigbee2mqtt/data/configuration.yaml
+	```
+
+2. Find the following text:
+
+	```
+	frontend:
+	  port: 8080
+	# auth_token: PASSWORD
+	```
+	
+3. Uncomment the `auth_token` line and replace "PASSWORD" with the password of your choice. For example, to set the password to "mypassword":
+
+	```
+	  auth_token: mypassword
+	```
+	
+	Note:
+	
+	* although the name `auth_token` suggests something more complex, it really is no more than a simple *en-clear* password. If this concerns you, consider disabling the web front-end entirely, like this:
+	
+		```
+		#frontend:
+		# port: 8080
+		# auth_token: PASSWORD
+		```
+
+4. Save the file and restart the container:
+
+	```
+	$ cd ~/IOTstack
+	$ docker-compose restart zigbee2mqtt
+	```
+
 ## Container maintenance
 
 Because the Zigbee2MQTT container is built from a Dockerfile, a normal `pull` command will not automatically download any updates released on DockerHub.
