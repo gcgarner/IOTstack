@@ -6,6 +6,6 @@ theme:
     - navigation.tabs
 plugins:
   - search
-  - awesome-pages
+# - awesome-pages
 markdown_extensions:
   - pymdownx.superfences
