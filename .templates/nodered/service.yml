@@ -3,7 +3,6 @@ nodered:
   build: ./services/nodered/.
   restart: unless-stopped
   user: "0"
-  privileged: true
   environment:
     - TZ=Etc/UTC
   ports:
