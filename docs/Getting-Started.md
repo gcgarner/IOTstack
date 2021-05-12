@@ -15,7 +15,7 @@ Andreas Spiess Video #352: Raspberry Pi4 Home Automation Server (incl. Docker, O
 IOTstack makes the following assumptions:
 
 1. Your hardware is a Raspberry Pi (typically a 3B+ or 4B)
-2. It has a reasonably-recent version of Raspberry Pi OS (aka "Raspbian" installed) which has been kept up-to-date with:
+2. It has a reasonably-recent version of Raspberry Pi OS (aka "Raspbian") installed which has been kept up-to-date with:
 
 	```
 	$ sudo apt update
@@ -280,7 +280,7 @@ Notes:
 
 * The way back is to take down your stack, restore a backup, and bring up your stack again.
 
-## <a name="dockerAndCompose"> useful commands: docker \& docker-compose </a>
+## <a name="dockerAndCompose"> useful commands: docker & docker-compose </a>
 
 Handy rules:
 
@@ -501,6 +501,7 @@ If you need a "clean slate" for a container, you can delete its volumes. Using I
 ```
 $ cd ~/IOTstack
 $ docker-compose stop influxdb
+$ docker-compose rm -f influxdb
 $ sudo rm -rf ./volumes/influxdb
 $ docker-compose up -d influxdb
 ```
@@ -665,7 +666,7 @@ $ docker rmi portainer/portainer
 $ docker rmi dbf28ba50432
 ```
 
-In general, you can use the repository name to remove an image but the Image ID is sometimes needed. The most common situation where you are likely to need the Image ID is after an image has been updated on DockerHub and pulled down to your Raspberry Pi. You will find two containers with the same name. One will be tagged "latest" (the running version) while the other will be tagged "<none>" (the prior version). You use the Image ID to resolve the ambiguity.
+In general, you can use the repository name to remove an image but the Image ID is sometimes needed. The most common situation where you are likely to need the Image ID is after an image has been updated on DockerHub and pulled down to your Raspberry Pi. You will find two containers with the same name. One will be tagged "latest" (the running version) while the other will be tagged "\<none\>" (the prior version). You use the Image ID to resolve the ambiguity.
 
 ## <a name="nuclearOption"> the nuclear option - use with caution </a>
 
