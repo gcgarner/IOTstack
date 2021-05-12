@@ -65,9 +65,9 @@ By activating host mode the Node-RED container can no longer access containers b
 * GPIO `127.0.0.1` port `8888`
 * MQTT `127.0.0.1`
 
-## Unused node in Protainer
+## Unused node in Portainer
 
-Portainer will report that the nodered image is unsed, this is normal due to the method used build the image. This is normal behavior. It is not advised to remove it as it is used as the base for the iotstack_nodered image, you will need to redownload it should you rebuild the nodered image.
+Portainer will report that the nodered image is unused, this is normal due to the method used build the image. This is normal behavior. It is not advised to remove it as it is used as the base for the iotstack_nodered image, you will need to redownload it should you rebuild the nodered image.
 
 <img width="1444" alt="UnusedImage" src="https://user-images.githubusercontent.com/34226495/69213978-cd555b80-0bb9-11ea-8734-1c42ff52bf7d.png">
 
