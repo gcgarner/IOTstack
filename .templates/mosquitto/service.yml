@@ -1,14 +1,15 @@
 mosquitto:
   container_name: mosquitto
-  image: eclipse-mosquitto
+  build: ./.templates/mosquitto/.
   restart: unless-stopped
-  user: "1883"
+  environment:
+    - TZ=Etc/UTC
   ports:
     - "1883:1883"
   volumes:
+    - ./volumes/mosquitto/config:/mosquitto/config
     - ./volumes/mosquitto/data:/mosquitto/data
     - ./volumes/mosquitto/log:/mosquitto/log
     - ./volumes/mosquitto/pwfile:/mosquitto/pwfile
-    - ./services/mosquitto:/mosquitto/config:ro
   networks:
     - iotstack_nw
