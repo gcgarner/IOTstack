@@ -9,7 +9,6 @@ octoprint:
   # - CAMERA_DEV=/dev/video0
   ports:
     - "9980:80"
-    - "9981:8080"
   devices:
     - /dev/ttyAMA0:/dev/ttyACM0
   # - /dev/video0:/dev/video0

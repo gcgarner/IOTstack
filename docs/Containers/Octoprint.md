@@ -170,14 +170,6 @@ To activate a Raspberry Pi camera attached via ribbon cable:
 	
 	* The device path on the right hand side of the `CAMERA_DEV` environment variable corresponds with the right hand side (ie *after* the colon) of the device mapping. There should be no reason to change either.
 
-Use the following values to configure the camera in the OctoPrint web interface:
-
-* Stream URL: /webcam/?action=stream
-* Snapshot URL: http://localhost:8080/?action=snapshot
-* Path to FFMPEG: /usr/bin/ffmpeg
-
-> For those who normally hear alarm bells when they see "localhost" in a Docker context, rest assured that this is correct. The MJPG streamer runs inside the *same* container as OctoPrint so "localhost" is appropriate.
-
 The three environment variables are required:
 
 ```
@@ -220,6 +212,140 @@ To start a print session:
 
 If you try to start the OctoPrint container before your 3D printer has been switched on and the USB interface has registered with the Raspberry Pi, the container will go into a restart loop.
 
+### first run – the Setup Wizard
+
+Use a browser to point to port 9980 on your Raspberry Pi. For example:
+
+```
+http://raspberrypi.local:9980
+```
+
+This will launch the "Setup Wizard".
+
+1. Click the "Next" button until you reach the "Access Control" screen:
+
+	* Define a Username and Password, and keep a record of your decisions.
+	* Click "Create Account".
+	* Ignore the alarming popup alert by clicking "Ignore". This alert is a result of OctoPrint running in a Docker container.
+	* Click "Next".
+
+2. At the "Online Connectivity Check" screen:
+
+	* Click "Disable Connectivity Check".
+	* Click "Next".
+
+3. At the "Configure Anonymous Usage Tracking" and "Configure plugin blacklist processing" screens:
+
+	* Make a decision about whether you want the feature enabled or disabled and click the appropriate button.
+	* Click "Next".
+
+4. At the "Set up your printer profile" screen:
+
+	* It is probably a good idea to visit the tabs and set values appropriate to your printer (build volume, at least).
+	* Click "Next".
+
+5. At the "Server Commands" screen:
+
+	* Enter the following in the "Restart OctoPrint" field:
+	
+		```
+		s6-svc -r /var/run/s6/services/octoprint
+		```
+	
+	* Click "Next".
+
+6. At the "Webcam & Timelapse Recordings" screen, and assuming you are configuring a PiCamera:
+
+	* Enter the following in the "Stream URL" field:
+	
+		```
+		/webcam/?action=stream
+		```
+	
+		Click the "Test" button to confirm that the camera is working, then click "Close".
+		
+	* Enter the following in the "Snapshot URL" field:
+	
+		```
+		http://localhost:8080/?action=snapshot
+		```
+	
+		Click the "Test" button to confirm that the camera is working, then click "Close".
+	
+	* Enter the following in the "Path to FFMPEG" field:
+	
+		```
+		/usr/bin/ffmpeg
+		```
+		
+		The expected result is the message "The path is valid".
+		
+	* Click "Next".
+
+7. Click "Finish" then click the button to reload the user interface.
+
+### after the first run
+
+Use a browser to point to port 9980 on your Raspberry Pi. For example:
+
+```
+http://raspberrypi.local:9980
+```
+
+Supply your user credentials and login.
+
+### popup messages
+
+OctoPrint will display *numerous* messages in popup windows. These generally fall into two categories:
+
+* Messages that refer to updates; and
+* Messages that refer to other events.
+
+In general, you can ignore messages about updates. You will get all updates automatically the next time the octoprint-docker container is rebuilt and pushed to DockerHub.
+
+You can, if you wish, allow an update to proceed. It might be appropriate to do that if you want to test an update. Just be aware that:
+
+1. Updates are ephemeral and will disappear the next time the Octoprint container is created.
+2. Updates can change the structure of the persistent storage area in a way which can't be undone, and which may prevent the Octoprint container from starting the next time it is created. In other words, if you want to trial an update, take a backup of OctoPrint's persistent storage area **first**.
+
+### restarting the OctoPrint container
+
+You can restart the OctoPrint service in two ways:
+
+* via the Raspberry Pi command line; or
+* via the OctoPrint user interface.
+
+Whichever method you choose will result in a refresh of the OctoPrint user interface and you will need to follow the prompts to reload your browser page.
+
+#### restarting via the command line
+
+Run the following commands:
+
+```
+$ cd ~/IOTstack
+$ docker-compose restart octoprint
+```
+
+#### restarting via OctoPrint user interface
+
+From the "System" icon in the OctoPrint toolbar (looks like a power button symbol):
+
+1. Choose "Restart OctoPrint".
+
+Note:
+
+* If you do not see the "System" icon in the toolbar, fix it line this:
+
+	1. Click the "Settings" icon (looks like a wrench) in the OctoPrint toolbar.
+	2. Choose "Server".
+	3. Enter the following into the "Restart OctoPrint" field:
+	
+		```
+		s6-svc -r /var/run/s6/services/octoprint
+		```
+
+	4. Click "Save".
+
 ### stopping the OctoPrint container
 
 Unless you intend to leave your printer switched on 24 hours a day, you will also need to be careful when you switch off the printer:
@@ -236,25 +362,15 @@ Unless you intend to leave your printer switched on 24 hours a day, you will als
 
 If you turn the printer off without terminating the container, you will crash the container.
 
-### Connecting to OctoPrint
-
-Use a browser to point to port 9980 on your Raspberry Pi. For example:
-
-```
-http://raspberrypi.local:9980
-```
-
-The first time you do this, you will need to create an administrative account.
-
-### Video feed (built-in camera interface)
+## Video feed (built-in camera interface)
 
 You can view the video feed independently of the OctoPrint web interface like this:
 
 ```
-http://raspberrypi.local:9981/?action=stream
+http://raspberrypi.local:9980/webcam/?action=stream
 ```
 
-### Silencing the security warning
+## Silencing the security warning
 
 OctoPrint assumes it is running "natively" rather than in a container. From a data-communications perspective, OctoPrint (the process running inside the OctoPrint container) sees itself as running on a computer attached to the internal Docker network. When you connect to OctoPrint's web interface from a client device attached to an external network, OctoPrint sees that your source IP address is not on the internal Docker network and it issues a security warning.
 
@@ -278,16 +394,16 @@ To silence the warning:
 
 	```
 	server:
-	    …
-	    ipCheck:
-	        enabled: true
-	        trustedSubnets:
-	        - 192.168.1.0/24
+	  …
+	  ipCheck:
+	    enabled: true
+	    trustedSubnets:
+	    - 203.0.132.0/24
 	```
 
 	Notes:
 	
-	* It is likely that the `server:`, `ipCheck:` and `enabled:` directives are already in place but the `trustedSubnets:` directive may not be. Add it, and then add your local subnet(s) where you see the "192.168.1.0/24" example.
+	* The `server:`, `ipCheck:` and `enabled:` directives may already be in place but the `trustedSubnets:` directive may not be. Add it, and then add your local subnet(s) where you see the "192.168.1.0/24" example.
 	* Remember to use spaces in YAML files. Do not use tabs.
 
 4. Save the file.
@@ -298,7 +414,7 @@ To silence the warning:
 	$ docker-compose up -d octoprint
 	```
 
-### routine container maintenance
+## Routine container maintenance
 
 You can check for updates like this:
 
@@ -309,9 +425,46 @@ $ docker-compose up -d octoprint
 $ docker system prune
 ```
 
-### if all else fails…
+## If you forget your username and password
 
-If you forget your administrative password or the OctoPrint container seems to be misbehaving, you can get a "clean slate" by:
+You can view a list of usernames like this:
+
+```
+$ docker exec octoprint octoprint --basedir /octoprint/octoprint user list
+```
+
+To reset a user's password:
+
+1. Use the following line as a template and replace `«username»` and `«password»` with appropriate values:
+
+	```
+	docker exec octoprint octoprint --basedir /octoprint/octoprint user password --password «password» «username»
+	```
+	
+2. Execute the edited command. For example, to set the password for user "me" to "verySecure":
+
+	```
+	$ docker exec octoprint octoprint --basedir /octoprint/octoprint user password --password verySecure me
+	```
+
+3. Restart OctoPrint:
+
+	```
+	$ cd ~/IOTstack
+	$ docker-compose restart octoprint
+	```
+
+Note:
+
+* OctoPrint supports more than one username. To explore the further:
+
+	```
+	$ docker exec octoprint octoprint --basedir /octoprint/octoprint user --help
+	```
+
+## If all else fails…
+
+If the OctoPrint container seems to be misbehaving, you can get a "clean slate" by:
 
 ```
 $ cd ~/IOTstack
@@ -320,3 +473,5 @@ $ docker-compose rm -f octoprint
 $ sudo rm -rf ./volumes/octoprint
 $ docker-compose up -d octoprint
 ```
+
+The OctoPrint container is well-behaved and will re-initialise its persistent storage area correctly. OctoPrint will adopt "first run" behaviour and display the Setup Wizard.
