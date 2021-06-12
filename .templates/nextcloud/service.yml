@@ -1,35 +1,35 @@
 nextcloud:
-  image: nextcloud
   container_name: nextcloud
-  ports:
-    - "9321:80"
-  volumes:
-    - ./volumes/nextcloud/html:/var/www/html:rw
+  image: nextcloud
   restart: unless-stopped
-  depends_on: 
-    - nextcloud_db
-  links:
-    - nextcloud_db
-  networks:
-    - iotstack_nw
-    - nextcloud_internal
   environment:
     - MYSQL_HOST=nextcloud_db
     - MYSQL_PASSWORD=%randomMySqlPassword%
     - MYSQL_DATABASE=nextcloud
     - MYSQL_USER=nextcloud
+  ports:
+    - "9321:80"
+  volumes:
+    - ./volumes/nextcloud/html:/var/www/html
+  depends_on:
+    - nextcloud_db
+  networks:
+    - iotstack_nw
+    - nextcloud_internal
 
 nextcloud_db:
-  image: linuxserver/mariadb
   container_name: nextcloud_db
-  volumes:
-    - ./volumes/nextcloud/db:/config
+  image: ghcr.io/linuxserver/mariadb
+  restart: unless-stopped
   environment:
+    - TZ=Etc/UTC
+    - PUID=1000
+    - PGID=1000
     - MYSQL_ROOT_PASSWORD=%randomPassword%
     - MYSQL_PASSWORD=%randomMySqlPassword%
     - MYSQL_DATABASE=nextcloud
     - MYSQL_USER=nextcloud
-  restart: unless-stopped
+  volumes:
+    - ./volumes/nextcloud/db:/config
   networks:
     - nextcloud_internal
-
