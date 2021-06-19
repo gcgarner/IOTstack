@@ -1,5 +1,5 @@
 deconz:
-  image: marthoc/deconz
+  image: marthoc/deconz:stable
   container_name: deconz
   restart: unless-stopped
   ports:
