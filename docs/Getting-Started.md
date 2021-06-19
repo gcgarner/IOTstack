@@ -113,7 +113,9 @@ If you are still running on gcgarner/IOTstack and need to migrate to SensorsIot/
 
 * [Migrating IOTstack from gcgarner to SensorsIot](./gcgarner-migration.md).
 
-## <a name="recommendedPatches"> recommended system patch </a>
+## <a name="recommendedPatches"> recommended system patches </a>
+
+### <a name="patch1DHCP"> patch 1 – restrict DHCP </a>
 
 Run the following commands:
 
@@ -123,6 +125,17 @@ $ sudo reboot
 ```
 
 See [Issue 219](https://github.com/SensorsIot/IOTstack/issues/219) and [Issue 253](https://github.com/SensorsIot/IOTstack/issues/253) for more information.
+
+### <a name="patch2DHCP"> patch 2 – update libseccomp2</a>
+
+If you don't have this patch in place, Docker images that are based on Alpine will fail if an image's maintainer updates to [Alpine 3.13](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirement).
+
+```
+$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+$ echo "deb http://httpredir.debian.org/debian buster-backports main contrib non-free" | sudo tee -a "/etc/apt/sources.list.d/debian-backports.list"
+$ sudo apt update
+$ sudo apt install libseccomp2 -t buster-backports
+```
 
 ## <a name="aboutSudo"> a word about the `sudo` command </a>
 
@@ -236,6 +249,38 @@ The commands in this menu execute shell scripts in the root of the project.
 The old and new menus differ in the options they offer. You should come back and explore them once your stack is built and running.
 
 ## <a name="switchingMenus"> switching menus </a>
+
+At the time of writing, IOTstack supports three menus:
+
+* "Old Menu" on the `old-menu` branch. This was inherited from [gcgarner/IOTstack](https://github.com/gcgarner/IOTstack).
+* "New Menu" on the `master` branch. This is the current menu.
+* "New New Menu" on the `experimental` branch. This is under development.
+
+With a few precautions, you can switch between git branches as much as you like without breaking anything. The basic check you should perform is:
+
+```
+$ cd ~/IOTstack
+$ git status
+```
+
+Check the results to see if any files are marked as "modified". For example:
+
+```
+modified:   .templates/mosquitto/Dockerfile
+```
+
+Key point:
+
+* Files marked "untracked" do not matter. You only need to check for "modified" files because those have the potential to stop you from switching branches cleanly.
+
+The way to avoid potential problems is to move any modified files to one side and restore the unmodified original. For example:
+
+```
+$ mv .templates/mosquitto/Dockerfile .templates/mosquitto/Dockerfile.save
+$ git checkout -- .templates/mosquitto/Dockerfile
+```
+
+When `git status` reports no more "modified" files, it is safe to switch your branch.
 
 ### <a name="menuMasterBranch"> current menu (master branch) </a>
 
