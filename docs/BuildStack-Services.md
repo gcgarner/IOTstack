@@ -1,4 +1,4 @@
-# Buid Stack Services system
+# Build Stack Services system
 
 This page explains how the build stack system works for developers.
 

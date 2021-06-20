@@ -1,10 +1,16 @@
 zigbee2mqtt:
   container_name: zigbee2mqtt
-  image: koenkk/zigbee2mqtt
+  build: ./.templates/zigbee2mqtt/.
+  environment:
+    - TZ=Etc/UTC
+  ports:
+    - "8080:8080"
   volumes:
     - ./volumes/zigbee2mqtt/data:/app/data
   devices:
-    - /dev/ttyAMA0:/dev/ttyACM0
-    #- /dev/ttyUSB0:/dev/ttyACM0 # Electrolama zig-a-zig-ah! (zzh!) maybe other as well
+    - /dev/ttyAMA0:/dev/ttyACM0 # should work even if no adapter
+   #- /dev/ttyACM0:/dev/ttyACM0 # should work if CC2531 connected
+   #- /dev/ttyUSB0:/dev/ttyACM0 # Electrolama zig-a-zig-ah! (zzh!) maybe other as well
   restart: unless-stopped
-  network_mode: host
+  networks:
+    - iotstack_nw

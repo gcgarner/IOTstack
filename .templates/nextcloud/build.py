@@ -129,8 +129,8 @@ def main():
       with open(r'%s' % buildSettings) as objBuildSettingsFile:
         nextCloudYamlBuildOptions = yaml.load(objBuildSettingsFile)
         if (
-          nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database passwords for this build"
-          or nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database passwords every build"
+          nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise passwords for this build"
+          or nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise passwords every build"
           or nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default passwords for this build"
         ):
           if nextCloudYamlBuildOptions["databasePasswordOption"] == "Use default passwords for this build":
@@ -148,7 +148,7 @@ def main():
                 dockerComposeServicesYaml[serviceName]["environment"][envIndex] = envName.replace("%randomPassword%", mySqlRootPassword)
 
           # Ensure you update the "Do nothing" and other 2 strings used for password settings in 'passwords.py'
-          if (nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise database passwords for this build"):
+          if (nextCloudYamlBuildOptions["databasePasswordOption"] == "Randomise passwords for this build"):
             nextCloudYamlBuildOptions["databasePasswordOption"] = "Do nothing"
             with open(buildSettings, 'w') as outputFile:
               yaml.dump(nextCloudYamlBuildOptions, outputFile)
@@ -180,7 +180,6 @@ def main():
       nextCloudYamlBuildOptions["databasePasswordOption"] = "Do nothing"
       with open(buildSettings, 'w') as outputFile:
         yaml.dump(nextCloudYamlBuildOptions, outputFile)
-
 
     return True
 

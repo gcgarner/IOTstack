@@ -1,4 +1,4 @@
-# Let’s begin by understanding, What is Docker?
+# What is Docker?
 
 In simple terms, Docker is a software platform that simplifies the process of building, running, 
 managing and distributing applications. It does this by virtualizing the operating system of the 

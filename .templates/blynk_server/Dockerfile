@@ -5,7 +5,7 @@ MAINTAINER 877dev <877dev@gmail.com>
 #RUN apt-get install -y apt-utils
 #RUN apt-get install -y default-jdk curl
 
-ENV BLYNK_SERVER_VERSION 0.41.14
+ENV BLYNK_SERVER_VERSION 0.41.16
 RUN mkdir /blynk
 RUN curl -L https://github.com/blynkkk/blynk-server/releases/download/v${BLYNK_SERVER_VERSION}/server-${BLYNK_SERVER_VERSION}.jar > /blynk/server.jar
 

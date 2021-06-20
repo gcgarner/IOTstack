@@ -1,7 +1,6 @@
-FROM nodered/node-red:latest
+FROM nodered/node-red:latest-12
 USER root
-RUN apk update
-RUN apk upgrade
-RUN apk add --no-cache eudev-dev
+RUN apk update && apk add --no-cache eudev-dev
+USER node-red
 
 %run npm install modules list%

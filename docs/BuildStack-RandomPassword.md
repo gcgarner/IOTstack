@@ -1,4 +1,4 @@
-# Build Stack Random Services Passowrd
+# Build Stack Random Services Password
 
 This page explains how to have a service generate a random password during build time. This will require that your service have a working options menu.
 

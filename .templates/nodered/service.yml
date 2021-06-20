@@ -3,13 +3,13 @@ nodered:
   build: ./services/nodered/.
   restart: unless-stopped
   user: "0"
-  privileged: true
   environment:
     - TZ=Etc/UTC
   ports:
     - "1880:1880"
   volumes:
     - ./volumes/nodered/data:/data
+    - ./volumes/nodered/ssh:/root/.ssh
     - /var/run/docker.sock:/var/run/docker.sock
     - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
   devices:

@@ -1,0 +1,19 @@
+octoprint:
+  container_name: octoprint
+  image: octoprint/octoprint
+  restart: unless-stopped
+  environment:
+    - TZ=Etc/UTC
+  # - ENABLE_MJPG_STREAMER=true
+  # - MJPG_STREAMER_INPUT=-r 640x480 -f 10 -y
+  # - CAMERA_DEV=/dev/video0
+  ports:
+    - "9980:80"
+  devices:
+    - /dev/ttyAMA0:/dev/ttyACM0
+  # - /dev/video0:/dev/video0
+  volumes:
+    - ./volumes/octoprint:/octoprint
+  networks:
+    - iotstack_nw
+
