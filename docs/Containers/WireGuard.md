@@ -188,8 +188,8 @@ See [Understanding WireGuard's port numbers](#understandingPorts) if you want mo
 
 There are two approaches:
 
-1. Let the menu generate a `docker-compose.yml` with the default WireGuard service definition template, and then edit `docker-compose.yml`. This method works in both "old" and "new" menu.
-2. Prepare a `compose-override.yml` file, then run the menu and have it perform the substitutions for you. This method only works in "new" menu.
+1. Let the menu generate a `docker-compose.yml` with the default WireGuard service definition template, and then edit `docker-compose.yml`.
+2. Prepare a `compose-override.yml` file, then run the menu and have it perform the substitutions for you.
 
 Of the two, the first is generally the simpler and means you don't have to re-run the menu whenever you want to change WireGuard's configuration.
 
@@ -450,7 +450,7 @@ In other words:
 
 You also need to make a few assumptions:
 
-1. The host running the remote WireGuard client has been allocated the IP address 55.66.77.88.
+1. The host running the remote WireGuard client (eg a mobile phone with the WireGuard app installed) has been allocated the IP address 55.66.77.88 when it connected to the Internet over 3G/4G/5G.
 2. When the remote WireGuard client initiated the session, it chose UDP port 44524 as its source port. The actual number chosen is (essentially) random and only significant to the client.
 3. Your Internet Service Provider allocated the IP address 12.13.14.15 to the WAN side of your router.
 4. You have done all the steps in [Set up a Dynamic DNS name] and your WAN IP address (12.13.14.15) is being propagated to your Dynamic DNS service provider.
@@ -484,6 +484,14 @@ This model is a slight simplification because the remote client may also be also
 ## <a name="debugging"> Debugging techniques </a>
 
 ### <a name="tcpdumpExternal"> Monitor WireGuard traffic between your router and your Raspberry Pi </a>
+
+If `tcpdump` is not installed on your Raspberry Pi, you can install it by:
+
+```bash
+$ sudo apt install tcpdump
+```
+
+After that, you can capture traffic between your router and your Raspberry Pi by:
 
 ```bash
 $ sudo tcpdump -i eth0 -n udp port «external»

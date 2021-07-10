@@ -20,7 +20,7 @@ The first part is fairly simple and there are quite a few Dynamic DNS service pr
 * [DuckDNS.org](https://www.duckdns.org)
 * [NoIP.com](https://www.noip.com)
 
-> You can find more service providers by Googling ["Dynamic DNS service"](https://www.google.com/search?q="Dynamic DNS service").
+> You can find more service providers by Googling ["Dynamic DNS service"](https://www.google.com/search?q=%22Dynamic%20DNS%20service%22).
 
 Some router vendors also provide their own built-in Dynamic DNS capabilities for registered customers so it's a good idea to check your router's capabilities before you plough ahead.
 
@@ -31,7 +31,7 @@ The "something" on your side of the network propagating WAN IP address changes c
 * your router; or
 * a "behind the router" technique, typically a periodic job running on the same Raspberry Pi that is hosting IOTstack and WireGuard.
 
-If you have the choice, your router is to be preferred. That's because your router is usually the only device in your network that actually knows when its WAN IP address changes. A Dynamic DNS client running on your router will propagate changes immediately only will only transmit updates when necessary. More importantly, it will persist through network interruptions or Dynamic DNS service provider outages until it receives an acknowledgement that the update has been accepted.
+If you have the choice, your router is to be preferred. That's because your router is usually the only device in your network that actually knows when its WAN IP address changes. A Dynamic DNS client running on your router will propagate changes immediately and will only transmit updates when necessary. More importantly, it will persist through network interruptions or Dynamic DNS service provider outages until it receives an acknowledgement that the update has been accepted.
 
 Nevertheless, your router may not support the Dynamic DNS service provider you wish to use, or may come with constraints that you find unsatisfactory so any behind-the-router technique is always a viable option, providing you understand its limitations.
 
@@ -48,12 +48,29 @@ $ mkdir -p ~/.local/bin
 $ cp ~/IOTstack/duck/duck.sh ~/.local/bin
 ```
 
+> The reason for recommending that you make a copy of `duck.sh` is because the "original" is under Git control. If you change the "original", Git will keep telling you that the file has changed and it may block incoming updates from GitHub.
+
 Then edit `~/.local/bin/duck.sh` to add your DuckDNS domain name(s) and token:
 
 ```bash
 DOMAINS="YOURS.duckdns.org"
 DUCKDNS_TOKEN="YOUR_DUCKDNS_TOKEN"
 ```
+
+For example:
+
+```bash
+DOMAINS="downunda.duckdns.org"
+DUCKDNS_TOKEN="8a38f294-b5b6-4249-b244-936e997c6c02"
+```
+
+Note:
+
+* The `DOMAINS=` variable can be simplified to just "YOURS", with the `.duckdns.org` portion implied, as in:
+
+	```bash
+	DOMAINS="downunda"
+	```
 
 Once your credentials are in place, test the result by running:
 
@@ -100,7 +117,9 @@ The last line means "run duck.sh every five minutes". See [crontab.guru](https:/
 
 When launched in the background by `cron`, the script supplied with IOTstack adds a random delay of up to one minute to try to reduce the "hammering effect" of a large number of users updating DuckDNS simultaneously.
 
-Standard output and standard error are redirected to `/dev/null` which is appropriate for jobs run by `cron`. Keep in mind that you can always run the `duck.sh` command from a terminal session, in which case you will see all the output.
+Standard output and standard error are redirected to `/dev/null` which is appropriate in this instance. When DuckDNS is working correctly (which is most of the time), the only output from the `curl` command is "OK". Logging that every five minutes would add wear and tear to SD cards for no real benefit.
+
+If you suspect DuckDNS is misbehaving, you can run the `duck.sh` command from a terminal session, in which case you will see all the `curl` output in the terminal window.
 
 If you wish to keep a log of `duck.sh` activity, the following will get the job done:
 
@@ -115,6 +134,12 @@ If you wish to keep a log of `duck.sh` activity, the following will get the job 
 	```bash
 	*/5	*	*	*	*	duck.sh >>./Logs/duck.log 2>&1
 	```
+
+Remember to prune the log from time to time. The generally-accepted approach is:
+
+```
+$ cat /dev/null >~/Logs/duck.log
+```
 
 ## Virtual Private Network
 
