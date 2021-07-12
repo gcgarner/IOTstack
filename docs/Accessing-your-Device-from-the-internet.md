@@ -80,7 +80,12 @@ ddd, dd mmm yyyy hh:mm:ss ±zzzz - updating DuckDNS
 OK
 ```
 
-The expected response is a timestamp followed by "OK". Check your work if you get any errors.
+The timestamp is produced by the `duck.sh` script. The [expected responses from the DuckDNS service](https://www.duckdns.org/spec.jsp) are:
+
+* "OK" - indicating success; or
+* "KO" - indicating failure.
+
+Check your work if you get "KO" or any other errors.
 
 Next, assuming `dig` is installed on your Raspberry Pi (`sudo apt install dnsutils`), you can test propagation by sending a directed query to a DuckDNS name server. For example, assuming the domain name you registered was `downunda.duckdns.org`, you would query like this:
 
@@ -91,6 +96,8 @@ $ dig @ns1.duckdns.org downunda.duckdns.org +short
 The expected result is the IP address of your router's WAN interface. It is a good idea to confirm that it is the same as you get from [whatismyipaddress.com](https://whatismyipaddress.com).
 
 A null result indicates failure so check your work.
+
+Remember, the Domain Name System is a *distributed* database. It takes *time* for changes to propagate. The response you get from directing a query to ns1.duckdns.org may not be the same as the response you get from any other DNS server. You often have to wait until cached records expire and a recursive query reaches the authoritative DuckDNS name-servers.
 
 #### <a name="duckDNSauto"> Running the DuckDNS client automatically </a>
 
