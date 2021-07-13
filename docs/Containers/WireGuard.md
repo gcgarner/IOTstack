@@ -11,44 +11,6 @@ Assumptions:
 * These instructions assume that you have privileges to configure your network's gateway (router). If you are not able to make changes to your network's firewall settings, then you will not be able to finish this setup.
 * In common with most VPN technologies, WireGuard assumes that the WAN side of your network's gateway has a public IP address which is reachable directly. WireGuard may not work if that assumption does not hold. If you strike this problem, you have to take it up with your ISP.
 
-<HR>
-
-## Contents
-
-- [Installing WireGuard under IOTstack](#installWireguard)
-
-	- [Step 1: Update your Raspberry Pi OS](#updateRaspbian)
-	- [Step 2: Set up a Dynamic DNS name](#obtainDDNS)
-	- [Step 3: Understand the Service Definition](#serviceDefinition)
-	- [Step 4: Decide what to configure](#configureWhat)
-	
-		- [Fields that you should always configure](#configureAlways)
-		- [Optional configuration - DNS resolution for peers](#configurePeerDNS)
-		- [Optional configuration - WireGuard ports](#configurePorts)
-	
-	- [Step 5: Configure WireGuard](#configureWireGuard)
-	
-		- [Method 1: Configure WireGuard by editing `docker-compose.yml`](#editCompose)
-		- [Method 2: Configure WireGuard using `compose-override.yml`](#editOverride)
-	
-	- [Step 6: Start WireGuard](#startWireGuard)
-	- [Step 7: Save your WireGuard client configuration files (QR codes)](#clientQRcodes)
-	- [Step 8: Configure your router with a NAT rule](#routerNATConfig)
-	- [Step 9: Configure your remote WireGuard clients](#configureClients)
-
-- [Understanding WireGuard's port numbers](#understandingPorts)
-- [Debugging techniques](#debugging)
-
-	- [Monitor WireGuard traffic between your router and your Raspberry Pi](#tcpdumpExternal)
-	- [Monitor WireGuard traffic between your Raspberry Pi and the WireGuard container](#tcpdumpInternal)
-	- [Is Docker listening on the Raspberry Pi's «external» port?](#listenExternal)
-	- [Is your router listening on the «public» port?](#listenPublic)
-
-- [The read-only flag](#readOnlyFlag)
-- [Updating WireGuard](#pullWireguard)
-- [Getting a clean slate](#cleanSlate)
-
-<HR>
 
 ## <a name="installWireguard"> Installing WireGuard under IOTstack </a>
 
