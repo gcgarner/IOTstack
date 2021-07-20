@@ -126,7 +126,7 @@ If you are still running on gcgarner/IOTstack and need to migrate to SensorsIot/
 Run the following commands:
 
 ```
-$ sudo bash -c '[ $(egrep -c "^allowinterfaces eth0,wlan0" /etc/dhcpcd.conf) -eq 0 ] && echo "allowinterfaces eth0,wlan0" >> /etc/dhcpcd.conf'
+$ sudo bash -c '[ $(egrep -c "^allowinterfaces eth*,wlan*" /etc/dhcpcd.conf) -eq 0 ] && echo "allowinterfaces eth*,wlan*" >> /etc/dhcpcd.conf'
 $ sudo reboot
 ```
 
