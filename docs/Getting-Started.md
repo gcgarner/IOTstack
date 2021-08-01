@@ -137,7 +137,7 @@ See [Issue 219](https://github.com/SensorsIot/IOTstack/issues/219) and [Issue 25
 If you don't have this patch in place, Docker images that are based on Alpine will fail if an image's maintainer updates to [Alpine 3.13](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirement).
 
 ```
-$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+$ sudo apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
 $ echo "deb http://httpredir.debian.org/debian buster-backports main contrib non-free" | sudo tee -a "/etc/apt/sources.list.d/debian-backports.list"
 $ sudo apt update
 $ sudo apt install libseccomp2 -t buster-backports
