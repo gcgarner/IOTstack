@@ -41,13 +41,17 @@ The source code for Node-RED lives at [GitHub node-red/node-red-docker](https://
 
 ### Node-RED images ([DockerHub](https://hub.docker.com))
 
-Periodically, the source code is recompiled and pushed to [nodered/node-red](https://hub.docker.com/r/nodered/node-red/tags?page=1&ordering=last_updated) on *DockerHub*. There's a lot of stuff at that page but it boils down to variations on three basic themes:
+Periodically, the source code is recompiled and pushed to [nodered/node-red](https://hub.docker.com/r/nodered/node-red/tags?page=1&ordering=last_updated) on *DockerHub*. There's a lot of stuff at that page but it boils down to variations on two basic themes:
 
-* images with a `-10` suffix;
-* images with a `-12` suffix; and
-* images without a numeric suffix, which are the same as `-10`.
+* images with a suffix like `-10`, `-12` or `-14`; and
+* images without a numeric suffix.
 
-The suffixes refer to the version of "Node.js" installed when the image was built.
+The suffixes refer to the version of "Node.js" installed when the image was built. In the case of images without a numeric suffix:
+
+* If the version of Node-RED is 1.3.x then a suffix of `-10` is implied. In other words, Node.js defaults to version 10.
+* If the version of Node-RED is 2.x.x then a suffix of `-14` is implied. In other words, Node.js defaults to version 14.
+
+As you will see a bit further down, the current default for IOTstack is an image tag of `latest-12` which means Node-RED 2.x.x with Node.js version 12. 
  
 ### IOTstack menu
 
