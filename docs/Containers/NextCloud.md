@@ -23,7 +23,7 @@ nextcloud:
 
 nextcloud_db:
   container_name: nextcloud_db
-  image: ghcr.io/linuxserver/mariadb
+  build: ./.templates/mariadb/.
   restart: unless-stopped
   environment:
     - TZ=Etc/UTC
@@ -33,8 +33,11 @@ nextcloud_db:
     - MYSQL_PASSWORD=«user_password»
     - MYSQL_DATABASE=nextcloud
     - MYSQL_USER=nextcloud
+  ports:
+    - "9322:3306"
   volumes:
     - ./volumes/nextcloud/db:/config
+    - ./volumes/nextcloud/db_backup:/backup
 ```
 
 There are two containers, one for the cloud service itself, and the other for the database. Both containers share the same persistent storage area in the volumes subdirectory so they are treated as a unit. This will not interfere with any other MariaDB containers you might wish to run.
@@ -258,6 +261,29 @@ You can silence the warning by editing the Nextcloud service definition in `dock
 ## <a name="security"> Security considerations</a>
 
 Nextcloud traffic is not encrypted. Do **not** expose it to the web by opening a port on your home router. Instead, use a VPN like Wireguard to provide secure access to your home network, and let your remote clients access Nextcloud over the VPN tunnel.
+
+## <a name="updatingNextcloud"> Keeping Nextcloud up-to-date </a>
+
+To update the `nextcloud` container:
+
+```
+$ cd ~/IOTstack
+$ docker-compose pull nextcloud
+$ docker-compose up -d nextcloud
+$ docker system prune
+```
+
+To update the `nextcloud_db` container:
+
+```
+$ cd ~/IOTstack
+$ docker-compose build --no-cache --pull nextcloud_db
+$ docker-compose up -d nextcloud_db
+$ docker system prune
+$ docker system prune
+```
+
+The first "prune" removes the old *local* image, the second removes the old *base* image.
 
 ## <a name="backups"> Backups </a>
 
