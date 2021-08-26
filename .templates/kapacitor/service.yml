@@ -1,0 +1,21 @@
+kapacitor:
+  container_name: kapacitor
+  image: kapacitor:1.5
+  restart: unless-stopped
+  environment:
+    - TZ=Etc/UTC
+  # see https://docs.influxdata.com/kapacitor/v1.6/administration/configuration/#kapacitor-environment-variables
+    - KAPACITOR_INFLUXDB_0_URLS_0=http://influxdb:8086
+  # - KAPACITOR_INFLUXDB_USERNAME=
+  # - KAPACITOR_INFLUXDB_PASSWORD=
+  # - KAPACITOR_HOSTNAME=kapacitor
+  # - KAPACITOR_LOGGING_LEVEL=INFO
+  # - KAPACITOR_REPORTING_ENABLED=false
+  ports:
+    - "9092:9092"
+  volumes:
+    - ./volumes/kapacitor:/var/lib/kapacitor
+  depends_on:
+    - influxdb
+  networks:
+    - iotstack_nw

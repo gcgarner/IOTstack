@@ -1,0 +1,21 @@
+chronograf:
+  container_name: chronograf
+  image: chronograf:latest
+  restart: unless-stopped
+  environment:
+    - TZ=Etc/UTC
+  # see https://docs.influxdata.com/chronograf/v1.9/administration/config-options/
+    - INFLUXDB_URL=http://influxdb:8086
+  # - INFLUXDB_USERNAME=
+  # - INFLUXDB_PASSWORD=
+  # - INFLUXDB_ORG=
+  # - KAPACITOR_URL=http://kapacitor:9092
+  ports:
+    - "8888:8888"
+  volumes:
+    - ./volumes/chronograf:/var/lib/chronograf
+  depends_on:
+    - influxdb
+  # - kapacitor
+  networks:
+    - iotstack_nw
