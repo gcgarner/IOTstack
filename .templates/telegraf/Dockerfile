@@ -17,4 +17,7 @@ COPY ${IOTSTACK_ENTRY_POINT} /${IOTSTACK_ENTRY_POINT}
 RUN chmod 755 /${IOTSTACK_ENTRY_POINT}
 ENV IOTSTACK_ENTRY_POINT=
 
+# IOTstack declares this path for persistent storage
+VOLUME ["/etc/telegraf"]
+
 # EOF
