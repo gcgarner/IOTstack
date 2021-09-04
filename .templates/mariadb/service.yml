@@ -1,5 +1,5 @@
 mariadb:
-  image: linuxserver/mariadb
+  build: ./.templates/mariadb/.
   container_name: mariadb
   environment:
     - TZ=Etc/UTC
@@ -11,6 +11,7 @@ mariadb:
     - MYSQL_PASSWORD=%randomPassword%
   volumes:
     - ./volumes/mariadb/config:/config
+    - ./volumes/mariadb/db_backup:/backup
   ports:
     - "3306:3306"
   restart: unless-stopped

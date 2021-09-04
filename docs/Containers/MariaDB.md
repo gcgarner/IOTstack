@@ -4,9 +4,9 @@
 
 ## About
 
-MariaDB is a fork of MySQL. This is an unofficial image provided by linuxserver.io because there is no official image for arm
+MariaDB is a fork of MySQL. This is an unofficial image provided by linuxserver.io because there is no official image for arm.
 
-## Conneting to the DB
+## Connecting to the DB
 
 The port is 3306. It exists inside the docker network so you can connect via `mariadb:3306` for internal connections. For external connections use `<your Pis IP>:3306`
 
@@ -14,10 +14,65 @@ The port is 3306. It exists inside the docker network so you can connect via `ma
 
 ## Setup
 
-Before starting the stack edit the `./services/mariadb/mariadb.env` file and set your access details. This is optional however you will only have one shot at the preconfig. If you start the container without setting the passwords then you will have to either delete its volume directory or enter the terminal and change manually
+Before starting the stack, edit the `docker-compose.yml` file and check your environment variables. In particular:
 
-The env file has three commented fields for credentials, either **all three** must be commented or un-commented. You can't have only one or two, its all or nothing.
+```
+  environment:
+    - TZ=Etc/UTC
+    - MYSQL_ROOT_PASSWORD=
+    - MYSQL_DATABASE=default
+    - MYSQL_USER=mariadbuser
+    - MYSQL_PASSWORD=
+```
+
+If you are running old-menu, you will have to set both passwords. Under new-menu, the menu may have allocated random passwords for you but you can change them if you like.
+
+You only get the opportunity to change the `MQSL_` prefixed environment variables before you bring up the container for the first time. If you decide to change these values after initialisation, you will either have to:
+
+1. Erase the persistent storage area and start again. There are three steps:
+
+	* Stop the container and remove the persistent storage area:
+
+		```
+		$ cd ~/IOTstack
+		$ docker-compose rm --force --stop -v mariadb
+		$ sudo rm -rf ./volumes/mariadb
+		```
+		
+	* Edit `docker-compose.yml` and change the variables.
+	* Bring up the container:
+	
+		```
+		$ docker-compose up -d mariadb 
+		```
+
+2. Open a terminal window within the container (see below) and change the values by hand.
+
+	> The how-to is beyond the scope of this documentation. Google is your friend!
 
 ## Terminal
 
-A terminal is provided to access mariadb by the cli. execute `./services/mariadb/terminal.sh`. You will need to run `mysql -uroot -p` to enter mariadbs interface
+You can open a terminal session within the mariadb container via:
+
+```
+$ docker exec -it mariadb bash
+```
+
+To close the terminal session, either:
+
+* type "exit" and press <kbd>return</kbd>; or
+* press <kbd>control</kbd>+<kbd>d</kbd>.
+
+## Keeping MariaDB up-to-date
+
+To update the `mariadb` container:
+
+```
+$ cd ~/IOTstack
+$ docker-compose build --no-cache --pull mariadb
+$ docker-compose up -d mariadb
+$ docker system prune
+$ docker system prune
+```
+
+The first "prune" removes the old *local* image, the second removes the old *base* image.
