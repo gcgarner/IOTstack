@@ -15,7 +15,7 @@ Andreas Spiess Video #352: Raspberry Pi4 Home Automation Server (incl. Docker, O
 IOTstack makes the following assumptions:
 
 1. Your hardware is a Raspberry Pi (typically a 3B+ or 4B)
-2. It has a reasonably-recent version of Raspberry Pi OS (aka "Raspbian") installed which has been kept up-to-date with:
+2. It has a reasonably-recent version of 32-bit Raspberry Pi OS (aka "Raspbian") installed which has been kept up-to-date with:
 
 	```
 	$ sudo apt update
@@ -29,7 +29,13 @@ IOTstack makes the following assumptions:
 
 The first five assumptions are Raspberry Pi defaults on a clean installation. The sixth is what you get if you follow these instructions faithfully.
 
-> Please don't read these assumptions as saying that IOTstack will not run on other hardware, other operating systems, or as a different user. It is just that IOTstack gets most of its testing under these conditions. The further you get from these implicit assumptions, the more your mileage may vary.
+Please don't read these assumptions as saying that IOTstack will not run on other hardware, other operating systems, or as a different user. It is just that IOTstack gets most of its testing under these conditions. The further you get from these implicit assumptions, the more your mileage may vary.
+
+### <a name="otherPlatforms"> other platforms </a>
+
+Users have reported success on other platforms, including:
+
+* [Orange Pi WinPlus](https://github.com/SensorsIot/IOTstack/issues/375)
 
 ## <a name="newInstallation"> new installation </a>
 
@@ -120,7 +126,7 @@ If you are still running on gcgarner/IOTstack and need to migrate to SensorsIot/
 Run the following commands:
 
 ```
-$ sudo bash -c '[ $(egrep -c "^allowinterfaces eth0,wlan0" /etc/dhcpcd.conf) -eq 0 ] && echo "allowinterfaces eth0,wlan0" >> /etc/dhcpcd.conf'
+$ sudo bash -c '[ $(egrep -c "^allowinterfaces eth*,wlan*" /etc/dhcpcd.conf) -eq 0 ] && echo "allowinterfaces eth*,wlan*" >> /etc/dhcpcd.conf'
 $ sudo reboot
 ```
 
@@ -131,7 +137,7 @@ See [Issue 219](https://github.com/SensorsIot/IOTstack/issues/219) and [Issue 25
 If you don't have this patch in place, Docker images that are based on Alpine will fail if an image's maintainer updates to [Alpine 3.13](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirement).
 
 ```
-$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+$ sudo apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
 $ echo "deb http://httpredir.debian.org/debian buster-backports main contrib non-free" | sudo tee -a "/etc/apt/sources.list.d/debian-backports.list"
 $ sudo apt update
 $ sudo apt install libseccomp2 -t buster-backports
@@ -375,7 +381,7 @@ You can also turn logging off or set it to use another option for any service by
 
 ### <a name="upContainer"> starting an individual container </a>
 
-To start the stack:
+To start a particular container:
 
 ```
 $ cd ~/IOTstack
@@ -566,7 +572,7 @@ $ sudo mkdir -p ./volumes/influxdb/data
 
 When InfluxDB starts, it sees that the folder on right-hand-side of the volumes mapping (`/var/lib/influxdb`) is empty and initialises new databases.
 
-This is how **most** containers behave. But there are exceptions. A good example of an exception is Mosquitto which does not re-initialise correctly so you should avoid removing its persistent store.
+This is how **most** containers behave. There are exceptions so it's always a good idea to keep a backup.
 
 ## <a name="stackMaintenance"> stack maintenance </a>
 
@@ -673,6 +679,7 @@ $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull «container»
 $ docker-compose up -d «container»
 $ docker system prune
+$ docker system prune
 ```
 
 This causes DockerHub to be checked for the later version of the *base* image, downloading it as needed.
@@ -687,7 +694,7 @@ As your system evolves and new images come down from DockerHub, you may find tha
 $ docker system prune
 ```
 
-This recovers anything no longer in use.
+This recovers anything no longer in use. Sometimes multiple `prune` commands are needed (eg the first removes an old *local* image, the second removes the old *base* image).
 
 If you add a container via `menu.sh` and later remove it (either manually or via `menu.sh`), the associated images(s) will probably persist. You can check which images are installed via:
 
@@ -712,6 +719,64 @@ $ docker rmi dbf28ba50432
 ```
 
 In general, you can use the repository name to remove an image but the Image ID is sometimes needed. The most common situation where you are likely to need the Image ID is after an image has been updated on DockerHub and pulled down to your Raspberry Pi. You will find two containers with the same name. One will be tagged "latest" (the running version) while the other will be tagged "\<none\>" (the prior version). You use the Image ID to resolve the ambiguity.
+
+### <a name="versionPinning"> pinning to specific versions </a>
+
+See [container image updates](#imageUpdates) to understand how to tell the difference between images that are used "as is" from DockerHub versus those that are built from local Dockerfiles.
+
+Note:
+
+* You should **always** visit an image's DockerHub page before pinning to a specific version. This is the only way to be certain that you are choosing the appropriate version suffix.
+
+To pin an image to a specific version:
+
+* If the image comes straight from DockerHub, you apply the pin in `docker-compose.yml`. For example, to pin Grafana to version 7.5.7, you change:
+
+	```
+	  grafana:
+	    container_name: grafana
+	    image: grafana/grafana:latest
+	    …
+	```
+	
+	to:
+	
+	```
+	  grafana:
+	    container_name: grafana
+	    image: grafana/grafana:7.5.7
+	    …
+	```
+	
+	To apply the change, "up" the container:
+	
+	```
+	$ cd ~/IOTstack
+	$ docker-compose up -d grafana
+	```
+
+* If the image is built using a local Dockerfile, you apply the pin in the Dockerfile. For example, to pin Mosquitto to version 1.6.15, edit `~/IOTstack/.templates/mosquitto/Dockerfile` to change:
+
+	```
+	# Download base image
+	FROM eclipse-mosquitto:latest
+	…
+	```
+
+	to:
+	
+	```
+	# Download base image
+	FROM eclipse-mosquitto:1.6.15
+	…
+	```
+	
+	To apply the change, "up" the container and pass the `--build` flag:
+	
+	```
+	$ cd ~/IOTstack
+	$ docker-compose up -d --build mosquitto
+	```
 
 ## <a name="nuclearOption"> the nuclear option - use with caution </a>
 
