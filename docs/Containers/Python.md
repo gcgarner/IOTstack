@@ -44,11 +44,37 @@ When you select Python in the menu:
 	  - iotstack_nw
 	```
 	
-	Notes:
+	Note:
 	
 	* This service definition is for "new menu" (master branch). The only difference with "old menu" (old-menu branch) is the omission of the last two lines.
-	* See also [customising your Python service definition](#customisingPython).
 
+### <a name="customisingPython"> customising your Python service definition </a>
+
+The service definition contains a number of customisation points:
+
+1. `restart: unless-stopped` assumes your Python script will run in an infinite loop. If your script is intended to run once and terminate, you should remove this directive.
+2. `TZ=Etc/UTC` should be set to your local time-zone. Never use quote marks on the right hand side of a `TZ=` variable.
+3. If you are running as a different user ID, you may want to change both `IOTSTACK_UID` and `IOTSTACK_GID` to appropriate values.
+
+	Notes:
+
+	* Don't use user and group *names* because these variables are applied *inside* the container where those names are (probably) undefined.
+	* The only thing these variables affect is the ownership of:
+
+		```
+		~/IOTstack/volumes/python/app
+		```
+
+		and its contents. If you want everything to be owned by root, set both of these variables to zero (eg `IOTSTACK_UID=0`).
+
+4. If your Python script listens to data-communications traffic, you can set up the port mappings by uncommenting the `ports:` directive.
+
+If your Python container is already running when you make a change to its service definition, you can apply it via:
+
+```bash
+$ cd ~/IOTstack
+$ docker-compose up -d python
+```
 
 ## <a name="firstLaunchPython"> Python - first launch </a>
 
@@ -163,21 +189,6 @@ Each time you launch the Python container *after* the first launch:
 2. The `docker-entrypoint.sh` script runs and performs "self-repair" by replacing any files that have gone missing from the persistent storage area. Self-repair does **not** overwrite existing files! 
 3. The `app.py` Python script is run.
 
-## <a name="yourPythonScript"> developing your own Python script </a>
-
-1. Edit (or replace) the file:
-
-	```
-	~/IOTstack/volumes/python/app/app.py
-	```
-	
-2. Tell the python container to notice the change by:
-
-	```bash
-	$ cd ~/IOTstack
-	$ docker-compose restart python
-	```
-	
 ## <a name="debugging"> when things go wrong - check the log </a>
 
 If the container misbehaves, the log is your friend:
@@ -186,9 +197,67 @@ If the container misbehaves, the log is your friend:
 $ docker logs python
 ```
 
-## <a name="cleanSlate"> getting a clean slate </a>
+## <a name="yourPythonScript"> project development life-cycle </a>
 
-If you make a mess of things and need to start from a clean slate:
+It is **critical** that you understand that **all** of your project development should occur within the folder:
+
+```
+~/IOTstack/volumes/python/app
+```
+
+So long as you are performing some sort of routine backup (either with a supplied script or a third party solution like [Paraphraser/IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup)), your work will be protected.
+
+### <a name="gettingStarted"> getting started </a>
+
+Start by editing the file:
+
+```
+~/IOTstack/volumes/python/app/app.py
+```
+
+If you need other supporting scripts or data files, also add those to the directory:
+
+```
+~/IOTstack/volumes/python/app
+```
+
+Any time you change something in the `app` folder, tell the running python container to notice the change by:
+
+```bash
+$ cd ~/IOTstack
+$ docker-compose restart python
+```
+
+### <a name="persistentStorage"> reading and writing to disk </a>
+
+Consider this line in the service definition:
+
+```
+- ./volumes/python/app:/usr/src/app
+```
+
+The leading period means "the directory containing `docker-compose.yml`" so it the same as:
+
+```
+- ~/IOTstack/volumes/python/app:/usr/src/app
+```
+
+Then, you split the line at the ":", resulting in:
+
+* The *external* directory = `~/IOTstack/volumes/python/app`
+* The *internal* directory = `/usr/src/app`
+
+What it means is that:
+
+* Any file you put into the *external* directory (or any sub-directories you create within the *external* directory) will be visible to your Python script running inside the container at the same relative position in the *internal* directory.
+* Any file or sub-directory created in the *internal* directory by your Python script running inside the container will be visible outside the container at the same relative position in the *external* directory.
+* The contents of *external* directory and, therefore, the *internal* directory will persist across container launches.
+
+If your script writes into any other directory inside the container, the data will be lost when the container re-launches.
+
+### <a name="cleanSlate"> getting a clean slate </a>
+
+If you make a mess of things and need to start from a clean slate, erase the persistent storage area:
 
 ```bash
 $ cd ~/IOTstack
@@ -199,23 +268,101 @@ $ docker-compose up -d python
 
 The container will re-initialise the persistent storage area from its defaults.
 
-## <a name="bakingPython"> making your own Python script the default </a>
+### <a name="addingPackages"> adding packages </a>
 
-Suppose you have been developing a Python script and you want to "freeze dry" everything into an image so that it becomes the default when you ask for a clean slate.
+As you develop your project, you may find that you need to add supporting packages. For this example, we will assume you want to add "[Flask](https://pypi.org/project/Flask/)" and "[beautifulsoup4](https://pypi.org/project/beautifulsoup4/)".
 
-1. If you have identified a need for a `requirements.txt`, create that by running the following command:
+If you were developing a project outside of container-space, you would simply run:
+
+```
+$ pip3 install -U Flask beautifulsoup4
+```
+
+You *can* do the same thing with the running container:
+
+```
+$ docker exec python pip3 install -U Flask beautifulsoup4
+```
+
+and that will work&nbsp;—&nbsp;until the container is re-launched, at which point the added packages will disappear.
+
+To make *Flask* and *beautifulsoup4* a permanent part of your container:
+
+1. Change your working directory:
+
+	```
+	$ cd ~/IOTstack/services/python/app
+	```
+	
+2. Use your favourite text editor to create the file `requirements.txt` in that directory. Each package you want to add should be on a line by itself:
+
+	```
+	Flask
+	beautifulsoup4
+	``` 
+
+3. Tell Docker to rebuild the local Python image:
+
+	```
+	$ cd ~/IOTstack
+	$ docker-compose build --force-rm python
+	$ docker-compose up -d --force-recreate python
+	$ docker system prune -f
+	```
+
+	Note:
+	
+	* You will see a warning about running pip as root - ignore it.
+
+4. Confirm that the packages have been added:
+
+	```
+	$ docker exec python pip3 freeze | grep -e "Flask" -e "beautifulsoup4"
+	beautifulsoup4==4.10.0
+	Flask==2.0.1
+	```
+
+5. Continue your development work by returning to [getting started](#gettingStarted).
+
+Note:
+
+* The first time you following the process described above to create `requirements.txt`, a copy will appear at:
+
+	```
+	~/IOTstack/volumes/python/app/requirements.txt
+	```
+	
+	This copy is the result of the "self-repair" code that runs each time the container starts noticing that `requirements.txt` is missing and making a copy from the defaults stored inside the image.
+	
+	If you make more changes to the master version of `requirements.txt` in the *services* directory and rebuild the local image, the copy in the *volumes* directory will **not** be kept in-sync. That's because the "self-repair" code **never** overwrites existing files.
+	
+	If you want to bring the copy of `requirements.txt` in the *volumes* directory up-to-date:
+	
+	```
+	$ cd ~/IOTstack
+	$ rm ./volumes/python/app/requirements.txt
+	$ docker-compose restart python
+	```
+	
+	The `requirements.txt` file will be recreated and it will be a copy of the version in the *services* directory as of the last image rebuild.
+
+### <a name="scriptBaking"> making your own Python script the default </a>
+
+Suppose the Python script you have been developing reaches a major milestone and you decide to "freeze dry" your work up to that point so that it becomes the default when you ask for a [clean slate](#cleanSlate). Proceed like this:
+
+1. If you have added any packages by following the steps in [adding packages](#addingPackages), run the following command:
 
 	```bash
 	$ docker exec python bash -c 'pip3 freeze >requirements.txt'
 	```
 	
-	That creates a file at the following path (it will be owned by root):
+	That generates a `requirements.txt` representing the state of play inside the running container. Because it is running *inside* the container, the `requirements.txt` created by that command appears *outside* the container at:
 	
 	```
 	~/IOTstack/volumes/python/app/requirements.txt
 	```
-
-2. Run the following commands:
+	
+2. Make your work the default:
 
 	```bash
 	$ cd ~/IOTstack
@@ -225,12 +372,12 @@ Suppose you have been developing a Python script and you want to "freeze dry" ev
 	The `cp` command copies:
 	
 	* your Python script;
-	* the optional `requirements.txt`; and
+	* the optional `requirements.txt` (from step 1); and
 	* any other files you may have put into the Python working directory.
 
 	Key point:
 	
-	* **everything** copied into the `./services/python/app` directory will become part of the new image.
+	* **everything** copied into `./services/python/app` will become part of the new local image.
 
 3. Terminate the Python container and erase its persistent storage area:
 
@@ -252,13 +399,12 @@ Suppose you have been developing a Python script and you want to "freeze dry" ev
 4. Rebuild the local image:
 
 	```bash
-	$ cd ~IOTstack
-	$ docker-compose up --build -d python
+	$ cd ~/IOTstack
+	$ docker-compose build --force-rm python
+	$ docker-compose up -d --force-recreate python
 	```
-	
-	The `--build` directive will trigger a new Dockerfile run which, in turn, will process the (optional) `requirements.txt` and then bundle your Python application and any other supporting folders and files into a new local image, and then instantiate that to be the new running container.
-	
-	On its first launch, the new container will re-populate the persistent storage area but, this time it will be your Python script and any other supporting files, rather than the original "hello world" script.
+		
+	On its first launch, the new container will re-populate the persistent storage area but, this time, it will be your Python script and any other supporting files, rather than the original "hello world" script.
 	
 5. Clean up by removing the old local image:
 
@@ -266,39 +412,72 @@ Suppose you have been developing a Python script and you want to "freeze dry" ev
 	$ docker system prune -f
 	```
 
-## <a name="customisingPython"> customising your Python service definition </a>
+### <a name="scriptCanning"> canning your project </a>
 
-The service definition shown in [selecting Python in the menu](#menuPython) contains a number of customisation points:
+Suppose your project has reached the stage where you wish to put it into production as a service under its own name. Make two further assumptions:
 
-1. `restart: unless-stopped` assumes your Python script will run in an infinite loop. If your script is intended to run once and terminate, you should remove this directive.
-2. `TZ=Etc/UTC` should be set to your local time-zone. Never use quote marks on the right hand side of a `TZ=` variable.
-3. If you are running as a different user ID, you may want to change both `IOTSTACK_UID` and `IOTSTACK_GID` to appropriate values.
+1. You have gone through the steps in [making your own Python script the default](#scriptBaking) and you are **certain** that the content of `./services/python/app` correctly captures your project.
+2. You want to give your project the name "wishbone".
 
-	Notes:
+Proceed like this:
 
-	* Don't use user and group *names* because these variables are applied *inside* the container where those names are (probably) undefined.
-	* The only thing these variables affect is the ownership of:
+1. Stop the development project:
 
-		```
-		~/IOTstack/volumes/python/app
-		```
+	```
+	$ cd ~/IOTstack
+	$ docker-compose rm --force --stop -v python
+	```
 
-		and its contents. If you want everything to be owned by root, set both of these variables to zero (eg `IOTSTACK_UID=0`).
+2. Remove the existing local image:
 
-4. If your Python script listens to data-communications traffic, you can set up the port mappings by uncommenting the `ports:` directive.
+	```
+	$ docker rmi iotstack_python
+	```
+	
+3. Rename the `python` services directory to the name of your project:
 
-After making a change to the service definition, you can apply it via:
+	```
+	$ cd ~/IOTstack/services
+	$ mv python wishbone
+	```
 
-```bash
-$ cd ~/IOTstack
-$ docker-compose up -d python
-```
+4. Edit the `python` service definition in `docker-compose.yml` and replace references to `python` with the name of your project. In the following, the original is on the left, the edited version on the right, and the lines that need to change are indicated with a "|": 
 
-## <a name="persistentStorage"> writing to disk </a>
+	```
+	python:                                  |  wishbone:
+	  container_name: python                 |    container_name: wishbone
+	  build: ./services/python/.             |    build: ./services/wishbone/.
+	  restart: unless-stopped                     restart: unless-stopped
+	  environment:                                environment:
+	    - TZ=Etc/UTC                                - TZ=Etc/UTC
+	    - IOTSTACK_UID=1000                         - IOTSTACK_UID=1000
+	    - IOTSTACK_GID=1000                         - IOTSTACK_GID=1000
+	  # ports:                                    # ports:
+	  #   - "external:internal"                   #   - "external:internal"
+	  volumes:                                    volumes:
+	    - ./volumes/python/app:/usr/src/app  |      - ./volumes/wishbone/app:/usr/src/app
+	  networks:                                   networks:
+	    - iotstack_nw                               - iotstack_nw
+	```
+	
+	Note:
+	
+	* if you make a copy of the `python` service definition and then perform the required "wishbone" edits on the copy, the `python` definition will still be active so `docker-compose` may try to bring up both services. You will eliminate the risk of confusing yourself if you follow these instructions "as written" by **not** leaving the `python` service definition in place.
+		
+5. Start the renamed service:
 
-Inside the container the working directory is `/usr/src/app` (ie as mapped in the `volumes:` directive of the service definition). Any data your Python script writes into this directory (or a sub-directory) will persist across container launches.
+	```
+	$ cd ~/IOTstack
+	$ docker-compose up -d wishbone
+	```
 
-If your script writes into any other directory inside the container, the data will be lost when the container re-launches.
+Remember:
+
+* After you have done this, the persistent storage area will be at the path:
+
+	```
+	~/IOTstack/volumes/wishbone/app
+	``` 
 
 ## <a name="routineMaintenance"> routine maintenance </a>
 
@@ -320,4 +499,8 @@ In words:
 4. Remove the old **local** image.
 5. Remove the old **base** image
 
-The old base image can't be removed until the old local image has been removed, which is why the `prune` command needs to be run twice. 
+The old base image can't be removed until the old local image has been removed, which is why the `prune` command needs to be run twice.
+
+Note:
+
+* If you have followed the steps in [canning your project](#scriptCanning) and your service has a name other than `python`, just substitute the new name where you see `python` in the two `dockerc-compose` commands.
