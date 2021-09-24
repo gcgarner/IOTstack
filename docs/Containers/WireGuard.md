@@ -550,8 +550,7 @@ The procedure is:
 
 	```bash
 	$ cd ~/IOTstack
-	$ docker-compose stop wireguard
-	$ docker-compose rm -f wireguard
+	$ docker-compose rm --force --stop -v wireguard
 	```
 
 2. Erase the persistent storage area (essential):
