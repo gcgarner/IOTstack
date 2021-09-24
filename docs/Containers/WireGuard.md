@@ -498,8 +498,8 @@ $ PORT=«public»; sudo nmap -sU -p $PORT downunda.duckdns.org | grep "$PORT/udp
 
 There will be a short delay. The expected answer is either:
 
-* `«public»/udp open|filtered unknown` = Docker is listening
-* `«public»/udp closed unknown` = Docker is not listening
+* `«public»/udp open|filtered unknown` = router is listening
+* `«public»/udp closed unknown` = router is not listening
 
 ## <a name="readOnlyFlag"> The read-only flag </a>
 
