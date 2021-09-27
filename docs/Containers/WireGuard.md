@@ -415,7 +415,7 @@ You also need to make a few assumptions:
 1. The host running the remote WireGuard client (eg a mobile phone with the WireGuard app installed) has been allocated the IP address 55.66.77.88 when it connected to the Internet over 3G/4G/5G.
 2. When the remote WireGuard client initiated the session, it chose UDP port 44524 as its source port. The actual number chosen is (essentially) random and only significant to the client.
 3. Your Internet Service Provider allocated the IP address 12.13.14.15 to the WAN side of your router.
-4. You have done all the steps in [Set up a Dynamic DNS name] and your WAN IP address (12.13.14.15) is being propagated to your Dynamic DNS service provider.
+4. You have done all the steps in [Set up a Dynamic DNS name](#obtainDDNS) and your WAN IP address (12.13.14.15) is being propagated to your Dynamic DNS service provider.
 
 Here's a reference model to help explain what occurs:
 
