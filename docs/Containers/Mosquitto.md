@@ -298,6 +298,10 @@ Replace «username» and «password» with appropriate values, then execute the 
 ```
 $ docker exec mosquitto mosquitto_passwd -b /mosquitto/pwfile/pwfile hello world
 ```
+
+Note:
+
+* See also [customising health-check](#healthCheckCustom). If you are creating usernames and passwords, you may also want to create credentials for the health-check agent.
 	
 #### <a name="checkPasswordFile"> check password file </a>
 
@@ -475,6 +479,118 @@ $ kill %1
 $
 [1]+  Terminated              mosquitto_sub -v -h 127.0.0.1 -p 1883 -t "/password/test" -F "%I %t %p" -u hello -P world
 ```
+
+## <a name="healthCheck"> Container health check </a>
+
+### <a name="healthCheckTheory"> theory of operation </a>
+
+A script , or "agent", to assess the health of the Mosquitto container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
+
+The agent is invoked 30 seconds after the container starts, and every 30 seconds thereafter. The agent:
+
+* Publishes a retained MQTT message to the broker running in the same container. The message payload is the current date and time, and the default topic string is:
+
+	```
+	iotstack/mosquitto/healthcheck
+	```
+	
+* Subscribes to the same broker for the same topic for a single message event.
+* Compares the payload sent with the payload received. If the payloads (ie time-stamps) match, the agent concludes that the Mosquitto broker (the process running inside the same container) is functioning properly for round-trip messaging.
+
+### <a name="healthCheckMonitor"> monitoring health-check </a>
+
+Portainer's *Containers* display contains a *Status* column which shows health-check results for all containers that support the feature.
+
+You can also use the `docker ps` command to monitor health-check results. The following command narrows the focus to mosquitto:
+
+```bash
+$ docker ps --format "table {{.Names}}\t{{.Status}}"  --filter name=mosquitto
+```
+
+Possible reply patterns are:
+
+1. The container is starting and has not yet run the health-check agent:
+
+	```
+	NAMES       STATUS
+	mosquitto   Up 3 seconds (health: starting)
+	```
+
+2. The container has been running for at least 30 seconds and the health-check agent has returned a positive result within the last 30 seconds:
+
+	```
+	NAMES       STATUS
+	mosquitto   Up 34 seconds (healthy)
+	```
+
+3. The container has been running for more than 90 seconds but has failed the last three successive health-check tests:
+
+	```
+	NAMES       STATUS
+	mosquitto   Up About a minute (unhealthy)
+	```
+	
+You can also subscribe to the same topic that the health-check agent is using to view the retained messages as they are published:
+
+```bash
+$ mosquitto_sub -v -h localhost -p 1883 -t "iotstack/mosquitto/healthcheck" -F "%I %t %p"
+```
+
+Notes:
+
+* This assumes you are running the command *outside* container-space on the *same* host as your Mosquitto container. If you run this command from *another* host, replace `localhost` with the IP address or domain name of the host where your Mosquitto container is running.
+* The `-p 1883` is the *external* port. You will need to adjust this if you are using a different *external* port for your MQTT service.
+* If you enable authentication for your Mosquitto broker, you will need to add `-u «user»` and `-P «password»` parameters to this command.
+* You should expect to see a new message appear approximately every 30 seconds. That indicates the health-check agent is functioning normally. Use <kbd>control</kbd>+<kbd>c</kbd> to terminate the command.
+
+### <a name="healthCheckCustom"> customising health-check </a>
+
+You can customise the operation of the health-check agent by editing the `mosquitto` service definition in your *Compose* file:
+
+1. By default, the mosquitto broker listens to **internal** port 1883. If you need change that port, you also need to inform the health-check agent via an environment variable. For example, suppose you changed the **internal** port to 12345:
+
+	```yaml
+	    environment:
+	      - HEALTHCHECK_PORT=12345
+	```
+	
+2. If the default topic string used by the health-check agent causes a name-space collision, you can override it. For example, you could use a Universally-Unique Identifier (UUID):
+
+	```yaml
+	    environment:
+	      - HEALTHCHECK_TOPIC=4DAA361F-288C-45D5-9540-F1275BDCAF02
+	```
+	
+	Note:
+	
+	* You will also need to use the same topic string in the `mosquitto_sub` command shown at [monitoring health-check](#healthCheckMonitor).
+
+3. If you have enabled authentication for your Mosquitto broker service, you will need to provide appropriate credentials for your health-check agent:
+
+	```yaml
+	    environment:
+	      - HEALTHCHECK_USER=healthyUser
+	      - HEALTHCHECK_PASSWORD=healthyUserPassword
+	```
+
+4. If the health-check agent misbehaves in your environment, or if you simply don't want it to be active, you can disable all health-checking for the container by adding the following lines to its service definition:
+
+	```yaml
+	    healthcheck:
+	      disable: true
+	```
+
+	Notes:
+	
+	* The directives to disable health-checking are independent of the environment variables. If you want to disable health-checking temporarily, there is no need to remove any `HEALTHCHECK_` environment variables that may already be in place.
+	* Conversely, the mere presence of a `healthcheck:` clause in the `mosquitto` service definition overrides the supplied agent. In other words, the following can't be used to re-enable the supplied agent:	
+
+		```yaml
+		    healthcheck:
+		      disable: false
+		```
+		
+		You must remove the entire `healthcheck:` clause.
 
 ## <a name="upgradingMosquitto"> Upgrading Mosquitto </a>
 
