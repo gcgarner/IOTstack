@@ -262,6 +262,12 @@ You can silence the warning by editing the Nextcloud service definition in `dock
 
 Nextcloud traffic is not encrypted. Do **not** expose it to the web by opening a port on your home router. Instead, use a VPN like Wireguard to provide secure access to your home network, and let your remote clients access Nextcloud over the VPN tunnel.
 
+## <a name="healthCheck"> Container health check </a>
+
+A script , or "agent", to assess the health of the MariaDB container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
+
+Because it is an instance of MariaDB, Nextcloud_DB inherits the health-check agent. See the [IOTstack MariaDB](https://sensorsiot.github.io/IOTstack/Containers/MariaDB/) documentation for more information.
+
 ## <a name="updatingNextcloud"> Keeping Nextcloud up-to-date </a>
 
 To update the `nextcloud` container:
