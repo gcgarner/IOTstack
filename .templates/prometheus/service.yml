@@ -1,15 +1,47 @@
 prometheus:
   container_name: prometheus
-  image: prom/prometheus:latest
+  build: ./.templates/prometheus/.
   restart: unless-stopped
   user: "0"
   ports:
     - "9090:9090"
+  environment:
+    - IOTSTACK_UID=1000
+    - IOTSTACK_GID=1000
   volumes:
-    - ./services/prometheus/config.yml:/etc/prometheus/config.yml
-    - ./volumes/prometheus/data:/data
+    - ./volumes/prometheus/data:/prometheus
   command:
-    - '--config.file=/etc/prometheus/config.yml'
-    - '--storage.tsdb.path=/data'
+    - '--config.file=/prometheus/config/config.yml'
+    #    defaults are:
+    #    - --config.file=/etc/prometheus/prometheus.yml
+    #    - --storage.tsdb.path=/prometheus
+    #    - --web.console.libraries=/usr/share/prometheus/console_libraries
+    #    - --web.console.templates=/usr/share/prometheus/consoles
+  depends_on:
+    - cadvisor
+    - nodeexporter
+  networks:
+    - iotstack_nw
+
+cadvisor:
+  container_name: cadvisor
+  image: zcube/cadvisor:latest
+  restart: unless-stopped
+  ports:
+    - "8082:8080"
+  volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+  networks:
+    - iotstack_nw
+
+nodeexporter:
+  container_name: nodeexporter
+  image: prom/node-exporter:latest
+  restart: unless-stopped
+  expose:
+    - "9100"
   networks:
     - iotstack_nw
