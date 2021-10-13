@@ -63,19 +63,19 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 	```
 	$ cd ~/IOTstack
 	```
-	
+
 2. If the stack is running, take it down:
 
 	```
 	$ docker-compose down
 	```
-	
+
 3. Erase the persistent storage area for Nextcloud (double-check the command *before* you hit return):
 
 	```
 	$ sudo rm -rf ./volumes/nextcloud
 	```
-	
+
 	This is done to force re-initialisation. In particular, it gives you assurance that the passwords in your `docker-compose.yml` are the ones that are actually in effect.
 
 4. Bring up the stack:
@@ -87,17 +87,17 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 5. Check for errors:
 
 	Repeat the following command two or three times at 10-second intervals:
-	
+
 	```
 	$ docker ps
 	```
 
 	You are looking for evidence that the `nextcloud` and `nextcloud_db` containers are up, stable, and not restarting. If you see any evidence of restarts, try to figure out why using:
-	
+
 	```
 	$ docker logs nextcloud
 	```
-	
+
 6. If you want to be sure Nextcloud gets set up correctly, it is best to perform the remaining steps from a **different** computer.
 
 	That means you need to decide how that **other** computer will refer to your Raspberry Pi running Nextcloud. Your choices are:
@@ -107,7 +107,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 	* your Raspberry Pi's host name – eg `myrpi`
 
 	Key points:
-	
+
 	* You **can't** use a multicast domain name (eg `myrpi.local`). An mDNS name will not work until Nextcloud has been initialised!
 	* Once you have picked a connection method, **STICK TO IT**.
 	* You are only stuck with this restriction until Nextcloud has been initialised. You **can** (and should) fix it later by completing the steps in ["Access through untrusted domain"](#untrustedDomain).
@@ -131,9 +131,9 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 		```
 		http://myrpi:9321
 		```
-	
+
 	The expected result is:
-	
+
 	![Create Administrator Account](./images/nextcloud-createadminaccount.png)
 
 8. Create an administrator account and then click "Finish Setup".
@@ -141,28 +141,29 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 9. There is a long delay. And then you get an error:
 
 	![Mal-formed URL](./images/nextcloud-malformedurl.png)
-	
+
 	If you examine the contents of your browser's URL bar, you will find:
-	
+
 	```
 	http://localhost/index.php/core/apps/recommended
 	```
-	
-	That is **clearly** wrong and it is probably a bug in Nextcloud.	
+
+	That is **clearly** wrong and it is probably a bug in Nextcloud.
+
 10. Edit the URL to replace `localhost` with what it *should* be, which will be **one** of the following patterns, depending on which method you chose to access Nextcloud:
 
 	* `http://192.168.203.200:9321/index.php/core/apps/recommended`
 	* `http://myrpi.mydomain.com:9321/index.php/core/apps/recommended`
 	* `http://myrpi:9321/index.php/core/apps/recommended`
-	
+
 	Note:
-	
+
 	* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
-	
+
 11. After a delay, you will see the "Recommended apps" screen with a spinner moving down the list of apps as they are loaded:
 
 	![Recommended Apps](./images/nextcloud-recommendedapps.png)
-	
+
 	Wait for the loading to complete.
 
 12. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window:
