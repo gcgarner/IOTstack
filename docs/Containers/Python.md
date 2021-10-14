@@ -20,9 +20,9 @@ When you select Python in the menu:
 	├── docker-entrypoint.sh
 	└── Dockerfile
 	```
-	
+
 	Note:
-	
+
 	* Under "old menu" (old-menu branch), the `service.yml` is also copied into the `python` directory but is then not used.
 
 2. This service definition is added to your `docker-compose.yml`:
@@ -43,9 +43,9 @@ When you select Python in the menu:
 	  networks:
 	  - iotstack_nw
 	```
-	
+
 	Note:
-	
+
 	* This service definition is for "new menu" (master branch). The only difference with "old menu" (old-menu branch) is the omission of the last two lines.
 
 ### <a name="customisingPython"> customising your Python service definition </a>
@@ -115,9 +115,9 @@ This is what happens:
 		```
 
 		The `docker-entrypoint.sh` script runs each time the container launches and performs initialisation and "self repair" functions.
-	
+
 	The output of the Dockerfile run is a new **local** image tagged with the name `iotstack_python`.
-	
+
 4. The `iotstack_python` image is instantiated to become the running container.
 5. When the container starts, the `docker-entrypoint.sh` script runs and initialises the container's persistent storage area:
 
@@ -128,11 +128,11 @@ This is what happens:
 	    └── [drwxr-xr-x pi      ]  app
 	        └── [-rwxr-xr-x pi      ]  app.py
 	```
-	
+
 	Note:
-	
+
 	* the top-level `python` folder is owned by "root" but the `app` directory and its contents are owned by "pi".
-	
+
 5. The initial `app.py` Python script is a "hello world" placeholder. It runs as an infinite loop emitting messages every 10 seconds until terminated. You can see what it is doing by running:
 
 	```bash
@@ -142,9 +142,9 @@ This is what happens:
 	The world is re-born. Hello World.
 	…
 	```
-	
+
 	Pressing <kbd>control</kbd>+<kbd>c</kbd> terminates the log display but does not terminate the running container.
-	
+
 ## <a name="stopPython"> stopping the Python service </a>
 
 To stop the container from running, either:
@@ -155,14 +155,14 @@ To stop the container from running, either:
 	$ cd ~/IOTstack
 	$ docker-compose down
 	```
-	
+
 * terminate the python container
 
 	```bash
 	$ cd ~/IOTstack
 	$ docker-compose rm --force --stop -v python
 	```
-		
+
 ## <a name="startPython"> starting the Python service </a>
 
 To bring up the container again after you have stopped it, either:
@@ -173,7 +173,7 @@ To bring up the container again after you have stopped it, either:
 	$ cd ~/IOTstack
 	$ docker-compose up -d
 	```
-	
+
 * bring up the python container
 
 	```bash
@@ -293,7 +293,7 @@ To make *Flask* and *beautifulsoup4* a permanent part of your container:
 	```
 	$ cd ~/IOTstack/services/python/app
 	```
-	
+
 2. Use your favourite text editor to create the file `requirements.txt` in that directory. Each package you want to add should be on a line by itself:
 
 	```
@@ -311,7 +311,7 @@ To make *Flask* and *beautifulsoup4* a permanent part of your container:
 	```
 
 	Note:
-	
+
 	* You will see a warning about running pip as root - ignore it.
 
 4. Confirm that the packages have been added:
@@ -331,19 +331,19 @@ Note:
 	```
 	~/IOTstack/volumes/python/app/requirements.txt
 	```
-	
+
 	This copy is the result of the "self-repair" code that runs each time the container starts noticing that `requirements.txt` is missing and making a copy from the defaults stored inside the image.
-	
+
 	If you make more changes to the master version of `requirements.txt` in the *services* directory and rebuild the local image, the copy in the *volumes* directory will **not** be kept in-sync. That's because the "self-repair" code **never** overwrites existing files.
-	
+
 	If you want to bring the copy of `requirements.txt` in the *volumes* directory up-to-date:
-	
+
 	```
 	$ cd ~/IOTstack
 	$ rm ./volumes/python/app/requirements.txt
 	$ docker-compose restart python
 	```
-	
+
 	The `requirements.txt` file will be recreated and it will be a copy of the version in the *services* directory as of the last image rebuild.
 
 ### <a name="scriptBaking"> making your own Python script the default </a>
@@ -355,13 +355,13 @@ Suppose the Python script you have been developing reaches a major milestone and
 	```bash
 	$ docker exec python bash -c 'pip3 freeze >requirements.txt'
 	```
-	
+
 	That generates a `requirements.txt` representing the state of play inside the running container. Because it is running *inside* the container, the `requirements.txt` created by that command appears *outside* the container at:
-	
+
 	```
 	~/IOTstack/volumes/python/app/requirements.txt
 	```
-	
+
 2. Make your work the default:
 
 	```bash
@@ -370,13 +370,13 @@ Suppose the Python script you have been developing reaches a major milestone and
 	```
 
 	The `cp` command copies:
-	
+
 	* your Python script;
 	* the optional `requirements.txt` (from step 1); and
 	* any other files you may have put into the Python working directory.
 
 	Key point:
-	
+
 	* **everything** copied into `./services/python/app` will become part of the new local image.
 
 3. Terminate the Python container and erase its persistent storage area:
@@ -386,16 +386,16 @@ Suppose the Python script you have been developing reaches a major milestone and
 	$ docker-compose rm --force --stop -v python
 	$ sudo rm -rf ./volumes/python
 	```
-	
+
 	Note:
-	
+
 	* If erasing the persistent storage area feels too risky, just move it out of the way:
 
 		```
 		$ cd ~/IOTstack/volumes
 		$ sudo mv python python.off
 		```
-	
+
 4. Rebuild the local image:
 
 	```bash
@@ -403,9 +403,9 @@ Suppose the Python script you have been developing reaches a major milestone and
 	$ docker-compose build --force-rm python
 	$ docker-compose up -d --force-recreate python
 	```
-		
+
 	On its first launch, the new container will re-populate the persistent storage area but, this time, it will be your Python script and any other supporting files, rather than the original "hello world" script.
-	
+
 5. Clean up by removing the old local image:
 
 	```bash
@@ -433,7 +433,7 @@ Proceed like this:
 	```
 	$ docker rmi iotstack_python
 	```
-	
+
 3. Rename the `python` services directory to the name of your project:
 
 	```
@@ -459,11 +459,11 @@ Proceed like this:
 	  networks:                                   networks:
 	    - iotstack_nw                               - iotstack_nw
 	```
-	
+
 	Note:
-	
+
 	* if you make a copy of the `python` service definition and then perform the required "wishbone" edits on the copy, the `python` definition will still be active so `docker-compose` may try to bring up both services. You will eliminate the risk of confusing yourself if you follow these instructions "as written" by **not** leaving the `python` service definition in place.
-		
+
 5. Start the renamed service:
 
 	```
