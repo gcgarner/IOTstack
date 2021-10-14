@@ -39,10 +39,10 @@ You only get the opportunity to change the `MQSL_` prefixed environment variable
 		$ docker-compose rm --force --stop -v mariadb
 		$ sudo rm -rf ./volumes/mariadb
 		```
-		
+
 	* Edit `docker-compose.yml` and change the variables.
 	* Bring up the container:
-	
+
 		```
 		$ docker-compose up -d mariadb 
 		```
@@ -79,11 +79,11 @@ The agent is invoked 30 seconds after the container starts, and every 30 seconds
 	```
 
 2. If that command succeeds, the agent compares the response returned by the command with the expected response:
-	
+
 	```
 	mysqld is alive
 	```
-	
+
 3. If the command returned the expected response, the agent tests the responsiveness of the TCP port the `mysqld` daemon should be listening on (see [customising health-check](#healthCheckCustom)).
 
 4. If all of those steps succeed, the agent concludes that MariaDB is functioning properly and returns "healthy".
@@ -120,7 +120,7 @@ Possible reply patterns are:
 	NAMES     STATUS
 	mariadb   Up About a minute (unhealthy)
 	```
-	
+
 ### <a name="healthCheckCustom"> customising health-check </a>
 
 You can customise the operation of the health-check agent by editing the `mariadb` service definition in your *Compose* file:
@@ -131,16 +131,16 @@ You can customise the operation of the health-check agent by editing the `mariad
 	    environment:
 	      - MYSQL_TCP_PORT=12345
 	```
-	
+
 	Notes:
-	
+
 	* The `MYSQL_TCP_PORT` variable is [defined by MariaDB](https://mariadb.com/kb/en/mariadb-environment-variables/), not IOTstack, so changing this variable affects more than just the health-check agent.
 	* If you are running "old menu", this change should be made in the file:
 
 		```
 		~/IOTstack/services/mariadb/mariadb.env
 		```
-	
+
 2. The `mysqladmin ping` command relies on the root password supplied via the `MYSQL_ROOT_PASSWORD` environment variable in the *Compose* file. The command will not succeed if the root password is not correct, and the agent will return "unhealthy". 
 
 3. If the health-check agent misbehaves in your environment, or if you simply don't want it to be active, you can disable all health-checking for the container by adding the following lines to its service definition:
@@ -151,14 +151,14 @@ You can customise the operation of the health-check agent by editing the `mariad
 	```
 
 	Note:
-	
-	* The mere presence of a `healthcheck:` clause in the `mariadb` service definition overrides the supplied agent. In other words, the following can't be used to re-enable the supplied agent:	
+
+	* The mere presence of a `healthcheck:` clause in the `mariadb` service definition overrides the supplied agent. In other words, the following can't be used to re-enable the supplied agent:
 
 		```yaml
 		    healthcheck:
 		      disable: false
 		```
-		
+
 		You must remove the entire `healthcheck:` clause.
 
 ## Keeping MariaDB up-to-date
