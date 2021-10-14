@@ -349,7 +349,7 @@ If you need to pin *Prometheus* to a particular version:
 	``` 
 
 	The new *local image* is built, then the new container is instantiated based on that image. The `prune` deletes the old *local image*.
-	
+
 Note:
 
 * As well as preventing Docker from updating the *base image*, pinning will also block incoming updates to the *Dockerfile* from a `git pull`. Nothing will change until you decide to remove the pin.
