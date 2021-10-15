@@ -7,9 +7,12 @@ RUN apt update && apt install -y rsync
 # where IOTstack template files are stored
 ENV IOTSTACK_DEFAULTS_DIR="iotstack_defaults"
 
-# make a copy of the default config file
+# make a copy of the default config file and point to influxdb container
 RUN mkdir -p /${IOTSTACK_DEFAULTS_DIR} && \
-    cp /etc/telegraf/telegraf.conf /${IOTSTACK_DEFAULTS_DIR}/
+    cp /etc/telegraf/telegraf.conf /${IOTSTACK_DEFAULTS_DIR}/ && \
+    sed -i.bak \
+        '/^\[\[outputs.influxdb\]\]/a\ \ urls = ["http://influxdb:8086"]' \
+        /${IOTSTACK_DEFAULTS_DIR}/telegraf.conf
 
 # replace the docker entry-point script with a self-repairing version
 ENV IOTSTACK_ENTRY_POINT="entrypoint.sh"
