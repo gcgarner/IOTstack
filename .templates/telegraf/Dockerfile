@@ -7,9 +7,23 @@ RUN apt update && apt install -y rsync
 # where IOTstack template files are stored
 ENV IOTSTACK_DEFAULTS_DIR="iotstack_defaults"
 
-# make a copy of the default config file
-RUN mkdir -p /${IOTSTACK_DEFAULTS_DIR} && \
-    cp /etc/telegraf/telegraf.conf /${IOTSTACK_DEFAULTS_DIR}/
+# copy template files to image
+COPY ${IOTSTACK_DEFAULTS_DIR} /${IOTSTACK_DEFAULTS_DIR}
+
+# 1. copy the default configuration file that ships with the image as
+#    a baseline reference for the user, and make it read-only.
+# 2. strip comment lines and blank lines from the baseline reference to
+#    use as the starting point for the IOTstack default configuration.
+# 3. edit the IOTstack default configuration to insert an appropriate
+#    URL for influxdb running in another container in the same stack.
+ENV BASELINE_CONFIG=/${IOTSTACK_DEFAULTS_DIR}/telegraf-reference.conf
+ENV IOTSTACK_CONFIG=/${IOTSTACK_DEFAULTS_DIR}/telegraf.conf
+RUN cp /etc/telegraf/telegraf.conf ${BASELINE_CONFIG} && \
+    chmod 444 ${BASELINE_CONFIG} && \
+    grep -v -e "^[ ]*#" -e "^[ ]*$" ${BASELINE_CONFIG} >${IOTSTACK_CONFIG} && \
+    sed -i '/^\[\[outputs.influxdb\]\]/a\ \ urls = ["http://influxdb:8086"]' ${IOTSTACK_CONFIG}
+ENV BASELINE_CONFIG=
+ENV IOTSTACK_CONFIG=
 
 # replace the docker entry-point script with a self-repairing version
 ENV IOTSTACK_ENTRY_POINT="entrypoint.sh"

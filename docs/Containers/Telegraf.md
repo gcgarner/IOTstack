@@ -2,7 +2,10 @@
 
 This document discusses an IOTstack-specific version of Telegraf built on top of [influxdata/influxdata-docker/telegraf](https://github.com/influxdata/influxdata-docker/tree/master/telegraf) using a *Dockerfile*.
 
-The purpose of the Dockerfile is to enable the container to perform self-repair if the `telegraf.conf	` configuration file disappears.
+The purpose of the Dockerfile is to:
+
+* tailor the default configuration to be IOTstack-ready; and
+* enable the container to perform self-repair if essential elements of the persistent storage area disappear.
  
 ## <a name="references"> References </a>
 
@@ -18,23 +21,35 @@ The purpose of the Dockerfile is to enable the container to perform self-repair 
 │   └── telegraf
 │       ├── Dockerfile ❶
 │       ├── entrypoint.sh ❷
-│       └── service.yml ❸
+│       ├── iotstack_defaults
+│       │   └── additions ❸
+│       └── service.yml ❹
 ├── services
 │   └── telegraf
-│       └── service.yml ❹
-├── docker-compose.yml ❺
+│       └── service.yml ❺
+├── docker-compose.yml ❻
 └── volumes
-    └── telegraf ❻
-        └── telegraf.conf ❼
+    └── telegraf ❼
+        ├── additions ❽
+        ├── telegraf-reference.conf ➒
+        └── telegraf.conf ➓
 ```
 
 1. The *Dockerfile* used to customise Telegraf for IOTstack.
 2. A replacement for the `telegraf` container script of the same name, extended to handle container self-repair.
-3. The *template service definition*.
-4. The *working service definition* (only relevant to old-menu, copied from ❸).
-5. The *Compose* file (includes ❸).
-6. The *persistent storage area* for the `telegraf` container.
-7. The configuration file. Will be created by default if not present in ❻ when the container starts but will not be overwritten if customised by you.
+3. The *additions folder*. See [Applying optional additions](#optionalAdditions).
+4. The *template service definition*.
+5. The *working service definition* (only relevant to old-menu, copied from ❹).
+6. The *Compose* file (includes ❹).
+7. The *persistent storage area* for the `telegraf` container.
+8. A working copy of the *additions folder* (copied from ❸). See [Applying optional additions](#optionalAdditions).
+9. The *reference configuration file*. See [Changing Telegraf's configuration](#editConfiguration).
+10. The *active configuration file*. A subset of ➒ altered to support communication with InfluxDB running in a container in the same IOTstack instance.
+
+Everything in the persistent storage area ❼:
+
+* will be replaced if it is not present when the container starts; but
+* will never be overwritten if altered by you.
 
 ## <a name="howTelegrafIOTstackGetsBuilt"> How Telegraf gets built for IOTstack </a>
 
@@ -88,16 +103,18 @@ The `FROM` statement tells the build process to pull down the ***base image*** f
 
 > It is a ***base*** image in the sense that it never actually runs as a container on your Raspberry Pi.
 
-The remaining instructions in the *Dockerfile* customise the *base image* to produce a ***local image***. The customisations are:
+The remaining instructions in the *Dockerfile* customise the ***base image*** to produce a ***local image***. The customisations are:
 
 1. Add the `rsync` package. This helps the container perform self-repair.
-2. Make a backup copy of the default `telegraf.conf`. The backup is used to re-create the working copy if that ever gets removed from the persistent storage area.
-3. Replace `entrypoint.sh` with a version which:
+2. Copy the *default configuration file* that comes with the DockerHub image (so it will be available as a fully-commented reference for the user) and make it read-only.
+3. Make a *working version* of the *default configuration file* from which comment lines and blank lines have been removed.
+4. Patch the *working version* to support communications with InfluxDB running in another container in the same IOTstack instance.
+5. Replace `entrypoint.sh` with a version which:
 
 	* calls `rsync` to perform self-repair if `telegraf.conf` goes missing; and
 	* enforces root:root ownership in `~/IOTstack/volumes/telegraf`.
 
-The *local image* is instantiated to become your running container.
+The ***local image*** is instantiated to become your running container.
 
 When you run the `docker images` command after Telegraf has been built, you will see two rows for Telegraf:
 
@@ -108,10 +125,10 @@ iotstack_telegraf   latest   59861b7fe9ed   2 hours ago   292MB
 telegraf            latest   a721ac170fad   3 days ago    273MB
 ```
 
-* `telegraf ` is the *base image*; and
-* `iotstack_telegraf ` is the *local image*.
+* `telegraf ` is the ***base image***; and
+* `iotstack_telegraf ` is the ***local image***.
 
-You will see the same pattern in *Portainer*, which reports the *base image* as "unused". You should not remove the *base* image, even though it appears to be unused.
+You will see the same pattern in *Portainer*, which reports the ***base image*** as "unused". You should not remove the ***base*** image, even though it appears to be unused.
 
 ### <a name="migration"> Migration considerations </a>
 
@@ -129,29 +146,11 @@ Under this implementation of Telegraf, the configuration file has moved to:
 
 > The change of location is one of the things that allows self-repair to work properly. 
 
-The default version the configuration file supplied with earlier versions of IOTstack only contained 237 lines. At the time of writing (August 2021), the default version supplied with the Telegraf image downloaded from *DockerHub* contains 8641 lines.
+With one exception, all prior and current versions of the default configuration file are identical in terms of their semantics.
 
-> That is a **significant** difference. It is not clear why the version supplied with the original [gcgarner/IOTstack](https://github.com/gcgarner/IOTstack/blob/master/.templates/telegraf/telegraf.conf) was so short. Nevertheless, that file was inherited by [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack/blob/master/.templates/telegraf/telegraf.conf) and has never been changed.
+> In other words, once you strip away comments and blank lines, and remove any "active" configuration options that simply repeat their default setting, you get the same subset of "active" configuration options. The default configuration file supplied with gcgarner/IOTstack is available [here](https://github.com/gcgarner/IOTstack/blob/master/.templates/telegraf/telegraf.conf) if you wish to refer to it.
 
-If you did not need to alter the 237-line file when you were running the original IOTstack implementation of Telegraf, it is *readonably* likely that the 8641-line default will also work, and that there will be no change in Telegraf's behaviour when it is built from a *Dockerfile*.
-
-However, if you experience problems then you have two choices:
-
-1. Use your old `telegraf.conf`:
-
-	```bash
-	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v telegraf
-	$ sudo cp ./services/telegraf/telegraf.conf ./volumes/telegraf/telegraf.conf
-	$ docker-compose up -d telegraf
-	```
-	
-2. Work out which options you need to change in the 8641-line version. You can use your favourite Unix text editor. To cause Telegraf to notice your changes:
-
-	```
-	$ cd ~/IOTstack
-	$ docker-compose restart telegraf
-	```
+The exception is `[[inputs.mqtt_consumer]]` which is now provided as an optional addition. If your existing Telegraf configuration depends on that input, you will need to apply it. See [applying optional additions](#optionalAdditions).
 
 ## <a name="logging"> Logging </a>
 
@@ -162,6 +161,123 @@ $ docker logs telegraf
 ```
 
 These logs are ephemeral and will disappear when your Telegraf container is rebuilt.
+
+### <a name="logTelegrafDB"> log message: *database "telegraf" creation failed* </a>
+
+The following log message can be misleading:
+
+```
+W! [outputs.influxdb] When writing to [http://influxdb:8086]: database "telegraf" creation failed: Post "http://influxdb:8086/query": dial tcp 172.30.0.9:8086: connect: connection refused
+```
+
+If InfluxDB is not running when Telegraf starts, the `depends_on:` clause in Telegraf's service definition tells Docker to start InfluxDB (and Mosquitto) before starting Telegraf. Although it can launch the InfluxDB *container* first, Docker has no way of knowing when the `influxd` *process* running inside the InfluxDB container will start listening to port 8086.
+
+What this error message *usually* means is that Telegraf has tried to communicate with InfluxDB before the latter is ready to accept connections. Telegraf typically retries after a short delay and is then able to communicate with InfluxDB.
+
+## <a name="editConfiguration"> Changing Telegraf's configuration </a>
+
+The first time you launch the Telegraf container, the following structure will be created in the persistent storage area:
+
+```
+~/IOTstack/volumes/telegraf
+├── [drwxr-xr-x root    ]  additions
+│   ├── [-rw-r--r-- root    ]  inputs.docker.conf
+│   └── [-rw-r--r-- root    ]  inputs.mqtt_consumer.conf
+├── [-rw-r--r-- root    ]  telegraf.conf
+└── [-r--r--r-- root    ]  telegraf-reference.conf
+```
+
+The file:
+
+* `telegraf-reference.conf`:
+
+	- is a *reference* copy of the default configuration file that ships with the ***base image*** for Telegraf when it is downloaded from DockerHub. It is nearly 9000 lines long and is mostly comments.
+	- is **not** used by Telegraf but will be replaced if you delete it.
+	- is marked "read-only" (even for root) as a reminder that it is only for your reference. Any changes you make will be ignored.
+
+* `telegraf.conf`:
+
+	- is created by removing all comment lines and blank lines from `telegraf-reference.conf`, leaving only the "active" configuration options, and then adding options necessary for IOTstack.
+	- is less than 30 lines and is significantly easier to understand than `telegraf-reference.conf`.
+
+* `inputs.docker.conf` – see [Applying optional additions](#optionalAdditions) below.
+
+The intention of this structure is that you:
+
+1. search `telegraf-reference.conf` to find the configuration option you need;
+2. read the comments to understand what the option does and how to use it; and then
+3. import the option into the correct section of `telegraf.conf`.
+
+When you make a change to `telegraf.conf`, you activate it by restarting the container:
+
+```
+$ cd ~/IOTstack
+$ docker-compose restart telegraf
+```
+ 
+### <a name="optionalAdditions"> Applying optional additions </a>
+
+The *additions folder* (see [Significant directories and files](#significantFiles)) is a mechanism for additional *IOTstack-ready* configuration options to be provided for Telegraf.
+
+At the time of writing (October 2021), two additions are provided:
+
+1. `inputs.docker.conf` provided by @tablatronix, which instructs Telegraf to collect metrics from Docker.
+2. `inputs.mqtt_consumer.conf` which formed part of the [gcgarner/IOTstack telegraf configuration](https://github.com/gcgarner/IOTstack/blob/master/.templates/telegraf/telegraf.conf) and instructs Telegraf to subscribe to a metric feed from the Mosquitto broker. This assumes, of course, that something is publishing those metrics.
+
+Using `inputs.docker.conf` as the example, applying that addition to your Telegraf configuration file involves:
+
+```
+$ cd ~/IOTstack/volumes/telegraf
+$ grep -v "^#" additions/inputs.docker.conf | sudo tee -a telegraf.conf >/dev/null
+$ cd ~/IOTstack
+$ docker-compose restart telegraf
+```
+
+The `grep` strips comment lines and the `sudo tee` is a safe way of appending the result to `telegraf.conf`. The `restart` causes Telegraf to notice the change.
+
+## <a name="cleanSlate"> Getting a clean slate </a>
+
+### <a name="resetDB"> Erasing the persistent storage area </a>
+
+Erasing Telegraf's persistent storage area triggers self-healing and restores known defaults:
+
+```
+$ cd ~/IOTstack
+$ docker-compose rm --force --stop -v telegraf
+$ sudo rm -rf ./volumes/telegraf
+$ docker-compose up -d telegraf
+```
+
+Note:
+
+* You can also remove individual files within the persistent storage area and then trigger self-healing. For example, if you decide to edit `telegraf-reference.conf` and make a mess, you can restore the original version like this:
+
+	```
+	$ cd ~/IOTstack
+	$ sudo rm ./volumes/telegraf/telegraf-reference.conf
+	$ docker-compose restart telegraf
+	```
+
+### <a name="resetDB"> Resetting the InfluxDB database </a>
+
+To reset the InfluxDB database that Telegraf writes into, proceed like this:
+
+```
+$ cd ~/IOTstack
+$ docker-compose rm --force --stop -v telegraf
+$ docker exec -it influxdb influx -precision=rfc3339
+> drop database telegraf
+> exit
+$ docker-compose up -d telegraf
+```
+
+In words:
+
+* Be in the right directory.
+* Stop the Telegraf container (while leaving the InfluxDB container running).
+* Launch the Influx CLI inside the InfluxDB container.
+* Delete the `telegraf` database, and then exit the CLI.
+* Start the Telegraf container. This re-creates the database automatically. 
 
 ## <a name="upgradingTelegraf"> Upgrading Telegraf </a>
 
@@ -180,7 +296,7 @@ In words:
 * `docker-compose up -d` causes any newly-downloaded images to be instantiated as containers (replacing the old containers); and
 * the `prune` gets rid of the outdated images.
 
-This strategy doesn't work when a *Dockerfile* is used to build a *local image* on top of a *base image* downloaded from [*DockerHub*](https://hub.docker.com). The *local image* is what is running so there is no way for the `pull` to sense when a newer version becomes available.
+This strategy doesn't work when a *Dockerfile* is used to build a ***local image*** on top of a ***base image*** downloaded from [*DockerHub*](https://hub.docker.com). The ***local image*** is what is running so there is no way for the `pull` to sense when a newer version becomes available.
 
 The only way to know when an update to Telegraf is available is to check the [Telegraf tags page](https://hub.docker.com/_/telegraf?tab=tags&page=1&ordering=last_updated) on *DockerHub*.
 
@@ -197,13 +313,13 @@ $ docker system prune
 Breaking it down into parts:
 
 * `build` causes the named container to be rebuilt;
-* `--no-cache` tells the *Dockerfile* process that it must not take any shortcuts. It really **must** rebuild the *local image*;
-* `--pull` tells the *Dockerfile* process to actually check with [*DockerHub*](https://hub.docker.com) to see if there is a later version of the *base image* and, if so, to download it before starting the build;
+* `--no-cache` tells the *Dockerfile* process that it must not take any shortcuts. It really **must** rebuild the ***local image***;
+* `--pull` tells the *Dockerfile* process to actually check with [*DockerHub*](https://hub.docker.com) to see if there is a later version of the ***base image*** and, if so, to download it before starting the build;
 * `telegraf` is the named container argument required by the `build` command.
 
-Your existing Telegraf container continues to run while the rebuild proceeds. Once the freshly-built *local image* is ready, the `up` tells `docker-compose` to do a new-for-old swap. There is barely any downtime for your service.
+Your existing Telegraf container continues to run while the rebuild proceeds. Once the freshly-built ***local image*** is ready, the `up` tells `docker-compose` to do a new-for-old swap. There is barely any downtime for your service.
 
-The `prune` is the simplest way of cleaning up. The first call removes the old *local image*. The second call cleans up the old *base image*.
+The `prune` is the simplest way of cleaning up. The first call removes the old ***local image***. The second call cleans up the old ***base image***.
 
 ### <a name="versionPinning"> Telegraf version pinning </a>
 
@@ -227,7 +343,7 @@ If you need to pin Telegraf to a particular version:
 	FROM telegraf:1.19.3
 	```
 
-4. Save the file and tell `docker-compose` to rebuild the local image:
+4. Save the file and tell `docker-compose` to rebuild the ***local image***:
 
 	```bash
 	$ cd ~/IOTstack
@@ -235,8 +351,8 @@ If you need to pin Telegraf to a particular version:
 	$ docker system prune
 	``` 
 
-	The new *local image* is built, then the new container is instantiated based on that image. The `prune` deletes the old *local image*.
+	The new ***local image*** is built, then the new container is instantiated based on that image. The `prune` deletes the old ***local image***.
 	
 Note:
 
-* As well as preventing Docker from updating the *base image*, pinning will also block incoming updates to the *Dockerfile* from a `git pull`. Nothing will change until you decide to remove the pin.
+* As well as preventing Docker from updating the ***base image***, pinning will also block incoming updates to the *Dockerfile* from a `git pull`. Nothing will change until you decide to remove the pin.

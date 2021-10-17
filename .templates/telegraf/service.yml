@@ -10,6 +10,7 @@ telegraf:
     - "8125:8125/udp"
   volumes:
     - ./volumes/telegraf/:/etc/telegraf
+    - /var/run/docker.sock:/var/run/docker.sock:ro
   depends_on:
     - influxdb
     - mosquitto
