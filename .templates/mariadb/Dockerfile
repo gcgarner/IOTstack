@@ -10,4 +10,16 @@ RUN sed -i.bak \
   -e "s/^read_buffer_size/# read_buffer_size/" \
   /defaults/my.cnf
 
+# copy the health-check script into place
+ENV HEALTHCHECK_SCRIPT "iotstack_healthcheck.sh"
+COPY ${HEALTHCHECK_SCRIPT} /usr/local/bin/${HEALTHCHECK_SCRIPT}
+
+# define the health check
+HEALTHCHECK \
+   --start-period=30s \
+   --interval=30s \
+   --timeout=10s \
+   --retries=3 \
+   CMD ${HEALTHCHECK_SCRIPT} || exit 1
+
 # EOF
