@@ -2,6 +2,13 @@ python:
   container_name: python
   build: ./services/python/.
   restart: unless-stopped
-  network_mode: host
+  environment:
+    - TZ=Etc/UTC
+    - IOTSTACK_UID=1000
+    - IOTSTACK_GID=1000
+  # ports:
+  #   - "external:internal"
   volumes:
     - ./volumes/python/app:/usr/src/app
+  networks:
+    - iotstack_nw

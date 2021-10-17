@@ -89,14 +89,11 @@ def main():
     if not os.path.exists(serviceService):
       os.makedirs(serviceService, exist_ok=True)
 
-    # Files copy
+    # copy supporting files
     shutil.copy(r'%s/Dockerfile' % serviceTemplate, r'%s/Dockerfile' % serviceService)
+    shutil.copy(r'%s/docker-entrypoint.sh' % serviceTemplate, r'%s/docker-entrypoint.sh' % serviceService)
+    shutil.copytree(r'%s/app' % serviceTemplate, r'%s/app' % serviceService)
 
-    print("sudo mkdir -p " + serviceVolume + "/app ")
-    subprocess.call("user=$(whoami) && sudo mkdir -p " + serviceVolume + "/app && sudo chown -R $user:$user " + serviceVolume, shell=True)
-    print("sudo chown -R $user:$user ./volumes/python")
-    shutil.copy(r'%s/app/requirements.txt' % serviceTemplate, r'%s/app/requirements.txt' % serviceVolume)
-    shutil.copy(r'%s/app/app.py' % serviceTemplate, r'%s/app/app.py' % serviceVolume)
     return True
 
   # #####################################
