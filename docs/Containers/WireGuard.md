@@ -24,7 +24,7 @@ To be able to run WireGuard successfully, your Raspberry Pi needs to be **fully*
 $ sudo apt update
 $ sudo apt upgrade -y
 ```
-	
+
 ### <a name="obtainDDNS"> Step 2: Set up a Dynamic DNS name </a>
 
 Before you can use WireGuard (or any VPN solution), you need a mechanism for your remote clients to reach your home router. You have two choices:
@@ -80,9 +80,9 @@ With most containers, you can continue to tweak environment variables and settin
 	```yml
 	- TZ=Australia/Sydney
 	```
-	
+
 	Note:
-	
+
 	- Never use quote marks around the right hand side of a time-zone definition.
 
 * `SERVERURL=` should be set to the domain name you have registered with a Dynamic DNS service provider. Example:
@@ -98,7 +98,7 @@ With most containers, you can continue to tweak environment variables and settin
 	```
 
 	Note:
-	
+
 	- Many examples on the web use "PEERS=n" where "n" is a number. In practice, that approach seems to be a little fragile and is not recommended for IOTstack.
 
 #### <a name="configurePeerDNS"> Optional configuration - DNS resolution for peers </a>
@@ -110,7 +110,7 @@ With most containers, you can continue to tweak environment variables and settin
 	```yml
 	- PEERDNS=192.168.203.65
 	```
-	
+
 #### <a name="configurePorts"> Optional configuration - WireGuard ports </a>
 
 The WireGuard service definition template follows the convention of using UDP port "51820" in three places. You can leave it like that and it will just work. There is no reason to change the defaults unless you want to.
@@ -163,7 +163,7 @@ Of the two, the first is generally the simpler and means you don't have to re-ru
 	$ cd ~/IOTstack
 	$ ./menu.sh
 	```
-	
+
 2. Choose the "Build Stack" option.
 3. If WireGuard is not already selected, select it.
 4. Press <kbd>enter</kbd> to begin the build.
@@ -200,9 +200,9 @@ You will need to create the `compose-override.yml` **before** running the menu t
 	    - PEERDNS=auto
 	    - ALLOWEDIPS=0.0.0.0/0
 	```
-	
+
 	Key points:
-	
+
 	* The override file works at the **section** level. Therefore, you have to include *all* of the environment variables from the template, not just the ones you want to alter.
 	* If your override file contains configurations for other containers, make sure the file only has a single `services:` directive at the start.
 
@@ -213,7 +213,7 @@ You will need to create the `compose-override.yml` **before** running the menu t
 	$ cd ~/IOTstack
 	$ ./menu.sh
 	```
-	
+
 5. Choose the "Build Stack" option.
 6. If WireGuard is not already selected, select it.
 7. Press <kbd>enter</kbd> to begin the build.
@@ -223,7 +223,7 @@ You will need to create the `compose-override.yml` **before** running the menu t
 	```bash
 	$ cat docker-compose.yml
 	```
-	
+
 	and verify that the `wireguard` service definition is as you expect.
 
 ### <a name="startWireGuard"> Step 6: Start WireGuard </a>
@@ -240,13 +240,13 @@ You will need to create the `compose-override.yml` **before** running the menu t
 	```bash
 	$ docker ps --format "table {{.Names}}\t{{.RunningFor}}\t{{.Status}}" --filter name=wireguard
 	```
-	
+
 	Repeat the command a few times with a short delay in between. You are looking for signs that the WireGuard container is restarting. If the container seems to be restarting then this command is your friend:
-		
+
 	```bash
 	$ docker logs wireguard
 	```
-	
+
 	See also discussion of [the read-only flag](#readOnlyFlag).
 
 3. Confirm that WireGuard has generated the expected configurations. For example, given the following setting in `docker-compose.yml`:
@@ -287,7 +287,7 @@ You will need to create the `compose-override.yml` **before** running the menu t
 	│   └── server.conf
 	└── wg0.conf
 	```
-	
+
 	Notice how each element in the `PEERS=` list is represented by a sub-directory prefixed with `peer_`. You should expect the same pattern for your peers.
 
 ### <a name="clientQRcodes"> Step 7: Save your WireGuard client configuration files (QR codes) </a>
@@ -365,7 +365,7 @@ A typical configuration process goes something like this:
 	Service Name | WireGuard
 
 	The fields in the above list are in alphabetical order. They will almost certainly be in a different order in your router and may also have different names:
-	
+
 	* *Interface* is typically a popup menu. Generally it will either default to the name of the physical port on your router that connects to the outside world, or be some other sensible default like "All".
 	* *Private IP* (or *Internal IP*) is the IP address of the Raspberry Pi running WireGuard. Note that this pretty much forces you to give your Raspberry Pi a statically-configured IP address (either a static binding in your DHCP server or a hard-coded address in the Raspberry Pi itself).
 	* *Private Port* (or *Internal Port*) needs to be the value you chose for «external» in the WireGuard service definition (51820 if you didn't change it).
@@ -415,7 +415,7 @@ You also need to make a few assumptions:
 1. The host running the remote WireGuard client (eg a mobile phone with the WireGuard app installed) has been allocated the IP address 55.66.77.88 when it connected to the Internet over 3G/4G/5G.
 2. When the remote WireGuard client initiated the session, it chose UDP port 44524 as its source port. The actual number chosen is (essentially) random and only significant to the client.
 3. Your Internet Service Provider allocated the IP address 12.13.14.15 to the WAN side of your router.
-4. You have done all the steps in [Set up a Dynamic DNS name] and your WAN IP address (12.13.14.15) is being propagated to your Dynamic DNS service provider.
+4. You have done all the steps in [Set up a Dynamic DNS name](#obtainDDNS) and your WAN IP address (12.13.14.15) is being propagated to your Dynamic DNS service provider.
 
 Here's a reference model to help explain what occurs:
 
@@ -498,8 +498,8 @@ $ PORT=«public»; sudo nmap -sU -p $PORT downunda.duckdns.org | grep "$PORT/udp
 
 There will be a short delay. The expected answer is either:
 
-* `«public»/udp open|filtered unknown` = Docker is listening
-* `«public»/udp closed unknown` = Docker is not listening
+* `«public»/udp open|filtered unknown` = router is listening
+* `«public»/udp closed unknown` = router is not listening
 
 ## <a name="readOnlyFlag"> The read-only flag </a>
 
@@ -508,7 +508,7 @@ The `:ro` at the end of the following line in WireGuard's service definition mea
 ```yml
 - /lib/modules:/lib/modules:ro
 ```
-			
+
 If that flag is omitted then WireGuard **may** try to update the `/lib/modules` path in your operating system. To be clear, `/lib/modules` is both **outside** the WireGuard container and **outside** the normal persistent storage area in the `./volumes` directory.
 
 The basic idea of containers is that processes are *contained*, include all their own dependencies, can be added and removed cleanly, and don't change the underlying operating system.
@@ -550,8 +550,7 @@ The procedure is:
 
 	```bash
 	$ cd ~/IOTstack
-	$ docker-compose stop wireguard
-	$ docker-compose rm -f wireguard
+	$ docker-compose rm --force --stop -v wireguard
 	```
 
 2. Erase the persistent storage area (essential):
@@ -559,9 +558,9 @@ The procedure is:
 	```bash
 	$ sudo rm -rf ./volumes/wireguard
 	```
-	
+
 	> Be very careful with that command and double-check your work **before** you hit <kbd>return</kbd>.
-	
+
 	Erasing the persistent storage area destroys the old client configurations and invalidates any copies of QR codes. Existing clients will stop working until presented with a new QR code.
 
 3. Start WireGuard:
