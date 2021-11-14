@@ -304,26 +304,25 @@ If you want to take a backup, something like the following will get the job done
 $ cd ~/IOTstack
 $ BACKUP_TAR_GZ=$PWD/backups/$(date +"%Y-%m-%d_%H%M").$HOSTNAME.nextcloud-backup.tar.gz
 $ touch "$BACKUP_TAR_GZ"
-$ docker-compose stop nextcloud nextcloud_db
-$ docker-compose rm -f nextcloud nextcloud_db
+$ docker-compose rm --force --stop -v nextcloud nextcloud_db
 $ sudo tar -czf "$BACKUP_TAR_GZ" -C "./volumes/nextcloud" .
-$ docker-compose up -d
+$ docker-compose up -d nextcloud
 ```
 
-Note:
+Notes:
 
 * A *baseline* backup takes over 400MB and about 2 minutes. Once you start adding your own data, it will take even more time and storage.
+* The `up` of the NextCloud container implies the `up` of the Nextcloud_DB container.
 
 To restore, you first need to identify the name of the backup file by looking in the `backups` directory. Then:
 
 ```
 $ cd ~/IOTstack
 $ RESTORE_TAR_GZ=$PWD/backups/2021-06-12_1321.sec-dev.nextcloud-backup.tar.gz
-$ docker-compose stop nextcloud nextcloud_db
-$ docker-compose rm -f nextcloud nextcloud_db
+$ docker-compose rm --force --stop -v nextcloud nextcloud_db
 $ sudo rm -rf ./volumes/nextcloud/*
 $ sudo tar -x --same-owner -z -f "$RESTORE_TAR_GZ" -C "./volumes/nextcloud"
-$ docker-compose up -d
+$ docker-compose up -d nextcloud
 ```
 
 If you are running from an SD card, it would be a good idea to mount an external drive to store the data. Something like:
