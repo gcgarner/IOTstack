@@ -138,41 +138,41 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 8. Create an administrator account and then click "Finish Setup".
 
-9. There is a long delay. And then you get an error:
+9. There is a long delay. In most cases, the "Recommended apps" screen appears and you can ignored the instructions in this section. However, if you see the following error:
 
 	![Mal-formed URL](./images/nextcloud-malformedurl.png)
+	
+	then you should:
 
-	If you examine the contents of your browser's URL bar, you will find:
+	* Examine the contents of your browser's URL bar. If you see this pattern:
 
-	```
-	http://localhost/index.php/core/apps/recommended
-	```
+		```
+		http://localhost/index.php/core/apps/recommended
+		```
 
-	That is **clearly** wrong and it is probably a bug in Nextcloud.
+	* Edit the URL to replace `localhost` with what it *should* be, which will be **one** of the following patterns, depending on which method you chose to access Nextcloud:
 
-10. Edit the URL to replace `localhost` with what it *should* be, which will be **one** of the following patterns, depending on which method you chose to access Nextcloud:
+		* `http://192.168.203.200:9321/index.php/core/apps/recommended`
+		* `http://myrpi.mydomain.com:9321/index.php/core/apps/recommended`
+		* `http://myrpi:9321/index.php/core/apps/recommended`
 
-	* `http://192.168.203.200:9321/index.php/core/apps/recommended`
-	* `http://myrpi.mydomain.com:9321/index.php/core/apps/recommended`
-	* `http://myrpi:9321/index.php/core/apps/recommended`
+		Note:
+	
+		* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
 
-	Note:
-
-	* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
-
-11. After a delay, you will see the "Recommended apps" screen with a spinner moving down the list of apps as they are loaded:
+10. The "Recommended apps" screen appears. A spinner moves down the list of apps as they are loaded:
 
 	![Recommended Apps](./images/nextcloud-recommendedapps.png)
 
 	Wait for the loading to complete.
 
-12. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window:
+11. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window:
 
 	![Post-initialisation](./images/nextcloud-postinitialisation.png)
 
 	Hover your mouse to the right of the floating window and keep clicking on the right-arrow button until you reach the last screen, then click "Start using Nextcloud".
 
-13. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
+12. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
 
 	![Dashboard](./images/nextcloud-dashboard.png)
 
