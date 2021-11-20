@@ -7,3 +7,4 @@ plugins:
 # - awesome-pages
 markdown_extensions:
   - pymdownx.superfences
+repo_url: https://github.com/SensorsIot/IOTstack
