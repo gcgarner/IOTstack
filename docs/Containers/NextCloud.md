@@ -138,41 +138,41 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 8. Create an administrator account and then click "Finish Setup".
 
-9. There is a long delay. And then you get an error:
+9. There is a long delay. In most cases, the "Recommended apps" screen appears and you can ignored the instructions in this section. However, if you see the following error:
 
 	![Mal-formed URL](./images/nextcloud-malformedurl.png)
+	
+	then you should:
 
-	If you examine the contents of your browser's URL bar, you will find:
+	* Examine the contents of your browser's URL bar. If you see this pattern:
 
-	```
-	http://localhost/index.php/core/apps/recommended
-	```
+		```
+		http://localhost/index.php/core/apps/recommended
+		```
 
-	That is **clearly** wrong and it is probably a bug in Nextcloud.
+	* Edit the URL to replace `localhost` with what it *should* be, which will be **one** of the following patterns, depending on which method you chose to access Nextcloud:
 
-10. Edit the URL to replace `localhost` with what it *should* be, which will be **one** of the following patterns, depending on which method you chose to access Nextcloud:
+		* `http://192.168.203.200:9321/index.php/core/apps/recommended`
+		* `http://myrpi.mydomain.com:9321/index.php/core/apps/recommended`
+		* `http://myrpi:9321/index.php/core/apps/recommended`
 
-	* `http://192.168.203.200:9321/index.php/core/apps/recommended`
-	* `http://myrpi.mydomain.com:9321/index.php/core/apps/recommended`
-	* `http://myrpi:9321/index.php/core/apps/recommended`
+		Note:
+	
+		* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
 
-	Note:
-
-	* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
-
-11. After a delay, you will see the "Recommended apps" screen with a spinner moving down the list of apps as they are loaded:
+10. The "Recommended apps" screen appears. A spinner moves down the list of apps as they are loaded:
 
 	![Recommended Apps](./images/nextcloud-recommendedapps.png)
 
 	Wait for the loading to complete.
 
-12. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window:
+11. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window:
 
 	![Post-initialisation](./images/nextcloud-postinitialisation.png)
 
 	Hover your mouse to the right of the floating window and keep clicking on the right-arrow button until you reach the last screen, then click "Start using Nextcloud".
 
-13. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
+12. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
 
 	![Dashboard](./images/nextcloud-dashboard.png)
 
@@ -304,26 +304,25 @@ If you want to take a backup, something like the following will get the job done
 $ cd ~/IOTstack
 $ BACKUP_TAR_GZ=$PWD/backups/$(date +"%Y-%m-%d_%H%M").$HOSTNAME.nextcloud-backup.tar.gz
 $ touch "$BACKUP_TAR_GZ"
-$ docker-compose stop nextcloud nextcloud_db
-$ docker-compose rm -f nextcloud nextcloud_db
+$ docker-compose rm --force --stop -v nextcloud nextcloud_db
 $ sudo tar -czf "$BACKUP_TAR_GZ" -C "./volumes/nextcloud" .
-$ docker-compose up -d
+$ docker-compose up -d nextcloud
 ```
 
-Note:
+Notes:
 
 * A *baseline* backup takes over 400MB and about 2 minutes. Once you start adding your own data, it will take even more time and storage.
+* The `up` of the NextCloud container implies the `up` of the Nextcloud_DB container.
 
 To restore, you first need to identify the name of the backup file by looking in the `backups` directory. Then:
 
 ```
 $ cd ~/IOTstack
 $ RESTORE_TAR_GZ=$PWD/backups/2021-06-12_1321.sec-dev.nextcloud-backup.tar.gz
-$ docker-compose stop nextcloud nextcloud_db
-$ docker-compose rm -f nextcloud nextcloud_db
+$ docker-compose rm --force --stop -v nextcloud nextcloud_db
 $ sudo rm -rf ./volumes/nextcloud/*
 $ sudo tar -x --same-owner -z -f "$RESTORE_TAR_GZ" -C "./volumes/nextcloud"
-$ docker-compose up -d
+$ docker-compose up -d nextcloud
 ```
 
 If you are running from an SD card, it would be a good idea to mount an external drive to store the data. Something like:
