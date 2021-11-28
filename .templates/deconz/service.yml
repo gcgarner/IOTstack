@@ -7,7 +7,7 @@ deconz:
     - "443:443"
     - "5901:5900"
   volumes:
-    - ./volumes/deconz/:/opt/deCONZ
+    - ./volumes/deconz:/opt/deCONZ
   devices: # This list is replaced during the build process. Modify the list in "build_settings.yml" to change it.
     - /dev/null
   environment:
