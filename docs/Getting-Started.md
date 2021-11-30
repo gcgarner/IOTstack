@@ -14,22 +14,43 @@ Andreas Spiess Video #352: Raspberry Pi4 Home Automation Server (incl. Docker, O
 
 IOTstack makes the following assumptions:
 
-1. Your hardware is a Raspberry Pi (typically a 3B+ or 4B)
-2. It has a reasonably-recent version of Raspberry Pi OS (aka "Raspbian") installed which has been kept up-to-date with:
+1. Your hardware is a Raspberry Pi (typically a 3B+ or 4B).
 
-	```
+	Note: 
+
+	* The Raspberry Pi Zero W2 has been tested with IOTstack. It works but the 512MB RAM means you should not try to run too many containers concurrently.
+
+2. Your Raspberry Pi has a reasonably-recent version of 32-bit Raspberry Pi OS (aka "Raspbian") installed. You can download operating-system images:
+
+	* [Current release](https://www.raspberrypi.com/software/operating-systems/)
+	* [Prior releases](http://downloads.raspberrypi.org/raspios_armhf/images/)
+
+		Note:
+
+		* If you use the first link, "Raspberry Pi OS with desktop" is recommended.
+		* The second link only offers "Raspberry Pi OS with desktop" images.
+
+3. Your operating system has been kept up-to-date with:
+
+	```bash
 	$ sudo apt update
 	$ sudo apt upgrade -y
 	```
 
-3. You are logged-in as the user "pi"
-4. User "pi" has the user ID 1000
-5. The home directory for user "pi" is `/home/pi/`
-6. IOTstack is installed at `/home/pi/IOTstack` (with that exact spelling).
+4. You are logged-in as the user "pi".
+5. User "pi" has the user ID 1000.
+6. The home directory for user "pi" is `/home/pi/`.
+7. IOTstack is installed at `/home/pi/IOTstack` (with that exact spelling).
 
-The first five assumptions are Raspberry Pi defaults on a clean installation. The sixth is what you get if you follow these instructions faithfully.
+If the first three assumptions hold, assumptions four through six are Raspberry Pi defaults on a clean installation. The seventh is what you get if you follow these instructions faithfully.
 
-> Please don't read these assumptions as saying that IOTstack will not run on other hardware, other operating systems, or as a different user. It is just that IOTstack gets most of its testing under these conditions. The further you get from these implicit assumptions, the more your mileage may vary.
+Please don't read these assumptions as saying that IOTstack will not run on other hardware, other operating systems, or as a different user. It is just that IOTstack gets most of its testing under these conditions. The further you get from these implicit assumptions, the more your mileage may vary.
+
+### <a name="otherPlatforms"> other platforms </a>
+
+Users have reported success on other platforms, including:
+
+* [Orange Pi WinPlus](https://github.com/SensorsIot/IOTstack/issues/375)
 
 ## <a name="newInstallation"> new installation </a>
 
@@ -37,26 +58,26 @@ The first five assumptions are Raspberry Pi defaults on a clean installation. Th
 
 1. Install `curl`:
 
-	```
+	```bash
 	$ sudo apt install -y curl
 	```
 
 2. Run the following command:
 
-	```
+	```bash
 	$ curl -fsSL https://raw.githubusercontent.com/SensorsIot/IOTstack/master/install.sh | bash
 	```
 
 3. Run the menu and choose your containers:
 
-	```
+	```bash
 	$ cd ~/IOTstack
 	$ ./menu.sh
 	```
 
 4. Bring up your stack:
 
-	```
+	```bash
 	$ cd ~/IOTstack
 	$ docker-compose up -d
 	```
@@ -65,7 +86,7 @@ The first five assumptions are Raspberry Pi defaults on a clean installation. Th
 
 1. Install `git`:
 
-	```
+	```bash
 	$ sudo apt install -y git
 	```
 
@@ -73,19 +94,19 @@ The first five assumptions are Raspberry Pi defaults on a clean installation. Th
 
 	* If you want "new menu":
 
-		```
+		```bash
 		$ git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 		```
 
 	* If you prefer "old menu":
 
-		```
+		```bash
 		$ git clone -b old-menu https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 		```
 
 3. Run the menu and choose your containers:
 
-	```
+	```bash
 	$ cd ~/IOTstack
 	$ ./menu.sh
 	```
@@ -96,7 +117,7 @@ The first five assumptions are Raspberry Pi defaults on a clean installation. Th
 
 4. Bring up your stack:
 
-	```
+	```bash
 	$ cd ~/IOTstack
 	$ docker-compose up -d
 	```
@@ -119,19 +140,39 @@ If you are still running on gcgarner/IOTstack and need to migrate to SensorsIot/
 
 Run the following commands:
 
-```
-$ sudo bash -c '[ $(egrep -c "^allowinterfaces eth0,wlan0" /etc/dhcpcd.conf) -eq 0 ] && echo "allowinterfaces eth0,wlan0" >> /etc/dhcpcd.conf'
+```bash
+$ sudo bash -c '[ $(egrep -c "^allowinterfaces eth\*,wlan\*" /etc/dhcpcd.conf) -eq 0 ] && echo "allowinterfaces eth*,wlan*" >> /etc/dhcpcd.conf'
 $ sudo reboot
 ```
 
 See [Issue 219](https://github.com/SensorsIot/IOTstack/issues/219) and [Issue 253](https://github.com/SensorsIot/IOTstack/issues/253) for more information.
 
-### <a name="patch2DHCP"> patch 2 – update libseccomp2</a>
+### <a name="patch2DHCP"> patch 2 – update libseccomp2 </a>
 
-If you don't have this patch in place, Docker images that are based on Alpine will fail if an image's maintainer updates to [Alpine 3.13](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirement).
+This patch is **ONLY** for Raspbian Buster. Do **NOT** install this patch if you are running Raspbian Bullseye.
 
+#### step 1: check your OS release
+
+Run the following command:
+
+```bash
+$ grep "PRETTY_NAME" /etc/os-release
+PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
 ```
-$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+
+If you see the word "buster", proceed to step 2. Otherwise, skip this patch.
+
+#### step 2: if you are running "buster" …
+
+You need this patch if you are running Raspbian Buster. Without this patch, Docker images will fail if:
+
+* the image is based on Alpine and the image's maintainer updates to [Alpine 3.13](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirement); and/or
+* an image's maintainer updates to a library that depends on 64-bit values for *Unix epoch time* (the so-called Y2038 problem).
+
+To install the patch:
+
+```bash
+$ sudo apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
 $ echo "deb http://httpredir.debian.org/debian buster-backports main contrib non-free" | sudo tee -a "/etc/apt/sources.list.d/debian-backports.list"
 $ sudo apt update
 $ sudo apt install libseccomp2 -t buster-backports
@@ -141,21 +182,21 @@ $ sudo apt install libseccomp2 -t buster-backports
 
 Many first-time users of IOTstack get into difficulty by misusing the `sudo` command. The problem is best understood by example. In the following, you would expect `~` (tilde) to expand to `/home/pi`. It does:
 
-```
+```bash
 $ echo ~/IOTstack
 /home/pi/IOTstack
 ```
 
 The command below sends the same `echo` command to `bash` for execution. This is what happens when you type the name of a shell script. You get a new instance of `bash` to run the script:
 
-```
+```bash
 $ bash -c 'echo ~/IOTstack'
 /home/pi/IOTstack
 ```
 
 Same answer. Again, this is what you expect. But now try it with `sudo` on the front:
 
-```
+```bash
 $ sudo bash -c 'echo ~/IOTstack'
 /root/IOTstack
 ```
@@ -170,7 +211,7 @@ Please try to minimise your use of `sudo` when you are working with IOTstack. He
 
 1. Is what you are about to run a script? If yes, check whether the script already contains `sudo` commands. Using `menu.sh` as the example:
 
-	```
+	```bash
 	$ grep -c 'sudo' ~/IOTstack/menu.sh
 	28
 	```
@@ -179,7 +220,7 @@ Please try to minimise your use of `sudo` when you are working with IOTstack. He
 
 2. Did the command you **just executed** work without `sudo`? Note the emphasis on the past tense. If yes, then your work is done. If no, and the error suggests elevated privileges are necessary, then re-execute the last command like this:
 
-	```
+	```bash
 	$ sudo !!
 	```
 
@@ -195,7 +236,7 @@ The menu is used to install Docker and then build the `docker-compose.yml` file 
 
 Please do **not** try to install `docker` and `docker-compose` via `sudo apt install`. There's more to it than that. Docker needs to be installed by `menu.sh`. The menu will prompt you to install docker if it detects that docker is not already installed. You can manually install it from within the `Native Installs` menu:
 
-```
+```bash
 $ cd ~/IOTstack
 $ ./menu.sh
 Select "Native Installs"
@@ -212,7 +253,7 @@ Note:
 
 `docker-compose` uses a `docker-compose.yml` file to configure all your services. The `docker-compose.yml` file is created by the menu:
 
-```
+```bash
 $ cd ~/IOTstack
 $ ./menu.sh
 Select "Build Stack"
@@ -229,7 +270,7 @@ Key point:
 
 The process finishes by asking you to bring up the stack:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose up -d
 ```
@@ -258,7 +299,7 @@ At the time of writing, IOTstack supports three menus:
 
 With a few precautions, you can switch between git branches as much as you like without breaking anything. The basic check you should perform is:
 
-```
+```bash
 $ cd ~/IOTstack
 $ git status
 ```
@@ -275,7 +316,7 @@ Key point:
 
 The way to avoid potential problems is to move any modified files to one side and restore the unmodified original. For example:
 
-```
+```bash
 $ mv .templates/mosquitto/Dockerfile .templates/mosquitto/Dockerfile.save
 $ git checkout -- .templates/mosquitto/Dockerfile
 ```
@@ -284,7 +325,7 @@ When `git status` reports no more "modified" files, it is safe to switch your br
 
 ### <a name="menuMasterBranch"> current menu (master branch) </a>
 
-```
+```bash
 $ cd ~/IOTstack/
 $ git pull
 $ git checkout master
@@ -293,7 +334,7 @@ $ ./menu.sh
 
 ### <a name="menuOldMenuBranch"> old menu (old-menu branch)</a>
 
-```
+```bash
 $ cd ~/IOTstack/
 $ git pull
 $ git checkout old-menu
@@ -304,7 +345,7 @@ $ ./menu.sh
 
 Switch to the experimental branch to try the latest and greatest features.
 
-```
+```bash
 $ cd ~/IOTstack/
 $ git pull
 $ git checkout experimental
@@ -336,7 +377,7 @@ Handy rules:
 
 To start the stack:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose up -d
 ```
@@ -353,8 +394,8 @@ Cannot create container for service [service name here]: unknown log opt 'max-fi
 
 1. Run the command:
 
-	```
-	sudo nano /etc/docker/daemon.json
+	```bash
+	$ sudo nano /etc/docker/daemon.json
 	```
 
 2. change:
@@ -375,9 +416,9 @@ You can also turn logging off or set it to use another option for any service by
 
 ### <a name="upContainer"> starting an individual container </a>
 
-To start the stack:
+To start a particular container:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose up -d «container»
 ```
@@ -386,14 +427,14 @@ $ docker-compose up -d «container»
 
 Stopping aka "downing" the stack stops and deletes all containers, and removes the internal network:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose down
 ```
 
 To stop the stack without removing containers, run:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose stop
 ```
@@ -402,29 +443,28 @@ $ docker-compose stop
 
 `stop` can also be used to stop individual containers, like this:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose stop «container»
 ```
 
 This puts the container in a kind of suspended animation. You can resume the container with
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose start «container»
 ```
 
-There is no equivalent of `down` for a single container. It needs two commands:
+There is no equivalent of `down` for a single container. It needs:
 
-```
+```bash
 $ cd ~/IOTstack
-$ docker-compose stop «container»
-$ docker-compose rm -f «container»
+$ docker-compose rm --force --stop -v «container»
 ```
 
 To reactivate a container which has been stopped and removed:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose up -d «container»
 ```
@@ -433,13 +473,13 @@ $ docker-compose up -d «container»
 
 You can check the status of containers with:
 
-```
+```bash
 $ docker ps
 ```
 
 or
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose ps
 ```
@@ -448,19 +488,19 @@ $ docker-compose ps
 
 You can inspect the logs of most containers like this:
 
-```
+```bash
 $ docker logs «container»
 ```
 
 for example:
 
-```
+```bash
 $ docker logs nodered
 ```
 
 You can also follow a container's log as new entries are added by using the `-f` flag:
 
-```
+```bash
 $ docker logs -f nodered
 ```
 
@@ -470,7 +510,7 @@ Terminate with a Control+C. Note that restarting a container will also terminate
 
 You can restart a container in several ways:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose restart «container»
 ```
@@ -479,7 +519,7 @@ This kind of restart is the least-powerful form of restart. A good way to think 
 
 If you change a `docker-compose.yml` setting for a container and/or an environment variable file referenced by `docker-compose.yml` then a `restart` is usually not enough to bring the change into effect. You need to make `docker-compose` notice the change:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose up -d «container»
 ```
@@ -488,11 +528,9 @@ This type of "restart" rebuilds the container.
 
 Alternatively, to force a container to rebuild (without changing either `docker-compose.yml` or an environment variable file):
 
-```
+```bash
 $ cd ~/IOTstack
-$ docker-compose stop «container»
-$ docker-compose rm -f «container»
-$ docker-compose up -d «container»
+$ docker-compose up -d --force-recreate «container»
 ```
 
 See also [updating images built from Dockerfiles](#updateDockerfile) if you need to force `docker-compose` to notice a change to a Dockerfile.
@@ -501,7 +539,7 @@ See also [updating images built from Dockerfiles](#updateDockerfile) if you need
 
 Docker allows a container's designer to map folders inside a container to a folder on your disk (SD, SSD, HD). This is done with the "volumes" key in `docker-compose.yml`. Consider the following snippet for Node-RED:
 
-```
+```yaml
 volumes:
   - ./volumes/nodered/data:/data
 ```
@@ -543,30 +581,29 @@ is mirrored at the same relative path **inside** the container at:
 
 If you need a "clean slate" for a container, you can delete its volumes. Using InfluxDB as an example:
 
-```
+```bash
 $ cd ~/IOTstack
-$ docker-compose stop influxdb
-$ docker-compose rm -f influxdb
+$ docker-compose rm --force --stop -v influxdb
 $ sudo rm -rf ./volumes/influxdb
 $ docker-compose up -d influxdb
 ```
 
 When `docker-compose` tries to bring up InfluxDB, it will notice this volume mapping in `docker-compose.yml`:
 
-```
+```yaml
     volumes:
       - ./volumes/influxdb/data:/var/lib/influxdb
 ```
 
 and check to see whether `./volumes/influxdb/data` is present. Finding it not there, it does the equivalent of:
 
-```
+```bash
 $ sudo mkdir -p ./volumes/influxdb/data
 ```
 
 When InfluxDB starts, it sees that the folder on right-hand-side of the volumes mapping (`/var/lib/influxdb`) is empty and initialises new databases.
 
-This is how **most** containers behave. But there are exceptions. A good example of an exception is Mosquitto which does not re-initialise correctly so you should avoid removing its persistent store.
+This is how **most** containers behave. There are exceptions so it's always a good idea to keep a backup.
 
 ## <a name="stackMaintenance"> stack maintenance </a>
 
@@ -574,7 +611,7 @@ This is how **most** containers behave. But there are exceptions. A good example
 
 You should keep your Raspberry Pi up-to-date. Despite the word "container" suggesting that *containers* are fully self-contained, they sometimes depend on operating system components ("WireGuard" is an example).
 
-```
+```bash
 $ sudo apt update
 $ sudo apt upgrade -y
 ```
@@ -583,7 +620,7 @@ $ sudo apt upgrade -y
 
 Although the menu will generally do this for you, it does not hurt to keep your local copy of the IOTstack repository in sync with the master version on GitHub.
 
-```
+```bash
 $ cd ~/IOTstack
 $ git pull
 ```
@@ -606,7 +643,7 @@ The easiest way to work out which type of image you are looking at is to inspect
 
 If new versions of this type of image become available on DockerHub, your local IOTstack copies can be updated by a `pull` command:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose pull
 $ docker-compose up -d
@@ -641,7 +678,7 @@ Note:
 
 When your Dockerfile changes, you need to rebuild like this:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose up --build -d «container»
 $ docker system prune
@@ -659,7 +696,7 @@ Note:
 
 * You can also use this type of build if you get an error after modifying Node-RED's environment:
 
-	```
+	```bash
 	$ cd ~/IOTstack
 	$ docker-compose up --build -d nodered
 	```
@@ -668,10 +705,11 @@ Note:
 
 When a newer version of the *base* image appears on DockerHub, you need to rebuild like this:
 
-```
+```bash
 $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull «container»
 $ docker-compose up -d «container»
+$ docker system prune
 $ docker system prune
 ```
 
@@ -683,15 +721,15 @@ Then, the Dockerfile is run to produce a new *local* image. The Dockerfile run h
 
 As your system evolves and new images come down from DockerHub, you may find that more disk space is being occupied than you expected. Try running:
 
-```
+```bash
 $ docker system prune
 ```
 
-This recovers anything no longer in use.
+This recovers anything no longer in use. Sometimes multiple `prune` commands are needed (eg the first removes an old *local* image, the second removes the old *base* image).
 
 If you add a container via `menu.sh` and later remove it (either manually or via `menu.sh`), the associated images(s) will probably persist. You can check which images are installed via:
 
-```
+```bash
 $ docker images
 
 REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE
@@ -706,22 +744,114 @@ portainer/portainer      latest              dbf28ba50432        2 months ago   
 
 Both "Portainer CE" and "Portainer" are in that list. Assuming "Portainer" is no longer in use, it can be removed by using either its repository name or its Image ID. In other words, the following two commands are synonyms:
 
-```
+```bash
 $ docker rmi portainer/portainer
 $ docker rmi dbf28ba50432
 ```
 
 In general, you can use the repository name to remove an image but the Image ID is sometimes needed. The most common situation where you are likely to need the Image ID is after an image has been updated on DockerHub and pulled down to your Raspberry Pi. You will find two containers with the same name. One will be tagged "latest" (the running version) while the other will be tagged "\<none\>" (the prior version). You use the Image ID to resolve the ambiguity.
 
+### <a name="versionPinning"> pinning to specific versions </a>
+
+See [container image updates](#imageUpdates) to understand how to tell the difference between images that are used "as is" from DockerHub versus those that are built from local Dockerfiles.
+
+Note:
+
+* You should **always** visit an image's DockerHub page before pinning to a specific version. This is the only way to be certain that you are choosing the appropriate version suffix.
+
+To pin an image to a specific version:
+
+* If the image comes straight from DockerHub, you apply the pin in `docker-compose.yml`. For example, to pin Grafana to version 7.5.7, you change:
+
+	```yaml
+	  grafana:
+	    container_name: grafana
+	    image: grafana/grafana:latest
+	    …
+	```
+
+	to:
+
+	```yaml
+	  grafana:
+	    container_name: grafana
+	    image: grafana/grafana:7.5.7
+	    …
+	```
+
+	To apply the change, "up" the container:
+
+	```bash
+	$ cd ~/IOTstack
+	$ docker-compose up -d grafana
+	```
+
+* If the image is built using a local Dockerfile, you apply the pin in the Dockerfile. For example, to pin Mosquitto to version 1.6.15, edit `~/IOTstack/.templates/mosquitto/Dockerfile` to change:
+
+	```dockerfile
+	# Download base image
+	FROM eclipse-mosquitto:latest
+	…
+	```
+
+	to:
+
+	```dockerfile
+	# Download base image
+	FROM eclipse-mosquitto:1.6.15
+	…
+	```
+
+	To apply the change, "up" the container and pass the `--build` flag:
+
+	```bash
+	$ cd ~/IOTstack
+	$ docker-compose up -d --build mosquitto
+	```
+
 ## <a name="nuclearOption"> the nuclear option - use with caution </a>
 
-You can use Git to delete all files and folders to return your folder to the freshly cloned state.
+If you create a mess and can't see how to recover, try proceeding like this:
 
-Warning: **YOU WILL LOSE ALL YOUR DATA**.
-
-```
+```bash
 $ cd ~/IOTstack
-$ sudo git clean -d -x -f
+$ docker-compose down
+$ cd
+$ mv IOTstack IOTstack.old
+$ git clone https://github.com/SensorsIot/IOTstack.git IOTstack
 ```
 
-This is probably the **only** time you should ever need to use `sudo` in conjunction with `git` for IOTstack. This is not recoverable!
+In words:
+
+1. Be in the right directory.
+2. Take the stack down.
+3. The `cd` command without any arguments changes your working directory to your home directory (variously known as `~` or `$HOME` or `/home/pi`).
+4. Move your existing IOTstack directory out of the way. If you get a permissions problem:
+
+	* Re-try the command with `sudo`; and
+	* Read [a word about the `sudo` command](#aboutSudo). Needing `sudo` in this situation is an example of over-using `sudo`.
+
+5. Check out a clean copy of IOTstack.
+
+Now, you have a clean slate. You can either start afresh by running the menu:
+
+```bash
+$ cd ~/IOTstack
+$ ./menu.sh
+```
+
+Alternatively, you can mix and match by making selective copies from the old directory. For example:
+
+```bash
+$ cd
+$ cp IOTstack.old/docker-compose.yml IOTstack/
+```
+
+The `IOTstack.old` directory remains available as a reference for as long as you need it. Once you have no further use for it, you can clean it up via:
+
+```bash
+$ cd
+$ sudo rm -rf ./IOTstack.old
+```
+
+The `sudo` command is needed in this situation because some files and folders (eg the "volumes" directory and most of its contents) are owned by root.

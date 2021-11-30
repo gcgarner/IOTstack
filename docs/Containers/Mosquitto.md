@@ -179,9 +179,9 @@ Using `mosquitto.conf` as the example, assume you wish to use your existing file
 	$ cd ~/IOTstack
 	$ sudo mv ./services/mosquitto/mosquitto.conf ./volumes/mosquitto/config/mosquitto.conf
 	```
-	
+
 	> The move overwrites the default. At this point, the moved file will probably be owned by user "pi" but that does not matter.
-	
+
 2. Mosquitto will always enforce correct ownership (1883:1883) on any restart but it will not overwrite permissions. If in doubt, use mode 644 as your default for permissions:
 
 	```bash
@@ -193,7 +193,7 @@ Using `mosquitto.conf` as the example, assume you wish to use your existing file
 	```bash
 	$ docker-compose restart mosquitto
 	```
-	
+
 4. Check your work:
 
 	```bash
@@ -279,7 +279,7 @@ A common problem with the previous version of Mosquitto for IOTstack occurred wh
 The Mosquitto container performs self-repair each time the container is brought up or restarts. If `pwfile` is missing, an empty file is created as a placeholder. This prevents the restart loop. What happens next depends on `allow_anonymous`:
 
 * If `true` then:
-	
+
 	- Any MQTT request *without* credentials will be permitted;
 	- Any MQTT request *with* credentials will be rejected (because `pwfile` is empty so there is nothing to match on).
 
@@ -292,13 +292,17 @@ To create a username and password, use the following as a template.
 ```
 $ docker exec mosquitto mosquitto_passwd -b /mosquitto/pwfile/pwfile «username» «password» 
 ```
-		
+
 Replace «username» and «password» with appropriate values, then execute the command. For example, to create the username "hello" with password "world":
-	
+
 ```
 $ docker exec mosquitto mosquitto_passwd -b /mosquitto/pwfile/pwfile hello world
 ```
-	
+
+Note:
+
+* See also [customising health-check](#healthCheckCustom). If you are creating usernames and passwords, you may also want to create credentials for the health-check agent.
+
 #### <a name="checkPasswordFile"> check password file </a>
 
 There are two ways to verify that the password file exists and has the expected content:
@@ -308,7 +312,7 @@ There are two ways to verify that the password file exists and has the expected 
 	```bash
 	$ sudo cat ~/IOTstack/volumes/mosquitto/pwfile/pwfile 
 	```
-	
+
 	> `sudo` is needed because the file is neither owned nor readable by `pi`.
 
 2. View the file using its **internal** path:
@@ -342,24 +346,24 @@ There are several ways to reset the password file. Your options are:
 	$ sudo rm ./volumes/mosquitto/pwfile/pwfile
 	$ docker-compose restart mosquitto 
 	```
-	
+
 	The result is an empty password file.
-	
+
 2. Clear all existing passwords while adding a new password:
 
 	```bash
 	$ docker exec mosquitto mosquitto_passwd -c -b /mosquitto/pwfile/pwfile «username» «password»
 	```
-	
+
 	The result is a password file with a single entry.
-	
+
 3. Clear all existing passwords in favour of a single dummy password which is then removed:
 
 	```bash
 	$ docker exec mosquitto mosquitto_passwd -c -b /mosquitto/pwfile/pwfile dummy dummy
 	$ docker exec mosquitto mosquitto_passwd -D /mosquitto/pwfile/pwfile dummy
 	```
-	
+
 	The result is an empty password file.
 
 ### <a name="activateSecurity"> Activate Mosquitto security </a>
@@ -375,7 +379,7 @@ There are several ways to reset the password file. Your options are:
 	```
 	#password_file /mosquitto/pwfile/pwfile
 	```
-	
+
 	so that it becomes:
 
 	```
@@ -387,14 +391,14 @@ There are several ways to reset the password file. Your options are:
 	```
 	allow_anonymous true
 	```
-	
+
 	If `true` then:
-	
+
 	* Any MQTT request without credentials will be permitted;
 	* The validity of credentials supplied with any MQTT request will be enforced.
 
 	If `false` then:
-	
+
 	* Any MQTT request without credentials will be rejected;
 	* The validity of credentials supplied with any MQTT request will be enforced.
 
@@ -458,7 +462,7 @@ $ mosquitto_sub -v -h 127.0.0.1 -p 1883 -t "/password/test" -F "%I %t %p" -u hel
 ```
 
 Repeat the earlier test:
-	
+
 ```
 $ mosquitto_pub -h 127.0.0.1 -p 1883 -t "/password/test" -m "up up and away" -u hello -P world
 2021-02-16T14:40:51+1100 /password/test up up and away
@@ -467,7 +471,7 @@ $ mosquitto_pub -h 127.0.0.1 -p 1883 -t "/password/test" -m "up up and away" -u 
 Note:
 
 * the second line above is coming from the `mosquitto_sub` running in the background.
-	
+
 When you have finished testing you can kill the background process (press return twice after you enter the `kill` command):
 
 ```
@@ -475,6 +479,118 @@ $ kill %1
 $
 [1]+  Terminated              mosquitto_sub -v -h 127.0.0.1 -p 1883 -t "/password/test" -F "%I %t %p" -u hello -P world
 ```
+
+## <a name="healthCheck"> Container health check </a>
+
+### <a name="healthCheckTheory"> theory of operation </a>
+
+A script , or "agent", to assess the health of the Mosquitto container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
+
+The agent is invoked 30 seconds after the container starts, and every 30 seconds thereafter. The agent:
+
+* Publishes a retained MQTT message to the broker running in the same container. The message payload is the current date and time, and the default topic string is:
+
+	```
+	iotstack/mosquitto/healthcheck
+	```
+
+* Subscribes to the same broker for the same topic for a single message event.
+* Compares the payload sent with the payload received. If the payloads (ie time-stamps) match, the agent concludes that the Mosquitto broker (the process running inside the same container) is functioning properly for round-trip messaging.
+
+### <a name="healthCheckMonitor"> monitoring health-check </a>
+
+Portainer's *Containers* display contains a *Status* column which shows health-check results for all containers that support the feature.
+
+You can also use the `docker ps` command to monitor health-check results. The following command narrows the focus to mosquitto:
+
+```bash
+$ docker ps --format "table {{.Names}}\t{{.Status}}"  --filter name=mosquitto
+```
+
+Possible reply patterns are:
+
+1. The container is starting and has not yet run the health-check agent:
+
+	```
+	NAMES       STATUS
+	mosquitto   Up 3 seconds (health: starting)
+	```
+
+2. The container has been running for at least 30 seconds and the health-check agent has returned a positive result within the last 30 seconds:
+
+	```
+	NAMES       STATUS
+	mosquitto   Up 34 seconds (healthy)
+	```
+
+3. The container has been running for more than 90 seconds but has failed the last three successive health-check tests:
+
+	```
+	NAMES       STATUS
+	mosquitto   Up About a minute (unhealthy)
+	```
+
+You can also subscribe to the same topic that the health-check agent is using to view the retained messages as they are published:
+
+```bash
+$ mosquitto_sub -v -h localhost -p 1883 -t "iotstack/mosquitto/healthcheck" -F "%I %t %p"
+```
+
+Notes:
+
+* This assumes you are running the command *outside* container-space on the *same* host as your Mosquitto container. If you run this command from *another* host, replace `localhost` with the IP address or domain name of the host where your Mosquitto container is running.
+* The `-p 1883` is the *external* port. You will need to adjust this if you are using a different *external* port for your MQTT service.
+* If you enable authentication for your Mosquitto broker, you will need to add `-u «user»` and `-P «password»` parameters to this command.
+* You should expect to see a new message appear approximately every 30 seconds. That indicates the health-check agent is functioning normally. Use <kbd>control</kbd>+<kbd>c</kbd> to terminate the command.
+
+### <a name="healthCheckCustom"> customising health-check </a>
+
+You can customise the operation of the health-check agent by editing the `mosquitto` service definition in your *Compose* file:
+
+1. By default, the mosquitto broker listens to **internal** port 1883. If you need change that port, you also need to inform the health-check agent via an environment variable. For example, suppose you changed the **internal** port to 12345:
+
+	```yaml
+	    environment:
+	      - HEALTHCHECK_PORT=12345
+	```
+
+2. If the default topic string used by the health-check agent causes a name-space collision, you can override it. For example, you could use a Universally-Unique Identifier (UUID):
+
+	```yaml
+	    environment:
+	      - HEALTHCHECK_TOPIC=4DAA361F-288C-45D5-9540-F1275BDCAF02
+	```
+
+	Note:
+
+	* You will also need to use the same topic string in the `mosquitto_sub` command shown at [monitoring health-check](#healthCheckMonitor).
+
+3. If you have enabled authentication for your Mosquitto broker service, you will need to provide appropriate credentials for your health-check agent:
+
+	```yaml
+	    environment:
+	      - HEALTHCHECK_USER=healthyUser
+	      - HEALTHCHECK_PASSWORD=healthyUserPassword
+	```
+
+4. If the health-check agent misbehaves in your environment, or if you simply don't want it to be active, you can disable all health-checking for the container by adding the following lines to its service definition:
+
+	```yaml
+	    healthcheck:
+	      disable: true
+	```
+
+	Notes:
+
+	* The directives to disable health-checking are independent of the environment variables. If you want to disable health-checking temporarily, there is no need to remove any `HEALTHCHECK_` environment variables that may already be in place.
+	* Conversely, the mere presence of a `healthcheck:` clause in the `mosquitto` service definition overrides the supplied agent. In other words, the following can't be used to re-enable the supplied agent:
+
+		```yaml
+		    healthcheck:
+		      disable: false
+		```
+
+		You must remove the entire `healthcheck:` clause.
 
 ## <a name="upgradingMosquitto"> Upgrading Mosquitto </a>
 
@@ -549,7 +665,7 @@ If you need to pin Mosquitto to a particular version:
 	``` 
 
 	The new *local image* is built, then the new container is instantiated based on that image. The `prune` deletes the old *local image*.
-	
+
 Note:
 
 * As well as preventing Docker from updating the *base image*, pinning will also block incoming updates to the *Dockerfile* from a `git pull`. Nothing will change until you decide to remove the pin.
@@ -585,7 +701,7 @@ If you have a use-case that needs port 9001, you can re-enable support by:
 	listener 1883
 	listener 9001
 	```
-	
+
 	You need **both** lines. If you omit 1883 then Mosquitto will stop listening to port 1883 and will only listen to port 9001.
 
 3. Restarting the container:

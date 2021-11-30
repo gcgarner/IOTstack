@@ -1,12 +1,13 @@
 ## Source
+
 * [Docker hub](https://hub.docker.com/r/linuxserver/mariadb/)
 * [Webpage](https://mariadb.org/)
 
 ## About
 
-MariaDB is a fork of MySQL. This is an unofficial image provided by linuxserver.io because there is no official image for arm
+MariaDB is a fork of MySQL. This is an unofficial image provided by linuxserver.io because there is no official image for arm.
 
-## Conneting to the DB
+## Connecting to the DB
 
 The port is 3306. It exists inside the docker network so you can connect via `mariadb:3306` for internal connections. For external connections use `<your Pis IP>:3306`
 
@@ -14,10 +15,162 @@ The port is 3306. It exists inside the docker network so you can connect via `ma
 
 ## Setup
 
-Before starting the stack edit the `./services/mariadb/mariadb.env` file and set your access details. This is optional however you will only have one shot at the preconfig. If you start the container without setting the passwords then you will have to either delete its volume directory or enter the terminal and change manually
+Before starting the stack, edit the `docker-compose.yml` file and check your environment variables. In particular:
 
-The env file has three commented fields for credentials, either **all three** must be commented or un-commented. You can't have only one or two, its all or nothing.
+```
+  environment:
+    - TZ=Etc/UTC
+    - MYSQL_ROOT_PASSWORD=
+    - MYSQL_DATABASE=default
+    - MYSQL_USER=mariadbuser
+    - MYSQL_PASSWORD=
+```
+
+If you are running old-menu, you will have to set both passwords. Under new-menu, the menu may have allocated random passwords for you but you can change them if you like.
+
+You only get the opportunity to change the `MQSL_` prefixed environment variables before you bring up the container for the first time. If you decide to change these values after initialisation, you will either have to:
+
+1. Erase the persistent storage area and start again. There are three steps:
+
+	* Stop the container and remove the persistent storage area:
+
+		```
+		$ cd ~/IOTstack
+		$ docker-compose rm --force --stop -v mariadb
+		$ sudo rm -rf ./volumes/mariadb
+		```
+
+	* Edit `docker-compose.yml` and change the variables.
+	* Bring up the container:
+
+		```
+		$ docker-compose up -d mariadb 
+		```
+
+2. Open a terminal window within the container (see below) and change the values by hand.
+
+	> The how-to is beyond the scope of this documentation. Google is your friend!
 
 ## Terminal
 
-A terminal is provided to access mariadb by the cli. execute `./services/mariadb/terminal.sh`. You will need to run `mysql -uroot -p` to enter mariadbs interface
+You can open a terminal session within the mariadb container via:
+
+```
+$ docker exec -it mariadb bash
+```
+
+To close the terminal session, either:
+
+* type "exit" and press <kbd>return</kbd>; or
+* press <kbd>control</kbd>+<kbd>d</kbd>.
+
+## <a name="healthCheck"> Container health check </a>
+
+### <a name="healthCheckTheory"> theory of operation </a>
+
+A script , or "agent", to assess the health of the MariaDB container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
+
+The agent is invoked 30 seconds after the container starts, and every 30 seconds thereafter. The agent:
+
+1. Runs the command:
+
+	```
+	mysqladmin ping -h localhost
+	```
+
+2. If that command succeeds, the agent compares the response returned by the command with the expected response:
+
+	```
+	mysqld is alive
+	```
+
+3. If the command returned the expected response, the agent tests the responsiveness of the TCP port the `mysqld` daemon should be listening on (see [customising health-check](#healthCheckCustom)).
+
+4. If all of those steps succeed, the agent concludes that MariaDB is functioning properly and returns "healthy".
+
+### <a name="healthCheckMonitor"> monitoring health-check </a>
+
+Portainer's *Containers* display contains a *Status* column which shows health-check results for all containers that support the feature.
+
+You can also use the `docker ps` command to monitor health-check results. The following command narrows the focus to mariadb:
+
+```bash
+$ docker ps --format "table {{.Names}}\t{{.Status}}"  --filter name=mariadb
+```
+
+Possible reply patterns are:
+
+1. The container is starting and has not yet run the health-check agent:
+
+	```
+	NAMES     STATUS
+	mariadb   Up 5 seconds (health: starting)
+	```
+
+2. The container has been running for at least 30 seconds and the health-check agent has returned a positive result within the last 30 seconds:
+
+	```
+	NAMES     STATUS
+	mariadb   Up 33 seconds (healthy)
+	```
+
+3. The container has been running for more than 90 seconds but has failed the last three successive health-check tests:
+
+	```
+	NAMES     STATUS
+	mariadb   Up About a minute (unhealthy)
+	```
+
+### <a name="healthCheckCustom"> customising health-check </a>
+
+You can customise the operation of the health-check agent by editing the `mariadb` service definition in your *Compose* file:
+
+1. By default, the `mysqld` daemon listens to **internal** port 3306. If you need change that port, you also need to inform the health-check agent via an environment variable. For example, suppose you changed the **internal** port to 12345:
+
+	```yaml
+	    environment:
+	      - MYSQL_TCP_PORT=12345
+	```
+
+	Notes:
+
+	* The `MYSQL_TCP_PORT` variable is [defined by MariaDB](https://mariadb.com/kb/en/mariadb-environment-variables/), not IOTstack, so changing this variable affects more than just the health-check agent.
+	* If you are running "old menu", this change should be made in the file:
+
+		```
+		~/IOTstack/services/mariadb/mariadb.env
+		```
+
+2. The `mysqladmin ping` command relies on the root password supplied via the `MYSQL_ROOT_PASSWORD` environment variable in the *Compose* file. The command will not succeed if the root password is not correct, and the agent will return "unhealthy". 
+
+3. If the health-check agent misbehaves in your environment, or if you simply don't want it to be active, you can disable all health-checking for the container by adding the following lines to its service definition:
+
+	```yaml
+	    healthcheck:
+	      disable: true
+	```
+
+	Note:
+
+	* The mere presence of a `healthcheck:` clause in the `mariadb` service definition overrides the supplied agent. In other words, the following can't be used to re-enable the supplied agent:
+
+		```yaml
+		    healthcheck:
+		      disable: false
+		```
+
+		You must remove the entire `healthcheck:` clause.
+
+## Keeping MariaDB up-to-date
+
+To update the `mariadb` container:
+
+```
+$ cd ~/IOTstack
+$ docker-compose build --no-cache --pull mariadb
+$ docker-compose up -d mariadb
+$ docker system prune
+$ docker system prune
+```
+
+The first "prune" removes the old *local* image, the second removes the old *base* image.

@@ -23,7 +23,7 @@ nextcloud:
 
 nextcloud_db:
   container_name: nextcloud_db
-  image: ghcr.io/linuxserver/mariadb
+  build: ./.templates/mariadb/.
   restart: unless-stopped
   environment:
     - TZ=Etc/UTC
@@ -33,8 +33,11 @@ nextcloud_db:
     - MYSQL_PASSWORD=«user_password»
     - MYSQL_DATABASE=nextcloud
     - MYSQL_USER=nextcloud
+  ports:
+    - "9322:3306"
   volumes:
     - ./volumes/nextcloud/db:/config
+    - ./volumes/nextcloud/db_backup:/backup
 ```
 
 There are two containers, one for the cloud service itself, and the other for the database. Both containers share the same persistent storage area in the volumes subdirectory so they are treated as a unit. This will not interfere with any other MariaDB containers you might wish to run.
@@ -60,19 +63,19 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 	```
 	$ cd ~/IOTstack
 	```
-	
+
 2. If the stack is running, take it down:
 
 	```
 	$ docker-compose down
 	```
-	
+
 3. Erase the persistent storage area for Nextcloud (double-check the command *before* you hit return):
 
 	```
 	$ sudo rm -rf ./volumes/nextcloud
 	```
-	
+
 	This is done to force re-initialisation. In particular, it gives you assurance that the passwords in your `docker-compose.yml` are the ones that are actually in effect.
 
 4. Bring up the stack:
@@ -84,17 +87,17 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 5. Check for errors:
 
 	Repeat the following command two or three times at 10-second intervals:
-	
+
 	```
 	$ docker ps
 	```
 
 	You are looking for evidence that the `nextcloud` and `nextcloud_db` containers are up, stable, and not restarting. If you see any evidence of restarts, try to figure out why using:
-	
+
 	```
 	$ docker logs nextcloud
 	```
-	
+
 6. If you want to be sure Nextcloud gets set up correctly, it is best to perform the remaining steps from a **different** computer.
 
 	That means you need to decide how that **other** computer will refer to your Raspberry Pi running Nextcloud. Your choices are:
@@ -104,7 +107,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 	* your Raspberry Pi's host name – eg `myrpi`
 
 	Key points:
-	
+
 	* You **can't** use a multicast domain name (eg `myrpi.local`). An mDNS name will not work until Nextcloud has been initialised!
 	* Once you have picked a connection method, **STICK TO IT**.
 	* You are only stuck with this restriction until Nextcloud has been initialised. You **can** (and should) fix it later by completing the steps in ["Access through untrusted domain"](#untrustedDomain).
@@ -128,47 +131,48 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 		```
 		http://myrpi:9321
 		```
-	
+
 	The expected result is:
-	
+
 	![Create Administrator Account](./images/nextcloud-createadminaccount.png)
 
 8. Create an administrator account and then click "Finish Setup".
 
-9. There is a long delay. And then you get an error:
+9. There is a long delay. In most cases, the "Recommended apps" screen appears and you can ignored the instructions in this section. However, if you see the following error:
 
 	![Mal-formed URL](./images/nextcloud-malformedurl.png)
 	
-	If you examine the contents of your browser's URL bar, you will find:
-	
-	```
-	http://localhost/index.php/core/apps/recommended
-	```
-	
-	That is **clearly** wrong and it is probably a bug in Nextcloud.	
-10. Edit the URL to replace `localhost` with what it *should* be, which will be **one** of the following patterns, depending on which method you chose to access Nextcloud:
+	then you should:
 
-	* `http://192.168.203.200:9321/index.php/core/apps/recommended`
-	* `http://myrpi.mydomain.com:9321/index.php/core/apps/recommended`
-	* `http://myrpi:9321/index.php/core/apps/recommended`
+	* Examine the contents of your browser's URL bar. If you see this pattern:
+
+		```
+		http://localhost/index.php/core/apps/recommended
+		```
+
+	* Edit the URL to replace `localhost` with what it *should* be, which will be **one** of the following patterns, depending on which method you chose to access Nextcloud:
+
+		* `http://192.168.203.200:9321/index.php/core/apps/recommended`
+		* `http://myrpi.mydomain.com:9321/index.php/core/apps/recommended`
+		* `http://myrpi:9321/index.php/core/apps/recommended`
+
+		Note:
 	
-	Note:
-	
-	* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
-	
-11. After a delay, you will see the "Recommended apps" screen with a spinner moving down the list of apps as they are loaded:
+		* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
+
+10. The "Recommended apps" screen appears. A spinner moves down the list of apps as they are loaded:
 
 	![Recommended Apps](./images/nextcloud-recommendedapps.png)
-	
+
 	Wait for the loading to complete.
 
-12. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window:
+11. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window:
 
 	![Post-initialisation](./images/nextcloud-postinitialisation.png)
 
 	Hover your mouse to the right of the floating window and keep clicking on the right-arrow button until you reach the last screen, then click "Start using Nextcloud".
 
-13. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
+12. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
 
 	![Dashboard](./images/nextcloud-dashboard.png)
 
@@ -259,6 +263,35 @@ You can silence the warning by editing the Nextcloud service definition in `dock
 
 Nextcloud traffic is not encrypted. Do **not** expose it to the web by opening a port on your home router. Instead, use a VPN like Wireguard to provide secure access to your home network, and let your remote clients access Nextcloud over the VPN tunnel.
 
+## <a name="healthCheck"> Container health check </a>
+
+A script , or "agent", to assess the health of the MariaDB container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
+
+Because it is an instance of MariaDB, Nextcloud_DB inherits the health-check agent. See the [IOTstack MariaDB](https://sensorsiot.github.io/IOTstack/Containers/MariaDB/) documentation for more information.
+
+## <a name="updatingNextcloud"> Keeping Nextcloud up-to-date </a>
+
+To update the `nextcloud` container:
+
+```
+$ cd ~/IOTstack
+$ docker-compose pull nextcloud
+$ docker-compose up -d nextcloud
+$ docker system prune
+```
+
+To update the `nextcloud_db` container:
+
+```
+$ cd ~/IOTstack
+$ docker-compose build --no-cache --pull nextcloud_db
+$ docker-compose up -d nextcloud_db
+$ docker system prune
+$ docker system prune
+```
+
+The first "prune" removes the old *local* image, the second removes the old *base* image.
+
 ## <a name="backups"> Backups </a>
 
 Nextcloud is currently excluded from the IOTstack-supplied backup scripts due to its potential size.
@@ -271,26 +304,25 @@ If you want to take a backup, something like the following will get the job done
 $ cd ~/IOTstack
 $ BACKUP_TAR_GZ=$PWD/backups/$(date +"%Y-%m-%d_%H%M").$HOSTNAME.nextcloud-backup.tar.gz
 $ touch "$BACKUP_TAR_GZ"
-$ docker-compose stop nextcloud nextcloud_db
-$ docker-compose rm -f nextcloud nextcloud_db
+$ docker-compose rm --force --stop -v nextcloud nextcloud_db
 $ sudo tar -czf "$BACKUP_TAR_GZ" -C "./volumes/nextcloud" .
-$ docker-compose up -d
+$ docker-compose up -d nextcloud
 ```
 
-Note:
+Notes:
 
 * A *baseline* backup takes over 400MB and about 2 minutes. Once you start adding your own data, it will take even more time and storage.
+* The `up` of the NextCloud container implies the `up` of the Nextcloud_DB container.
 
 To restore, you first need to identify the name of the backup file by looking in the `backups` directory. Then:
 
 ```
 $ cd ~/IOTstack
 $ RESTORE_TAR_GZ=$PWD/backups/2021-06-12_1321.sec-dev.nextcloud-backup.tar.gz
-$ docker-compose stop nextcloud nextcloud_db
-$ docker-compose rm -f nextcloud nextcloud_db
+$ docker-compose rm --force --stop -v nextcloud nextcloud_db
 $ sudo rm -rf ./volumes/nextcloud/*
 $ sudo tar -x --same-owner -z -f "$RESTORE_TAR_GZ" -C "./volumes/nextcloud"
-$ docker-compose up -d
+$ docker-compose up -d nextcloud
 ```
 
 If you are running from an SD card, it would be a good idea to mount an external drive to store the data. Something like:

@@ -19,7 +19,7 @@ nextcloud:
 
 nextcloud_db:
   container_name: nextcloud_db
-  image: ghcr.io/linuxserver/mariadb
+  build: ./.templates/mariadb/.
   restart: unless-stopped
   environment:
     - TZ=Etc/UTC
@@ -29,7 +29,10 @@ nextcloud_db:
     - MYSQL_PASSWORD=%randomMySqlPassword%
     - MYSQL_DATABASE=nextcloud
     - MYSQL_USER=nextcloud
+  ports:
+    - "9322:3306"
   volumes:
     - ./volumes/nextcloud/db:/config
+    - ./volumes/nextcloud/db_backup:/backup
   networks:
     - nextcloud_internal
