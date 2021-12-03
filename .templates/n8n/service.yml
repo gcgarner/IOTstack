@@ -1,0 +1,30 @@
+n8n:
+    container_name: "n8n"
+    restart: unless-stopped
+    ports:
+        - "5678:5678"
+    image: n8nio/n8n
+    stdin_open: true
+    volumes:
+        - ./volumes/n8n:/home/node/.n8n
+    networks:
+        - iotstack_nw
+# Optional DB and Timezone configs.
+#        environment:
+#           - DB_TYPE=mysqldb
+#           - DB_MYSQLDB_DATABASE=<MYSQLDB_DATABASE>
+#           - DB_MYSQLDB_HOST=<MYSQLDB_HOST>
+#           - DB_MYSQLDB_PORT=<MYSQLDB_PORT>
+#           - DB_MYSQLDB_USER=<MYSQLDB_USER>
+#           - DB_MYSQLDB_PASSWORD=<MYSQLDB_PASSWORD>
+#           - GENERIC_TIMEZONE="Europe/Berlin"
+#           - TZ="Europe/Berlin"
+# Uncomment to enable authentication
+#           - N8N_BASIC_AUTH_ACTIVE=true
+#           - N8N_BASIC_AUTH_USER=<USER>
+#           - N8N_BASIC_AUTH_PASSWORD=<PASSWORD>
+
+#            - PGID=1000
+#            - PUID=1000
+#            - USBDEVICES=/dev/ttyAMA0
+#            - PACKAGES=mc
