@@ -1,3 +1,4 @@
+# MariaDB
 ## Source
 
 * [Docker hub](https://hub.docker.com/r/linuxserver/mariadb/)
@@ -58,6 +59,8 @@ You can open a terminal session within the mariadb container via:
 ```
 $ docker exec -it mariadb bash
 ```
+
+To connect to the database: `mysql -uroot -p`
 
 To close the terminal session, either:
 
