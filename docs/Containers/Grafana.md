@@ -15,6 +15,16 @@ The default *~/IOTstack/services/grafana/grafana.env* contains this line:
 
 Uncomment that line and change the right hand side to [your own timezone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
+## Adding InfluxDB datasource
+
+Select Data Sources -> Add data source -> InfluxDB.
+
+Set options:
+
+* HTTP / URL: `http://influxdb:8086`
+* InfluxDB Details / Database: `telegraf`
+* InfluxDB Details / User: `nodered`
+* InfluxDB Details / Password: `nodered`
 
 ## Security
  
