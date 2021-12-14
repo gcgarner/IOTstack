@@ -33,8 +33,6 @@ nextcloud_db:
     - MYSQL_PASSWORD=«user_password»
     - MYSQL_DATABASE=nextcloud
     - MYSQL_USER=nextcloud
-  ports:
-    - "9322:3306"
   volumes:
     - ./volumes/nextcloud/db:/config
     - ./volumes/nextcloud/db_backup:/backup
