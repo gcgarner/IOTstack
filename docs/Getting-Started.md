@@ -178,6 +178,17 @@ $ sudo apt update
 $ sudo apt install libseccomp2 -t buster-backports
 ```
 
+### patch 3 - kernel control groups
+
+Kernel control groups need to be enabled in order to monitor container specific
+usage. This makes commands like `docker stats` fully work. Also needed for full
+monitoring of docker resource usage by the telegraf container.
+
+Enable by running (takes effect after reboot):
+```
+echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
+```
+
 ## <a name="aboutSudo"> a word about the `sudo` command </a>
 
 Many first-time users of IOTstack get into difficulty by misusing the `sudo` command. The problem is best understood by example. In the following, you would expect `~` (tilde) to expand to `/home/pi`. It does:

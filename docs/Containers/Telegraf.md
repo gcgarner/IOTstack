@@ -22,12 +22,13 @@ The purpose of the Dockerfile is to:
 │       ├── Dockerfile ❶
 │       ├── entrypoint.sh ❷
 │       ├── iotstack_defaults
-│       │   └── additions ❸
-│       └── service.yml ❹
+│       │   ├── additions ❸
+│       │   └── auto_include ❹
+│       └── service.yml ❺
 ├── services
 │   └── telegraf
-│       └── service.yml ❺
-├── docker-compose.yml ❻
+│       └── service.yml ❻
+├── docker-compose.yml
 └── volumes
     └── telegraf ❼
         ├── additions ❽
@@ -38,9 +39,10 @@ The purpose of the Dockerfile is to:
 1. The *Dockerfile* used to customise Telegraf for IOTstack.
 2. A replacement for the `telegraf` container script of the same name, extended to handle container self-repair.
 3. The *additions folder*. See [Applying optional additions](#optionalAdditions).
-4. The *template service definition*.
-5. The *working service definition* (only relevant to old-menu, copied from ❹).
-6. The *Compose* file (includes ❹).
+4. The *auto_include folder*. Additions automatically applied to
+   `telegraf.conf`. See [Automatic includes to telegraf.conf](#autoInclude).
+5. The *template service definition*.
+6. The *working service definition* (only relevant to old-menu, copied from ❹).
 7. The *persistent storage area* for the `telegraf` container.
 8. A working copy of the *additions folder* (copied from ❸). See [Applying optional additions](#optionalAdditions).
 9. The *reference configuration file*. See [Changing Telegraf's configuration](#editConfiguration).
@@ -214,21 +216,31 @@ When you make a change to `telegraf.conf`, you activate it by restarting the con
 $ cd ~/IOTstack
 $ docker-compose restart telegraf
 ```
+
+### <a name="autoInclude"> Automatic includes to telegraf.conf </a>
+
+* `inputs.docker.conf` instructs Telegraf to collect metrics from Docker. Requires kernel control
+  groups to be enabled to collect memory usage data. If not done during initial installation,
+  enable by running (reboot required):
+  ```
+  echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
+  ```
+* `inputs.cpu_temp.conf' collects cpu temperature.
  
 ### <a name="optionalAdditions"> Applying optional additions </a>
 
 The *additions folder* (see [Significant directories and files](#significantFiles)) is a mechanism for additional *IOTstack-ready* configuration options to be provided for Telegraf.
 
-At the time of writing (October 2021), two additions are provided:
+Currently there is one addition:
 
-1. `inputs.docker.conf` provided by @tablatronix, which instructs Telegraf to collect metrics from Docker.
-2. `inputs.mqtt_consumer.conf` which formed part of the [gcgarner/IOTstack telegraf configuration](https://github.com/gcgarner/IOTstack/blob/master/.templates/telegraf/telegraf.conf) and instructs Telegraf to subscribe to a metric feed from the Mosquitto broker. This assumes, of course, that something is publishing those metrics.
+1. `inputs.mqtt_consumer.conf` which formed part of the [gcgarner/IOTstack telegraf configuration](https://github.com/gcgarner/IOTstack/blob/master/.templates/telegraf/telegraf.conf) and instructs Telegraf to subscribe to a metric feed from the Mosquitto broker. This assumes, of course, that something is publishing those metrics.
 
-Using `inputs.docker.conf` as the example, applying that addition to your Telegraf configuration file involves:
+Using `inputs.mqtt_consumer.conf` as the example, applying that addition to
+your Telegraf configuration file involves:
 
 ```
 $ cd ~/IOTstack/volumes/telegraf
-$ grep -v "^#" additions/inputs.docker.conf | sudo tee -a telegraf.conf >/dev/null
+$ grep -v "^#" additions/inputs.mqtt_consumer.conf | sudo tee -a telegraf.conf >/dev/null
 $ cd ~/IOTstack
 $ docker-compose restart telegraf
 ```
