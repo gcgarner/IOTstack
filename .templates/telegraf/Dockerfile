@@ -20,6 +20,7 @@ ENV BASELINE_CONFIG=/${IOTSTACK_DEFAULTS_DIR}/telegraf-reference.conf
 ENV IOTSTACK_CONFIG=/${IOTSTACK_DEFAULTS_DIR}/telegraf.conf
 RUN cp /etc/telegraf/telegraf.conf ${BASELINE_CONFIG} && \
     cat /${IOTSTACK_DEFAULTS_DIR}/auto_include/*.conf >> ${BASELINE_CONFIG} && \
+    rm -r /${IOTSTACK_DEFAULTS_DIR}/auto_include && \
     chmod 444 ${BASELINE_CONFIG} && \
     grep -v -e "^[ ]*#" -e "^[ ]*$" ${BASELINE_CONFIG} >${IOTSTACK_CONFIG} && \
     sed -i '/^\[\[outputs.influxdb\]\]/a\ \ urls = ["http://influxdb:8086"]' ${IOTSTACK_CONFIG}
