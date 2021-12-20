@@ -5,9 +5,13 @@ set -e
 user="$(id -u)"
 if [ "$user" = '0' -a -d "/mosquitto" ]; then
 
-   rsync -arp --ignore-existing /${IOTSTACK_DEFAULTS_DIR}/ "/mosquitto"
+   echo "[IOTstack] begin self-repair"
 
-   chown -R mosquitto:mosquitto /mosquitto
+   rsync -arpv --ignore-existing /${IOTSTACK_DEFAULTS_DIR}/ "/mosquitto"
+
+   chown -Rc mosquitto:mosquitto /mosquitto
+
+   echo "[IOTstack] end self-repair"
    
 fi
 
