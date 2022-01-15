@@ -9,3 +9,5 @@ Welcome to the IOTstack Wiki:
 * If you are looking for information on a specific container, click on the "Containers" folder at the bottom of the list.
 
 * If you are just getting started with IOTstack, see [Getting Started](./Getting-Started.md).
+
+* To contribute see [Contributing Services](Developers/Contributing-Services.md)

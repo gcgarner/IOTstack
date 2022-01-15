@@ -9,8 +9,8 @@ Services will grow over time, we may split up the buildstack menu into subsectio
 * `build.py` file is correct
 * Service allows for changing external WUI port from Build Stack's options menu if service uses a HTTP/S port
 * Use a default password, or allow the user to generate a random password for the service for initial installation. If the service asks to setup an account this can be ignored.
-* Ensure [Default Configs](https://sensorsiot.github.io/IOTstack/Default-Configs) is updated with WUI port and username/password.
-* Must detect port confilicts with other services on [BuildStack](https://sensorsiot.github.io/IOTstack/Menu-System) Menu.
+* Ensure [Default Configs](../Default-Configs.md) is updated with WUI port and username/password.
+* Must detect port confilicts with other services on [BuildStack](Menu-System.md) Menu.
 * `Pre` and `Post` hooks work with no errors. 
 * Does not require user to edit config files in order to get the service running.
 * Ensure that your service can be backed up and restored without errors or data loss.
@@ -21,8 +21,9 @@ Services will grow over time, we may split up the buildstack menu into subsectio
 If your new service is approved and merged then congratulations! Please watch the Issues page on github over the next few days and weeks to see if any users have questions or issues with your new service.
 
 Links:
-* [Default configs](https://sensorsiot.github.io/IOTstack/Default-Configs)
-* [Password configuration for Services](https://sensorsiot.github.io/IOTstack/BuildStack-RandomPassword)
-* [Build Stack Menu System](https://sensorsiot.github.io/IOTstack/Menu-System)
-* [Coding a new service](https://sensorsiot.github.io/IOTstack/BuildStack-Services)
-* [IOTstack issues](https://github.com/SensorsIot/IOTstack/issues)
+
+* [Default configs](../Default-Configs.md)
+* [Password configuration for Services](BuildStack-RandomPassword.md)
+* [Build Stack Menu System](Menu-System.md)
+* [Coding a new service](BuildStack-Services.md)
+* [IOTstack issues](htps://github.com/SensorsIot/IOTstack/issues)
