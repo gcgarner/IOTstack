@@ -265,7 +265,7 @@ Nextcloud traffic is not encrypted. Do **not** expose it to the web by opening a
 
 A script , or "agent", to assess the health of the MariaDB container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
 
-Because it is an instance of MariaDB, Nextcloud_DB inherits the health-check agent. See the [IOTstack MariaDB](https://sensorsiot.github.io/IOTstack/Containers/MariaDB/) documentation for more information.
+Because it is an instance of MariaDB, Nextcloud_DB inherits the health-check agent. See the [IOTstack MariaDB](MariaDB.md) documentation for more information.
 
 ## <a name="updatingNextcloud"> Keeping Nextcloud up-to-date </a>
 

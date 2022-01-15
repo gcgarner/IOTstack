@@ -423,7 +423,7 @@ Cannot create container for service [service name here]: unknown log opt 'max-fi
 
 Logging limits were added to prevent Docker using up lots of RAM if log2ram is enabled, or SD cards being filled with log data and degraded from unnecessary IO. See [Docker Logging configurations](https://docs.docker.com/config/containers/logging/configure/)
 
-You can also turn logging off or set it to use another option for any service by using the IOTstack `docker-compose-override.yml` file mentioned at [IOTstack/Custom](https://sensorsiot.github.io/IOTstack/Custom/).
+You can also turn logging off or set it to use another option for any service by using the IOTstack `docker-compose-override.yml` file mentioned at [IOTstack/Custom](Custom.md).
 
 ### <a name="upContainer"> starting an individual container </a>
 
