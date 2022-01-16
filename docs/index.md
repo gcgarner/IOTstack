@@ -10,4 +10,4 @@ Welcome to the IOTstack Wiki:
 
 * If you are just getting started with IOTstack, see [Getting Started](./Getting-Started.md).
 
-* To contribute see [Contributing Services](Developers/Contributing-Services.md)
+* To contribute see [Contributing](Developers/Contributing.md)
