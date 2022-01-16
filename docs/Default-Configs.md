@@ -15,7 +15,7 @@ Do note that the ports listed are not all of the ports containers use. They are 
 | blynk_server   | *none*           | *none*     | 8180   | No |
 | deconz         | *none*           | IOtSt4ckDec0nZ | 8090 | No |
 | diyhue         | *none*           | *none*     | 8070   | No |
-| dozzle         | *none*           | *none*     | 8080   | No |
+| dozzle         | *none*           | *none*     | 8889   | No |
 | espruinohub    | *none*           | *none*     | *none* | No |
 | gitea          | *none*           | *none*     | 7920   | No |
 | grafana        | *none*           | *none*     | 3000   | No |
