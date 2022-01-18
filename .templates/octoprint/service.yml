@@ -14,6 +14,4 @@ octoprint:
   # - /dev/video0:/dev/video0
   volumes:
     - ./volumes/octoprint:/octoprint
-  networks:
-    - iotstack_nw
 

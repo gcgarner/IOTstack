@@ -6,6 +6,4 @@ tasmoadmin:
     - "8088:80"
   volumes:
     - ./volumes/tasmoadmin/data:/data
-  networks:
-    - iotstack_nw
 

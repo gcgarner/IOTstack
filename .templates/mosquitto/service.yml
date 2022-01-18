@@ -11,5 +11,4 @@ mosquitto:
     - ./volumes/mosquitto/data:/mosquitto/data
     - ./volumes/mosquitto/log:/mosquitto/log
     - ./volumes/mosquitto/pwfile:/mosquitto/pwfile
-  networks:
-    - iotstack_nw
+

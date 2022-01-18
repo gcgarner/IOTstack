@@ -17,5 +17,4 @@ chronograf:
   depends_on:
     - influxdb
   # - kapacitor
-  networks:
-    - iotstack_nw
+

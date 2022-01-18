@@ -14,3 +14,4 @@ domoticz:
     - PGID=1000
     # - TZ=
     # - WEBROOT=domoticz
+

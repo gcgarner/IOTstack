@@ -6,11 +6,10 @@ grafana:
   ports:
     - "3000:3000"
   environment:
+    - TZ=Etc/UTC
     - GF_PATHS_DATA=/var/lib/grafana
     - GF_PATHS_LOGS=/var/log/grafana
   volumes:
     - ./volumes/grafana/data:/var/lib/grafana
     - ./volumes/grafana/log:/var/log/grafana
-  networks:
-    - iotstack_nw
 

@@ -12,5 +12,4 @@ zigbee2mqtt:
    #- /dev/ttyACM0:/dev/ttyACM0 # should work if CC2531 connected
    #- /dev/ttyUSB0:/dev/ttyACM0 # Electrolama zig-a-zig-ah! (zzh!) maybe other as well
   restart: unless-stopped
-  networks:
-    - iotstack_nw
+
