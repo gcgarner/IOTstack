@@ -20,28 +20,4 @@ prometheus:
   depends_on:
     - cadvisor
     - nodeexporter
-  networks:
-    - iotstack_nw
 
-cadvisor:
-  container_name: cadvisor
-  image: zcube/cadvisor:latest
-  restart: unless-stopped
-  ports:
-    - "8082:8080"
-  volumes:
-    - /:/rootfs:ro
-    - /var/run:/var/run:rw
-    - /sys:/sys:ro
-    - /var/lib/docker/:/var/lib/docker:ro
-  networks:
-    - iotstack_nw
-
-nodeexporter:
-  container_name: nodeexporter
-  image: prom/node-exporter:latest
-  restart: unless-stopped
-  expose:
-    - "9100"
-  networks:
-    - iotstack_nw

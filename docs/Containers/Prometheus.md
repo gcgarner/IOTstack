@@ -1,24 +1,5 @@
 # Prometheus
 
-- [References](#references)
-- [Significant directories and files](#significantFiles)
-- [How Prometheus gets built for IOTstack](#howPrometheusIOTstackGetsBuilt)
-	- [Prometheus source code](#githubSourceCode)
-	- [Prometheus images](#dockerHubImages)
-	- [IOTstack menu](#iotstackMenu)
-	- [IOTstack first run](#iotstackFirstRun)
-	- [Dependencies: *CAdvisor* and *Node Exporter*](#dependencies)
-- [Configuring Prometheus](#configuringPrometheus)
-	- [Configuration directory](#configDir)
-		- [Active configuration file](#activeConfig)
-		- [Reference configuration file](#referenceConfig)
-	- [Environment variables](#environmentVars)
-	- [Migration considerations](#migration)
-- [Upgrading Prometheus](#upgradingPrometheus)
-	- [Prometheus version pinning](#versionPinning)
-
-<hr>
-
 ## <a name="references"> References </a>
 
 * [*Prometheus* home](https://prometheus.io)
@@ -36,13 +17,32 @@
 
 ## <a name="overview"> Overview </a>
 
-Three containers are installed when you select *Prometheus* in the IOTstack menu:
+Prometheus is a collection of three containers:
 
 * *Prometheus*
 * *CAdvisor*
 * *Node Exporter*
 
 The [default configuration](#activeConfig) for *Prometheus* supplied with IOTstack scrapes information from all three containers.
+
+## <a name="installProm"> Installing Prometheus </a>
+
+### <a name="installPromNewMenu"> *if you are running New Menu …* </a>
+
+When you select *Prometheus* in the IOTstack menu, you must also select:
+
+*	*prometheus-cadvisor;* and
+* 	*prometheus-nodeexporter*.
+
+If you do not select all three containers, Prometheus will not start.
+
+### <a name="installPromOldMenu"> *if you are running Old Menu …* </a>
+
+When you select *Prometheus* in the IOTstack menu, the service definition includes the three containers:
+
+* *Prometheus*
+* *CAdvisor*
+* *Node Exporter*
 
 ## <a name="significantFiles"> Significant directories and files </a>
 
@@ -276,11 +276,11 @@ Note:
 
 ## <a name="upgradingPrometheus"> Upgrading *Prometheus* </a>
 
-You can update most containers like this:
+You can update `cadvisor` and `nodeexporter` like this:
 
 ```bash
 $ cd ~/IOTstack
-$ docker-compose pull
+$ docker-compose pull cadvisor nodeexporter
 $ docker-compose up -d
 $ docker system prune
 ```
@@ -290,8 +290,6 @@ In words:
 * `docker-compose pull` downloads any newer images;
 * `docker-compose up -d` causes any newly-downloaded images to be instantiated as containers (replacing the old containers); and
 * the `prune` gets rid of the outdated images.
-
-The auxiliary containers `cadvisor` and `nodeexporter` are updated via this method.
 
 This "simple pull" strategy doesn't work when a *Dockerfile* is used to build a *local image* on top of a *base image* downloaded from [*DockerHub*](https://hub.docker.com). The *local image* is what is running so there is no way for the `pull` to sense when a newer version becomes available.
 
