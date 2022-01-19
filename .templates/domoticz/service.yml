@@ -2,7 +2,7 @@ domoticz:
   container_name: domoticz
   image: linuxserver/domoticz:stable
   ports:
-    - "8080:8080"
+    - "8083:8080"
     - "6144:6144"
     - "1443:1443"
   volumes:
