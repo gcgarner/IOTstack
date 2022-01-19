@@ -275,6 +275,14 @@ function do_env_checks() {
 	fi
 }
 
+function do_kernel_checks() {
+    if ! grep -q "cgroup_memory=1 cgroup_enable=memory" /boot/cmdline.txt; then
+        echo "Kernel cgroups not enabled. Adding kernel parameters." >&2
+        echo "You will need to restart your system before the changes take effect."
+        echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
+    fi
+}
+
 touch .new_install
 echo "Enter in the sudo password when prompted, to install dependencies"
 
@@ -306,3 +314,4 @@ if [ ! "$(user_in_group docker)" == "true" ]; then
 	sudo usermod -G "docker" -a $USER
 fi
 do_env_checks
+do_kernel_checks
