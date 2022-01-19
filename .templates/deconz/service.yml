@@ -18,6 +18,5 @@ deconz:
     - DEBUG_ZCL=0
     - DEBUG_ZDP=0
     - DEBUG_OTAU=0
-  networks:
-    - iotstack_nw
+
 

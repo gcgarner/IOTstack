@@ -13,3 +13,4 @@ homebridge:
   #ports:
   #  - "4040:4040"
   network_mode: host
+

@@ -30,6 +30,4 @@ adguardhome:
   volumes:
      - ./volumes/adguardhome/workdir:/opt/adguardhome/work
      - ./volumes/adguardhome/confdir:/opt/adguardhome/conf
-  networks:
-    - iotstack_nw
-    - vpn_nw
+

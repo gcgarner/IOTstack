@@ -8,3 +8,4 @@ home_assistant:
   volumes:
     - /etc/localtime:/etc/localtime:ro
     - ./volumes/home_assistant:/config
+

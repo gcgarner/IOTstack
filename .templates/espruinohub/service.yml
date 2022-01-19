@@ -4,3 +4,4 @@ espruinohub:
   network_mode: host
   privileged: true
   restart: unless-stopped
+

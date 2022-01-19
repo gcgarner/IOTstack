@@ -7,8 +7,6 @@ n8n:
     stdin_open: true
     volumes:
         - ./volumes/n8n:/home/node/.n8n
-    networks:
-        - iotstack_nw
 # Optional DB and Timezone configs.
 #        environment:
 #           - DB_TYPE=mysqldb
@@ -28,3 +26,4 @@ n8n:
 #            - PUID=1000
 #            - USBDEVICES=/dev/ttyAMA0
 #            - PACKAGES=mc
+

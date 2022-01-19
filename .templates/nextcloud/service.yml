@@ -14,8 +14,8 @@ nextcloud:
   depends_on:
     - nextcloud_db
   networks:
-    - iotstack_nw
-    - nextcloud_internal
+    - default
+    - nextcloud
 
 nextcloud_db:
   container_name: nextcloud_db
@@ -35,4 +35,5 @@ nextcloud_db:
     - ./volumes/nextcloud/db:/config
     - ./volumes/nextcloud/db_backup:/backup
   networks:
-    - nextcloud_internal
+    - nextcloud
+

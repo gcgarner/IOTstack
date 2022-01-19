@@ -11,5 +11,4 @@ gitea:
   volumes:
     - ./volumes/gitea/data:/data
     - /etc/timezone:/etc/timezone:ro
-  networks:
-    - iotstack_nw
+

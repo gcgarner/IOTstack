@@ -10,5 +10,4 @@ python:
   #   - "external:internal"
   volumes:
     - ./volumes/python/app:/usr/src/app
-  networks:
-    - iotstack_nw
+

@@ -9,3 +9,4 @@ homer:
   ports:
     - "8881:8080"
   restart: unless-stopped
+

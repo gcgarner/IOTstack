@@ -11,7 +11,6 @@ Assumptions:
 * These instructions assume that you have privileges to configure your network's gateway (router). If you are not able to make changes to your network's firewall settings, then you will not be able to finish this setup.
 * In common with most VPN technologies, WireGuard assumes that the WAN side of your network's gateway has a public IP address which is reachable directly. WireGuard may not work if that assumption does not hold. If you strike this problem, you have to take it up with your ISP.
 
-
 ## <a name="installWireguard"> Installing WireGuard under IOTstack </a>
 
 You increase your chances of a trouble-free installation by performing the installation steps in the following order.
@@ -37,29 +36,30 @@ Before you can use WireGuard (or any VPN solution), you need a mechanism for you
 This is the service definition *template* that IOTstack uses for WireGuard:
 
 ```yml
-  wireguard:
-    container_name: wireguard
-    image: ghcr.io/linuxserver/wireguard
-    restart: unless-stopped
-    environment:
-    - PUID=1000
-    - PGID=1000
-    - TZ=Etc/UTC
-    - SERVERURL=your.dynamic.dns.name
-    - SERVERPORT=51820
-    - PEERS=laptop,phone,tablet
-    - PEERDNS=auto
-    - ALLOWEDIPS=0.0.0.0/0
-    ports:
-    - "51820:51820/udp"
-    volumes:
-    - ./volumes/wireguard:/config
-    - /lib/modules:/lib/modules:ro
-    cap_add:
-    - NET_ADMIN
-    - SYS_MODULE
-    sysctls:
-    - net.ipv4.conf.all.src_valid_mark=1
+wireguard:
+  container_name: wireguard
+  image: ghcr.io/linuxserver/wireguard
+  restart: unless-stopped
+  environment:
+  - PUID=1000
+  - PGID=1000
+  - TZ=Etc/UTC
+  - SERVERURL=your.dynamic.dns.name
+  - SERVERPORT=51820
+  - PEERS=laptop,phone,tablet
+  - PEERDNS=auto
+  # - PEERDNS=172.30.0.1
+  - ALLOWEDIPS=0.0.0.0/0
+  ports:
+  - "51820:51820/udp"
+  volumes:
+  - ./volumes/wireguard:/config
+  - /lib/modules:/lib/modules:ro
+  cap_add:
+  - NET_ADMIN
+  - SYS_MODULE
+  sysctls:
+  - net.ipv4.conf.all.src_valid_mark=1
 ```
 
 Unfortunately, that service definition will not work "as is". It needs to be configured.
@@ -103,9 +103,60 @@ With most containers, you can continue to tweak environment variables and settin
 
 #### <a name="configurePeerDNS"> Optional configuration - DNS resolution for peers </a>
 
-* `PEERDNS=`. The default value of `auto` instructs the WireGuard container to use the same DNS as other containers when resolving requests from connected peers. In practice, that means the container directs queries to 127.0.0.11, which Docker intercepts and forwards to whichever resolvers are specified in the Raspberry Pi's `/etc/resolv.conf`.
+You have several options for how your remote peers resolve DNS requests:
 
-	If you have a local upstream DNS server, you can change this setting so that queries are directed to that server. For example:
+* `PEERDNS=auto`
+
+	The default value of `auto` instructs the WireGuard *service* running within the WireGuard *container* to use the same DNS as the WireGuard *container* when resolving requests from connected peers. In practice, that means the *service* directs queries to 127.0.0.11, which Docker intercepts and forwards to whichever resolvers are specified in the Raspberry Pi's `/etc/resolv.conf`.
+
+* <a name="customContInit"> `PEERDNS=auto` with `custom-cont-init` </a>
+
+	This configuration instructs WireGuard to forward DNS queries from remote peers to any **container** which is listening on port 53. This is the option you will want to choose if you are running an ad-blocking DNS server (eg *PiHole* or *AdGuardHome*) in a container on the same host as WireGuard, and you want your remote clients to obtain DNS resolution via the ad-blocker.
+
+	> Acknowledgement: thanks to @ukkopahis for developing this option.
+
+	To activate this feature:
+
+	1. Make sure your WireGuard service definition contains `PEERDNS=auto`.
+	2. Start the WireGuard container by executing:
+
+		```bash
+		$ cd ~/IOTstack
+		$ docker-compose up -d wireguard
+		```
+
+		This ensures that the `~/IOTstack/volumes/wireguard` folder structure is created and remote client configurations are (re)generated properly.
+
+	3. Run the following commands:  
+
+		```bash
+		$ cd ~/IOTstack
+		$ sudo cp ./.templates/wireguard/use-container-dns.sh ./volumes/wireguard/custom-cont-init.d/
+		$ docker-compose restart wireguard
+		```
+
+	 	The presence of `use-container-dns.sh` causes WireGuard to redirect incoming DNS queries to the default gateway on the internal bridged network. That, in turn, results in the queries being forwarded to any other container that is listening for DNS traffic on port 53. It does not matter if that other container is PiHole, AdGuardHome, bind9 or any other kind of DNS server.
+	 
+	 	Do note, however, that this configuration creates a dependency between WireGuard and the container providing DNS resolution. You may wish to make that explicit in your `docker-compose.yml` by adding these lines to your WireGuard service definition:
+	 
+		```yaml
+		depends_on:
+		  - pihole
+		```
+
+	 	> Substitute `adguardhome` or `bind9` for `pihole`, as appropriate.
+
+	Once activated, this feature will remain active until you decide to deactivate it. If you ever wish to deactivate it, run the following commands:
+
+	```bash
+	$ cd ~/IOTstack
+	$ sudo rm ./volumes/wireguard/custom-cont-init.d/use-container-dns.sh
+	$ docker-compose restart wireguard
+	```
+
+* `PEERDNS=«ip address»`
+
+	A third possibility is if you have a local upstream DNS server. You can specify the IP address of that server so that remote peers receive DNS resolution from that host. For example:
 
 	```yml
 	- PEERDNS=192.168.203.65
@@ -535,7 +586,7 @@ $ docker system prune
 
 ## <a name="cleanSlate"> Getting a clean slate </a>
 
-If WireGuard misbehaves, you can start over from a clean slate. You also need to do this if you change any of the following environment variables:
+If WireGuard misbehaves, you can start over from a clean slate. You *may* also need to do this if you change any of the following environment variables:
 
 ```yml
 - SERVERURL=
@@ -561,7 +612,10 @@ The procedure is:
 
 	> Be very careful with that command and double-check your work **before** you hit <kbd>return</kbd>.
 
-	Erasing the persistent storage area destroys the old client configurations and invalidates any copies of QR codes. Existing clients will stop working until presented with a new QR code.
+	Erasing the persistent storage area:
+
+	* destroys the old client configurations and invalidates any copies of QR codes. Existing clients will stop working until presented with a new QR code.
+	* deactivates [`PEERDNS=auto` with `custom-cont-init`](#customContInit).
 
 3. Start WireGuard:
 
@@ -570,3 +624,5 @@ The procedure is:
 	```
 
 	This will generate new client configurations and QR codes for your devices.
+
+	Remember to re-activate [`PEERDNS=auto` with `custom-cont-init`](#customContInit) if you need it.

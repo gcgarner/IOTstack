@@ -9,6 +9,4 @@ motioneye:
     - /etc/localtime:/etc/localtime:ro
     - ./volumes/motioneye/etc_motioneye:/etc/motioneye
     - ./volumes/motioneye/var_lib_motioneye:/var/lib/motioneye
-  networks:
-    - iotstack_nw
 

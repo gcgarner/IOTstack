@@ -10,3 +10,4 @@ plex:
     - ./volumes/plex/config:/config
     - ./volumes/plex/transcode:/transcode
   restart: unless-stopped
+

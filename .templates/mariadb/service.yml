@@ -15,5 +15,4 @@ mariadb:
   ports:
     - "3306:3306"
   restart: unless-stopped
-  networks:
-    - iotstack_nw
+

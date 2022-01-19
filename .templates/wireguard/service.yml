@@ -10,6 +10,7 @@ wireguard:
   - SERVERPORT=51820
   - PEERS=laptop,phone,tablet
   - PEERDNS=auto
+  # - PEERDNS=172.30.0.1
   - ALLOWEDIPS=0.0.0.0/0
   ports:
   - "51820:51820/udp"
@@ -21,3 +22,4 @@ wireguard:
   - SYS_MODULE
   sysctls:
   - net.ipv4.conf.all.src_valid_mark=1
+

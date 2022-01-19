@@ -17,5 +17,4 @@ kapacitor:
     - ./volumes/kapacitor:/var/lib/kapacitor
   depends_on:
     - influxdb
-  networks:
-    - iotstack_nw
+
