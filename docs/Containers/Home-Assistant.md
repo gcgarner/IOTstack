@@ -222,6 +222,119 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
+## HTTPS with a valid certificate
+
+Some HA integrations (e.g google assistant) require your HA API to be
+accessible via https with a valid certificate. You can configure HA to do this:
+[docs](https://www.home-assistant.io/docs/configuration/remote/) /
+[guide](https://www.home-assistant.io/docs/ecosystem/certificates/lets_encrypt/)
+or use a reverse proxy container, as described below.
+
+The linuxserver Secure Web Access Gateway container
+([swag](https://docs.linuxserver.io/general/swag)) ([Docker hub
+docs](https://hub.docker.com/r/linuxserver/swag)) will automatically generate a
+SSL-certificate, update the SSL certificate before it expires and act as a
+reverse proxy.
+
+1. First test your HA is working correctly: `http://raspberrypi.local:8123/` (assuming
+your RPi hostname is raspberrypi)
+2. Make sure you have duckdns working.
+3. On your internet router, forward public port 443 to the RPi port 443
+4. Add swag to ~/IOTstack/docker-compose.yml beneath the `services:`-line:
+```
+  swag:
+    image: ghcr.io/linuxserver/swag
+    cap_add:
+      - NET_ADMIN
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - URL=<yourdomain>.duckdns.org
+      - SUBDOMAINS=wildcard
+      - VALIDATION=duckdns
+      - DUCKDNSTOKEN=<token>
+      - CERTPROVIDER=zerossl
+      - EMAIL=<e-mail> # required when using zerossl
+    volumes:
+      - ./volumes/swag/config:/config
+    ports:
+      - 443:443
+    restart: unless-stopped
+```
+    Replace the bracketed values. Do NOT use any "-characters to enclose the values.
+
+5. Start the swag container, this creates the file to be edited in the next step:
+   ```
+   cd ~/IOTstack && docker-compose up -d
+   ```
+
+    Check it starts up OK: `docker-compose logs -f swag`. It will take a minute or two before it finally logs "Server ready".
+
+6. Enable reverse proxy for `raspberrypi.local`. `homassistant.*` is already by default. and fix homeassistant container name ("upstream_app"):
+      ```
+      sed -e 's/server_name/server_name *.local/' \
+          volumes/swag/config/nginx/proxy-confs/homeassistant.subdomain.conf.sample \
+          > volumes/swag/config/nginx/proxy-confs/homeassistant.subdomain.conf
+      ```
+
+7. Forward to correct IP when target is a container running in "network_mode:
+   host" (like Home Assistant does):
+   ```
+   cat << 'EOF' | sudo tee volumes/swag/config/custom-cont-init.d/add-host.docker.internal.sh
+   #!/bin/sh
+   DOCKER_GW=$(ip route | awk 'NR==1 {print $3}')
+
+   sed -i -e "s/upstream_app .*/upstream_app ${DOCKER_GW};/" \
+       /config/nginx/proxy-confs/homeassistant.subdomain.conf
+   EOF
+   sudo chmod u+x volumes/swag/config/custom-cont-init.d/add-host.docker.internal.sh
+   ```
+   (This needs to be copy-pasted/entered as-is, ignore any "> "-prefixes printed
+   by bash)
+
+8. (optional) Add reverse proxy password protection if you don't want to rely
+   on the HA login for security, doesn't affect API-access:
+    ```
+    sed -i -e 's/#auth_basic/auth_basic/' \
+        volumes/swag/config/nginx/proxy-confs/homeassistant.subdomain.conf
+    docker-compose exec swag htpasswd -c /config/nginx/.htpasswd anyusername
+    ```
+9. Add `use_x_forwarded_for` and `trusted_proxies` to your homeassistant [http
+   config](https://www.home-assistant.io/integrations/http). The configuration
+   file is at `volumes/home_assistant/configuration.yaml` For a default install
+   the resulting http-section should be:
+   ```
+   http:
+      use_x_forwarded_for: true
+      trusted_proxies:
+        - 192.168.0.0/16
+        - 172.16.0.0/12
+        - 10.77.0.0/16
+   ```
+10. Refresh the stack: `cd ~/IOTstack && docker-compose stop && docker-compose
+    up -d` (again may take 1-3 minutes for swag to start if it recreates
+    certificates)
+11. Test homeassistant is still working correctly:
+    `http://raspberrypi.local:8123/` (assuming your RPi hostname is
+    raspberrypi)
+12. Test the reverse proxy https is working correctly:
+    `https://raspberrypi.local/` (browser will issue a warning about wrong
+    certificate domain, as the certificate is issued for you duckdns-domain, we
+    are just testing)
+
+    Or from the command line in the RPi:
+    ```
+    curl --resolve homeassistant.<yourdomain>.duckdns.org:443:127.0.0.1 \
+        https://homeassistant.<yourdomain>.duckdns.org/
+    ```
+    (output should end in `if (!window.latestJS) { }</script></body></html>`)
+
+13. And finally test your router forwards correctly by accessing it from
+    outside your LAN(e.g. using a mobile phone):
+    `https://homeassistant.<yourdomain>.duckdns.org/` Now the certificate
+    should work without any warnings.
+
 ## Deactivating Hass.io
 
 Because Hass.io is independent of IOTstack, you can't deactivate it with any of the commands you normally use for IOTstack.
