@@ -12,4 +12,4 @@ echo "to exit type: EXIT"
 echo ""
 echo "docker exec -it influxdb influx"
 
-docker exec -it influxdb influx
+docker exec -it influxdb influx $*
