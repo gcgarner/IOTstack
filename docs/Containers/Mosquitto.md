@@ -6,7 +6,7 @@ This document discusses an IOTstack-specific version of Mosquitto built on top o
  
 <hr>
 
-## <a name="references"> References </a>
+## References
 
 - [*Eclipse Mosquitto* home](https://mosquitto.org)
 - [*GitHub*: eclipse/mosquitto](https://github.com/eclipse/mosquitto)
@@ -14,7 +14,7 @@ This document discusses an IOTstack-specific version of Mosquitto built on top o
 - [Setting up passwords](https://www.youtube.com/watch?v=1msiFQT_flo) (video)
 - [Tutorial: from MQTT to InfluxDB via Node-Red](https://gist.github.com/Paraphraser/c9db25d131dd4c09848ffb353b69038f)
 
-## <a name="significantFiles"> Significant directories and files </a>
+## Significant directories and files
 
 ```
 ~/IOTstack
@@ -57,23 +57,23 @@ This document discusses an IOTstack-specific version of Mosquitto built on top o
 	* You will normally need `sudo` to make changes in this area.
 	* Each time Mosquitto starts, it automatically replaces anything originating in ❹ that has gone missing from ❼. This "self-repair" function is intended to provide reasonable assurance that Mosquitto will at least **start** instead of going into a restart loop.
 
-## <a name="howMosquittoIOTstackGetsBuilt"> How Mosquitto gets built for IOTstack </a>
+## How Mosquitto gets built for IOTstack
 
-### <a name="githubSourceCode"> Mosquitto source code ([*GitHub*](https://github.com)) </a>
+### Mosquitto source code ([*GitHub*](https://github.com))
 
 The source code for Mosquitto lives at [*GitHub* eclipse/mosquitto](https://github.com/eclipse/mosquitto).
 
-### <a name="dockerHubImages"> Mosquitto images ([*DockerHub*](https://hub.docker.com)) </a>
+### Mosquitto images ([*DockerHub*](https://hub.docker.com))
 
 Periodically, the source code is recompiled and the resulting image is pushed to [eclipse-mosquitto](https://hub.docker.com/_/eclipse-mosquitto?tab=tags&page=1&ordering=last_updated) on *DockerHub*.
  
-### <a name="iotstackMenu"> IOTstack menu </a>
+### IOTstack menu
 
 When you select Mosquitto in the IOTstack menu, the *template service definition* is copied into the *Compose* file.
 
 > Under old menu, it is also copied to the *working service definition* and then not really used.
 
-### <a name="iotstackFirstRun"> IOTstack first run </a>
+### IOTstack first run
 
 On a first install of IOTstack, you run the menu, choose Mosquitto as one of your containers, and are told to do this:
 
@@ -82,7 +82,7 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
-> See also the [Migration considerations](#migration) (below).
+> See also the [Migration considerations](#migration-considerations) (below).
 
 `docker-compose` reads the *Compose* file. When it arrives at the `mosquitto` fragment, it finds:
 
@@ -107,7 +107,7 @@ The *Dockerfile* begins with:
 FROM eclipse-mosquitto:latest
 ```
 
-> If you need to pin to a particular version of Mosquitto, the *Dockerfile* is the place to do it. See [Mosquitto version pinning](#versionPinning).
+> If you need to pin to a particular version of Mosquitto, the *Dockerfile* is the place to do it. See [Mosquitto version pinning](#mosquitto-version-pinning).
 
 The `FROM` statement tells the build process to pull down the ***base image*** from [*DockerHub*](https://hub.docker.com).
 
@@ -142,7 +142,7 @@ eclipse-mosquitto               latest      46ad1893f049   4 weeks ago    8.31MB
 
 You will see the same pattern in Portainer, which reports the *base image* as "unused". You should not remove the *base* image, even though it appears to be unused.
 
-### <a name="migration"> Migration considerations </a>
+### Migration considerations
 
 Under the original IOTstack implementation of Mosquitto (just "as it comes" from *DockerHub*), the service definition expected the configuration files to be at:
 
@@ -203,7 +203,7 @@ Using `mosquitto.conf` as the example, assume you wish to use your existing file
 
 5. If necessary, repeat these steps with `filter.acl`.
 
-## <a name="logging"> Logging </a>
+## Logging
 
 Mosquitto logging is controlled by `mosquitto.conf`. This is the default configuration:
 
@@ -246,9 +246,9 @@ $ sudo tail ~/IOTstack/volumes/mosquitto/log/mosquitto.log
 
 Logs written to `mosquitto.log` do not disappear when your IOTstack is restarted. They persist until you take action to prune the file.
 
-## <a name="security"> Security </a>
+## Security
 
-### <a name="securityConfiguration"> Configuring security </a>
+### Configuring security
 
 Mosquitto security is controlled by `mosquitto.conf`. These are the relevant directives:
 
@@ -267,7 +267,7 @@ enabled         | true              | credentials optional |                   |
 enabled         | false             | credentials required |                   |
 
 
-### <a name="passwordManagement"> Password file management </a>
+### Password file management
 
 The password file for Mosquitto is part of a mapped volume:
 
@@ -285,7 +285,7 @@ The Mosquitto container performs self-repair each time the container is brought 
 
 * If `false` then **all** MQTT requests will be rejected.
 
-#### <a name="passwordCreation"> create username and password </a>
+#### create username and password
 
 To create a username and password, use the following as a template.
  
@@ -301,9 +301,9 @@ $ docker exec mosquitto mosquitto_passwd -b /mosquitto/pwfile/pwfile hello world
 
 Note:
 
-* See also [customising health-check](#healthCheckCustom). If you are creating usernames and passwords, you may also want to create credentials for the health-check agent.
+* See also [customising health-check](#customising-health-check). If you are creating usernames and passwords, you may also want to create credentials for the health-check agent.
 
-#### <a name="checkPasswordFile"> check password file </a>
+#### check password file
 
 There are two ways to verify that the password file exists and has the expected content:
 
@@ -327,7 +327,7 @@ Each credential starts with the username and occupies one line in the file:
 hello:$7$101$ZFOHHVJLp2bcgX+h$MdHsc4rfOAhmGG+65NpIEJkxY0beNeFUyfjNAGx1ILDmI498o4cVOaD9vDmXqlGUH9g6AgHki8RPDEgjWZMkDA==
 ```
 
-#### <a name="deletePassword"> remove entry from password file </a>
+#### remove entry from password file
 
 To remove an entry from the password file:
 
@@ -335,7 +335,7 @@ To remove an entry from the password file:
 $ docker exec mosquitto mosquitto_passwd -D /mosquitto/pwfile/pwfile «username»
 ```
 
-#### <a name="resetPasswordFile"> reset the password file </a>
+#### reset the password file
 
 There are several ways to reset the password file. Your options are:
 
@@ -366,7 +366,7 @@ There are several ways to reset the password file. Your options are:
 
 	The result is an empty password file.
 
-### <a name="activateSecurity"> Activate Mosquitto security </a>
+### Activate Mosquitto security
 
 1. Use `sudo` and your favourite text editor to open the following file:
 
@@ -409,15 +409,15 @@ There are several ways to reset the password file. Your options are:
 	$ docker-compose restart mosquitto
 	```
 
-### <a name="testSecurity"> Testing Mosquitto security </a>
+### Testing Mosquitto security
 
-#### <a name="testAssumptions"> assumptions </a>
+#### assumptions
 
 1. You have created at least one username ("hello") and password ("world").
 2. `password_file` is enabled.
 3. `allow_anonymous` is `false`.
 
-#### <a name="installTestTools"> install testing tools </a>
+#### install testing tools
 
 If you do not have the Mosquitto clients installed on your Raspberry Pi (ie `$ which mosquitto_pub` does not return a path), install them using:
 
@@ -425,7 +425,7 @@ If you do not have the Mosquitto clients installed on your Raspberry Pi (ie `$ w
 $ sudo apt install -y mosquitto-clients
 ```
 
-#### <a name="anonymousDenied"> test: *anonymous access is prohibited* </a>
+#### test: *anonymous access is prohibited*
 
 Test **without** providing credentials:
 
@@ -439,7 +439,7 @@ Note:
 
 * The error is the expected result and shows that Mosquitto will not allow anonymous access.
 
-#### <a name="pubPermitted"> test: *access with credentials is permitted* </a>
+#### test: *access with credentials is permitted*
 
 Test with credentials
 
@@ -452,7 +452,7 @@ Note:
 
 * The absence of any error message means the message was sent. Silence = success!
 
-#### <a name="pubSubPermitted"> test: *round-trip with credentials is permitted* </a>
+#### test: *round-trip with credentials is permitted*
 
 Prove round-trip connectivity will succeed when credentials are provided. First, set up a subscriber as a background process. This mimics the role of a process like Node-Red:
 
@@ -480,9 +480,9 @@ $
 [1]+  Terminated              mosquitto_sub -v -h 127.0.0.1 -p 1883 -t "/password/test" -F "%I %t %p" -u hello -P world
 ```
 
-## <a name="healthCheck"> Container health check </a>
+## Container health check
 
-### <a name="healthCheckTheory"> theory of operation </a>
+### theory of operation
 
 A script , or "agent", to assess the health of the Mosquitto container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
 
@@ -497,7 +497,7 @@ The agent is invoked 30 seconds after the container starts, and every 30 seconds
 * Subscribes to the same broker for the same topic for a single message event.
 * Compares the payload sent with the payload received. If the payloads (ie time-stamps) match, the agent concludes that the Mosquitto broker (the process running inside the same container) is functioning properly for round-trip messaging.
 
-### <a name="healthCheckMonitor"> monitoring health-check </a>
+### monitoring health-check
 
 Portainer's *Containers* display contains a *Status* column which shows health-check results for all containers that support the feature.
 
@@ -543,7 +543,7 @@ Notes:
 * If you enable authentication for your Mosquitto broker, you will need to add `-u «user»` and `-P «password»` parameters to this command.
 * You should expect to see a new message appear approximately every 30 seconds. That indicates the health-check agent is functioning normally. Use <kbd>control</kbd>+<kbd>c</kbd> to terminate the command.
 
-### <a name="healthCheckCustom"> customising health-check </a>
+### customising health-check
 
 You can customise the operation of the health-check agent by editing the `mosquitto` service definition in your *Compose* file:
 
@@ -563,7 +563,7 @@ You can customise the operation of the health-check agent by editing the `mosqui
 
 	Note:
 
-	* You will also need to use the same topic string in the `mosquitto_sub` command shown at [monitoring health-check](#healthCheckMonitor).
+	* You will also need to use the same topic string in the `mosquitto_sub` command shown at [monitoring health-check](#monitoring-health-check).
 
 3. If you have enabled authentication for your Mosquitto broker service, you will need to provide appropriate credentials for your health-check agent:
 
@@ -592,7 +592,7 @@ You can customise the operation of the health-check agent by editing the `mosqui
 
 		You must remove the entire `healthcheck:` clause.
 
-## <a name="upgradingMosquitto"> Upgrading Mosquitto </a>
+## Upgrading Mosquitto
 
 You can update most containers like this:
 
@@ -634,7 +634,7 @@ Your existing Mosquitto container continues to run while the rebuild proceeds. O
 
 The `prune` is the simplest way of cleaning up. The first call removes the old *local image*. The second call cleans up the old *base image*.
 
-### <a name="versionPinning"> Mosquitto version pinning </a>
+### Mosquitto version pinning
 
 If you need to pin Mosquitto to a particular version:
 
@@ -670,7 +670,7 @@ Note:
 
 * As well as preventing Docker from updating the *base image*, pinning will also block incoming updates to the *Dockerfile* from a `git pull`. Nothing will change until you decide to remove the pin.
 
-## <a name="aboutPort9001"> About Port 9001 </a>
+## About Port 9001
 
 Earlier versions of the IOTstack service definition for Mosquitto included two port mappings:
 

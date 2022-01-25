@@ -2,7 +2,7 @@
 
 Home Assistant is a home automation platform running on Python 3. It is able to track and control all devices at your home and offer a platform for automating control.
 
-## <a name="references"> References </a>
+## References
 
 - [Home Assistant home page](https://www.home-assistant.io/)
 
@@ -31,7 +31,7 @@ Note:
 
 * Technically, both versions can **run** at the same time but it is not **supported**. Each version runs in "host mode" and binds to port 8123 so, in practice, the first version to start will claim the port and the second version will then be blocked.
 
-### <a name="versionHassio"> Hass.io </a>
+### Hass.io
 
 Hass.io uses its own orchestration:
 
@@ -45,13 +45,13 @@ Hass.io uses its own orchestration:
 
 IOTstack can only offer limited configuration of Hass.io since it is its own platform.
 
-### <a name="versionHAContainer"> Home Assistant Container </a>
+### Home Assistant Container
 
 Home Assistant Container runs as a single Docker container, and doesn't support all the features that Hass.io does (such as add-ons).
 
-## <a name="menuInstallation"> Menu installation </a>
+## Menu installation
 
-### <a name="installHassio"> Installing Hass.io </a>
+### Installing Hass.io
 
 Hass.io creates a conundrum:
 
@@ -59,7 +59,7 @@ Hass.io creates a conundrum:
 * One of Hass.io's dependencies is [Network Manager](https://wiki.archlinux.org/index.php/NetworkManager). Network Manager makes **serious** changes to your operating system, with side-effects you may not expect such as giving your Raspberry Pi's WiFi interface a random MAC address both during the installation and, then, each time you reboot. You are in for a world of pain if you install Network Manager without first understanding what is going to happen and planning accordingly.
 * If you don't install Hass.io's dependencies before you install Docker, you will either have to uninstall Docker or rebuild your system. This is because both Docker and Network Manager adjust your Raspberry Pi's networking. Docker is happy to install after Network Manager, but the reverse is not true.
 
-#### <a name="uninstallDocker"> Step 1: If Docker is already installed, uninstall it </a>
+#### Step 1: If Docker is already installed, uninstall it
 
 ```bash
 $ sudo apt -y purge docker-ce docker-ce-cli containerd.io
@@ -71,21 +71,21 @@ Note:
 
 * Removing Docker does **not** interfere with your existing `~/IOTstack` folder.
 
-#### <a name="aptUpdate"> Step 2: Ensure your system is fully up-to-date </a>
+#### Step 2: Ensure your system is fully up-to-date
 
 ```bash
 $ sudo apt update
 $ sudo apt upgrade -y
 ```
 
-#### <a name="hassioDependencies1"> Step 3: Install Hass.io dependencies (stage 1) </a>
+#### Step 3: Install Hass.io dependencies (stage 1)
 
 ```bash
 $ sudo apt install -y apparmor apparmor-profiles apparmor-utils
 $ sudo apt install -y software-properties-common apt-transport-https ca-certificates dbus
 ```
 
-#### <a name="useEthernet"> Step 4: Connect to your Raspberry Pi via Ethernet </a>
+#### Step 4: Connect to your Raspberry Pi via Ethernet
 
 You can skip this step if you interact with your Raspberry Pi via a screen connected to its HDMI port, along with a keyboard and mouse.
 
@@ -127,7 +127,7 @@ You *may* be able to re-connect after the WiFi interface acquires a new IP addre
 
 The advice about using Ethernet is well-intentioned. You should heed this advice even if means you need to temporarily relocate your Raspberry Pi just so you can attach it via Ethernet for the next few steps. You can go back to WiFi later, once everything is set up. You have been warned!
 
-#### <a name="hassioDependencies2"> Step 5: Install Hass.io dependencies (stage 2) </a>
+#### Step 5: Install Hass.io dependencies (stage 2)
 
 Install Network Manager:
 
@@ -135,9 +135,9 @@ Install Network Manager:
 $ sudo apt install -y network-manager
 ```
 
-#### <a name="disableRandomMac1"> Step 6: Consider disabling random MAC address allocation </a>
+#### Step 6: Consider disabling random MAC address allocation
 
-To understand why you should consider disabling random MAC address allocation, see [why random MACs are such a hassle ](#aboutRandomMACs).
+To understand why you should consider disabling random MAC address allocation, see [why random MACs are such a hassle ](#why-random-macs-are-such-a-hassle).
 
 You can stop Network Manager from allocating random MAC addresses to your WiFi interface by running the following commands:
 
@@ -150,7 +150,7 @@ Acknowledgement:
 
 * This tip came from [@steveatk on Discord](https://discordapp.com/channels/638610460567928832/638610461109256194/758825690715652116).
 
-#### <a name="reinstallDocker"> Step 7: Re-install Docker </a>
+#### Step 7: Re-install Docker
 
 You can re-install Docker using the IOTstack menu or one of the scripts provided with IOTstack but the following commands guarantee an up-to-date version of `docker-compose` and also include a dependency needed if you want to run with the 64-bit kernel:
 
@@ -169,7 +169,7 @@ Note:
 
 * Installing or re-installing Docker does **not** interfere with your existing `~/IOTstack` folder.
 
-#### <a name="runHassioInstall"> Step 8: Run the Hass.io installation </a>
+#### Step 8: Run the Hass.io installation
 
 Start at:
 
@@ -184,7 +184,7 @@ The installation of Hass.io takes up to 20 minutes (depending on your internet c
 
 Hass.io installation is provided as a convenience. It is independent of, is not maintained by, and does not appear in the `docker-compose.yml` for IOTstack. Hass.io has its own service for maintaining its uptime.
 
-#### <a name="disableRandomMac2"> Re-check random MAC address allocation </a>
+#### Re-check random MAC address allocation
 
 Installing Hass.io can re-enable random MAC address allocation. You should check this via:
 
@@ -195,9 +195,9 @@ wifi.scan-rand-mac-address=no
 
 ```
 
-If you do **NOT** see `wifi.scan-rand-mac-address=no`, repeat [Step 6](#disableRandomMac1).
+If you do **NOT** see `wifi.scan-rand-mac-address=no`, repeat [Step 6](#step-6-consider-disabling-random-mac-address-allocation).
 
-### <a name="installHAContainer"> Installing Home Assistant Container </a>
+### Installing Home Assistant Container
 
 Home Assistant can be found in the `Build Stack` menu. Selecting it in this menu results in a service definition being added to:
 
@@ -222,7 +222,7 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
-## <a name="deactivateHassio"> Deactivating Hass.io </a>
+## Deactivating Hass.io
 
 Because Hass.io is independent of IOTstack, you can't deactivate it with any of the commands you normally use for IOTstack.
 
@@ -249,7 +249,7 @@ You can use Portainer to view what is running and clean up the unused images.
 At this point, Hass.io is stopped and will not start again after a reboot. Your options are:
 
 * Leave things as they are; or
-* Re-install Hass.io by starting over at [Installing Hass.io](#installHassio); or
+* Re-install Hass.io by starting over at [Installing Hass.io](#installing-hassio); or
 * Re-activate Hass.io by:
 
 	```bash
@@ -257,7 +257,7 @@ At this point, Hass.io is stopped and will not start again after a reboot. Your 
 	$ sudo systemctl start hassio-supervisor.service
 	```
 
-## <a name="aboutRandomMACs"> Why random MACs are such a hassle </a>
+## Why random MACs are such a hassle
 
 > This material was originally posted as part of [Issue 312](https://github.com/SensorsIot/IOTstack/issues/312). It was moved here following a suggestion by [lole-elol](https://github.com/lole-elol).
 

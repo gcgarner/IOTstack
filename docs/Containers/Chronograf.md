@@ -1,12 +1,12 @@
 # Chronograf
  
-## <a name="references"> References </a>
+## References
 
 - [*influxdata Chronograf* documentation](https://docs.influxdata.com/chronograf/)
 - [*GitHub*: influxdata/influxdata-docker/chronograf](https://github.com/influxdata/influxdata-docker/tree/master/chronograf)
 - [*DockerHub*: influxdata Chronograf](https://hub.docker.com/_/chronograf)
 
-## <a name="kapacitorIntegration"> Kapacitor integration </a>
+## Kapacitor integration
 
 If you selected Kapacitor in the menu and want Chronograf to be able to interact with it, you need to edit `docker-compose.yml` to un-comment the lines which are commented-out in the following:
 
@@ -28,7 +28,7 @@ $ cd ~IOTstack
 $ docker-compose up -d chronograf
 ```
 
-## <a name="upgradingChronograf"> Upgrading Chronograf </a>
+## Upgrading Chronograf
 
 You can update the container via:
 
@@ -45,7 +45,7 @@ In words:
 * `docker-compose up -d` causes any newly-downloaded images to be instantiated as containers (replacing the old containers); and
 * the `prune` gets rid of the outdated images.
 
-### <a name="versionPinning"> Chronograf version pinning </a>
+### Chronograf version pinning
 
 If you need to pin to a particular version:
 

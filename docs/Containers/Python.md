@@ -1,12 +1,12 @@
 # Python
 
-## <a name="references"> references </a>
+## references
 
 * [Python.org](https://www.python.org)
 * [Dockerhub image library](https://hub.docker.com/_/python)
 * [GitHub docker-library/python](https://github.com/docker-library/python)
 
-## <a name="menuPython"> selecting Python in the IOTstack menu </a>
+## selecting Python in the IOTstack menu
 
 When you select Python in the menu:
 
@@ -48,7 +48,7 @@ When you select Python in the menu:
 
 	* This service definition is for "new menu" (master branch). The only difference with "old menu" (old-menu branch) is the omission of the last two lines.
 
-### <a name="customisingPython"> customising your Python service definition </a>
+### customising your Python service definition
 
 The service definition contains a number of customisation points:
 
@@ -76,7 +76,7 @@ $ cd ~/IOTstack
 $ docker-compose up -d python
 ```
 
-## <a name="firstLaunchPython"> Python - first launch </a>
+## Python - first launch
 
 After running the menu, you are told to run the commands:
 
@@ -145,7 +145,7 @@ This is what happens:
 
 	Pressing <kbd>control</kbd>+<kbd>c</kbd> terminates the log display but does not terminate the running container.
 
-## <a name="stopPython"> stopping the Python service </a>
+## stopping the Python service
 
 To stop the container from running, either:
 
@@ -163,7 +163,7 @@ To stop the container from running, either:
 	$ docker-compose rm --force --stop -v python
 	```
 
-## <a name="startPython"> starting the Python service </a>
+## starting the Python service
 
 To bring up the container again after you have stopped it, either:
 
@@ -181,7 +181,7 @@ To bring up the container again after you have stopped it, either:
 	$ docker-compose up -d python
 	```
 
-## <a name="reLaunchPython"> Python - second-and-subsequent launch </a>
+## Python - second-and-subsequent launch
 
 Each time you launch the Python container *after* the first launch:
 
@@ -189,7 +189,7 @@ Each time you launch the Python container *after* the first launch:
 2. The `docker-entrypoint.sh` script runs and performs "self-repair" by replacing any files that have gone missing from the persistent storage area. Self-repair does **not** overwrite existing files! 
 3. The `app.py` Python script is run.
 
-## <a name="debugging"> when things go wrong - check the log </a>
+## when things go wrong - check the log
 
 If the container misbehaves, the log is your friend:
 
@@ -197,7 +197,7 @@ If the container misbehaves, the log is your friend:
 $ docker logs python
 ```
 
-## <a name="yourPythonScript"> project development life-cycle </a>
+## project development life-cycle
 
 It is **critical** that you understand that **all** of your project development should occur within the folder:
 
@@ -207,7 +207,7 @@ It is **critical** that you understand that **all** of your project development 
 
 So long as you are performing some sort of routine backup (either with a supplied script or a third party solution like [Paraphraser/IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup)), your work will be protected.
 
-### <a name="gettingStarted"> getting started </a>
+### getting started
 
 Start by editing the file:
 
@@ -228,7 +228,7 @@ $ cd ~/IOTstack
 $ docker-compose restart python
 ```
 
-### <a name="persistentStorage"> reading and writing to disk </a>
+### reading and writing to disk
 
 Consider this line in the service definition:
 
@@ -255,7 +255,7 @@ What it means is that:
 
 If your script writes into any other directory inside the container, the data will be lost when the container re-launches.
 
-### <a name="cleanSlate"> getting a clean slate </a>
+### getting a clean slate
 
 If you make a mess of things and need to start from a clean slate, erase the persistent storage area:
 
@@ -268,7 +268,7 @@ $ docker-compose up -d python
 
 The container will re-initialise the persistent storage area from its defaults.
 
-### <a name="addingPackages"> adding packages </a>
+### adding packages
 
 As you develop your project, you may find that you need to add supporting packages. For this example, we will assume you want to add "[Flask](https://pypi.org/project/Flask/)" and "[beautifulsoup4](https://pypi.org/project/beautifulsoup4/)".
 
@@ -322,7 +322,7 @@ To make *Flask* and *beautifulsoup4* a permanent part of your container:
 	Flask==2.0.1
 	```
 
-5. Continue your development work by returning to [getting started](#gettingStarted).
+5. Continue your development work by returning to [getting started](#getting-started).
 
 Note:
 
@@ -346,11 +346,11 @@ Note:
 
 	The `requirements.txt` file will be recreated and it will be a copy of the version in the *services* directory as of the last image rebuild.
 
-### <a name="scriptBaking"> making your own Python script the default </a>
+### making your own Python script the default
 
-Suppose the Python script you have been developing reaches a major milestone and you decide to "freeze dry" your work up to that point so that it becomes the default when you ask for a [clean slate](#cleanSlate). Proceed like this:
+Suppose the Python script you have been developing reaches a major milestone and you decide to "freeze dry" your work up to that point so that it becomes the default when you ask for a [clean slate](#getting-a-clean-slate). Proceed like this:
 
-1. If you have added any packages by following the steps in [adding packages](#addingPackages), run the following command:
+1. If you have added any packages by following the steps in [adding packages](#adding-packages), run the following command:
 
 	```bash
 	$ docker exec python bash -c 'pip3 freeze >requirements.txt'
@@ -412,11 +412,11 @@ Suppose the Python script you have been developing reaches a major milestone and
 	$ docker system prune -f
 	```
 
-### <a name="scriptCanning"> canning your project </a>
+### canning your project
 
 Suppose your project has reached the stage where you wish to put it into production as a service under its own name. Make two further assumptions:
 
-1. You have gone through the steps in [making your own Python script the default](#scriptBaking) and you are **certain** that the content of `./services/python/app` correctly captures your project.
+1. You have gone through the steps in [making your own Python script the default](#making-your-own-python-script-the-default) and you are **certain** that the content of `./services/python/app` correctly captures your project.
 2. You want to give your project the name "wishbone".
 
 Proceed like this:
@@ -479,7 +479,7 @@ Remember:
 	~/IOTstack/volumes/wishbone/app
 	``` 
 
-## <a name="routineMaintenance"> routine maintenance </a>
+## routine maintenance
 
 To make sure you are running from the most-recent **base** image of Python from Dockerhub:
 
@@ -503,4 +503,4 @@ The old base image can't be removed until the old local image has been removed, 
 
 Note:
 
-* If you have followed the steps in [canning your project](#scriptCanning) and your service has a name other than `python`, just substitute the new name where you see `python` in the two `dockerc-compose` commands.
+* If you have followed the steps in [canning your project](#canning-your-project) and your service has a name other than `python`, just substitute the new name where you see `python` in the two `dockerc-compose` commands.

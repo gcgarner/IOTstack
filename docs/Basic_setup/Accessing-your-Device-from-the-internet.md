@@ -6,14 +6,14 @@ From time to time the IP address that your ISP assigns changes and it's difficul
 
 Secondly, how do you get into your home network? Your router has a firewall that is designed to keep the rest of the internet out of your network to protect you. The solution to that is a Virtual Private Network (VPN) or "tunnel". 
 
-## <a name="dynamicDNS"> Dynamic DNS </a>
+## Dynamic DNS
 
 There are two parts to a Dynamic DNS service:
 
 1. You have to register with a Dynamic DNS service provider and obtain a domain name that is not already taken by someone else.
 2. Something on your side of the network needs to propagate updates so that your chosen domain name remains in sync with your router's dynamically-allocated public IP address.
 
-### <a name="registerDDNS"> Register with a Dynamic DNS service provider </a>
+### Register with a Dynamic DNS service provider
 
 The first part is fairly simple and there are quite a few Dynamic DNS service providers including:
 
@@ -24,7 +24,7 @@ The first part is fairly simple and there are quite a few Dynamic DNS service pr
 
 Some router vendors also provide their own built-in Dynamic DNS capabilities for registered customers so it's a good idea to check your router's capabilities before you plough ahead.
 
-### <a name="propagateDDNS"> Dynamic DNS propagation </a>
+### Dynamic DNS propagation
 
 The "something" on your side of the network propagating WAN IP address changes can be either:
 
@@ -39,7 +39,7 @@ A behind-the-router technique usually relies on sending updates according to a s
 
 > This seems to be a problem for DuckDNS which takes a beating because almost every person using it is sending an update bang-on five minutes.
 
-### <a name="duckDNSclient"> DuckDNS client </a>
+### DuckDNS client
 
 IOTstack provides a solution for DuckDNS. The best approach to running it is:
 
@@ -99,7 +99,7 @@ A null result indicates failure so check your work.
 
 Remember, the Domain Name System is a *distributed* database. It takes *time* for changes to propagate. The response you get from directing a query to ns1.duckdns.org may not be the same as the response you get from any other DNS server. You often have to wait until cached records expire and a recursive query reaches the authoritative DuckDNS name-servers.
 
-#### <a name="duckDNSauto"> Running the DuckDNS client automatically </a>
+#### Running the DuckDNS client automatically
 
 The recommended arrangement for keeping your Dynamic DNS service up-to-date is to invoke `duck.sh` from `cron` at five minute intervals.
 

@@ -67,9 +67,9 @@ To close the terminal session, either:
 * type "exit" and press <kbd>return</kbd>; or
 * press <kbd>control</kbd>+<kbd>d</kbd>.
 
-## <a name="healthCheck"> Container health check </a>
+## Container health check
 
-### <a name="healthCheckTheory"> theory of operation </a>
+### theory of operation
 
 A script , or "agent", to assess the health of the MariaDB container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
 
@@ -87,11 +87,11 @@ The agent is invoked 30 seconds after the container starts, and every 30 seconds
 	mysqld is alive
 	```
 
-3. If the command returned the expected response, the agent tests the responsiveness of the TCP port the `mysqld` daemon should be listening on (see [customising health-check](#healthCheckCustom)).
+3. If the command returned the expected response, the agent tests the responsiveness of the TCP port the `mysqld` daemon should be listening on (see [customising health-check](#customising-health-check)).
 
 4. If all of those steps succeed, the agent concludes that MariaDB is functioning properly and returns "healthy".
 
-### <a name="healthCheckMonitor"> monitoring health-check </a>
+### monitoring health-check
 
 Portainer's *Containers* display contains a *Status* column which shows health-check results for all containers that support the feature.
 
@@ -124,7 +124,7 @@ Possible reply patterns are:
 	mariadb   Up About a minute (unhealthy)
 	```
 
-### <a name="healthCheckCustom"> customising health-check </a>
+### customising health-check
 
 You can customise the operation of the health-check agent by editing the `mariadb` service definition in your *Compose* file:
 
