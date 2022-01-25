@@ -152,7 +152,7 @@ $ cat /dev/null >~/Logs/duck.log
 
 ### WireGuard
 
-WireGuard is supplied as part of IOTstack. See [WireGuard documentation](Containers/WireGuard.md).
+WireGuard is supplied as part of IOTstack. See [WireGuard documentation](../Containers/WireGuard.md).
 
 ### PiVPN
 

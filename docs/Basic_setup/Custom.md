@@ -125,7 +125,7 @@ services:
     environment:
 ```
 
-This will remove the default environment variables set in the template, and tell docker-compose to use the variables specified in your file. It is not mandatory that the *.env file be placed in the service's service directory, but is strongly suggested. Keep in mind the [PostBuild Script](PostBuild-Script.md) functionality to automatically copy your *.env files into their directories on successful build if you need to.
+This will remove the default environment variables set in the template, and tell docker-compose to use the variables specified in your file. It is not mandatory that the *.env file be placed in the service's service directory, but is strongly suggested. Keep in mind the [PostBuild Script](../Developers/PostBuild-Script.md) functionality to automatically copy your *.env files into their directories on successful build if you need to.
 
 ### Adding custom services
 

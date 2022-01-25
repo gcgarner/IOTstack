@@ -29,7 +29,7 @@ $ sudo apt upgrade -y
 Before you can use WireGuard (or any VPN solution), you need a mechanism for your remote clients to reach your home router. You have two choices:
 
 1. Obtain a permanent IP address for your home router from your Internet Service Provider (ISP). Approach your ISP if you wish to pursue this option. It generally involves additional charges.
-2. Use a Dynamic DNS service. See IOTstack documentation [Accessing your device from the internet](../Accessing-your-Device-from-the-internet.md). The rest of this documentation assumes you have chosen this option.
+2. Use a Dynamic DNS service. See IOTstack documentation [Accessing your device from the internet](../Basic_setup/Accessing-your-Device-from-the-internet.md). The rest of this documentation assumes you have chosen this option.
 
 ### <a name="serviceDefinition"> Step 3: Understand the Service Definition </a>
 
@@ -226,7 +226,7 @@ Of the two, the first is generally the simpler and means you don't have to re-ru
 
 #### <a name="editOverride"> Method 2: Configure WireGuard using `compose-override.yml` </a>
 
-The [Custom services and overriding default settings for IOTstack](../Custom.md) page describes how to use an override file to allow the menu to incorporate your custom configurations into the final `docker-compose.yml` file.
+The [Custom services and overriding default settings for IOTstack](../Basic_setup/Custom.md) page describes how to use an override file to allow the menu to incorporate your custom configurations into the final `docker-compose.yml` file.
 
 You will need to create the `compose-override.yml` **before** running the menu to build your stack. If you have already built your stack, you'll have to rebuild it after creating `compose-override.yml`.
 

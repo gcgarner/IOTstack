@@ -8,7 +8,8 @@ There are many features that are needing to be introduced into the new menu syst
 
 ## Breaking changes
 There are a few changes that you need to be aware of:
-* Docker Environmental `*.env` files are no longer a thing by default. Everything needed is specified in the service.yml file, you can still optionally use them though either with [Custom Overrides](Custom.md) or with the [PostBuild](PostBuild-Script.md) script. Specific config files for certain services still work as they once did.
+
+* Docker Environmental `*.env` files are no longer a thing by default. Everything needed is specified in the service.yml file, you can still optionally use them though either with [Custom Overrides](../Custom.md) or with the [PostBuild](../../Developers/PostBuild-Script.md) script. Specific config files for certain services still work as they once did.
 * Python 3, pip3, PyYAML and Blessed are all required to be installed.
 * Not backwards compatible with old menu system. You will be able to switch back to the old menu system for a period of time by changing to the `old-menu` branch. It will be unmaintained except for critical updates. It will eventually be removed - but not before everyone is ready to leave it.
 

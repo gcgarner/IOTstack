@@ -20,10 +20,35 @@ theme:
         name: Switch to light mode
   features:
     - tabs
-    - navigation.expand
-  plugins:
-    - search
-    - git-revision-date-localized
+    - navigation.tabs
+    - navigation.sections
+
+plugins:
+  - search
+  - redirects:
+      # Forward renamed pages to avoid breaking old links.
+      redirect_maps:
+        Getting-Started.md: Basic_setup/index.md
+        Accessing-your-Device-from-the-internet.md: Basic_setup/Accessing-your-Device-from-the-internet.md
+        Backup-and-Restore.md: Basic_setup/Backup-and-Restore.md
+        Custom.md: Basic_setup/Custom.md
+        Default-Configs.md: Basic_setup/Default-Configs.md
+        Docker-commands.md: Basic_setup/Docker-commands.md
+        How-the-script-works.md: Basic_setup/How-the-script-works.md
+        Misc.md: Basic_setup/Misc.md
+        Native-RTL_433.md: Basic_setup/Native-RTL_433.md
+        Networking.md: Basic_setup/Networking.md
+        RPIEasy_native.md: Basic_setup/RPIEasy_native.md
+        Understanding-Containers.md: Basic_setup/Understanding-Containers.md
+        Updates/New-Menu-Release-Notes.md: Basic_setup/Updates/New-Menu-Release-Notes.md
+        Updates/Updating-the-Project.md: Basic_setup/Updates/Updating-the-Project.md
+        Updates/gcgarner-migration.md: Basic_setup/Updates/gcgarner-migration.md
+        PostBuild-Script.md: Developers/PostBuild-Script.md
+        BuildStack-RandomPassword.md: Developers/BuildStack-RandomPassword.md
+        BuildStack-Services.md: Developers/BuildStack-Services.md
+        Menu-System.md: Developers/Menu-System.md
+        Contributing-Services.md: Developers/index.md
+
 markdown_extensions:
   - admonition
   - pymdownx.superfences
