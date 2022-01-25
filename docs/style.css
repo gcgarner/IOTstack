@@ -1,0 +1,4 @@
+/* hide "Made with Material" footer */
+.md-footer-meta {
+    display: none;
+}

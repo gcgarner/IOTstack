@@ -21,6 +21,7 @@ theme:
   features:
     - tabs
     - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
 
 plugins:
@@ -48,6 +49,9 @@ plugins:
         BuildStack-Services.md: Developers/BuildStack-Services.md
         Menu-System.md: Developers/Menu-System.md
         Contributing-Services.md: Developers/index.md
+
+extra_css:
+  - style.css
 
 markdown_extensions:
   - admonition
