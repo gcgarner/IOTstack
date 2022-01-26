@@ -316,3 +316,22 @@ Random MACs are not a problem for a **client** device like a phone, tablet or la
 > In TCP/IP any device can be a client or a server for any protocol. The distinction here is about *typical* use. A mobile device is not usually set up to *offer* services like MQTT or Node-RED. It typically *initiates* connections with servers like Docker containers running on a Raspberry Pi.
 
 It is not just configuration-time SSH sessions that break. If you decide to leave Raspberry Pi random Wifi MAC active **and** you have other clients (eq IoT devices) communicating with the Pi over WiFi, you will wrong-foot those clients each time the Raspberry Pi reboots. Data communications services from those clients will be impacted until those client devices time-out and catch up.
+
+# Using bluetooth from the container
+In order to be able to use BT & BLE devices from HA integrations, make sure that bluetooth is enabled and powered on at the start of the (Rpi) host by editing `/etc/bluetooth/main.conf`:
+
+```conf
+....
+[Policy]
+AutoEnable=true
+```
+
+After a reboot, check that BT is up:
+
+```sh
+(root) # hciconfig
+...
+UP
+...
+```
+ref: https://scribles.net/auto-power-on-bluetooth-adapter-on-boot-up/
