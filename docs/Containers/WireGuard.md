@@ -106,11 +106,26 @@ You have several options for how your remote peers resolve DNS requests:
 
 * `PEERDNS=auto`
 
-	The default value of `auto` instructs the WireGuard *service* running within the WireGuard *container* to use the same DNS as the WireGuard *container* when resolving requests from connected peers. In practice, that means the *service* directs queries to 127.0.0.11, which Docker intercepts and forwards to whichever resolvers are specified in the Raspberry Pi's `/etc/resolv.conf`.
+    DNS queries made on connected WireGuard clients should work as if they were
+    made on the host. If you [configure](Pi-hole.md#pi-hole-as-dns-server) your
+    ad-blocker into the host's `resolveconf.conf`, Wireguard clients will also
+    automatically use it.
+
+    Details: The default value of `auto` instructs the WireGuard *service*
+    running within the WireGuard *container* to use a DNS-service, coredns,
+    also running in the Wireguard container. Coredns by default directs queries
+    to 127.0.0.11, which Docker intercepts and forwards to whichever resolvers
+    are specified in the Raspberry Pi's `/etc/resolv.conf`.
 
 * `PEERDNS=auto` with `custom-cont-init` <a name="customContInit"></a>
 
-	This configuration instructs WireGuard to forward DNS queries from remote peers to any **container** which is listening on port 53. This is the option you will want to choose if you are running an ad-blocking DNS server (eg *PiHole* or *AdGuardHome*) in a container on the same host as WireGuard, and you want your remote clients to obtain DNS resolution via the ad-blocker.
+    This configuration instructs WireGuard to forward DNS queries from remote
+    peers to any host daemon or **container** which is listening on port 53.
+    This is the option you will want to choose if you are running an
+    ad-blocking DNS server (eg *PiHole* or *AdGuardHome*) in a container on the
+    same host as WireGuard, and you want your remote clients to obtain DNS
+    resolution via the ad-blocker, but don't want your Raspberry Pi host to use
+    it.
 
 	> Acknowledgement: thanks to @ukkopahis for developing this option.
 
@@ -160,6 +175,9 @@ You have several options for how your remote peers resolve DNS requests:
 	```yml
 	- PEERDNS=192.168.203.65
 	```
+    Do note that changes to `PEERDNS` will not be updated to existing clients,
+    and as such you may want to use `PEERDNS=auto` unless you have a very
+    specific requirement.
 
 #### Optional configuration - WireGuard ports
 
