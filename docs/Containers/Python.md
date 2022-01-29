@@ -40,13 +40,7 @@ When you select Python in the menu:
 	#   - "external:internal"
 	  volumes:
 	  - ./volumes/python/app:/usr/src/app
-	  networks:
-	  - iotstack_nw
 	```
-
-	Note:
-
-	* This service definition is for "new menu" (master branch). The only difference with "old menu" (old-menu branch) is the omission of the last two lines.
 
 ### customising your Python service definition
 
@@ -456,8 +450,6 @@ Proceed like this:
 	  #   - "external:internal"                   #   - "external:internal"
 	  volumes:                                    volumes:
 	    - ./volumes/python/app:/usr/src/app  |      - ./volumes/wishbone/app:/usr/src/app
-	  networks:                                   networks:
-	    - iotstack_nw                               - iotstack_nw
 	```
 
 	Note:

@@ -67,7 +67,6 @@ Unfortunately, that service definition will not work "as is". It needs to be con
 Key points:
 
 * Everything in the `environment:` section from `SERVERURL=` down to `PEERDNS=` (inclusive) affects WireGuard's generated configurations (the QR codes). In other words, any time you change any of those values, any existing QR codes will stop working.
-* WireGuard does not need to communicate directly with other Docker containers so there is no need for it to join `iotstack_nw`.
 
 ### Step 4: Decide what to configure
 
