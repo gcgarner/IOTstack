@@ -1,6 +1,6 @@
 # Home Assistant
 
-Home Assistant is a home automation platform running on Python 3. It is able to track and control all devices at your home and offer a platform for automating control.
+Home Assistant is a home automation platform. It is able to track and control all devices at your home and offer a platform for automating control.
 
 ## <a name="references"> References </a>
 
@@ -17,189 +17,23 @@ Home Assistant is a home automation platform running on Python 3. It is able to 
 
 There are two versions of Home Assistant:
 
-* Hass.io (Home Assistant Core), and
-* Home Assistant Container.
+* Home Assistant Container; and
+* Supervised Home Assistant (also known as both "Hass.io" and "Home Assistant Core").
 
 Each version:
 
 * provides a web-based management interface on port 8123; and
 * runs in "host mode" in order to discover devices on your LAN, including devices communicating via multicast traffic.
 
-IOTstack allows you to **install** either, or both, versions.
+Home Assistant Container runs as a **single** Docker container, and doesn't support all the features that Supervised Home Assistant does (such as add-ons). Supervised Home Assistant runs as a **collection** of Docker containers under its own orchestration.
 
-Note:
+Technically, both versions of Home Assistant can be installed on your Raspberry Pi but you can't **run** both at the same time. Each version runs in "host mode" and binds to port 8123 so, in practice, the first version to start will claim the port and the second will then be blocked.
 
-* Technically, both versions can **run** at the same time but it is not **supported**. Each version runs in "host mode" and binds to port 8123 so, in practice, the first version to start will claim the port and the second version will then be blocked.
-
-### <a name="versionHassio"> Hass.io </a>
-
-Hass.io uses its own orchestration:
-
-* hassio\_supervisor
-* hassio\_audio
-* hassio\_cli
-* hassio\_dns
-* hassio\_multicast
-* hassio\_observer
-* homeassistant.
-
-IOTstack can only offer limited configuration of Hass.io since it is its own platform.
-
-### <a name="versionHAContainer"> Home Assistant Container </a>
-
-Home Assistant Container runs as a single Docker container, and doesn't support all the features that Hass.io does (such as add-ons).
-
-## <a name="menuInstallation"> Menu installation </a>
-
-### <a name="installHassio"> Installing Hass.io </a>
-
-Hass.io creates a conundrum:
-
-* If you are definitely going to install Hass.io then you **must** install its dependencies **before** you install Docker.
-* One of Hass.io's dependencies is [Network Manager](https://wiki.archlinux.org/index.php/NetworkManager). Network Manager makes **serious** changes to your operating system, with side-effects you may not expect such as giving your Raspberry Pi's WiFi interface a random MAC address both during the installation and, then, each time you reboot. You are in for a world of pain if you install Network Manager without first understanding what is going to happen and planning accordingly.
-* If you don't install Hass.io's dependencies before you install Docker, you will either have to uninstall Docker or rebuild your system. This is because both Docker and Network Manager adjust your Raspberry Pi's networking. Docker is happy to install after Network Manager, but the reverse is not true.
-
-#### <a name="uninstallDocker"> Step 1: If Docker is already installed, uninstall it </a>
-
-```bash
-$ sudo apt -y purge docker-ce docker-ce-cli containerd.io
-$ sudo apt -y remove docker-compose
-$ sudo pip3 uninstall docker-compose
-```
-
-Note:
-
-* Removing Docker does **not** interfere with your existing `~/IOTstack` folder.
-
-#### <a name="aptUpdate"> Step 2: Ensure your system is fully up-to-date </a>
-
-```bash
-$ sudo apt update
-$ sudo apt upgrade -y
-```
-
-#### <a name="hassioDependencies1"> Step 3: Install Hass.io dependencies (stage 1) </a>
-
-```bash
-$ sudo apt install -y apparmor apparmor-profiles apparmor-utils
-$ sudo apt install -y software-properties-common apt-transport-https ca-certificates dbus
-```
-
-#### <a name="useEthernet"> Step 4: Connect to your Raspberry Pi via Ethernet </a>
-
-You can skip this step if you interact with your Raspberry Pi via a screen connected to its HDMI port, along with a keyboard and mouse.
-
-If, however, you are running "headless" (SSH or VNC), we **strongly recommend** connecting your Raspberry Pi to Ethernet. This is only a temporary requirement. You can return to WiFi-only operation after Hass.io is installed.
-
-When the Ethernet interface initialises, work out its IP address:
-
-```bash
-$ ifconfig eth0
-
-eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
-        inet 192.168.132.9  netmask 255.255.255.0  broadcast 192.168.132.255
-        ether ab:cd:ef:12:34:56  txqueuelen 1000  (Ethernet)
-        RX packets 4166292  bytes 3545370373 (3.3 GiB)
-        RX errors 0  dropped 0  overruns 0  frame 0
-        TX packets 2086814  bytes 2024386593 (1.8 GiB)
-        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-```   
-
-In the above, the IP address assigned to the Ethernet interface is on the second line of output, to the right of "inet": 192.168.132.9.
-
-Drop out of your existing session (SSH or VNC) and re-connect to your Raspberry Pi using the IP address assigned to its Ethernet interface:
-
-```bash
-$ ssh pi@192.168.132.9
-```
-
-or:
-
-```
-vnc://pi@192.168.132.9
-```
-
-The reason for stipulating the IP address, rather than a name like `raspberrypi.local` is so that you are *definitely* connected to the Ethernet interface.
-
-If you ignore the advice about connecting via Ethernet and install Network Manager while your session is connected via WiFi, your connection will freeze part way through the installation (when Network Manager starts running and unconditionally changes your Raspberry Pi's WiFi MAC address).
-
-You *may* be able to re-connect after the WiFi interface acquires a new IP address and advertises that via multicast DNS associated with the name of your device (eg `raspberrypi.local`), but you may also find that the only way to regain control is to power-cycle your Raspberry Pi.
-
-The advice about using Ethernet is well-intentioned. You should heed this advice even if means you need to temporarily relocate your Raspberry Pi just so you can attach it via Ethernet for the next few steps. You can go back to WiFi later, once everything is set up. You have been warned!
-
-#### <a name="hassioDependencies2"> Step 5: Install Hass.io dependencies (stage 2) </a>
-
-Install Network Manager:
-
-```bash
-$ sudo apt install -y network-manager
-```
-
-#### <a name="disableRandomMac1"> Step 6: Consider disabling random MAC address allocation </a>
-
-To understand why you should consider disabling random MAC address allocation, see [why random MACs are such a hassle ](#aboutRandomMACs).
-
-You can stop Network Manager from allocating random MAC addresses to your WiFi interface by running the following commands:
-
-```bash
-$ sudo sed -i.bak '$a\\n[device]\nwifi.scan-rand-mac-address=no\n' /etc/NetworkManager/NetworkManager.conf
-$ sudo systemctl restart NetworkManager.service
-```
-
-Acknowledgement:
-
-* This tip came from [@steveatk on Discord](https://discordapp.com/channels/638610460567928832/638610461109256194/758825690715652116).
-
-#### <a name="reinstallDocker"> Step 7: Re-install Docker </a>
-
-You can re-install Docker using the IOTstack menu or one of the scripts provided with IOTstack but the following commands guarantee an up-to-date version of `docker-compose` and also include a dependency needed if you want to run with the 64-bit kernel:
-
-```bash
-$ curl -fsSL https://get.docker.com | sh
-$ sudo usermod -G docker -a $USER
-$ sudo usermod -G bluetooth -a $USER
-$ sudo apt install -y python3-pip python3-dev
-$ [ "$(uname -m)" = "aarch64" ] && sudo apt install libffi-dev
-$ sudo pip3 install -U docker-compose
-$ sudo pip3 install -U ruamel.yaml==0.16.12 blessed
-$ sudo reboot
-```
-
-Note:
-
-* Installing or re-installing Docker does **not** interfere with your existing `~/IOTstack` folder.
-
-#### <a name="runHassioInstall"> Step 8: Run the Hass.io installation </a>
-
-Start at:
-
-```bash
-$ cd ~/IOTstack
-$ ./menu.sh
-```
-
-Hass.io installation can be found inside the `Native Installs` menu on the main menu. You will be asked to select your device type during the installation.
-
-The installation of Hass.io takes up to 20 minutes (depending on your internet connection). You may also need to respond "Y" to a prompt during the installation process. Refrain from restarting your machine until it has come online and you are able to create a user account.
-
-Hass.io installation is provided as a convenience. It is independent of, is not maintained by, and does not appear in the `docker-compose.yml` for IOTstack. Hass.io has its own service for maintaining its uptime.
-
-#### <a name="disableRandomMac2"> Re-check random MAC address allocation </a>
-
-Installing Hass.io can re-enable random MAC address allocation. You should check this via:
-
-```bash
-$ tail -3 /etc/NetworkManager/NetworkManager.conf
-[device]
-wifi.scan-rand-mac-address=no
-
-```
-
-If you do **NOT** see `wifi.scan-rand-mac-address=no`, repeat [Step 6](#disableRandomMac1).
+IOTstack used to offer a menu entry leading to a convenience script that could install Supervised Home Assistant but that stopped working when Home Assistant changed their approach. Now, the only method supported by IOTstack is Home Assistant Container.
 
 ### <a name="installHAContainer"> Installing Home Assistant Container </a>
 
-Home Assistant can be found in the `Build Stack` menu. Selecting it in this menu results in a service definition being added to:
+Home Assistant (Container) can be found in the `Build Stack` menu. Selecting it in this menu results in a service definition being added to:
 
 ```
 ~/IOTstack/docker-compose.yml
@@ -222,40 +56,58 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
-## <a name="deactivateHassio"> Deactivating Hass.io </a>
+### <a name="installHASupervised"> Installing Supervised Home Assistant </a>
 
-Because Hass.io is independent of IOTstack, you can't deactivate it with any of the commands you normally use for IOTstack.
+The direction being taken by the Home Assistant folks is to supply a ready-to-run image for your Raspberry Pi. That effectively dedicates your Raspberry Pi to Home Assistant and precludes the possibility of running alongside IOTstack and containers like Mosquitto, InfluxDB, Node-RED, Grafana, PiHole and WireGuard.
 
-To deactivate Hass.io you first need to stop the service that controls it. Run the following commands in the terminal: 
+It is possible to run Supervised Home Assistant on the same Raspberry Pi as IOTstack. The recommended approach is to start from a clean slate and use [PiBuilder](https://github.com/Paraphraser/PiBuilder).
 
-```bash
-$ sudo systemctl stop hassio-supervisor.service
-$ sudo systemctl disable hassio-supervisor.service
-```
+When you visit the PiBuilder link you may well have a reaction like "all far too complicated" but you should try to get past that. PiBuilder has two main use-cases:
 
-This will stop the main service and prevent it from starting on the next boot. Next you need to stop and remove the dependent services:
+1. Getting a Raspberry Pi built for IOTstack (and, optionally, Supervised Home Assistant) with the least fuss.
+2. Letting you record all your own customisations so that you can rebuild your Pis quickly with all your customisations already in place (the "magic smoke" scenario).
 
-```bash
-$ docker stop hassio_audio hassio_cli hassio_dns hassio_multicast hassio_observer homeassistant
-$ docker rm hassio_audio hassio_cli hassio_dns hassio_multicast hassio_observer homeassistant 
-```
+It's the second use-case that produces most of the apparent complexity you see when you read the [PiBuilder README](https://github.com/Paraphraser/PiBuilder/blob/master/README.md) for the first time.
 
-Double-check with `docker ps` to see if there are other containers running with a `hassio_` prefix. They can stopped and removed in the same fashion for `hassio_audio` and so-on.
+The first time you use PiBuilder, the process boils down to:
 
-The stored files are located in `/usr/share/hassio` which can be removed if you need to.
+1. Clone the PiBuilder repo onto your support host (Mac, Windows, etc).
+2. Customise two files within the PiBuilder scope:
 
-You can use Portainer to view what is running and clean up the unused images.
+	- `wpa_supplicant.conf`
+	- `options.sh` where, among other things, you will enable:
 
-At this point, Hass.io is stopped and will not start again after a reboot. Your options are:
+		- `HOME_ASSISTANT_SUPERVISED_INSTALL=true`
 
-* Leave things as they are; or
-* Re-install Hass.io by starting over at [Installing Hass.io](#installHassio); or
-* Re-activate Hass.io by:
+3. Choose a Raspbian image and transfer it to your installation media (SD/SSD). The imaging tools typically finish by ejecting the installation media.
+4. Re-mount the installation media on your support host and either:
 
-	```bash
-	$ sudo systemctl enable hassio-supervisor.service
-	$ sudo systemctl start hassio-supervisor.service
-	```
+	- Run the supplied `setup_boot_volume.sh` script (if your support host is macOS or Unix); or
+	- Just drag the *contents* of the PiBuilder "boot" folder into the top level of the "/boot" partition on your installation media (if your support host is Windows).
+
+5. Move the installation media to your Raspberry Pi and apply power.
+6. Run the scripts in order:
+
+	Step | Command run on support host       | Command run on Raspberry Pi
+	:---:|-----------------------------------|-------------
+	1    | `ssh -4 pi@raspberrypi.local`     |
+	2    |                                   | `/boot/scripts/01_setup.sh «name»`
+	3    | `ssh-keygen -R raspberrypi.local` |
+	4    | `ssh -4 pi@«name».local`          |
+	5    |                                   | `/boot/scripts/02_setup.sh`
+	6    | `ssh pi@«name».local`             |
+	7    |                                   | `/boot/scripts/03_setup.sh`
+	8    | `ssh pi@«name».local`             |
+	9    |                                   | `/boot/scripts/04_setup.sh`
+	10   | `ssh pi@«name».local`             |
+	11   |                                   | `/boot/scripts/05_setup.sh`
+
+	where «name» is the name you give to your Raspberry Pi (eg "iot-hub").
+
+After step 9, Supervised Home Assistant will be running. The `04_setup.sh` script also deals with the [random MACs](#aboutRandomMACs) problem. After step 11, you'll be able to either:
+
+1. Restore a backup; or
+2. Run the IOTstack menu and choose your containers.
 
 ## <a name="aboutRandomMACs"> Why random MACs are such a hassle </a>
 
