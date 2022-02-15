@@ -1,4 +1,14 @@
+import re
+
 def checkVersion(requiredVersion, currentVersion):
+  """
+  >>> checkVersion('18.2.0', '20.10.11')
+  (True, '', [])
+  >>> checkVersion('18.2.0', '16.3.1')
+  (False, 'Version Check Fail', [False, False, True])
+  >>> checkVersion('18.2.0', '20.10.5+dfsg1')
+  (True, '', [])
+  """
   requiredSplit = requiredVersion.split('.')
 
   if len(requiredSplit) < 2:
@@ -19,7 +29,7 @@ def checkVersion(requiredVersion, currentVersion):
   try:
     currentMajor = int(currentSplit[0])
     currentMinor = int(currentSplit[1])
-    currentBuild = currentSplit[2].split("-")[0]
+    currentBuild = re.split(r'[+-]', currentSplit[2])[0]
     currentBuild = int(currentBuild)
   except:
     return False, 'Invalid Current Version', currentVersion
