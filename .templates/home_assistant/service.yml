@@ -8,4 +8,9 @@ home_assistant:
   volumes:
     - /etc/localtime:/etc/localtime:ro
     - ./volumes/home_assistant:/config
-
+    - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+  devices:
+    - "/dev/ttyAMA0:/dev/ttyAMA0"
+    - "/dev/vcio:/dev/vcio"
+    - "/dev/gpiomem:/dev/gpiomem"
+  privileged: true
