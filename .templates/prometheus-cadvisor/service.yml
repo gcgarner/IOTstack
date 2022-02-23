@@ -1,5 +1,5 @@
 prometheus-cadvisor:
-  container_name: cadvisor
+  container_name: prometheus-cadvisor
   image: zcube/cadvisor:latest
   restart: unless-stopped
   ports:

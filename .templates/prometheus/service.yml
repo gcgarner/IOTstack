@@ -18,6 +18,6 @@ prometheus:
     #    - --web.console.libraries=/usr/share/prometheus/console_libraries
     #    - --web.console.templates=/usr/share/prometheus/consoles
   depends_on:
-    - cadvisor
-    - nodeexporter
+    - prometheus-cadvisor
+    - prometheus-nodeexporter
 
