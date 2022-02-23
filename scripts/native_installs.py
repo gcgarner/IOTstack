@@ -30,21 +30,6 @@ def main():
     if (screenActive):
       mainRender(1, mainMenuList, currentMenuItemIndex)
 
-  def installHassIo():
-    print(term.clear())
-    print("Install Home Assistant Supervisor")
-    print("./.native/hassio_supervisor.sh")
-    res = subprocess.call("./.native/hassio_supervisor.sh", shell=True)
-    print("")
-    if res == 0:
-      print("Preinstallation complete. Your system may run slow for a few hours as Hass.io installs its services.")
-      print("Press [Up] or [Down] arrow key to show the menu if it has scrolled too far.")
-    else:
-      print("Preinstallation not completed.")
-    input("Process terminated. Press [Enter] to show menu and continue.")
-    time.sleep(0.5)
-    return True
-
   def installRtl433():
     print(term.clear())
     print("Install RTL_433")
@@ -93,7 +78,6 @@ def main():
     return True
 
   mainMenuList = [
-    ["Hass.io (Supervisor)", installHassIo],
     ["RTL_433", installRtl433],
     ["RPIEasy", installRpiEasy],
     ["Upgrade Docker and Docker-Compose", upgradeDockerAndCompose],
