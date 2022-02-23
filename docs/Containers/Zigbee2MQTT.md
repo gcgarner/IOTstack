@@ -259,4 +259,4 @@ $ docker system prune
 
 Note:
 
-* Sometimes it is necessary to repeat the `docker system prune` command.
+* Sometimes it is necessary to repeat the `docker system prune` command but it depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
