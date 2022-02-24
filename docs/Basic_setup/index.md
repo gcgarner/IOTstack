@@ -132,7 +132,7 @@ If you prefer to automate your installations using scripts, see:
 
 If you are still running on gcgarner/IOTstack and need to migrate to SensorsIot/IOTstack, see:
 
-* [Migrating IOTstack from gcgarner to SensorsIot](Updates/gcgarner-migration.md).
+* [Migrating IOTstack from gcgarner to SensorsIot](../Updates/gcgarner-migration.md).
 
 ## recommended system patches
 

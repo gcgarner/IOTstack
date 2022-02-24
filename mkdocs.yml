@@ -43,9 +43,7 @@ plugins:
         Networking.md: Basic_setup/Networking.md
         RPIEasy_native.md: Basic_setup/RPIEasy_native.md
         Understanding-Containers.md: Basic_setup/Understanding-Containers.md
-        Updates/New-Menu-Release-Notes.md: Basic_setup/Updates/New-Menu-Release-Notes.md
-        Updates/Updating-the-Project.md: Basic_setup/Updates/Updating-the-Project.md
-        Updates/gcgarner-migration.md: Basic_setup/Updates/gcgarner-migration.md
+        Updates/Updating-the-Project.md: Updates/index.md
         PostBuild-Script.md: Developers/PostBuild-Script.md
         BuildStack-RandomPassword.md: Developers/BuildStack-RandomPassword.md
         BuildStack-Services.md: Developers/BuildStack-Services.md

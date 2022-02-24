@@ -11,7 +11,7 @@ Periodically updates are made to project which include new or modified container
 5. rebuild localy created images from new Dockerfiles: `docker-compose build --pull --no-cache`
 6. update running containers to latest: `docker-compose up --build -d`
 
-*Troubleshooting:* if a container fails to restart after update
+### Troubleshooting: if a container fails to start after update
 
 * try restarting the whole stack: `docker-compose restart`
 * backup your stack settings: `cp docker-compose.yml docker-compose.yml.bak`
