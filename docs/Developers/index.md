@@ -4,10 +4,9 @@
 
 Documentation is is written as markdown, processed using mkdocs ([docs](https://www.mkdocs.org/user-guide/writing-your-docs/#writing-your-docs)) and the Material theme ([docs](https://squidfunk.github.io/mkdocs-material/reference/)). The Material theme is not just styling, but provides additional syntax extensions.
 
-Setup your system for Material:
+Setup your system for mkdocs and Material:
 ```
-pip3 install mkdocs-material
-pip3 install mkdocs-git-revision-date-localized-plugin
+pip3 install -r requirements-mkdocs.txt
 ```
 
 To test your local changes while writing them and before making a pull-request:
