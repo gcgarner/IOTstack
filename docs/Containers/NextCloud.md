@@ -288,7 +288,7 @@ $ docker system prune
 $ docker system prune
 ```
 
-The first "prune" removes the old *local* image, the second removes the old *base* image.
+The first "prune" removes the old *local* image, the second removes the old *base* image. Whether an old *base image* exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
 ## Backups
 

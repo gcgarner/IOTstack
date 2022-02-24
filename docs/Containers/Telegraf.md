@@ -118,7 +118,7 @@ The remaining instructions in the *Dockerfile* customise the ***base image*** to
 
 The ***local image*** is instantiated to become your running container.
 
-When you run the `docker images` command after Telegraf has been built, you will see two rows for Telegraf:
+When you run the `docker images` command after Telegraf has been built, you *may* see two rows for Telegraf:
 
 ```bash
 $ docker images
@@ -130,7 +130,9 @@ telegraf            latest   a721ac170fad   3 days ago    273MB
 * `telegraf ` is the ***base image***; and
 * `iotstack_telegraf ` is the ***local image***.
 
-You will see the same pattern in *Portainer*, which reports the ***base image*** as "unused". You should not remove the ***base*** image, even though it appears to be unused.
+You *may* see the same pattern in *Portainer*, which reports the ***base image*** as "unused". You should not remove the ***base*** image, even though it appears to be unused.
+
+> Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
 ### Migration considerations
 
@@ -331,7 +333,7 @@ Breaking it down into parts:
 
 Your existing Telegraf container continues to run while the rebuild proceeds. Once the freshly-built ***local image*** is ready, the `up` tells `docker-compose` to do a new-for-old swap. There is barely any downtime for your service.
 
-The `prune` is the simplest way of cleaning up. The first call removes the old ***local image***. The second call cleans up the old ***base image***.
+The `prune` is the simplest way of cleaning up. The first call removes the old ***local image***. The second call cleans up the old ***base image***. Whether an old ***base image*** exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
 ### Telegraf version pinning
 

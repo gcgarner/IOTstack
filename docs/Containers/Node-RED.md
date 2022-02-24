@@ -115,7 +115,7 @@ Notes:
 
 	> Acknowledgement: Successful installation of the SQLite node is thanks to @fragolinux.
 
-When you run the `docker images` command after Node-RED has been built, you will see two rows for Node-RED:
+When you run the `docker images` command after Node-RED has been built, you *may* see two rows for Node-RED:
 
 ```bash
 $ docker images
@@ -127,11 +127,13 @@ nodered/node-red         latest              deb99584fa75        5 days ago     
 * `nodered/node-red` is the *base image*; and
 * `iotstack_nodered` is the *local image*. The *local* image is the one that is instantiated to become the running container.
 
-You will see the same pattern in Portainer, which reports the *base image* as "unused":
+You *may* see the same pattern in Portainer, which reports the *base image* as "unused":
 
 ![nodered-portainer-unused-image](./images/nodered-portainer-unused-image.png)
 
 You should not remove the *base* image, even though it appears to be unused.
+
+> Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
 ## Securing Node-RED
 
@@ -858,7 +860,8 @@ Breaking it down into parts:
 
 Your existing Node-RED container continues to run while the rebuild proceeds. Once the freshly-built *local image* is ready, the `up` tells `docker-compose` to do a new-for-old swap. There is barely any downtime for your Node-RED service.
 
-The `prune` is the simplest way of cleaning up old images. Sometimes you need to run this twice, the first time to clean up the old local image, the second time for the old base image.
+The `prune` is the simplest way of cleaning up old images. Sometimes you need to run this twice, the first time to clean up the old local image, the second time for the old base image. Whether an old base image exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
+
 
 ## Customising Node-RED
 

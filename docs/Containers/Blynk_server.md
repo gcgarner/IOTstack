@@ -115,7 +115,7 @@ The remaining instructions in the *Dockerfile* customise the ***base image*** to
 
 The ***local image*** is instantiated to become your running container.
 
-When you run the `docker images` command after Blynk Server has been built, you will see two rows that are relevant:
+When you run the `docker images` command after Blynk Server has been built, you *may* see two rows that are relevant:
 
 ```bash
 $ docker images
@@ -127,7 +127,9 @@ ubuntu                  latest   897590a6c564   7 days ago      49.8MB
 * `ubuntu ` is the ***base image***; and
 * `iotstack_blynk_server ` is the ***local image***.
 
-You will see the same pattern in *Portainer*, which reports the ***base image*** as "unused". You should not remove the ***base*** image, even though it appears to be unused.
+You *may* see the same pattern in *Portainer*, which reports the ***base image*** as "unused". You should not remove the ***base*** image, even though it appears to be unused.
+
+> Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
 ## Logging
 
@@ -215,6 +217,8 @@ At the time of writing, version 0.41.16 was the most up-to-date. Suppose that ve
 		$ docker system prune -f
 		$ docker system prune -f
 		```
+
+		The second `prune` will only be needed if there is an old *base image* and that, in turn, depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
 ## Using Blynk Server
 
