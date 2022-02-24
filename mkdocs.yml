@@ -8,6 +8,9 @@ edit_uri: "https://github.com/SensorsIot/IOTstack/edit/master/docs"
 
 theme:
   name: material
+  icon:
+    logo: octicons/stack-24
+  favicon: stack-24.svg
   palette:
     - scheme: default
       toggle:
