@@ -10,27 +10,25 @@ Andreas Spiess Video #352: Raspberry Pi4 Home Automation Server (incl. Docker, O
 
 [![#352 Raspberry Pi4 Home Automation Server (incl. Docker, OpenHAB, HASSIO, NextCloud)](http://img.youtube.com/vi/KJRMjUzlHI8/0.jpg)](https://www.youtube.com/watch?v=KJRMjUzlHI8)
 
-## assumptions
+## Assumptions
 
 IOTstack makes the following assumptions:
 
 1. Your hardware is a Raspberry Pi (typically a 3B+ or 4B).
 
-	Note: 
-
 	* The Raspberry Pi Zero W2 has been tested with IOTstack. It works but the 512MB RAM means you should not try to run too many containers concurrently.
+    * Users have also [reported success
+      ](https://github.com/SensorsIot/IOTstack/issues/375) on Orange Pi
+      Win/Plus.
 
-2. Your Raspberry Pi has a reasonably-recent version of 32-bit Raspberry Pi OS (aka "Raspbian") installed. You can download operating-system images:
+2. Your Raspberry Pi has a reasonably-recent version of 32-bit or 64-bit Raspberry Pi OS (aka "Raspbian") installed. You can download operating-system images:
 
 	* [Current release](https://www.raspberrypi.com/software/operating-systems/)
+      : "Raspberry Pi OS with desktop" is recommended.
 	* [Prior releases](http://downloads.raspberrypi.org/raspios_armhf/images/)
+      : This offers only "Raspberry Pi OS with desktop" images.
 
-		Note:
-
-		* If you use the first link, "Raspberry Pi OS with desktop" is recommended.
-		* The second link only offers "Raspberry Pi OS with desktop" images.
-
-3. Your operating system has been kept up-to-date with:
+3. Your operating system has been updated:
 
 	```bash
 	$ sudo apt update
@@ -46,13 +44,7 @@ If the first three assumptions hold, assumptions four through six are Raspberry 
 
 Please don't read these assumptions as saying that IOTstack will not run on other hardware, other operating systems, or as a different user. It is just that IOTstack gets most of its testing under these conditions. The further you get from these implicit assumptions, the more your mileage may vary.
 
-### other platforms
-
-Users have reported success on other platforms, including:
-
-* [Orange Pi WinPlus](https://github.com/SensorsIot/IOTstack/issues/375)
-
-## new installation
+## New installation
 
 ### automatic (recommended)
 
@@ -128,13 +120,9 @@ If you prefer to automate your installations using scripts, see:
 
 * [Installing Docker for IOTstack](https://gist.github.com/Paraphraser/d119ae81f9e60a94e1209986d8c9e42f#scripting-iotstack-installations).
 
-## migrating from the old repo (gcgarner)?
+## Required system patches
 
-If you are still running on gcgarner/IOTstack and need to migrate to SensorsIot/IOTstack, see:
-
-* [Migrating IOTstack from gcgarner to SensorsIot](../Updates/gcgarner-migration.md).
-
-## recommended system patches
+Unless you know what you are doing, assume these are needed.
 
 ### patch 1 – restrict DHCP
 
@@ -162,9 +150,9 @@ PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
 
 If you see the word "buster", proceed to step 2. Otherwise, skip this patch.
 
-#### step 2: if you are running "buster" …
+#### step 2: if you are indeed running "buster"
 
-You need this patch if you are running Raspbian Buster. Without this patch, Docker images will fail if:
+Without this patch on Buster, Docker images will fail if:
 
 * the image is based on Alpine and the image's maintainer updates to [Alpine 3.13](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirement); and/or
 * an image's maintainer updates to a library that depends on 64-bit values for *Unix epoch time* (the so-called Y2038 problem).
@@ -189,53 +177,6 @@ Enable by running (takes effect after reboot):
 echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
 ```
 
-## a word about the `sudo` command
-
-Many first-time users of IOTstack get into difficulty by misusing the `sudo` command. The problem is best understood by example. In the following, you would expect `~` (tilde) to expand to `/home/pi`. It does:
-
-```bash
-$ echo ~/IOTstack
-/home/pi/IOTstack
-```
-
-The command below sends the same `echo` command to `bash` for execution. This is what happens when you type the name of a shell script. You get a new instance of `bash` to run the script:
-
-```bash
-$ bash -c 'echo ~/IOTstack'
-/home/pi/IOTstack
-```
-
-Same answer. Again, this is what you expect. But now try it with `sudo` on the front:
-
-```bash
-$ sudo bash -c 'echo ~/IOTstack'
-/root/IOTstack
-```
-
-Different answer. It is different because `sudo` means "become root, and then run the command". The process of becoming root changes the home directory, and that changes the definition of `~`.
-
-Any script designed for working with IOTstack assumes `~` (or the equivalent `$HOME` variable) expands to `/home/pi`. That assumption is invalidated if the script is run by `sudo`.
-
-Of necessity, any script designed for working with IOTstack will have to invoke `sudo` **inside** the script **when it is required**. You do not need to second-guess the script's designer.
-
-Please try to minimise your use of `sudo` when you are working with IOTstack. Here are some rules of thumb:
-
-1. Is what you are about to run a script? If yes, check whether the script already contains `sudo` commands. Using `menu.sh` as the example:
-
-	```bash
-	$ grep -c 'sudo' ~/IOTstack/menu.sh
-	28
-	```
-
-	There are numerous uses of `sudo` within `menu.sh`. That means the designer thought about when `sudo` was needed.
-
-2. Did the command you **just executed** work without `sudo`? Note the emphasis on the past tense. If yes, then your work is done. If no, and the error suggests elevated privileges are necessary, then re-execute the last command like this:
-
-	```bash
-	$ sudo !!
-	```
-
-It takes time, patience and practice to learn when `sudo` is **actually** needed. Over-using `sudo` out of habit, or because you were following a bad example you found on the web, is a very good way to find that you have created so many problems for yourself that will need to reinstall your IOTstack. *Please* err on the side of caution!
 
 ## the IOTstack menu
 
@@ -343,7 +284,7 @@ $ git checkout master
 $ ./menu.sh
 ```
 
-### <a name="menuOldMenuBranch"> old menu (old-menu branch)</a>
+### old menu (old-menu branch)
 
 ```bash
 $ cd ~/IOTstack/

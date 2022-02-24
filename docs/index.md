@@ -19,6 +19,7 @@ Welcome to the IOTstack Wiki:
   </label>
 
 * If you are just getting started with IOTstack, see [Getting Started](Basic_setup/).
+    * If you're running gcgarner/IOTstack see [Migrating to SensorsIot](Updates/gcgarner-migration.md).
 
 * You're always welcome to ask questions on the [IOTStack Discord](https://discord.gg/ZpKHnks).
 
