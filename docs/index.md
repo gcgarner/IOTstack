@@ -1,11 +1,26 @@
+---
+title: Home
+hide:
+  - navigation
+---
 # IOTStack Wiki
+
+!!! abstract inline end "What is IOTstack"
+    IOTstack is a builder for docker-compose to easily make and maintain IoT
+    stacks on the Raspberry Pi
 
 Welcome to the IOTstack Wiki:
 
-* Use the list of contents at the left of this page to explore this Wiki.
+* <span class="show-when-wide-layout">
+  Use the header tabs and content list at the left to explore this Wiki.
+  </span>
+  <label class="show-when-narrow-layout">
+  Click the "≡" icon to navigate this Wiki.
+  </label>
 
-	- If you are viewing this on a device that does not show the list by default, click the "≡" icon.
+* If you are just getting started with IOTstack, see [Getting Started](Basic_setup/).
+    * If you're running gcgarner/IOTstack see [Migrating to SensorsIot](Updates/gcgarner-migration.md).
 
-* If you are looking for information on a specific container, click on the "Containers" folder at the bottom of the list.
+* You're always welcome to ask questions on the [IOTStack Discord](https://discord.gg/ZpKHnks).
 
-* If you are just getting started with IOTstack, see [Getting Started](./Getting-Started.md).
+* Fixes and improvements welcome, see [Contributing](Developers/)

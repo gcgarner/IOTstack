@@ -1,10 +1,60 @@
 site_name: IOTstack
 site_description: 'Docker stack for getting started on IOT on the Raspberry PI'
+
+# Repository
+repo_url: https://github.com/SensorsIot/IOTstack
+repo_name: SensorsIot/IOTstack
+edit_uri: "https://github.com/SensorsIot/IOTstack/edit/master/docs"
+
 theme:
   name: material
+  icon:
+    logo: octicons/stack-24
+  favicon: stack-24.svg
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+  features:
+    - tabs
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+
 plugins:
   - search
-# - awesome-pages
+  - redirects:
+      # Forward renamed pages to avoid breaking old links.
+      redirect_maps:
+        Getting-Started.md: Basic_setup/index.md
+        Accessing-your-Device-from-the-internet.md: Basic_setup/Accessing-your-Device-from-the-internet.md
+        Backup-and-Restore.md: Basic_setup/Backup-and-Restore.md
+        Custom.md: Basic_setup/Custom.md
+        Default-Configs.md: Basic_setup/Default-Configs.md
+        Docker-commands.md: Basic_setup/Docker-commands.md
+        How-the-script-works.md: Basic_setup/How-the-script-works.md
+        Misc.md: Basic_setup/Misc.md
+        Native-RTL_433.md: Basic_setup/Native-RTL_433.md
+        Networking.md: Basic_setup/Networking.md
+        RPIEasy_native.md: Basic_setup/RPIEasy_native.md
+        Understanding-Containers.md: Basic_setup/Understanding-Containers.md
+        Updates/Updating-the-Project.md: Updates/index.md
+        PostBuild-Script.md: Developers/PostBuild-Script.md
+        BuildStack-RandomPassword.md: Developers/BuildStack-RandomPassword.md
+        BuildStack-Services.md: Developers/BuildStack-Services.md
+        Menu-System.md: Developers/Menu-System.md
+        Contributing-Services.md: Developers/index.md
+
+extra_css:
+  - style.css
+
 markdown_extensions:
+  - admonition
   - pymdownx.superfences
-repo_url: https://github.com/SensorsIot/IOTstack
+  - toc:
+      permalink: true

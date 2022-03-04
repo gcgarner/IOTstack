@@ -1,4 +1,4 @@
-# Build Stack Default Passwords for Services
+# Default Passwords and ports
 
 Here you can find a list of the default configurations for IOTstack for quick referece.
 

@@ -6,9 +6,9 @@ Migrating to SensorsIot/IOTstack was fairly easy when this repository was first 
 
 The probability of conflicts developing increases as a function of time since the fork. Conflicts were and are pretty much inevitable so a more involved procedure is needed.
 
-## <a name="migrationSteps"> Migration Steps </a>
+## Migration Steps
 
-### <a name="checkAssumptions"> Step 1 – Check your assumptions </a>
+### Step 1 – Check your assumptions
 
 Make sure that you are, *actually*, on gcgarner. Don't assume!
 
@@ -20,7 +20,7 @@ origin	https://github.com/gcgarner/IOTstack.git (push)
 
 Do not proceed if you don't see those URLs!
 
-### <a name="downStack"> Step 2 – Take IOTstack down </a>
+### Step 2 – Take IOTstack down
 
 Take your stack down. This is not *strictly* necessary but we'll be moving the goalposts a bit so it's better to be on the safe side.
 
@@ -29,22 +29,22 @@ $ cd ~/IOTstack
 $ docker-compose down
 ```
 
-### <a name="chooseMigrationMethod"> Step 3 – Choose your migration method </a>
+### Step 3 – Choose your migration method
 
 There are two basic approaches to switching from gcgarner/IOTstack to SensorsIot/IOTstack:
 
-- [Migration by changing upstream repository](#migrateChangeUpstream)
-- [Migration by clone and merge](#migrateCloneMerge)
+- [Migration by changing upstream repository](#migration-option-1-change-upstream-repository)
+- [Migration by clone and merge](#migration-option-2-clone-and-merge)
 
 You can think of the first as "working *with* git" while the second is "using brute force".
 
 The first approach will work if you haven't tried any other migration steps and/or have not made too many changes to items in your gcgarner/IOTstack that are under git control.
 
-If you are already stuck or you try the first approach and get a mess, or it all looks far too hard to sort out, then try the [Migration by clone and merge](#migrateCloneMerge) approach.
+If you are already stuck or you try the first approach and get a mess, or it all looks far too hard to sort out, then try the [Migration by clone and merge](#migration-option-2-clone-and-merge) approach.
 
-#### <a name="migrateChangeUpstream"> Migration Option 1 – change upstream repository </a>
+#### Migration Option 1 – change upstream repository
 
-##### <a name="checkLocalChanges"> Check for local changes </a>
+##### Check for local changes
 
 Make sure you are on the master branch (you probably are so this is just a precaution), and then see if Git thinks you have made any local changes:
 
@@ -93,7 +93,7 @@ The simplest way to deal with modified files is to rename them to move them out 
 		menu.sh.jqh
 	```
 
-##### <a name="synchroniseGcgarner"> Synchronise with gcgarner on GitHub </a>
+##### Synchronise with gcgarner on GitHub
 
 Make sure your local copy of gcgarner is in sync with GitHub.
 
@@ -101,7 +101,7 @@ Make sure your local copy of gcgarner is in sync with GitHub.
 $ git pull
 ```
 
-##### <a name="removeUpstream"> Get rid of any upstream reference </a>
+##### Get rid of any upstream reference
 
 There may or may not be any "upstream" set. The most likely reason for this to happen is if you used your local copy as the basis of a Pull Request.
 
@@ -111,7 +111,7 @@ The next command will probably return an error, which you should ignore. It's ju
 $ git remote remove upstream
 ```
 
-##### <a name="pointToSensorsIoT"> Point to SensorsIot </a>
+##### Point to SensorsIot
 
 Change your local repository to point to SensorsIot.
 
@@ -119,7 +119,7 @@ Change your local repository to point to SensorsIot.
 $ git remote set-url origin https://github.com/SensorsIot/IOTstack.git
 ```
 
-##### <a name="syncSensorsIoT"> Synchronise with SensorsIot on GitHub </a>
+##### Synchronise with SensorsIot on GitHub
 
 This is where things can get a bit tricky so please read these instructions carefully **before** you proceed.
 
@@ -174,7 +174,7 @@ Auto-merging .templates/someRandomService/service.yml
 
 If you don't use `someRandomService` then you could safely ignore this on the basis that it was "probably right". However, if you did use that service and it started to misbehave after migration, you would know that the `service.yml` file was a good place to start looking for explanations.
 
-##### <a name="finishWithPull"> Finish with a pull </a>
+##### Finish with a pull
 
 At this point, only the migrated master branch is present on your local copy of the repository. The next command brings you fully in-sync with GitHub:
 
@@ -182,11 +182,11 @@ At this point, only the migrated master branch is present on your local copy of 
 $ git pull
 ```
 
-#### <a name="migrateCloneMerge"> Migration Option 2 – clone and merge </a>
+#### Migration Option 2 – clone and merge
 
 If you have been following the process correctly, your IOTstack will already be down.
 
-##### <a name="renameOldIOTstack"> Rename your existing IOTstack folder </a>
+##### Rename your existing IOTstack folder
 
 Move your old IOTstack folder out of the way, like this:
 
@@ -199,7 +199,7 @@ Note:
 
 * You should not need `sudo` for the `mv` command but it is OK to use it if necessary.
 
-##### <a name="fetchCleanClone"> Fetch a clean clone of SensorsIot/IOTstack </a>
+##### Fetch a clean clone of SensorsIot/IOTstack
 
 ```
 $ git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
@@ -240,7 +240,7 @@ Observe what is **not** there:
 
 From this, it should be self-evident that a clean checkout from GitHub is the factory for *all* IOTstack installations, while the contents of `backups`, `services`, `volumes` and `docker-compose.yml` represent each user's individual choices, configuration options and data.
 
-##### <a name="mergeOldWithNew"> Merge old into new </a>
+##### Merge old into new
 
 Execute the following commands:
 
@@ -272,7 +272,7 @@ There is no need to migrate the `backups` directory. You are better off creating
 $ mkdir ~/IOTstack/backups
 ```
 
-### <a name="chooseMenu"> Step 4 – Choose your menu </a>
+### Step 4 – Choose your menu
 
 If you have reached this point, you have migrated to SensorsIot/IOTstack where you are on the "master" branch. This implies "new menu".
 
@@ -353,7 +353,7 @@ Although you can freely change branches, it's probably not a good idea to try to
 
 Even so, nothing will change **until** you run your chosen menu to completion and allow it to generate a new `docker-compose.yml`.
 
-### <a name="upStack"> Step 5 – Bring up your stack </a>
+### Step 5 – Bring up your stack
 
 Unless you have gotten ahead of yourself and have already run the menu (old or new) then nothing will have changed in the parts of your `~/IOTstack` folder that define your IOTstack implementation. You can safely:
 
@@ -361,7 +361,7 @@ Unless you have gotten ahead of yourself and have already run the menu (old or n
 $ docker-compose up -d
 ```
 
-## <a name="seeAlso"> See also </a>
+## See also
 
 There is another gist [Installing Docker for IOTstack](https://gist.github.com/Paraphraser/d119ae81f9e60a94e1209986d8c9e42f) which explains how to overcome problems with outdated Docker and Docker-Compose installations.
 

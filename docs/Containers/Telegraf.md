@@ -7,13 +7,13 @@ The purpose of the Dockerfile is to:
 * tailor the default configuration to be IOTstack-ready; and
 * enable the container to perform self-repair if essential elements of the persistent storage area disappear.
  
-## <a name="references"> References </a>
+## References
 
 - [*influxdata Telegraf* home](https://www.influxdata.com/time-series-platform/telegraf/)
 - [*GitHub*: influxdata/influxdata-docker/telegraf](https://github.com/influxdata/influxdata-docker/tree/master/telegraf)
 - [*DockerHub*: influxdata Telegraf](https://hub.docker.com/_/telegraf)
 
-## <a name="significantFiles"> Significant directories and files </a>
+## Significant directories and files
 
 ```
 ~/IOTstack
@@ -38,14 +38,14 @@ The purpose of the Dockerfile is to:
 
 1. The *Dockerfile* used to customise Telegraf for IOTstack.
 2. A replacement for the `telegraf` container script of the same name, extended to handle container self-repair.
-3. The *additions folder*. See [Applying optional additions](#optionalAdditions).
+3. The *additions folder*. See [Applying optional additions](#applying-optional-additions).
 4. The *auto_include folder*. Additions automatically applied to
-   `telegraf.conf`. See [Automatic includes to telegraf.conf](#autoInclude).
+   `telegraf.conf`. See [Automatic includes to telegraf.conf](#automatic-includes-to-telegrafconf).
 5. The *template service definition*.
 6. The *working service definition* (only relevant to old-menu, copied from ❹).
 7. The *persistent storage area* for the `telegraf` container.
-8. A working copy of the *additions folder* (copied from ❸). See [Applying optional additions](#optionalAdditions).
-9. The *reference configuration file*. See [Changing Telegraf's configuration](#editConfiguration).
+8. A working copy of the *additions folder* (copied from ❸). See [Applying optional additions](#applying-optional-additions).
+9. The *reference configuration file*. See [Changing Telegraf's configuration](#changing-telegrafs-configuration).
 10. The *active configuration file*. A subset of ➒ altered to support communication with InfluxDB running in a container in the same IOTstack instance.
 
 Everything in the persistent storage area ❼:
@@ -53,19 +53,19 @@ Everything in the persistent storage area ❼:
 * will be replaced if it is not present when the container starts; but
 * will never be overwritten if altered by you.
 
-## <a name="howTelegrafIOTstackGetsBuilt"> How Telegraf gets built for IOTstack </a>
+## How Telegraf gets built for IOTstack
 
-### <a name="dockerHubImages"> Telegraf images ([*DockerHub*](https://hub.docker.com)) </a>
+### Telegraf images ([*DockerHub*](https://hub.docker.com))
 
 Periodically, the source code is recompiled and the resulting image is pushed to [influxdata Telegraf](https://hub.docker.com/_/telegraf?tab=tags&page=1&ordering=last_updated) on *DockerHub*.
  
-### <a name="iotstackMenu"> IOTstack menu </a>
+### IOTstack menu
 
 When you select Telegraf in the IOTstack menu, the *template service definition* is copied into the *Compose* file.
 
 > Under old menu, it is also copied to the *working service definition* and then not really used.
 
-### <a name="iotstackFirstRun"> IOTstack first run </a>
+### IOTstack first run
 
 On a first install of IOTstack, you run the menu, choose your containers, and are told to do this:
 
@@ -74,7 +74,7 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
-> See also the [Migration considerations](#migration) (below).
+> See also the [Migration considerations](#migration-considerations) (below).
 
 `docker-compose` reads the *Compose* file. When it arrives at the `telegraf` fragment, it finds:
 
@@ -99,7 +99,7 @@ The *Dockerfile* begins with:
 FROM telegraf:latest
 ```
 
-> If you need to pin to a particular version of Telegraf, the *Dockerfile* is the place to do it. See [Telegraf version pinning](#versionPinning).
+> If you need to pin to a particular version of Telegraf, the *Dockerfile* is the place to do it. See [Telegraf version pinning](#telegraf-version-pinning).
 
 The `FROM` statement tells the build process to pull down the ***base image*** from [*DockerHub*](https://hub.docker.com).
 
@@ -134,7 +134,7 @@ You *may* see the same pattern in *Portainer*, which reports the ***base image**
 
 > Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-### <a name="migration"> Migration considerations </a>
+### Migration considerations
 
 Under the original IOTstack implementation of Telegraf (just "as it comes" from *DockerHub*), the service definition expected `telegraf.conf` to be at:
 
@@ -154,9 +154,9 @@ With one exception, all prior and current versions of the default configuration 
 
 > In other words, once you strip away comments and blank lines, and remove any "active" configuration options that simply repeat their default setting, you get the same subset of "active" configuration options. The default configuration file supplied with gcgarner/IOTstack is available [here](https://github.com/gcgarner/IOTstack/blob/master/.templates/telegraf/telegraf.conf) if you wish to refer to it.
 
-The exception is `[[inputs.mqtt_consumer]]` which is now provided as an optional addition. If your existing Telegraf configuration depends on that input, you will need to apply it. See [applying optional additions](#optionalAdditions).
+The exception is `[[inputs.mqtt_consumer]]` which is now provided as an optional addition. If your existing Telegraf configuration depends on that input, you will need to apply it. See [applying optional additions](#applying-optional-additions).
 
-## <a name="logging"> Logging </a>
+## Logging
 
 You can inspect Telegraf's log by:
 
@@ -166,7 +166,7 @@ $ docker logs telegraf
 
 These logs are ephemeral and will disappear when your Telegraf container is rebuilt.
 
-### <a name="logTelegrafDB"> log message: *database "telegraf" creation failed* </a>
+### log message: *database "telegraf" creation failed*
 
 The following log message can be misleading:
 
@@ -178,7 +178,7 @@ If InfluxDB is not running when Telegraf starts, the `depends_on:` clause in Tel
 
 What this error message *usually* means is that Telegraf has tried to communicate with InfluxDB before the latter is ready to accept connections. Telegraf typically retries after a short delay and is then able to communicate with InfluxDB.
 
-## <a name="editConfiguration"> Changing Telegraf's configuration </a>
+## Changing Telegraf's configuration
 
 The first time you launch the Telegraf container, the following structure will be created in the persistent storage area:
 
@@ -204,7 +204,7 @@ The file:
 	- is created by removing all comment lines and blank lines from `telegraf-reference.conf`, leaving only the "active" configuration options, and then adding options necessary for IOTstack.
 	- is less than 30 lines and is significantly easier to understand than `telegraf-reference.conf`.
 
-* `inputs.docker.conf` – see [Applying optional additions](#optionalAdditions) below.
+* `inputs.docker.conf` – see [Applying optional additions](#applying-optional-additions) below.
 
 The intention of this structure is that you:
 
@@ -219,7 +219,7 @@ $ cd ~/IOTstack
 $ docker-compose restart telegraf
 ```
 
-### <a name="autoInclude"> Automatic includes to telegraf.conf </a>
+### Automatic includes to telegraf.conf
 
 * `inputs.docker.conf` instructs Telegraf to collect metrics from Docker. Requires kernel control
   groups to be enabled to collect memory usage data. If not done during initial installation,
@@ -229,9 +229,9 @@ $ docker-compose restart telegraf
   ```
 * `inputs.cpu_temp.conf' collects cpu temperature.
  
-### <a name="optionalAdditions"> Applying optional additions </a>
+### Applying optional additions
 
-The *additions folder* (see [Significant directories and files](#significantFiles)) is a mechanism for additional *IOTstack-ready* configuration options to be provided for Telegraf.
+The *additions folder* (see [Significant directories and files](#significant-directories-and-files)) is a mechanism for additional *IOTstack-ready* configuration options to be provided for Telegraf.
 
 Currently there is one addition:
 
@@ -249,9 +249,9 @@ $ docker-compose restart telegraf
 
 The `grep` strips comment lines and the `sudo tee` is a safe way of appending the result to `telegraf.conf`. The `restart` causes Telegraf to notice the change.
 
-## <a name="cleanSlate"> Getting a clean slate </a>
+## Getting a clean slate
 
-### <a name="resetDB"> Erasing the persistent storage area </a>
+### Erasing the persistent storage area
 
 Erasing Telegraf's persistent storage area triggers self-healing and restores known defaults:
 
@@ -272,7 +272,7 @@ Note:
 	$ docker-compose restart telegraf
 	```
 
-### <a name="resetDB"> Resetting the InfluxDB database </a>
+### Resetting the InfluxDB database
 
 To reset the InfluxDB database that Telegraf writes into, proceed like this:
 
@@ -293,7 +293,7 @@ In words:
 * Delete the `telegraf` database, and then exit the CLI.
 * Start the Telegraf container. This re-creates the database automatically. 
 
-## <a name="upgradingTelegraf"> Upgrading Telegraf </a>
+## Upgrading Telegraf
 
 You can update most containers like this:
 
@@ -335,7 +335,7 @@ Your existing Telegraf container continues to run while the rebuild proceeds. On
 
 The `prune` is the simplest way of cleaning up. The first call removes the old ***local image***. The second call cleans up the old ***base image***. Whether an old ***base image*** exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-### <a name="versionPinning"> Telegraf version pinning </a>
+### Telegraf version pinning
 
 If you need to pin Telegraf to a particular version:
 

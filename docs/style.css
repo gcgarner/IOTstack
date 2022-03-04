@@ -1,0 +1,17 @@
+/* vim: set sw=2: */
+
+/* hide "Made with Material" footer */
+.md-footer-meta {
+    display: none;
+}
+
+@media screen and (max-width:76.25em) {
+  .show-when-wide-layout {
+    display:none
+  }
+}
+@media screen and (min-width:76.25em) {
+  .show-when-narrow-layout {
+    display:none
+  }
+}

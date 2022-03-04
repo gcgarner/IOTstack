@@ -1,3 +1,6 @@
+---
+title: Octoprint
+---
 # OctoPrint – the snappy web interface for your 3D printer
 
 ## References

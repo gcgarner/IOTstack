@@ -2,7 +2,7 @@
 The postbuild bash script allows for executing arbitrary execution of bash commands after the stack has been build.
 
 ## How to use
-Place a file in the main directory called `postbuild.sh`. When the buildstack [build logic](https://sensorsiot.github.io/IOTstack/Menu-System) finishes, it'll execute the `postbuild.sh` script, passing in each service selected from the buildstack menu as a parameter. This script is run each time the buildstack logic runs.
+Place a file in the main directory called `postbuild.sh`. When the buildstack [build logic](../Developers/Menu-System.md) finishes, it'll execute the `postbuild.sh` script, passing in each service selected from the buildstack menu as a parameter. This script is run each time the buildstack logic runs.
 
 ## Updates
 The `postbuild.sh` file has been added to gitignore, so it won't be updated by IOTstack when IOTstack is updated. It has also been added to the backup script so that it will be backed up with your personal IOTstack backups.

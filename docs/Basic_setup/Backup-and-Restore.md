@@ -8,6 +8,7 @@ The backup command can be executed from IOTstack's menu, or from a cronjob.
 To ensure that all your data is saved correctly, the stack should be brought down. This is mainly due to databases potentially being in a state that could cause data loss.
 
 There are 2 ways to run backups:
+
 * From the menu: `Backup and Restore` > `Run backup`
 * Running the following command: `bash ./scripts/backup.sh`
 
@@ -21,6 +22,7 @@ The current directory of bash must be in IOTstack's directory, to ensure that it
 ```
 ./scripts/backup.sh {TYPE=3} {USER=$(whoami)}
 ```
+
 * Types:
   * 1 = Backup with Date
     * A tarball file will be created that contains the date and time the backup was started, in the filename.
@@ -33,10 +35,12 @@ The current directory of bash must be in IOTstack's directory, to ensure that it
       If this parameter is not supplied when run as root, the script will ask for the username as input
 
 Backups:
+
   * You can find the backups in the ./backups/ folder. With rolling being in ./backups/rolling/ and date backups in ./backups/backup/
   * Log files can also be found in the ./backups/logs/ directory.
 
 ### Examples:
+
   * `./scripts/backup.sh`
   * `./scripts/backup.sh 3`
 
@@ -52,6 +56,7 @@ This will only produce a backup in the rollowing folder and change all the permi
 
 ## Restore
 There are 2 ways to run a restore:
+
 * From the menu: `Backup and Restore` > `Restore from backup`
 * Running the following command: `bash ./scripts/restore.sh`
 
@@ -64,6 +69,7 @@ There are 2 ways to run a restore:
 ./scripts/restore.sh {FILENAME=backup.tar.gz} {noask}
 ```
 The restore script takes 2 arguments:
+
 * Filename: The name of the backup file. The file must be present in the `./backups/` directory, or a subfolder in it. That means it should be moved from `./backups/backup` to `./backups/`, or that you need to specify the `backup` portion of the directory (see examples)
 * NoAsk: If a second parameter is present, is acts as setting the no ask flag to true. 
 

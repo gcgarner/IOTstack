@@ -1,8 +1,9 @@
 # Forward DNS requests from remote WireGuard clients to the default
 # gateway on the internal bridged network that the WireGuard container
-# is attached to. This results in queries being sent to any other
-# container on the same internal bridged network that is listening
-# on port 53 (eg PiHole, AdGuardHome or bind9).
+# is attached to. The gateway routes queries out from the bridged network to
+# the host's network. This results in queries being sent to any daemon or
+# container that is listening on host port 53 (eg PiHole, AdGuardHome, dnsmasq
+# or bind9).
 #
 # Acknowledgement: @ukkopahis
 
