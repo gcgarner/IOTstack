@@ -1,7 +1,7 @@
   syncthing:
     image: linuxserver/syncthing:latest
     container_name: syncthing
-    hostname: syncthing #optional
+    hostname: raspberrypi #optional
     
     environment:
       - PUID=1000
