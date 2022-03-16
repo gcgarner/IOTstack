@@ -559,6 +559,12 @@ This is how **most** containers behave. There are exceptions so it's always a go
 
 ## stack maintenance
 
+!!! danger "Breaking update"
+    Recent changes will require [manual steps](
+    https://github.com/SensorsIot/IOTstack/blob/master/README.md#significant-change-to-networking)
+    or you may get an error like:  
+    `ERROR: Service "influxdb" uses an undefined network "iotstack_nw"`
+
 ### update Raspberry Pi OS
 
 You should keep your Raspberry Pi up-to-date. Despite the word "container" suggesting that *containers* are fully self-contained, they sometimes depend on operating system components ("WireGuard" is an example).

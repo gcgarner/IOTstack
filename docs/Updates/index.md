@@ -2,6 +2,12 @@
 
 Periodically updates are made to project which include new or modified container template, changes to backups or additional features. As these are released your local copy of this project will become out of date. This section deals with how to bring your project to the latest published state.
 
+!!! danger "Breaking update"
+    Recent changes will require [manual steps](
+    https://github.com/SensorsIot/IOTstack/blob/master/README.md#significant-change-to-networking)
+    or you may get an error like:  
+    `ERROR: Service "influxdb" uses an undefined network "iotstack_nw"`
+
 ## Quick instructions
 
 1. backup your current settings: `cp docker-compose.yml docker-compose.yml.bak`
