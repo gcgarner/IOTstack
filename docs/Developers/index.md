@@ -1,6 +1,24 @@
 # Contributing
 
+We welcome pull-requests.
+
+For larger contributions, please open an issue describing your idea. It
+may provide valuable discussion and feedback. It also prevents the unfortunate
+case of two persons working on the same thing. There's no need to wait for any
+approval.
+
+!!! check "Development guidelines"
+    * It-just-works - use good defaults that will work well for a first time user
+    * Keep-it-simple - try to keep stuff beginner-friendly and don't go too
+      deep into advanced topics
+
 ## Writing documentation
+
+!!! tip inline end
+    For simple changes you can straight-up just use the edit link available on
+    every documentation page. It's the pen-icon to the right of the top
+    heading. Write your changes, preview everything looks as expected and
+    submit as proposed changes.
 
 Documentation is is written as markdown, processed using mkdocs ([docs](https://www.mkdocs.org/user-guide/writing-your-docs/#writing-your-docs)) and the Material theme ([docs](https://squidfunk.github.io/mkdocs-material/reference/)). The Material theme is not just styling, but provides additional syntax extensions.
 
