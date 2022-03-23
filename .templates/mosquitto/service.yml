@@ -1,6 +1,9 @@
 mosquitto:
   container_name: mosquitto
-  build: ./.templates/mosquitto/.
+  build:
+    context: ./.templates/mosquitto/.
+    args:
+    - MOSQUITTO_BASE=eclipse-mosquitto:latest
   restart: unless-stopped
   environment:
     - TZ=Etc/UTC
