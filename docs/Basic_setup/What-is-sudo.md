@@ -45,3 +45,15 @@ Please try to minimise your use of `sudo` when you are working with IOTstack. He
 	```
 
 It takes time, patience and practice to learn when `sudo` is **actually** needed. Over-using `sudo` out of habit, or because you were following a bad example you found on the web, is a very good way to find that you have created so many problems for yourself that will need to reinstall your IOTstack. *Please* err on the side of caution!
+
+## Configuration
+
+To edit sudo functionality and permissions use: `sudo visudo`
+
+For instance, to allow sudo usage without prompting for a password:
+```bash
+# Allow members of group sudo to execute any command without password prompt
+%sudo   ALL=(ALL:ALL) NOPASSWD:ALL
+```
+
+For more information: `man sudoers`
