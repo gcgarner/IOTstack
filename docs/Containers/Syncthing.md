@@ -21,7 +21,7 @@ The web UI can be found on  `yourip:8384`
 
 Configuration data is available under `/config` containers directroy and mapped to `./volumes/syncthing/config` . 
 
-The data you want to sync must be under the same directory as configuration one. By default, Syncthing creates a `Sync` subdirectory
+The data you want to sync must be under `/app` directory.
 
 ## Ports
 
