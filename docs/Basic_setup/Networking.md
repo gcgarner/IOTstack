@@ -5,7 +5,9 @@ An easy way to find out your IP is by typing `ip address` in the terminal and lo
 
 Check the docker-compose.yml to see which ports have been used
 
+<div markdown="1" style="background: #FFFC; padding: 0.5em;">
 ![net](https://user-images.githubusercontent.com/46672225/66702353-0bcc4080-ed07-11e9-994b-62219f50b096.png)
+</div>
 
 ## Examples
 - You want to connect your nodered to your mqtt server. In nodered drop an mqtt node, when you need to specify the address type `mosquitto`

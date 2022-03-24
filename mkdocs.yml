@@ -58,3 +58,4 @@ markdown_extensions:
   - pymdownx.superfences
   - toc:
       permalink: true
+  - md_in_html
