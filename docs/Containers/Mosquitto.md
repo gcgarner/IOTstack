@@ -159,7 +159,7 @@ You *may* see the same pattern in Portainer, which reports the *base image* as "
 
 > Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-### <a name="migration-considerations"> Migration considerations </a>
+### <a name="migration-considerations"></a>Migration considerations
 
 Under the original IOTstack implementation of Mosquitto (just "as it comes" from *DockerHub*), the service definition expected the configuration files to be at:
 
@@ -514,7 +514,7 @@ The agent is invoked 30 seconds after the container starts, and every 30 seconds
 * Subscribes to the same broker for the same topic for a single message event.
 * Compares the payload sent with the payload received. If the payloads (ie time-stamps) match, the agent concludes that the Mosquitto broker (the process running inside the same container) is functioning properly for round-trip messaging.
 
-### <a name="monitoring health-check"> monitoring health-check </a>
+### <a name="monitoring-health-check"></a>monitoring health-check
 
 Portainer's *Containers* display contains a *Status* column which shows health-check results for all containers that support the feature.
 
@@ -560,7 +560,7 @@ Notes:
 * If you enable authentication for your Mosquitto broker, you will need to add `-u «user»` and `-P «password»` parameters to this command.
 * You should expect to see a new message appear approximately every 30 seconds. That indicates the health-check agent is functioning normally. Use <kbd>control</kbd>+<kbd>c</kbd> to terminate the command.
 
-### <a name="customising-health-check"> customising health-check </a>
+### <a name="customising-health-check"></a>customising health-check
 
 You can customise the operation of the health-check agent by editing the `mosquitto` service definition in your *Compose* file:
 
@@ -651,7 +651,7 @@ Your existing Mosquitto container continues to run while the rebuild proceeds. O
 
 The `prune` is the simplest way of cleaning up. The first call removes the old *local image*. The second call cleans up the old *base image*. Whether an old *base image* exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-### <a name="mosquitto-version-pinning"> Mosquitto version pinning </a>
+### <a name="mosquitto-version-pinning"></a>Mosquitto version pinning
 
 If an update to Mosquitto introduces a breaking change, you can revert to an earlier know-good version by pinning to that version. Here's how:
 
