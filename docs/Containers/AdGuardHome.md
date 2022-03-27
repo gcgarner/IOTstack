@@ -9,7 +9,7 @@
 
 AdGuard Home and PiHole perform similar functions. They use the same ports so you can **not** run both at the same time. You must choose one or the other.
 
-## Quick Start
+## <a name="quickStart"></a>Quick Start
 
 When you first install AdGuard Home:
 
@@ -34,7 +34,7 @@ When you first install AdGuard Home:
 
 Port 8089 is the default administrative user interface for AdGuard Home running under IOTstack.
 
-Port 8089 is not active until you have completed the [Quick Start](#quick-start) procedure. You must start by connecting to port 3001.
+Port 8089 is not active until you have completed the [Quick Start](#quickStart) procedure. You must start by connecting to port 3001.
 
 Because of AdGuard Home limitations, you must take special precautions if you decide to change to a different port number:
 
@@ -50,11 +50,11 @@ Because of AdGuard Home limitations, you must take special precautions if you de
 	 $ docker-compose up -d adguardhome
 	```
 
-3. Repeat the [Quick Start](#quick-start) procedure, this time substituting the new Admin Web Interface port where you see "8089".
+3. Repeat the [Quick Start](#quickStart) procedure, this time substituting the new Admin Web Interface port where you see "8089".
 
 ## About port 3001:3000
 
-Port 3001 (external, 3000 internal) is only used during [Quick Start](#quick-start) procedure. Once port 8089 becomes active, port 3001 ceases to be active.
+Port 3001 (external, 3000 internal) is only used during [Quick Start](#quickStart) procedure. Once port 8089 becomes active, port 3001 ceases to be active.
 
 In other words, you need to keep port 3001 reserved even though it is only ever used to set up port 8089.
 
