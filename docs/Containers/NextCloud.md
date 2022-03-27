@@ -1,6 +1,6 @@
 # Nextcloud
 
-## Service definition
+## <a name="serviceDefinition"></a>Service definition
 
 This is the **core** of the IOTstack Nextcloud service definition:
 
@@ -54,7 +54,7 @@ Under new-menu, the menu can generate random passwords for you. You can either u
 
 The passwords need to be set before you bring up the Nextcloud service for the first time but the following initialisation steps assume you might not have done that and always start over from a clean slate.
 
-## Initialising Nextcloud
+## <a name="initialisation"></a>Initialising Nextcloud 
 
 1. Be in the correct directory:
 
@@ -108,7 +108,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 	* You **can't** use a multicast domain name (eg `myrpi.local`). An mDNS name will not work until Nextcloud has been initialised!
 	* Once you have picked a connection method, **STICK TO IT**.
-	* You are only stuck with this restriction until Nextcloud has been initialised. You **can** (and should) fix it later by completing the steps in ["Access through untrusted domain"](#access-through-untrusted-domain).
+	* You are only stuck with this restriction until Nextcloud has been initialised. You **can** (and should) fix it later by completing the steps in ["Access through untrusted domain"](#untrustedDomain).
 
 7. On a computer that is **not** the Raspberry Pi running Nextcloud, launch a browser and point to the Raspberry Pi running Nextcloud using your chosen connection method. Examples:
 
@@ -174,7 +174,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 	![Dashboard](./images/nextcloud-dashboard.png)
 
-## <a name="untrustedDomain">"Access through untrusted domain"</a>
+## <a name="untrustedDomain"></a>"Access through untrusted domain"
 
 During Nextcloud initialisation you had to choose between an IP address, a domain name or a host name. Now that Nextcloud is running, you have the opportunity to expand your connection options.
 
@@ -243,7 +243,7 @@ See also:
 
 * [Nextcloud documentation - trusted domains](https://docs.nextcloud.com/server/21/admin_manual/installation/installation_wizard.html#trusted-domains).
 
-### Using a DNS alias for your Nextcloud service
+### <a name="dnsAlias"></a>Using a DNS alias for your Nextcloud service
 
 The examples above include using a DNS alias (a CNAME record) for your Nextcloud service. If you decide to do that, you may see this warning in the log:
 
@@ -257,17 +257,17 @@ You can silence the warning by editing the Nextcloud service definition in `dock
     hostname: nextcloud.mydomain.com
 ```
 
-## <a name="security"> Security considerations</a>
+## <a name="security"></a>Security considerations
 
 Nextcloud traffic is not encrypted. Do **not** expose it to the web by opening a port on your home router. Instead, use a VPN like Wireguard to provide secure access to your home network, and let your remote clients access Nextcloud over the VPN tunnel.
 
-## Container health check
+## <a name="healthCheck"></a>Container health check 
 
 A script , or "agent", to assess the health of the MariaDB container has been added to the *local image* via the *Dockerfile*. In other words, the script is specific to IOTstack.
 
 Because it is an instance of MariaDB, Nextcloud_DB inherits the health-check agent. See the [IOTstack MariaDB](MariaDB.md) documentation for more information.
 
-## Keeping Nextcloud up-to-date
+## <a name="updatingNextcloud"></a>Keeping Nextcloud up-to-date
 
 To update the `nextcloud` container:
 
@@ -290,7 +290,7 @@ $ docker system prune
 
 The first "prune" removes the old *local* image, the second removes the old *base* image. Whether an old *base image* exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-## Backups
+## <a name="backups"></a>Backups
 
 Nextcloud is currently excluded from the IOTstack-supplied backup scripts due to its potential size.
 
