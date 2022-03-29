@@ -68,7 +68,7 @@ When you select Blynk Server in the IOTstack menu, the *template service definit
 
 > Under old menu, it is also copied to the *working service definition* and then not really used.
 
-### <a name="iotstackFirstRun"></a>OTstack first run 
+### <a name="iotstackFirstRun"></a>IOTstack first run 
 
 On a first install of IOTstack, you run the menu, choose your containers, and are told to do this:
 
