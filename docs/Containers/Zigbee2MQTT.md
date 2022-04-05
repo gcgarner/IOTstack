@@ -1,262 +1,463 @@
 # Zigbee2MQTT
 
+## Quick links
+
+* New users: [start here](#basicProcess)
+* Existing users: [Service definition change](#update202204) (circa April 2022)
+
+## References
+
 * [Web Guide](https://www.zigbee2mqtt.io)
-* [Flashing the CC2531](https://www.zigbee2mqtt.io/information/flashing_the_cc2531.html)
-* [Figuring-out your device identifier](https://www.zigbee2mqtt.io/getting_started/running_zigbee2mqtt.html)
+* [Supported adapters](https://www.zigbee2mqtt.io/guide/adapters/#recommended)
+* [GitHub](https://github.com/Koenkk/zigbee2mqtt)
+* [DockerHub](https://hub.docker.com/r/koenkk/zigbee2mqtt/tags)
 
-## Service definition change - April 2021
+## Definitions
 
-The IOTstack service definition for Zigbee2MQTT is at the following path:
+* *"compose file"* means the file at the path:
 
-```
-~/IOTstack/.templates/zigbee2mqtt/service.yml
-```
+	```
+	~/IOTstack/docker-compose.yml
+	```
 
-As of April 2021, the service definition changed:
+## <a name="basicProcess"></a>Basic process for new users
 
-1. The Zigbee2MQTT container no longer runs in host mode.
-2. Adds timezone support.
-3. Builds the container from a Dockerfile providing appropriate defaults for IOTstack.
-4. Re-adds a port mapping for port 8080 (the Zigbee2MQTT web UI).
+1. Run the IOTstack menu and choose both "Mosquitto" and "Zigbee2MQTT". That adds the service definitions for both of those containers to your *compose file*.
 
-If you were running the Zigbee2MQTT service before this change, you may wish to compare and contrast your active service definition (in `docker-compose.yml`) with the revised template.
+2. [Prepare your Zigbee adapter](#prepareAdapter) by flashing its firmware.
+3. Follow the steps in [Identify your Zigbee adapter](#identifyAdapter) to work out how your adapter "mounts" on your Raspberry Pi, and edit your *compose file* to include that information.
+4. The default environment variables assume:
+
+	- You are running Mosquitto and Zigbee2MQTT as IOTstack containers on the same computer; and
+	- You want the Zigbee2MQTT web front end to be available on port 8080.
+
+	This is a good basis for getting started. If it sounds like it will meet your needs, you will not need to make any changes. Otherwise, review the [environment variables](#envVars) and make appropriate changes to the service definition in your *compose file*.
+
+5. <a name="upStack"></a>Bring up your stack:
+
+	```bash
+	$ cd ~/IOTstack
+	$ docker-compose up -d
+	```
+
+6. Confirm that the Zigbee2MQTT container appears to be working correctly. You should:
+
+	* [Check container status](#checkStatus) to confirm that the container is running and stable, and is not in a restart loop;
+	* [Check the container's log](#checkLog) for any errors, warnings or other evidence of malfunction; and
+	* [Check inter-container connectivity](#checkMQTT) by verifying that the Zigbee2MQTT container is publishing MQTT messages to the Mosquitto broker.
+
+7. [Connect to the web front end](#connectGUI) and start adding your Zigbee devices.
+
+## <a name="prepareAdapter"></a>Prepare your Zigbee adapter
+
+Zigbee adapters usually need to be "flashed" before they can be used by Zigbee2MQTT. To prepare your adatper:
+
+1. Go to the [supported adapters](https://www.zigbee2mqtt.io/guide/adapters/#recommended) page.
+2. Find your adapter in the list.
+3. Follow the instructions for flashing your adapter.
 
 Note:
 
-* You may need to `git pull` to update your local copy of the IOTstack repository against GitHub.
+* If you can't find your adapter in the list of supported devices, you may not be able to get the Zigbee2MQTT container to connect to it. This kind of problem is outside the scope of IOTstack. You will have to raise the issue with the [Zigbee2MQTT](https://www.zigbee2mqtt.io) project.
 
-## First startup with CC2531 adapter
+## <a name="identifyAdapter"></a>Identify your Zigbee adapter
 
-The service definition includes:
+This section covers adapters that connect to your Raspberry Pi via USB.
 
-```
-  devices:
-    - /dev/ttyAMA0:/dev/ttyACM0 # should work even if no adapter
-   #- /dev/ttyACM0:/dev/ttyACM0 # should work if CC2531 connected
-   #- /dev/ttyUSB0:/dev/ttyACM0 # Electrolama zig-a-zig-ah! (zzh!) maybe other as well
-```
+> See [connect to a remote adapter](https://www.zigbee2mqtt.io/advanced/remote-adapter/connect_to_a_remote_adapter.html) for information on connecting to adapters via TCP.
 
-The default device (`/dev/ttyAMA0`) probably will **not** work for any Zigbee adapter. It is only there because `/dev/ttyAMA0` exists on Raspberry Pis. Its presence permits the container to come up even though it will not actually be able to connect to an adapter.
+Many USB Zigbee adapters mount as `/dev/ttyACM0` but this is not true for *all* adapters. In addition, if you have multiple devices connected to your Raspberry Pi that contend for a given device name, there are no guarantees that your Zigbee adapter will *always* be assigned the *same* name each time the device list is enumerated.
 
-If you have a CC2531, properly flashed and connected to a USB port, you should be able to see it:
+For those reasons, it is better to take the time to identify your Zigbee adapter in a manner that will be predictable, unique and reliable:
 
-```
-$ ls -l /dev/ttyACM0
-crw-rw---- 1 root dialout 166, 0 Apr  7 09:38 /dev/ttyACM0
-``` 
+1. If your Zigbee adapter is connected to your Raspberry Pi, disconnect it.
+2. Run the following command (the option is the digit "1"):
 
-> If you see the error "No such file or directory", you will need to first figure out why your device is not visible.
-
-Assuming your CC2531 is visible:
-
-1. Change the device mapping in `docker-compose.yml` to deactivate `ttyAMA0` in favour of activating `ttyACM0`:
-
-	```
-	  devices:
-	   #- /dev/ttyAMA0:/dev/ttyACM0 # should work even if no adapter
-	    - /dev/ttyACM0:/dev/ttyACM0 # should work if CC2531 connected
-	   #- /dev/ttyUSB0:/dev/ttyACM0 # Electrolama zig-a-zig-ah! (zzh!) maybe other as well
+	```bash
+	$ ls -1 /dev/serial/by-id
 	```
 
-2. Bring up the container:
+	The possible response patterns are:
+
+	* An error message:
+
+		```
+		ls: cannot access '/dev/serial/by-id': No such file or directory
+		```
+
+	* A list of one or more lines where your Zigbee adapter is **not** present. Example:
+
+		```
+		usb-Silicon_Labs_CP2102N_USB_to_UART_Bridge_Controller_f068b8e7e82d4b119c0ee71fa1143ea0-if00-port0
+		```
+
+	The actual response (error, or a list of devices) does not matter. You are simply establishing a baseline.
+
+3. Connect your prepared Zigbee adapter to a USB port on your Raspberry Pi.
+4. Repeat the same `ls` command from step 2. The response pattern should be different from step 2. The list should now contain your Zigbee adapter. Example:
 
 	```
-	$ cd ~/IOTstack
-	$ docker-compose up -d zigbee2mqtt
+	usb-Silicon_Labs_CP2102N_USB_to_UART_Bridge_Controller_f068b8e7e82d4b119c0ee71fa1143ea0-if00-port0
+	usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00
 	```
 
-You can also follow the instructions in the Zigbee2MQTT documentation to [work out the identifier of your device](https://www.zigbee2mqtt.io/getting_started/running_zigbee2mqtt.html) and use that instead of `/dev/ttyACM0`. Then, your `docker-compose.yml` might look something like this:
+	The second line indicates a CC2531 adapter is attached to the Raspberry Pi.
 
+	If the response pattern does **not** change, it means the Raspberry Pi is unable to see your adapter. The two most common reasons are:
+	
+	1. Your adapter was not flashed correctly. Start over at [prepare your Zigbee adapter](#prepareAdapter).
+	2. Your adapter does not mount as a serial device. Try repeating steps 2 through 4 with the command:
+
+		```bash
+		$ ls -1 /dev
+		```
+		
+		to see if you can discover how your adapter attaches to your Raspberry Pi.
+		
+		> One example is the Electrolama zig-a-zig-ah which attaches as `/dev/ttyUSB0`.
+
+5. Use the output from the `ls` command in step 4 to form the absolute path to your Zigbee adapter. Example:
+
+	```
+	/dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00
+	```
+
+6. Check your work like this (the option is the lower-case letter "l"):
+
+	```bash
+	$ ls -l /dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00
+	lrwxrwxrwx 1 root root 13 Mar 31 19:49 dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00 -> ../../ttyACM0
+	```
+
+	What the output is telling you is that the *by-id* path is a symbolic link to `/dev/ttyACM0`. Although this *may* always be true on your Raspberry Pi, the only part that is actually *guaranteed* to be true is the *by-id* path, which is why you should use it.
+
+7. Use your favourite text editor to open your *compose file*.
+8. Find your `zigbee2mqtt` service definition and identify this line:
+
+	```yaml
+	- /dev/ttyAMA0:/dev/ttyACM0
+	```
+
+	The default from the IOTstack template maps the *external* (Raspberry Pi) device `/dev/ttyAMA0` to the *internal* (Zigbee2MQTT container) device `/dev/ttyACM0`.
+
+	> On the Raspberry Pi, the *external* device `/dev/ttyAMA0` is the Bluetooth adapter. It was chosen as the default because it normally exists and its presence avoids sending Zigbee2MQTT into a restart loop if you start the container before completing these steps.
+
+9. Replace `/dev/ttyAMA0` with your *by-id* path. Example:
+
+	```yaml
+	- /dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00:/dev/ttyACM0
+	```
+
+10. Save your work.
+11. Continue from [bring up your stack](#upStack).
+
+## <a name="configuration"></a>Configuration
+
+### <a name="envVars"></a>Environment variables
+
+Any value that can be set in a Zigbee2MQTT [configuration file](#confFile) can also be set using an environment variable.
+
+> The [Zigbee2MQTT documentation](https://www.zigbee2mqtt.io/guide/configuration/#environment-variables) explains the syntax.
+
+Note:
+
+* Do **not** use quote marks to enclose the values (right hand sides) of environment variables.
+
+Whenever you change the value of an environment variable, you also need to tell `docker-compose` to apply the change:
+
+```bash
+$ cd ~/IOTstack
+$ docker-compose up -d zigbee2mqtt
 ```
-  devices:
-   #- /dev/ttyAMA0:/dev/ttyACM0 # should work even if no adapter
-   #- /dev/ttyACM0:/dev/ttyACM0 # should work if CC2531 connected
-   #- /dev/ttyUSB0:/dev/ttyACM0 # Electrolama zig-a-zig-ah! (zzh!) maybe other as well
-    - "/dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___xxx:/dev/ttyACM0"
-```
 
-## First startup with other adapters
+The default service definition provided with IOTstack includes the following environment variables:
 
-Similar principles apply if you use other adapters. You must work out how the adapter presents itself on your Raspberry Pi and then map it to `/dev/ttyACM0` **inside** the container (ie the common right hand side of every device definition).
+* `TZ=Etc/UTC`
 
-## Configuration file
+	You should replace `Etc/UTC` with a value that is correct for your location.
 
-### Active configuration file
+* <a name="mqttServer"></a>`ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mosquitto:1883`
 
-Under IOTstack, the **active** configuration file for Zigbee2MQTT appears at the following path:
+	Typical values for this are:
+
+	- `mqtt://mosquitto:1883`
+
+		This is default value supplied with the IOTstack template. It assumes that both Zigbee2MQTT and the Mosquitto broker are running in non-host mode containers on the same Raspberry Pi.
+
+	- `mqtt://localhost:1883`
+
+		This would be appropriate if you were to run Zigbee2MQTT in host mode and the Mosquitto broker was running on the same Raspberry Pi.
+
+	- `mqtt://«host-or-ip»:1883`
+
+		If the Mosquitto broker is running on a *different* computer, replace `«host-or-ip»` with the IP address or domain name of that other computer. You should also remove or comment-out the following lines from the service definition:
+
+		```yaml
+		depends_on:
+		  - mosquitto
+		```
+
+		The `depends_on` clause ensures that the Mosquitto container starts alongside the Zigbee2MQTT container. That would not be appropriate if Mosquitto was running on a separate computer.
+	
+* <a name="frontEndEnable"></a>`ZIGBEE2MQTT_CONFIG_FRONTEND=true`
+
+	This variable activates the Zigbee2MQTT web interface on port 8080. If you want to change the port number where you access the Zigbee2MQTT web interface, see [connecting to the web GUI](#connectGUI).
+
+* <a name="logSymlink"></a>`ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_SYMLINK_CURRENT=true`
+
+	Defining this variable causes Zigbee2MQTT to create a symlink pointing to the current log **folder** at the path:
+
+	```
+	~/IOTstack/volumes/zigbee2mqtt/data/log/current
+	```
+
+	See [Checking the log](#checkLog) for more information about why this is useful.
+
+### <a name="confFile"></a>Configuration file
+
+Zigbee2MQTT creates a default configuration file at the path:
 
 ```
 ~/IOTstack/volumes/zigbee2mqtt/data/configuration.yaml
 ```
 
-After you make any changes to the configuration file (using `sudo`), you need to inform the running container by:
+Although you *can* edit the configuration file, the approach recommended for IOTstack is to use [environment variables](#envVars).
 
-```
-$ cd ~/IOTstack
-$ docker-compose restart zigbee2mqtt
-```
+If you decide to edit the configuration file:
 
-### Default configuration file
+1. You will need to use `sudo` to edit the file.
+2. After you have finished making changes, you need to inform the running container by:
 
-The IOTstack version of Zigbee2MQTT is built using a Dockerfile located at:
-
-```
-~/IOTstack/.templates/zigbee2mqtt/Dockerfile
-```
-
-The Dockerfile downloads the **base** `koenkk/zigbee2mqtt` image from DockerHub and then alters the **default** configuration file as it builds a **local** image to:
-
-* change the default MQTT server URL from "mqtt://localhost" to "mqtt://mosquitto"; and
-* activate the Zigbee2MQTT web interface on port 8080.
-
-Those changes are intended to help new IOTstack installations get started with a minimum of fuss.
-
-However, the **default** configuration file will only become the **active** configuration file in two situations:
-
-* On a first install of Zigbee2MQTT; or
-* If you erase the container's persistent storage area. For example:
-
-	```
+	```bash
 	$ cd ~/IOTstack
-	$ docker-compose stop zigbee2mqtt
-	$ docker-compose rm -f zigbee2mqtt
-	$ sudo rm -rf ./volumes/zigbee2mqtt
-	$ docker-compose up -d zigbee2mqtt
+	$ docker-compose restart zigbee2mqtt
 	```
-	
-In either of those situations, the **active** configuration file will be initialised by copying the **default** configuration file into place as the container comes up.
 
-### If you have an existing configuration file
+3. [Check the log](#checkLog) for errors.
 
-If you have an existing **active** Zigbee2MQTT configuration file, you may need to make two changes:
+Note:
 
-1. Alter the Mosquitto URL:
+* If you start Zigbee2MQTT from a clean slate (ie where the configuration file does not exist) **and** your *compose file* does not define the [`… MQTT_SERVER`](#mqttServer) environment variable discussed above, the container will go into a restart loop. This happens because the Zigbee2MQTT container defaults to trying to reach the Mosquitto broker at `localhost:1883` instead of `mosquitto:1883`. That usually fails.
 
-	- *before:*
-	
-		```
-		server: 'mqtt://localhost'
-		```
-	- *after:*
-	
-		```
-		server: 'mqtt://mosquitto'
-		```
-		
-2. Enable the web interface (if necessary):
+## <a name="verifyOperation"></a>Verifying basic operation
 
-	- *append:*
-	
-		```
-		frontend:
-		  port: 8080
-		```
+### <a name="checkStatus"></a>Checking status
 
-## Checking that the container is working
-
-### Checking status
-
-```
-$ docker ps --format "table {{.Names}}\t{{.RunningFor}}\t{{.Status}}" --filter name="zigbee2mqtt"
-NAMES         CREATED       STATUS
-zigbee2mqtt   2 hours ago   Up 2 hours
+```bash
+$ docker ps | grep -e mosquitto -e zigbee2mqtt
+NAMES         CREATED          STATUS
+zigbee2mqtt   33 seconds ago   Up 30 seconds
+mosquitto     33 seconds ago   Up 31 seconds (healthy)
 ```
 
-You are looking for signs that the container is restarting (ie the "Status" column only ever shows a low number of seconds).
+> The above output is filtered down to the relevant columns
 
-### Checking the log
+You are looking for evidence that the container is restarting (ie the "Status" column only ever shows a low number of seconds when compared with the "Created" column).
 
-```
-$ docker logs zigbee2mqtt
-```
+### <a name="checkLog"></a>Checking the log
 
-You are looking for evidence of malfunction.
-
-### Checking that Zigbee2MQTT is able to communicate with Mosquitto
-
-If you have the Mosquitto clients installed (`sudo apt install -y mosquitto-clients`), you can run the following command:
+You can't use `docker logs zigbee2mqtt` to inspect the Zigbee2MQTT container's logs. That's because Zigbee2MQTT writes its logging information to the path:
 
 ```
+~/IOTstack/volumes/zigbee2mqtt/data/log/yyyy-mm-dd.hh-mm-ss/log.txt
+```
+
+where `yyyy-mm-dd.hh-mm-ss` is the date and time the container was last started. This means that you have to identify the folder with the latest timestamp before you can inspect the log contained within it.
+
+Fortunately, Zigbee2MQTT offers a shortcut. If the [`… LOG_SYMLINK_CURRENT`](#logSymlink) environment variable is `true` then the path to the *current* log will be:
+
+```
+~/IOTstack/volumes/zigbee2mqtt/data/log/current/log.txt
+```
+
+You can use commands like `cat` and `tail` to examine the *current* log. Example:
+
+```bash
+$ cat ~/IOTstack/volumes/zigbee2mqtt/data/log/current/log.txt
+```
+
+### <a name="checkMQTT"></a>Checking Mosquitto connectivity
+
+To perform this check, you will need to have the Mosquitto clients installed:
+
+```bash
+$ sudo apt install -y mosquitto-clients
+```
+
+The Mosquitto clients package includes two command-line tools:
+
+* `mosquitto_pub` for publishing MQTT messages to the broker; and
+* `mosquitto_sub` for subscribing to MQTT messages distributed by the broker.
+
+	> In IOTstack, the "broker" is usually the Mosquitto container.
+
+Assuming the Mosquitto clients are installed, you can run the following command:
+
+```bash
 $ mosquitto_sub -v -h "localhost" -t "zigbee2mqtt/#" -F "%I %t %p"
 ```
 
 One of two things will happen:
 
-* *silence,* indicating that Zigbee2MQTT is **not** able to communicate with Mosquitto.
-* *chatter,* proving that Zigbee2MQTT **can** communicate with Mosquitto.
+* *silence,* indicating that the Zigbee2MQTT container is **not** able to communicate with the Mosquitto container. If this happens, you should [check the Zigbee2MQTT log](#checkLog). 
+* *chatter,* proving that the Zigbee2MQTT container **can** communicate with the Mosquitto container.
 
-Terminate the `mosquitto_sub` command with a Control-C.
+Terminate the `mosquitto_sub` command with a <kbd>Control</kbd><kbd>c</kbd>.
 
-### Checking that the Zigbee2MQTT web GUI is working
+## <a name="connectGUI"></a>Connecting to the web GUI
 
-Open a browser, and point it to port 8080 on your Raspberry Pi. You should see the Zigbee2MQTT interface.
+Open a browser, and point it to port 8080 on your Raspberry Pi. For example:
 
-### terminal access inside the container
-
-To access the terminal run:
-
+```url
+http://raspberrypi.local:8080
 ```
+
+You should see the Zigbee2MQTT interface.
+
+Notes:
+
+1. The availability of the Zigbee2MQTT UI is governed by an environment variable. If you do not see the UI, check that [`… FRONTEND`](#frontEndEnable) is defined.
+
+2. In the URL above, port 8080 is an **external** port which is exposed via the following port mapping in the Zigbee2MQTT service definition:
+
+	```yaml
+	ports:
+	  - "8080:8080"
+	```
+
+	If you want to reach the Zigbee2MQTT UI via a different port, you should edit the left hand side of that mapping. For example, if you wanted to use port 10080 you would write: 
+
+	```yaml
+	ports:
+	  - "10080:8080"
+	```
+
+	Do not change the *internal* port number on the right hand side of the mapping. To apply changes to the port mapping:
+
+	```bash
+	$ cd ~/IOTstack
+	$ docker-compose up -d zigbee2mqtt
+	```
+
+## <a name="openShell"></a>Shell access to the container
+
+To open a shell inside the Zigbee2MQTT container, run:
+
+```bash
 $ docker exec -it zigbee2mqtt ash
 ```
 
 > `ash` is **not** a typo!
 
-When you want to leave the container, either type `exit` and press return, or press Control-D.
+To close the shell and leave the container, either type "exit" and press <kbd>return</kbd>, or press <kbd>Control</kbd><kbd>d</kbd>.
 
-## Setting a password for the web interface
+## <a name="pullUpgrade"></a>Container maintenance
 
-By default, the web interface is unprotected. If you want to set a password:
+When you become aware of a new version of Zigbee2MQTT on [DockerHub](https://hub.docker.com/r/koenkk/zigbee2mqtt/tags), do the following:
 
-1. Use `sudo` to edit the active configuration file at the path:
-
-	```
-	~/IOTstack/volumes/zigbee2mqtt/data/configuration.yaml
-	```
-
-2. Find the following text:
-
-	```
-	frontend:
-	  port: 8080
-	# auth_token: PASSWORD
-	```
-	
-3. Uncomment the `auth_token` line and replace "PASSWORD" with the password of your choice. For example, to set the password to "mypassword":
-
-	```
-	  auth_token: mypassword
-	```
-	
-	Note:
-	
-	* although the name `auth_token` suggests something more complex, it really is no more than a simple *en-clear* password. If this concerns you, consider disabling the web front-end entirely, like this:
-	
-		```
-		#frontend:
-		# port: 8080
-		# auth_token: PASSWORD
-		```
-
-4. Save the file and restart the container:
-
-	```
-	$ cd ~/IOTstack
-	$ docker-compose restart zigbee2mqtt
-	```
-
-## Container maintenance
-
-Because the Zigbee2MQTT container is built from a Dockerfile, a normal `pull` command will not automatically download any updates released on DockerHub.
-
-When you become aware of a new version of Zigbee2MQTT being released on DockerHub, do the following:
-
-```
+```bash
 $ cd ~IOTstack
-$ docker-compose build --no-cache --pull zigbee2mqtt
+$ docker-compose pull zigbee2mqtt
 $ docker-compose up -d zigbee2mqtt
 $ docker system prune
 ```
 
-Note:
+In words:
 
-* Sometimes it is necessary to repeat the `docker system prune` command but it depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
+1. Be in the correct directory.
+2. The `pull` compares the version on your Raspberry Pi with the latest version on [DockerHub](https://hub.docker.com/r/koenkk/zigbee2mqtt/tags), and downloads any later version.
+3. If a newer version is downloaded, the `up` instantiates a new container based on the new image and performs a new-for-old swap. There is barely any downtime.
+4. The `prune` cleans up the older image.
+
+You can omit the `zigbee2mqtt` arguments from the `pull` and `up` commands, in which case `docker-compose` makes an attempt to pull any available updates for all non-Dockerfile-based images, and then instantiates any new images it has downloaded.
+
+## <a name="update202204"></a>Service definition change
+
+This information is for existing users of the Zigbee2MQTT container.
+
+The default IOTstack service definition for Zigbee2MQTT has changed:
+
+* The container no longer needs to be built using a Dockerfile.
+* The Zigbee2MQTT images on [DockerHub](https://hub.docker.com/r/koenkk/zigbee2mqtt/tags) can be used "as is".
+* Environment variables supplied with the updated service definition exactly replicate the purpose of the old Dockerfile. 
+* The Dockerfile supplied with the IOTstack template is deprecated but continues to be provided to maintain backwards compatibility and to avoid introducing a breaking change.
+
+If you were using the Zigbee2MQTT container in IOTstack before April 2022, you should use your favourite text editor to update your *compose file* to conform with the new service definition.
+
+> You *could* run the menu, then de-select and re-select Zigbee2MQTT. That *will* have the effect of applying the updated service definition but it also risks overwriting any other customisations you may have in place. That is why editing your *compose file* is the recommended approach.
+
+The updated service definition is included here for ease of reference:
+
+```yaml
+zigbee2mqtt:
+  container_name: zigbee2mqtt
+  image: koenkk/zigbee2mqtt:latest
+  environment:
+    - TZ=Etc/UTC
+    - ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mosquitto:1883
+    - ZIGBEE2MQTT_CONFIG_FRONTEND=true
+    - ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_SYMLINK_CURRENT=true
+  ports:
+    - "8080:8080"
+  volumes:
+    - ./volumes/zigbee2mqtt/data:/app/data
+  devices:
+    - /dev/ttyAMA0:/dev/ttyACM0
+  restart: unless-stopped
+  depends_on:
+    - mosquitto
+```
+
+The changes you should make to your existing Zigbee2MQTT service definition are:
+
+1. Replace the `build` directive:
+
+	```yaml
+	build: ./.templates/zigbee2mqtt/.
+	```
+
+	with this `image` directive:
+
+	```yaml
+	image: koenkk/zigbee2mqtt:latest
+	```
+
+	This causes IOTstack to use Zigbee2MQTT images "as is" from [DockerHub](https://hub.docker.com/r/koenkk/zigbee2mqtt/tags).
+
+2. Add these environment variables:
+
+	```yaml
+	  - ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mosquitto:1883
+	  - ZIGBEE2MQTT_CONFIG_FRONTEND=true
+	  - ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_SYMLINK_CURRENT=true
+	```
+
+	The first two have the **identical** effect to the changes previously made via the Dockerfile. The last variable makes it easier for you to find and [view the current log](#checkLog).
+	
+	See [environment variables](#envVars) for more detail.
+
+3. Add the dependency clause:
+
+	```yaml
+	depends_on:
+	  - mosquitto
+	```
+
+	This ensures the Mosquitto container is brought up alongside Zigbee2MQTT. The Zigbee2MQTT container goes into a restart loop if Mosquitto is not reachable so this change enforces that business rule. See [`… MQTT_SERVER`](#mqttServer) for the situation where this might not be appropriate.
+
+### <a name="confExists"></a>pre-existing configuration file
+
+Environment variables in your *compose file* override corresponding values set in the *configuration file* at:
+
+```
+~/IOTstack/volumes/zigbee2mqtt/data/configuration.yaml
+```
+
+If you have customised your existing Zigbee2MQTT [configuration file](#confFile), you should review your settings for potential conflicts with the environment variables introduced by the changes to the IOTstack service definition. You can resolve any conflicts either by:
+
+* removing or commenting-out conflicting environment variables; or
+* altering the environment variable values to match your configuration file.
+
+The second approach is recommended because it minimises the risk that Zigbee2MQTT will go into a restart loop if the configuration file is not present when the container starts.
+
+As the [Zigbee2MQTT documentation](https://www.zigbee2mqtt.io/guide/configuration/#environment-variables) explains, any option that can be set in a configuration file can also be set using an environment variable, so you may want to take the opportunity to implement all your settings as environment variables.

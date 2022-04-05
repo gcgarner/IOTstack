@@ -1,15 +1,18 @@
 zigbee2mqtt:
   container_name: zigbee2mqtt
-  build: ./.templates/zigbee2mqtt/.
+  image: koenkk/zigbee2mqtt:latest
   environment:
     - TZ=Etc/UTC
+    - ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mosquitto:1883
+    - ZIGBEE2MQTT_CONFIG_FRONTEND=true
+    - ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_SYMLINK_CURRENT=true
   ports:
     - "8080:8080"
   volumes:
     - ./volumes/zigbee2mqtt/data:/app/data
   devices:
-    - /dev/ttyAMA0:/dev/ttyACM0 # should work even if no adapter
-   #- /dev/ttyACM0:/dev/ttyACM0 # should work if CC2531 connected
-   #- /dev/ttyUSB0:/dev/ttyACM0 # Electrolama zig-a-zig-ah! (zzh!) maybe other as well
+    - /dev/ttyAMA0:/dev/ttyACM0
   restart: unless-stopped
+  depends_on:
+    - mosquitto
 
