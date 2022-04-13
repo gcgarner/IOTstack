@@ -1,4 +1,28 @@
-# Custom services and overriding default settings for IOTstack
+# Custom overrides
+
+Each time you build the stack from the menu, the Docker Compose file
+`docker-compose.yml` is recreated, losing any custom changes you've made. There
+are three ways of dealing with this:
+
+1.  Not using the menu after you've made changes. Do remember to backup, in
+    case you overwrite it by mistake or habit from the menu.
+2.  Use the Docker Compose's [inbuilt override
+    mechanism](https://docs.docker.com/compose/extends/). This limits you to
+    changing values already present in your `docker-compose.yml`, but is handy
+    as changes are immediately picked by running `docker-compose up -d`.
+3.  IOTstack menu, in the default master-branch, implements a mechanism to
+    merge the yaml file `compose-override.yml` with the menu-generated stack
+    into `docker-compose.yml`. This can be used to add even complete new
+    services. See below for details.
+4.  This is not an actual extension mechanism, but well worth mentioning: If
+    you need to add a new services that don't communicate with the services in
+    IOTstack, you can create it completely separately and independently into
+    its own folder, e.g. `~/customStack/docker-compose.yml`. These services can
+    then be independently managed by entering that folder: `cd ~/customStack`
+    and then using the `docker-compose` commands as normal. The best override is
+    the one you don't have to make.
+
+## Custom services and overriding default settings for IOTstack
 You can specify modifcations to the `docker-compose.yml` file, including your own networks and custom containers/services.
 
 Create a file called `compose-override.yml` in the main directory, and place your modifications into it. These changes will be merged into the `docker-compose.yml` file next time you run the build script.
@@ -24,9 +48,8 @@ services:
 ```
 
 When rebuilding the menu, ensure to have NodeRed service always included because if it's no longer included, the only values showing in the final `docker-compose.yml` file for NodeRed will be the `restart` key and its value. Docker Compose will error with the following message:
-```
-Service nodered has neither an image nor a build context specified. At least one must be provided.
-```
+
+`Service nodered has neither an image nor a build context specified. At least one must be provided.`
 
 When attempting to bring the services up with `docker-compose up -d`.
 
