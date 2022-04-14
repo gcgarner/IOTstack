@@ -91,6 +91,8 @@ Fixes #4567
     to automatically close issues when the pull-request of this commit is
     merged.
 
+For tips on how to use git, see [Git Setup](Git-Setup.md).
+
 ## Follow up
 If your new service is approved and merged then congratulations! Please watch the Issues page on github over the next few days and weeks to see if any users have questions or issues with your new service.
 
