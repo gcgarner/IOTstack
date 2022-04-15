@@ -25,27 +25,34 @@ flowchart TD
   class GITPULL,MENU,UP,PULL command
 ```
 
-In order to keep the graph from getting too complex, some minor details were
-left out:
+!!! note "Minor details"
 
-- `$ docker-compose pull` will read `docker-compose.yml`, in order to
-  know what image tags to check for updates.
-- `docker-compose build --pull --no-cache` will use
-  `~/IOTstack/.templates/*/Dockerfile` and pull referenced Docker images, if
-  there are selected services using these Dockerfiles.
+    In order to keep the graph simple, some minor details fudged:
+
+    - `$ docker-compose pull` will read `docker-compose.yml`, in order to know
+      what image tags to check for updates.
+    - `docker-compose build --pull --no-cache` will use
+      `~/IOTstack/.templates/*/Dockerfile` and
+      `~/IOTstack/services/*/Dockerfile` and pull their referenced Docker
+      images, if there are selected services using these Dockerfiles.
 
 ## Backup and rollback
 
-The usual way of backing up your `~/IOTstack` contents isn't sufficient to do a
-100% restore, as the local Docker image cache can't easily be restored back its
-initial state. To make matters worse, it's not unheard of that new images from
-hub.docker.com may [break
-something](https://github.com/node-red/node-red/issues/3461#issuecomment-1076348639).
-On the other hand, this may be a risk you're willing to take.
+The usual way of backing up just your `~/IOTstack` contents isn't sufficient
+for a 100% identical restore. Some containers may have local ephemeral
+modifications that will be lost when they're recreated. Currently running
+containers may be based on now outdated images. Recreating a container using an
+old image is tricky. The local Docker image cache can't easily be restored to
+the same state with old images and old tag references. The `docker pull` will
+fetch the latest images, but it's not unheard of that the latest image may
+break [something](
+https://github.com/node-red/node-red/issues/3461#issuecomment-1076348639).
 
-To ensure a successful rollback, you have to shutdown your RPi and backup a
-complete image of its storage device using another machine. This will also
-ensure all databases are saved in a valid state.
+Thus to *guarantee* a successful rollback, you have to shutdown your RPi and
+save a complete disk image backup of its storage using another machine.
+
+For a hobby project, not having perfect rollback may be a risk you're willing
+to take. Usually container image problems have fixes/workarounds within a day.
 
 ## Recommended: Update only Docker images
 
@@ -53,38 +60,38 @@ When you built the stack using the menu, it created the Docker Compose file
 `docker-compose.yml`. This file uses tag references (e.g. `:latest`) to get the
 image for that tag from hub.docker.com. Thus when Docker is told to pull
 images, it will download and update it's local cache to the newest image. No
-need to do any updates to `docker-compose.yml`.
+need to update `docker-compose.yml` or `Dockerfile`s.
 
 Updating the IOTstack project templates and recreating your
 `docker-compose.yml` isn't usually necessary. Doing so isn't likely to provide
 much benefits, and may actually break something. A full update is only
 recommended when there is a new feature or change you need.
 
-!!! note "Recommended update procedure"
+!!! tip "Recommended update procedure"
 
     1. Shutdown your RPi, remove its storage medium and backup a full image
-       of the storage to another machine. Reinstall your storage and power up
+       of the storage to another machine. Reattach your storage and power up
        your RPi. To skip this step may cause a long downtime as you debug the
        problem.
     2. Get latest images from the web:
-       ```bash
-       docker-compose pull
+       ``` console
+       $ docker-compose pull
        ```
     3. Rebuild localy created images based on new parent images:
-       ```bash
-       docker-compose build --pull --no-cache
+       ``` console
+       $ docker-compose build --pull --no-cache
        ```
        Note: this may not do anything, depending on your selected services.
-    4. Update(recreate) containers to use new images:
-       ```bash
-       docker-compose up --build -d
+    4. Update(recreate) containers that have new images:
+       ``` console
+       $ docker-compose up --build -d
        ```
 
 If a service fails to start after it's updated, especially if you are updating
-frequently, wait for a few hours and repeat the update procedure. Sometimes
-there are bad releases published to hub.docker.com, but they are usually fixed
-in under half a day. Of course you are always welcome to report the problem to
-our [Discord](https://discord.gg/ZpKHnks) server. Usually someone else has
+frequently, wait for a few hours and repeat the update procedure. Sometimes bad
+releases are published to hub.docker.com, but they are usually fixed in under
+half a day. Of course you are always welcome to report the problem to our
+[Discord](https://discord.gg/ZpKHnks) server. Usually someone else has
 encountered the same problem and reported the fix.
 
 ## Full update
@@ -98,7 +105,7 @@ Periodically updates are made to project which include new or modified container
 2. backup your current settings: `cp docker-compose.yml docker-compose.yml.bak`
 3. check `git status` for any local changes you may have made to project files, ignore any reported "Untracked files". Save and preserve your changes by doing a commit: `git commit -a -m "local customization"`. Or revert them using: `git checkout -- path/to/changed_file`.
 4. update project files from github: `git pull origin master -r`
-5. recreate the compose file: `./menu.sh`, select Build Stack, don't change selections only press enter to build, and then exit.
+5. recreate the compose file and Dockerfile:s: `./menu.sh`, select Build Stack, don't change selections, press enter to build, and then exit.
 4. get latest images from the web: `docker-compose pull`
 5. rebuild localy created images from new Dockerfiles: `docker-compose build --pull --no-cache`
 6. update running containers to latest: `docker-compose up --build -d`
