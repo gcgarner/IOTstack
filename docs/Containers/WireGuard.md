@@ -164,7 +164,7 @@ You have several options for how your remote peers resolve DNS requests:
 	```yml
 	- PEERDNS=192.168.203.65
 	```
-	
+
 	Do note that changes to `PEERDNS` will not be updated to existing clients, and as such you may want to use `PEERDNS=auto` unless you have a very specific requirement.
 
 #### <a name="configurePorts"></a>Optional configuration - WireGuard ports
@@ -528,7 +528,7 @@ $ docker exec wireguard bash -c 'apt update ; apt install -y tcpdump'
 To monitor traffic:
 
 ```bash
-$ docker exec wireguard tcpdump -i eth0 -n udp port «internal»
+$ docker exec -t wireguard tcpdump -i eth0 -n udp port «internal»
 ```
 
 Press <kbd>ctrl</kbd><kbd>c</kbd> to terminate the capture.
@@ -556,6 +556,10 @@ There will be a short delay. The expected answer is either:
 
 * `«public»/udp open|filtered unknown` = router is listening
 * `«public»/udp closed unknown` = router is not listening
+
+Note:
+
+* Some routers always return the same answer irrespective of whether the router is or isn't listening to the port being checked. This stops malicious users from working out which ports might be open. This test will not be useful if your router behaves like that. You will have to rely on `tcpdump` telling you whether your router is forwarding traffic to your Raspberry Pi.
 
 ## <a name="readOnlyFlag"></a>The read-only flag
 
