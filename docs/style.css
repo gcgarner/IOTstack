@@ -15,3 +15,11 @@
     display:none
   }
 }
+
+/* Make dark-mode links just a tiny bit lighter, for better contrast
+   on low brightness screens. */
+@media screen {
+  [data-md-color-scheme="slate"] {
+    --md-typeset-a-color: var(--md-primary-fg-color--light) !important;
+  }
+}
