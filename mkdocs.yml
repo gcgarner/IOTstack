@@ -54,6 +54,8 @@ extra_css:
   - style.css
 
 markdown_extensions:
+  - pymdownx.highlight:
+      pygments_lang_class: true
   - admonition
   - pymdownx.superfences
   - toc:
