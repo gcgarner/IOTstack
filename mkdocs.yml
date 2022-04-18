@@ -52,6 +52,8 @@ plugins:
 
 extra_css:
   - style.css
+extra_javascript:
+  - javascript/fix-codeblock-console-copy-button.js
 
 markdown_extensions:
   - pymdownx.highlight:
