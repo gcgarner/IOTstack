@@ -97,7 +97,7 @@ When you select *Prometheus* in the IOTstack menu, the *template service definit
 
 On a first install of IOTstack, you run the menu, choose *Prometheus* as one of your containers, and are told to do this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose up -d
 ```
@@ -144,7 +144,7 @@ The *local image* is instantiated to become your running container.
 
 When you run the `docker images` command after *Prometheus* has been built, you *may* see two rows for *Prometheus*:
 
-```bash
+``` console
 $ docker images
 REPOSITORY           TAG         IMAGE ID       CREATED          SIZE
 iotstack_prometheus  latest      1815f63da5f0   23 minutes ago   169MB
@@ -203,7 +203,7 @@ scrape_configs:
 
 To cause a running instance of *Prometheus* to notice a change to this file:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose restart prometheus
 $ docker logs prometheus
@@ -223,7 +223,7 @@ The file named `prometheus.yml` is a reference configuration. It is a **copy** o
 
 Editing `prometheus.yml` has no effect. It is provided as a convenience to help you follow examples on the web. If you want to make the contents of `prometheus.yml` the active configuration, you need to do this:
 
-```bash
+``` console
 $ cd ~/IOTstack/volumes/prometheus/data/config
 $ cp prometheus.yml config.yml
 $ cd ~/IOTstack
@@ -267,7 +267,7 @@ You should compare the old and new versions and decide which settings need to be
 
 If you change the configuration file, restart *Prometheus* and then check the log for errors:
 
-```bash
+``` console
 $ docker-compose restart prometheus
 $ docker logs prometheus
 ```
@@ -280,7 +280,7 @@ Note:
 
 You can update `cadvisor` and `nodeexporter` like this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose pull cadvisor nodeexporter
 $ docker-compose up -d
@@ -299,7 +299,7 @@ The only way to know when an update to *Prometheus* is available is to check the
 
 Once a new version appears on *DockerHub*, you can upgrade *Prometheus* like this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull prometheus
 $ docker-compose up -d prometheus
@@ -344,7 +344,7 @@ If you need to pin *Prometheus* to a particular version:
 
 4. Save the file and tell `docker-compose` to rebuild the local image:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d --build prometheus
 	$ docker system prune

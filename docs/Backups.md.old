@@ -49,7 +49,7 @@ Run `~/Dropbox-Uploader/dropbox_uploader.sh unlink` and if you have added it key
 
 Confirm by running `~/Dropbox-Uploader/dropbox_uploader.sh` it should ask you for your key if you removed it or show you the following prompt if it has the key:
 
-```
+``` console
  $ ~/Dropbox-Uploader/dropbox_uploader.sh
 Dropbox Uploader v1.0
 Andrea Fabrizi - andrea.fabrizi@gmail.com
@@ -75,9 +75,9 @@ If you ran the command with sudo the remove the old token file if it exists with
 
 To enable rclone to mount on boot you will need to make a user service. Run the following commands
 
-```bash
-mkdir -p ~/.config/systemd/user
-nano ~/.config/systemd/user/gdrive.service
+``` console
+$ mkdir -p ~/.config/systemd/user
+$ nano ~/.config/systemd/user/gdrive.service
 ```
 Copy the following code into the editor, save and exit
 
@@ -99,15 +99,15 @@ ExecStart= \
 WantedBy=default.target
 ```
 enable it to start on boot with: (no sudo)
-```bash
-systemctl --user enable gdrive.service
+``` console
+$ systemctl --user enable gdrive.service
 ```
 start with 
-```bash
-systemctl --user start gdrive.service
+``` console
+$ systemctl --user start gdrive.service
 ```
 if you no longer want it to start on boot then type:
-```bash
-systemctl --user disable gdrive.service
+``` console
+$ systemctl --user disable gdrive.service
 ```
 

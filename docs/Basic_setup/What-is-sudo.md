@@ -2,21 +2,21 @@
 
 Many first-time users of IOTstack get into difficulty by misusing the `sudo` command. The problem is best understood by example. In the following, you would expect `~` (tilde) to expand to `/home/pi`. It does:
 
-```bash
+``` console
 $ echo ~/IOTstack
 /home/pi/IOTstack
 ```
 
 The command below sends the same `echo` command to `bash` for execution. This is what happens when you type the name of a shell script. You get a new instance of `bash` to run the script:
 
-```bash
+``` console
 $ bash -c 'echo ~/IOTstack'
 /home/pi/IOTstack
 ```
 
 Same answer. Again, this is what you expect. But now try it with `sudo` on the front:
 
-```bash
+``` console
 $ sudo bash -c 'echo ~/IOTstack'
 /root/IOTstack
 ```
@@ -31,7 +31,7 @@ Please try to minimise your use of `sudo` when you are working with IOTstack. He
 
 1. Is what you are about to run a script? If yes, check whether the script already contains `sudo` commands. Using `menu.sh` as the example:
 
-	```bash
+	``` console
 	$ grep -c 'sudo' ~/IOTstack/menu.sh
 	28
 	```
@@ -40,7 +40,7 @@ Please try to minimise your use of `sudo` when you are working with IOTstack. He
 
 2. Did the command you **just executed** work without `sudo`? Note the emphasis on the past tense. If yes, then your work is done. If no, and the error suggests elevated privileges are necessary, then re-execute the last command like this:
 
-	```bash
+	``` console
 	$ sudo !!
 	```
 

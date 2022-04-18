@@ -12,7 +12,7 @@ When you select Python in the menu:
 
 1. The following folder and file structure is created:
 
-	```
+	``` console
 	$ tree ~/IOTstack/services/python
 	/home/pi/IOTstack/services/python
 	├── app
@@ -65,7 +65,7 @@ The service definition contains a number of customisation points:
 
 If your Python container is already running when you make a change to its service definition, you can apply it via:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose up -d python
 ```
@@ -74,7 +74,7 @@ $ docker-compose up -d python
 
 After running the menu, you are told to run the commands:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose up -d
 ```
@@ -115,7 +115,7 @@ This is what happens:
 4. The `iotstack_python` image is instantiated to become the running container.
 5. When the container starts, the `docker-entrypoint.sh` script runs and initialises the container's persistent storage area:
 
-	```bash
+	``` console
 	$ tree -pu ~/IOTstack/volumes
 	/home/pi/IOTstack/volumes
 	└── [drwxr-xr-x root    ]  python
@@ -129,7 +129,7 @@ This is what happens:
 
 5. The initial `app.py` Python script is a "hello world" placeholder. It runs as an infinite loop emitting messages every 10 seconds until terminated. You can see what it is doing by running:
 
-	```bash
+	``` console
 	$ docker logs -f python
 	The world is born. Hello World.
 	The world is re-born. Hello World.
@@ -145,14 +145,14 @@ To stop the container from running, either:
 
 * take down your whole stack:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose down
 	```
 
 * terminate the python container
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose rm --force --stop -v python
 	```
@@ -163,14 +163,14 @@ To bring up the container again after you have stopped it, either:
 
 * bring up your whole stack:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d
 	```
 
 * bring up the python container
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d python
 	```
@@ -187,7 +187,7 @@ Each time you launch the Python container *after* the first launch:
 
 If the container misbehaves, the log is your friend:
 
-```
+``` console
 $ docker logs python
 ```
 
@@ -217,7 +217,7 @@ If you need other supporting scripts or data files, also add those to the direct
 
 Any time you change something in the `app` folder, tell the running python container to notice the change by:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose restart python
 ```
@@ -253,7 +253,7 @@ If your script writes into any other directory inside the container, the data wi
 
 If you make a mess of things and need to start from a clean slate, erase the persistent storage area:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose rm --force --stop -v python
 $ sudo rm -rf ./volumes/python
@@ -268,13 +268,13 @@ As you develop your project, you may find that you need to add supporting packag
 
 If you were developing a project outside of container-space, you would simply run:
 
-```
+``` console
 $ pip3 install -U Flask beautifulsoup4
 ```
 
 You *can* do the same thing with the running container:
 
-```
+``` console
 $ docker exec python pip3 install -U Flask beautifulsoup4
 ```
 
@@ -284,7 +284,7 @@ To make *Flask* and *beautifulsoup4* a permanent part of your container:
 
 1. Change your working directory:
 
-	```
+	``` console
 	$ cd ~/IOTstack/services/python/app
 	```
 
@@ -297,7 +297,7 @@ To make *Flask* and *beautifulsoup4* a permanent part of your container:
 
 3. Tell Docker to rebuild the local Python image:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose build --force-rm python
 	$ docker-compose up -d --force-recreate python
@@ -310,7 +310,7 @@ To make *Flask* and *beautifulsoup4* a permanent part of your container:
 
 4. Confirm that the packages have been added:
 
-	```
+	``` console
 	$ docker exec python pip3 freeze | grep -e "Flask" -e "beautifulsoup4"
 	beautifulsoup4==4.10.0
 	Flask==2.0.1
@@ -332,7 +332,7 @@ Note:
 
 	If you want to bring the copy of `requirements.txt` in the *volumes* directory up-to-date:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ rm ./volumes/python/app/requirements.txt
 	$ docker-compose restart python
@@ -346,7 +346,7 @@ Suppose the Python script you have been developing reaches a major milestone and
 
 1. If you have added any packages by following the steps in [adding packages](#adding-packages), run the following command:
 
-	```bash
+	``` console
 	$ docker exec python bash -c 'pip3 freeze >requirements.txt'
 	```
 
@@ -358,7 +358,7 @@ Suppose the Python script you have been developing reaches a major milestone and
 
 2. Make your work the default:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ cp -r ./volumes/python/app/* ./services/python/app
 	```
@@ -375,7 +375,7 @@ Suppose the Python script you have been developing reaches a major milestone and
 
 3. Terminate the Python container and erase its persistent storage area:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose rm --force --stop -v python
 	$ sudo rm -rf ./volumes/python
@@ -385,14 +385,14 @@ Suppose the Python script you have been developing reaches a major milestone and
 
 	* If erasing the persistent storage area feels too risky, just move it out of the way:
 
-		```
+		``` console
 		$ cd ~/IOTstack/volumes
 		$ sudo mv python python.off
 		```
 
 4. Rebuild the local image:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose build --force-rm python
 	$ docker-compose up -d --force-recreate python
@@ -402,7 +402,7 @@ Suppose the Python script you have been developing reaches a major milestone and
 
 5. Clean up by removing the old local image:
 
-	```bash
+	``` console
 	$ docker system prune -f
 	```
 
@@ -417,20 +417,20 @@ Proceed like this:
 
 1. Stop the development project:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose rm --force --stop -v python
 	```
 
 2. Remove the existing local image:
 
-	```
+	``` console
 	$ docker rmi iotstack_python
 	```
 
 3. Rename the `python` services directory to the name of your project:
 
-	```
+	``` console
 	$ cd ~/IOTstack/services
 	$ mv python wishbone
 	```
@@ -458,7 +458,7 @@ Proceed like this:
 
 5. Start the renamed service:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d wishbone
 	```
@@ -475,7 +475,7 @@ Remember:
 
 To make sure you are running from the most-recent **base** image of Python from Dockerhub:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull python
 $ docker-compose up -d python

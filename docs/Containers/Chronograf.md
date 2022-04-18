@@ -23,7 +23,7 @@ chronograf:
 
 If the Chronograf container is already running when you make this change, run:
 
-```bash
+``` console
 $ cd ~IOTstack
 $ docker-compose up -d chronograf
 ```
@@ -32,7 +32,7 @@ $ docker-compose up -d chronograf
 
 You can update the container via:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose pull
 $ docker-compose up -d
@@ -64,7 +64,7 @@ If you need to pin to a particular version:
 
 4. Save the file and tell `docker-compose` to bring up the container:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d chronograf
 	$ docker system prune

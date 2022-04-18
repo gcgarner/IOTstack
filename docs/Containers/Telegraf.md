@@ -69,7 +69,7 @@ When you select Telegraf in the IOTstack menu, the *template service definition*
 
 On a first install of IOTstack, you run the menu, choose your containers, and are told to do this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose up -d
 ```
@@ -120,7 +120,7 @@ The ***local image*** is instantiated to become your running container.
 
 When you run the `docker images` command after Telegraf has been built, you *may* see two rows for Telegraf:
 
-```bash
+``` console
 $ docker images
 REPOSITORY          TAG      IMAGE ID       CREATED       SIZE
 iotstack_telegraf   latest   59861b7fe9ed   2 hours ago   292MB
@@ -160,7 +160,7 @@ The exception is `[[inputs.mqtt_consumer]]` which is now provided as an optional
 
 You can inspect Telegraf's log by:
 
-```
+``` console
 $ docker logs telegraf
 ```
 
@@ -214,7 +214,7 @@ The intention of this structure is that you:
 
 When you make a change to `telegraf.conf`, you activate it by restarting the container:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose restart telegraf
 ```
@@ -224,8 +224,8 @@ $ docker-compose restart telegraf
 * `inputs.docker.conf` instructs Telegraf to collect metrics from Docker. Requires kernel control
   groups to be enabled to collect memory usage data. If not done during initial installation,
   enable by running (reboot required):
-  ```
-  echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
+  ``` console
+  $ echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
   ```
 * `inputs.cpu_temp.conf' collects cpu temperature.
  
@@ -240,7 +240,7 @@ Currently there is one addition:
 Using `inputs.mqtt_consumer.conf` as the example, applying that addition to
 your Telegraf configuration file involves:
 
-```
+``` console
 $ cd ~/IOTstack/volumes/telegraf
 $ grep -v "^#" additions/inputs.mqtt_consumer.conf | sudo tee -a telegraf.conf >/dev/null
 $ cd ~/IOTstack
@@ -255,7 +255,7 @@ The `grep` strips comment lines and the `sudo tee` is a safe way of appending th
 
 Erasing Telegraf's persistent storage area triggers self-healing and restores known defaults:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose rm --force --stop -v telegraf
 $ sudo rm -rf ./volumes/telegraf
@@ -266,7 +266,7 @@ Note:
 
 * You can also remove individual files within the persistent storage area and then trigger self-healing. For example, if you decide to edit `telegraf-reference.conf` and make a mess, you can restore the original version like this:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ sudo rm ./volumes/telegraf/telegraf-reference.conf
 	$ docker-compose restart telegraf
@@ -276,7 +276,7 @@ Note:
 
 To reset the InfluxDB database that Telegraf writes into, proceed like this:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose rm --force --stop -v telegraf
 $ docker exec -it influxdb influx -precision=rfc3339
@@ -297,7 +297,7 @@ In words:
 
 You can update most containers like this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose pull
 $ docker-compose up -d
@@ -316,7 +316,7 @@ The only way to know when an update to Telegraf is available is to check the [Te
 
 Once a new version appears on *DockerHub*, you can upgrade Telegraf like this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull telegraf
 $ docker-compose up -d telegraf
@@ -359,7 +359,7 @@ If you need to pin Telegraf to a particular version:
 
 4. Save the file and tell `docker-compose` to rebuild the ***local image***:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d --build telegraf
 	$ docker system prune

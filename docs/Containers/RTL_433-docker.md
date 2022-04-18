@@ -3,7 +3,7 @@ Requirements, you will need to have a SDR dongle for you to be able to use RTL. 
 
 Make sure you can see your receiver by running `lsusb`
 
-```bash
+``` console
 $ lsusb
 Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub

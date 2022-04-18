@@ -19,7 +19,7 @@ You increase your chances of a trouble-free installation by performing the insta
 
 To be able to run WireGuard successfully, your Raspberry Pi needs to be **fully** up-to-date. If you want to understand why, see [the read only flag](#the-read-only-flag).
 
-```bash
+``` console
 $ sudo apt update
 $ sudo apt upgrade -y
 ```
@@ -134,7 +134,7 @@ You have several options for how your remote peers resolve DNS requests:
 	1. Make sure your WireGuard service definition contains `PEERDNS=auto`.
 	2. Start the WireGuard container by executing:
 
-		```bash
+		``` console
 		$ cd ~/IOTstack
 		$ docker-compose up -d wireguard
 		```
@@ -143,7 +143,7 @@ You have several options for how your remote peers resolve DNS requests:
 
 	3. Run the following commands:  
 
-		```bash
+		``` console
 		$ cd ~/IOTstack
 		$ sudo cp ./.templates/wireguard/use-container-dns.sh ./volumes/wireguard/custom-cont-init.d/
 		$ docker-compose restart wireguard
@@ -162,7 +162,7 @@ You have several options for how your remote peers resolve DNS requests:
 
 	Once activated, this feature will remain active until you decide to deactivate it. If you ever wish to deactivate it, run the following commands:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ sudo rm ./volumes/wireguard/custom-cont-init.d/use-container-dns.sh
 	$ docker-compose restart wireguard
@@ -227,7 +227,7 @@ Of the two, the first is generally the simpler and means you don't have to re-ru
 
 1. Run the menu:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ ./menu.sh
 	```
@@ -277,7 +277,7 @@ You will need to create the `compose-override.yml` **before** running the menu t
 3. Save your work.
 4. Run the menu:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ ./menu.sh
 	```
@@ -288,7 +288,7 @@ You will need to create the `compose-override.yml` **before** running the menu t
 8. Choose Exit.
 9. Check your work by running:
 
-	```bash
+	``` console
 	$ cat docker-compose.yml
 	```
 
@@ -298,20 +298,20 @@ You will need to create the `compose-override.yml` **before** running the menu t
 
 1. To start WireGuard, bring up your stack:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d
 	```
 
 2. Confirm that WireGuard has started properly by running:
 
-	```bash
+	``` console
 	$ docker ps --format "table {{.Names}}\t{{.RunningFor}}\t{{.Status}}" --filter name=wireguard
 	```
 
 	Repeat the command a few times with a short delay in between. You are looking for signs that the WireGuard container is restarting. If the container seems to be restarting then this command is your friend:
 
-	```bash
+	``` console
 	$ docker logs wireguard
 	```
 
@@ -325,7 +325,7 @@ You will need to create the `compose-override.yml` **before** running the menu t
 
 	you would expect a result something like this:
 
-	```bash
+	``` console
 	$ tree ./volumes/wireguard
 	volumes/wireguard/
 	├── coredns
@@ -362,7 +362,7 @@ You will need to create the `compose-override.yml` **before** running the menu t
 
 The first time you launch WireGuard, it generates cryptographically protected configurations for your remote clients and encapsulates those configurations in QR codes. You can see the QR codes by running:
 
-```bash
+``` console
 $ docker logs wireguard
 ```
 
@@ -378,7 +378,7 @@ If, however, your Raspberry Pi is running headless, you will need to copy the `.
 
 For example, to copy **all** PNG files from your Raspberry Pi to a target system:
 
-```bash
+``` console
 $ find ~/IOTstack/volumes/wireguard -name "*.png" -exec scp {} user@hostorip:. \;
 ```
 
@@ -389,7 +389,7 @@ Note:
 
 If you want to work in the other direction (ie from the GUI-capable system), you can try:
 
-```bash
+``` console
 $ scp pi@hostorip:IOTstack/volumes/wireguard/peer_jill-macbook/peer_jill-macbook.png .
 ```
 
@@ -517,13 +517,13 @@ This model is a slight simplification because the remote client may also be also
 
 If `tcpdump` is not installed on your Raspberry Pi, you can install it by:
 
-```bash
+``` console
 $ sudo apt install tcpdump
 ```
 
 After that, you can capture traffic between your router and your Raspberry Pi by:
 
-```bash
+``` console
 $ sudo tcpdump -i eth0 -n udp port «external»
 ```
 
@@ -533,7 +533,7 @@ Press <kbd>ctrl</kbd><kbd>c</kbd> to terminate the capture.
 
 First, you need to add `tcpdump` to the container. You only need to do this once per debugging session. The package will remain in place until the next time you re-create the container.
 
-```bash
+``` console
 $ docker exec wireguard bash -c 'apt update ; apt install -y tcpdump'
 ```
 
@@ -547,7 +547,7 @@ Press <kbd>ctrl</kbd><kbd>c</kbd> to terminate the capture.
 
 ### Is Docker listening on the Raspberry Pi's «external» port?
 
-```bash
+``` console
 $ PORT=«external»; sudo nmap -sU -p $PORT 127.0.0.1 | grep "$PORT/udp"
 ```
 
@@ -560,7 +560,7 @@ Success implies that the container is also listening.
 
 ### Is your router listening on the «public» port?
 
-```bash
+``` console
 $ PORT=«public»; sudo nmap -sU -p $PORT downunda.duckdns.org | grep "$PORT/udp"
 ```                                           
 
@@ -589,14 +589,14 @@ If WireGuard refuses to install and you have good reason to suspect that WireGua
 
 To update the WireGuard container:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose pull wireguard
 ```
 
 If a new image comes down, then:
 
-```
+``` console
 $ docker-compose up -d wireguard
 $ docker system prune
 ```
@@ -616,14 +616,14 @@ The procedure is:
 
 1. If WireGuard is running, terminate it:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose rm --force --stop -v wireguard
 	```
 
 2. Erase the persistent storage area (essential):
 
-	```bash
+	``` console
 	$ sudo rm -rf ./volumes/wireguard
 	```
 
@@ -636,7 +636,7 @@ The procedure is:
 
 3. Start WireGuard:
 
-	```bash
+	``` console
 	$ docker-compose up -d wireguard
 	```
 

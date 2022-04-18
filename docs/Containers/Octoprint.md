@@ -40,7 +40,7 @@ If the OctoPrint container is up when the device number changes, the container w
 
 The "xxxxxxxx" is (usually) unique to your 3D printer. To find it, connect your printer to your Raspberry Pi, then run the command:
 
-```
+``` console
 $ ls -1 /dev/serial/by-id
 ```
 
@@ -77,7 +77,7 @@ Suppose your 3D printer is a MasterDisaster5000Pro, and that you would like to b
 
 Start by disconnecting your 3D printer from your Raspberry Pi. Next, run this command:
 
-```
+``` console
 $ tail -f /var/log/messages
 ```
 
@@ -118,7 +118,7 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="dead", ATTRS{idProduct}=="beef", ATTRS{seria
 
 Next, ensure the required file exists by executing the following command:
 
-```
+``` console
 $ sudo touch /etc/udev/rules.d/99-usb-serial.rules
 ```
 
@@ -208,7 +208,7 @@ To start a print session:
 1. Turn the 3D printer on.
 2. Bring up the container:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d octoprint
 	```
@@ -324,7 +324,7 @@ Whichever method you choose will result in a refresh of the OctoPrint user inter
 
 Run the following commands:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose restart octoprint
 ```
@@ -355,7 +355,7 @@ Unless you intend to leave your printer switched on 24 hours a day, you will als
 
 1. Terminate the container:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose stop octoprint
 	$ docker-compose rm -f octoprint
@@ -381,7 +381,7 @@ To silence the warning:
 
 1. Terminate the container if it is running:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose stop octoprint
 	$ docker-compose rm -f octoprint
@@ -412,7 +412,7 @@ To silence the warning:
 4. Save the file.
 5. Bring up the container: 
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d octoprint
 	```
@@ -421,7 +421,7 @@ To silence the warning:
 
 You can check for updates like this:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose pull octoprint
 $ docker-compose up -d octoprint
@@ -432,7 +432,7 @@ $ docker system prune
 
 You can view a list of usernames like this:
 
-```
+``` console
 $ docker exec octoprint octoprint --basedir /octoprint/octoprint user list
 ```
 
@@ -440,19 +440,19 @@ To reset a user's password:
 
 1. Use the following line as a template and replace `«username»` and `«password»` with appropriate values:
 
-	```
-	docker exec octoprint octoprint --basedir /octoprint/octoprint user password --password «password» «username»
+	``` console
+	$ docker exec octoprint octoprint --basedir /octoprint/octoprint user password --password «password» «username»
 	```
 	
 2. Execute the edited command. For example, to set the password for user "me" to "verySecure":
 
-	```
+	``` console
 	$ docker exec octoprint octoprint --basedir /octoprint/octoprint user password --password verySecure me
 	```
 
 3. Restart OctoPrint:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose restart octoprint
 	```
@@ -461,7 +461,7 @@ Note:
 
 * OctoPrint supports more than one username. To explore the further:
 
-	```
+	``` console
 	$ docker exec octoprint octoprint --basedir /octoprint/octoprint user --help
 	```
 
@@ -469,7 +469,7 @@ Note:
 
 If the OctoPrint container seems to be misbehaving, you can get a "clean slate" by:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose stop octoprint
 $ docker-compose rm -f octoprint

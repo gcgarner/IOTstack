@@ -12,7 +12,7 @@ The probability of conflicts developing increases as a function of time since th
 
 Make sure that you are, *actually*, on gcgarner. Don't assume!
 
-```
+``` console
 $ git remote -v
 origin	https://github.com/gcgarner/IOTstack.git (fetch)
 origin	https://github.com/gcgarner/IOTstack.git (push)
@@ -24,7 +24,7 @@ Do not proceed if you don't see those URLs!
 
 Take your stack down. This is not *strictly* necessary but we'll be moving the goalposts a bit so it's better to be on the safe side.
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose down
 ```
@@ -48,7 +48,7 @@ If you are already stuck or you try the first approach and get a mess, or it all
 
 Make sure you are on the master branch (you probably are so this is just a precaution), and then see if Git thinks you have made any local changes:
 
-```
+``` console
 $ cd ~/IOTstack
 $ git checkout master
 $ git status
@@ -68,19 +68,19 @@ The simplest way to deal with modified files is to rename them to move them out 
 
 	Here I'm assuming your initials are "jqh":
 
-	```
+	``` console
 	$ mv menu.sh menu.sh.jqh
 	```
 	
 2. Tell git to restore the unmodified version:
 
-	```
+	``` console
 	$ git checkout -- menu.sh
 	```
 	
 3. Now, repeat the Git command that complained about the file:
 
-	```
+	``` console
 	$ git status
 	```
 	
@@ -97,7 +97,7 @@ The simplest way to deal with modified files is to rename them to move them out 
 
 Make sure your local copy of gcgarner is in sync with GitHub.
 
-```
+``` console
 $ git pull
 ```
 
@@ -107,7 +107,7 @@ There may or may not be any "upstream" set. The most likely reason for this to h
 
 The next command will probably return an error, which you should ignore. It's just a precaution.
 
-```
+``` console
 $ git remote remove upstream
 ```
 
@@ -115,7 +115,7 @@ $ git remote remove upstream
 
 Change your local repository to point to SensorsIot.
 
-```
+``` console
 $ git remote set-url origin https://github.com/SensorsIot/IOTstack.git
 ```
 
@@ -125,7 +125,7 @@ This is where things can get a bit tricky so please read these instructions care
 
 When you run the next command, it will probably give you a small fright by opening a text-editor window. Don't panic - just keep reading. Now, run this command:
 
-```
+``` console
 $ git pull -X theirs origin master
 ```
 
@@ -178,7 +178,7 @@ If you don't use `someRandomService` then you could safely ignore this on the ba
 
 At this point, only the migrated master branch is present on your local copy of the repository. The next command brings you fully in-sync with GitHub:
 
-```
+``` console
 $ git pull
 ```
 
@@ -190,7 +190,7 @@ If you have been following the process correctly, your IOTstack will already be 
 
 Move your old IOTstack folder out of the way, like this:
 
-```
+``` console
 $ cd ~
 $ mv IOTstack IOTstack.old
 ```
@@ -201,13 +201,13 @@ Note:
 
 ##### Fetch a clean clone of SensorsIot/IOTstack
 
-```
+``` console
 $ git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
 ```
 
 Explore the result:
 
-```
+``` console
 $ tree -aFL 1 --noreport ~/IOTstack
 /home/pi/IOTstack
 ├── .bash_aliases
@@ -244,7 +244,7 @@ From this, it should be self-evident that a clean checkout from GitHub is the fa
 
 Execute the following commands:
 
-```
+``` console
 $ mv ~/IOTstack.old/docker-compose.yml ~/IOTstack
 $ mv ~/IOTstack.old/services ~/IOTstack
 $ sudo mv ~/IOTstack.old/volumes ~/IOTstack 
@@ -254,21 +254,21 @@ You should not need to use `sudo` for the first two commands. However, if you ge
 
 * docker-compose.yml
 
-	```
+	``` console
 	$ sudo mv ~/IOTstack.old/docker-compose.yml ~/IOTstack
 	$ sudo chown pi:pi ~/IOTstack/docker-compose.yml
 	```
 
 * services
 
-	```
+	``` console
 	$ sudo mv ~/IOTstack.old/services ~/IOTstack
 	$ sudo chown -R pi:pi ~/IOTstack/services
 	```
 
 There is no need to migrate the `backups` directory. You are better off creating it by hand:
 
-```
+``` console
 $ mkdir ~/IOTstack/backups
 ```
 
@@ -333,19 +333,19 @@ You also give up the `compose-override.yml` functionality. On the other hand, Do
 
 If you want to switch to the old menu:
 
-```
+``` console
 $ git checkout old-menu
 ```
 
 Any time you want to switch back to the new menu:
 
-```
+``` console
 $ git checkout master
 ```
 
 You can switch back and forth as much as you like and as often as you like. It's no harm, no foul. The branch you are on just governs what you see when you run:
 
-```
+``` console
 $ ./menu.sh
 ```
 
@@ -357,7 +357,7 @@ Even so, nothing will change **until** you run your chosen menu to completion an
 
 Unless you have gotten ahead of yourself and have already run the menu (old or new) then nothing will have changed in the parts of your `~/IOTstack` folder that define your IOTstack implementation. You can safely:
 
-```
+``` console
 $ docker-compose up -d
 ```
 
