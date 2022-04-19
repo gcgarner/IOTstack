@@ -35,7 +35,7 @@
 
 5. <a name="upStack"></a>Bring up your stack:
 
-	```bash
+	```console
 	$ cd ~/IOTstack
 	$ docker-compose up -d
 	```
@@ -73,7 +73,7 @@ For those reasons, it is better to take the time to identify your Zigbee adapter
 1. If your Zigbee adapter is connected to your Raspberry Pi, disconnect it.
 2. Run the following command (the option is the digit "1"):
 
-	```bash
+	```console
 	$ ls -1 /dev/serial/by-id
 	```
 
@@ -108,7 +108,7 @@ For those reasons, it is better to take the time to identify your Zigbee adapter
 	1. Your adapter was not flashed correctly. Start over at [prepare your Zigbee adapter](#prepareAdapter).
 	2. Your adapter does not mount as a serial device. Try repeating steps 2 through 4 with the command:
 
-		```bash
+		```console
 		$ ls -1 /dev
 		```
 		
@@ -124,7 +124,7 @@ For those reasons, it is better to take the time to identify your Zigbee adapter
 
 6. Check your work like this (the option is the lower-case letter "l"):
 
-	```bash
+	```console
 	$ ls -l /dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00
 	lrwxrwxrwx 1 root root 13 Mar 31 19:49 dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00 -> ../../ttyACM0
 	```
@@ -165,7 +165,7 @@ Note:
 
 Whenever you change the value of an environment variable, you also need to tell `docker-compose` to apply the change:
 
-```bash
+```console
 $ cd ~/IOTstack
 $ docker-compose up -d zigbee2mqtt
 ```
@@ -228,7 +228,7 @@ If you decide to edit the configuration file:
 1. You will need to use `sudo` to edit the file.
 2. After you have finished making changes, you need to inform the running container by:
 
-	```bash
+	```console
 	$ cd ~/IOTstack
 	$ docker-compose restart zigbee2mqtt
 	```
@@ -243,7 +243,7 @@ Note:
 
 ### <a name="checkStatus"></a>Checking status
 
-```bash
+```console
 $ docker ps | grep -e mosquitto -e zigbee2mqtt
 NAMES         CREATED          STATUS
 zigbee2mqtt   33 seconds ago   Up 30 seconds
@@ -272,7 +272,7 @@ Fortunately, Zigbee2MQTT offers a shortcut. If the [`… LOG_SYMLINK_CURRENT`](#
 
 You can use commands like `cat` and `tail` to examine the *current* log. Example:
 
-```bash
+```console
 $ cat ~/IOTstack/volumes/zigbee2mqtt/data/log/current/log.txt
 ```
 
@@ -280,7 +280,7 @@ $ cat ~/IOTstack/volumes/zigbee2mqtt/data/log/current/log.txt
 
 To perform this check, you will need to have the Mosquitto clients installed:
 
-```bash
+```console
 $ sudo apt install -y mosquitto-clients
 ```
 
@@ -293,7 +293,7 @@ The Mosquitto clients package includes two command-line tools:
 
 Assuming the Mosquitto clients are installed, you can run the following command:
 
-```bash
+```console
 $ mosquitto_sub -v -h "localhost" -t "zigbee2mqtt/#" -F "%I %t %p"
 ```
 
@@ -334,7 +334,7 @@ Notes:
 
 	Do not change the *internal* port number on the right hand side of the mapping. To apply changes to the port mapping:
 
-	```bash
+	```console
 	$ cd ~/IOTstack
 	$ docker-compose up -d zigbee2mqtt
 	```
@@ -343,7 +343,7 @@ Notes:
 
 To open a shell inside the Zigbee2MQTT container, run:
 
-```bash
+```console
 $ docker exec -it zigbee2mqtt ash
 ```
 
@@ -355,7 +355,7 @@ To close the shell and leave the container, either type "exit" and press <kbd>re
 
 When you become aware of a new version of Zigbee2MQTT on [DockerHub](https://hub.docker.com/r/koenkk/zigbee2mqtt/tags), do the following:
 
-```bash
+```console
 $ cd ~IOTstack
 $ docker-compose pull zigbee2mqtt
 $ docker-compose up -d zigbee2mqtt
@@ -388,7 +388,7 @@ If you were using the Zigbee2MQTT container in IOTstack before April 2022, you s
 
 The updated service definition is included here for ease of reference:
 
-```yaml
+``` { .yaml linenums="1" }
 zigbee2mqtt:
   container_name: zigbee2mqtt
   image: koenkk/zigbee2mqtt:latest
