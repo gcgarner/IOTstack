@@ -25,14 +25,14 @@ From that it should be clear that *Portainer* is deprecated and that *Portainer 
 
 Run the menu:
 
-```
+```console
 $ cd ~/IOTstack
 $ ./menu.sh
 ```
 
 Choose "Build Stack", select "Portainer-ce", press [TAB] then "\<Ok\>" and follow through to the end of the menu process, typically choosing "Do not overwrite" for any existing services. When the menu finishes:
 
-```
+```console
 $ docker-compose up -d
 ```
 
@@ -83,7 +83,7 @@ Keep in mind that clicking on a "Published Port" does not guarantee that your br
 
 If you forget the password you created for *Portainer CE*, you can recover by doing the following:
 
-```
+```console
 $ cd ~/IOTstack
 $ docker-compose stop portainer-ce
 $ sudo rm -r ./volumes/portainer-ce
