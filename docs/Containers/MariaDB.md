@@ -19,7 +19,7 @@ The port is 3306. It exists inside the docker network so you can connect via `ma
 
 Before starting the stack, edit the `docker-compose.yml` file and check your environment variables. In particular:
 
-```
+```yaml
   environment:
     - TZ=Etc/UTC
     - MYSQL_ROOT_PASSWORD=
