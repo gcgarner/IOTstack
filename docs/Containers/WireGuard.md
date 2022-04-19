@@ -35,7 +35,7 @@ Before you can use WireGuard (or any VPN solution), you need a mechanism for you
 
 This is the service definition *template* that IOTstack uses for WireGuard:
 
-```yml
+``` { .yaml linenums="1" }
 wireguard:
   container_name: wireguard
   image: ghcr.io/linuxserver/wireguard
@@ -237,13 +237,13 @@ You will need to create the `compose-override.yml` **before** running the menu t
 
 1. Use your favourite text editor to create (or open) the override file. The file is expected to be at the path:
 
-	```bash
+	```
 	~/IOTstack/compose-override.yml
 	```
 
 2. Define overrides to implement the decisions you took in [Decide what to configure](#configureWhat). For example:
 
-	```yml
+	``` { .yaml linenums="1" }
 	services:
 	  wireguard:
 	    environment:
@@ -527,7 +527,7 @@ $ docker exec wireguard bash -c 'apt update ; apt install -y tcpdump'
 
 To monitor traffic:
 
-```bash
+```console
 $ docker exec -t wireguard tcpdump -i eth0 -n udp port «internal»
 ```
 
