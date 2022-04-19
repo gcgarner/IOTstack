@@ -21,7 +21,7 @@ Homebridge is configured using environment variables. In IOTstack:
 
 In either case, you apply changes by editing the relevant file (`docker-compose.yml` or `homebridge.env`) and then:
 
-```bash
+```console
 $ cd ~/IOTstack
 $ docker-compose up -d homebridge
 ```
