@@ -56,7 +56,7 @@ The active image is *generic* in the sense that it should work on any platform. 
 
 The normal IOTstack commands apply to Home Assistant Container such as:
 
-```bash
+```console
 $ cd ~/IOTstack
 $ docker-compose up -d
 ```
@@ -127,7 +127,7 @@ your RPi hostname is raspberrypi)
 
 5. Start the swag container, this creates the file to be edited in the next step:
 
-	```bash
+	```console
 	$ cd ~/IOTstack
 	$ docker-compose up -d
 	```
@@ -136,7 +136,7 @@ your RPi hostname is raspberrypi)
 
 6. Enable reverse proxy for `raspberrypi.local`. `homassistant.*` is already by default. and fix homeassistant container name ("upstream_app"):
 
-	```bash
+	```console
 	$ cd ~/IOTstack
 	$ sed -e 's/server_name/server_name *.local/' \
 	  volumes/swag/config/nginx/proxy-confs/homeassistant.subdomain.conf.sample \
@@ -146,7 +146,7 @@ your RPi hostname is raspberrypi)
 7. Forward to correct IP when target is a container running in "network_mode:
    host" (like Home Assistant does):
 
-	```bash
+	```console
 	cd ~/IOTstack
 	cat << 'EOF' | sudo tee volumes/swag/config/custom-cont-init.d/add-host.docker.internal.sh
 	#!/bin/sh
@@ -164,7 +164,7 @@ your RPi hostname is raspberrypi)
 8. (optional) Add reverse proxy password protection if you don't want to rely
    on the HA login for security, doesn't affect API-access:
 
-	```bash
+	```console
 	$ cd ~/IOTstack
 	$ sed -i -e 's/#auth_basic/auth_basic/' \
 		volumes/swag/config/nginx/proxy-confs/homeassistant.subdomain.conf
@@ -198,7 +198,7 @@ your RPi hostname is raspberrypi)
 
     Or from the command line in the RPi:
 
-    ```bash
+    ```console
     $ curl --resolve homeassistant.<yourdomain>.duckdns.org:443:127.0.0.1 \
         https://homeassistant.<yourdomain>.duckdns.org/
     ```
