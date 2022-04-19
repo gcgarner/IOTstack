@@ -42,12 +42,12 @@ Because of AdGuard Home limitations, you must take special precautions if you de
 
 2. You **must** convince AdGuard Home that it is a first-time installation: 
 
-	```
-	 $ cd ~/IOTstack
-	 $ docker-compose stop adguardhome
-	 $ docker-compose rm -f adguardhome
-	 $ sudo rm -rf ./volumes/adguardhome
-	 $ docker-compose up -d adguardhome
+	```console
+	$ cd ~/IOTstack
+	$ docker-compose stop adguardhome
+	$ docker-compose rm -f adguardhome
+	$ sudo rm -rf ./volumes/adguardhome
+	$ docker-compose up -d adguardhome
 	```
 
 3. Repeat the [Quick Start](#quickStart) procedure, this time substituting the new Admin Web Interface port where you see "8089".
@@ -64,7 +64,7 @@ If you want to run AdGuard Home as your DHCP server, you need to put the contain
 
 1. add the line:
 
-	```
+	```yaml
 	network_mode: host
 	```
 
