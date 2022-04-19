@@ -38,14 +38,14 @@ Bash aliases for stopping and starting the stack are in the file
 `.bash_aliases`. To use them immediately and in future logins, run in a
 console:
 
-```bash
-. ~/IOTstack/.bash_aliases
-echo ". ~/IOTstack/.bash_aliases" >> ~/.profile
+``` console
+$ source ~/IOTstack/.bash_aliases
+$ echo ". ~/IOTstack/.bash_aliases" >> ~/.profile
 ```
 
 These commands no longer need to be executed from the IOTstack directory and can be executed in any directory
 
-```bash
+``` console
 alias iotstack_up="docker-compose -f ~/IOTstack/docker-compose.yml up -d"
 alias iotstack_down="docker-compose -f ~/IOTstack/docker-compose.yml down"
 alias iotstack_start="docker-compose -f ~/IOTstack/docker-compose.yml start"
