@@ -4,7 +4,7 @@
 
 This is the **core** of the IOTstack Nextcloud service definition:
 
-```yml
+``` { .yaml linenums="1" }
 nextcloud:
   container_name: nextcloud
   image: nextcloud
@@ -58,19 +58,19 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 1. Be in the correct directory:
 
-	```
+	```console
 	$ cd ~/IOTstack
 	```
 
 2. If the stack is running, take it down:
 
-	```
+	```console
 	$ docker-compose down
 	```
 
 3. Erase the persistent storage area for Nextcloud (double-check the command *before* you hit return):
 
-	```
+	```console
 	$ sudo rm -rf ./volumes/nextcloud
 	```
 
@@ -78,7 +78,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 4. Bring up the stack:
 
-	```
+	```console
 	$ docker-compose up -d
 	```
 
@@ -86,13 +86,13 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 	Repeat the following command two or three times at 10-second intervals:
 
-	```
+	```console
 	$ docker ps
 	```
 
 	You are looking for evidence that the `nextcloud` and `nextcloud_db` containers are up, stable, and not restarting. If you see any evidence of restarts, try to figure out why using:
 
-	```
+	```console
 	$ docker logs nextcloud
 	```
 
@@ -211,7 +211,7 @@ Hint:
 
 * It is a good idea to make a backup of any file before you edit it. For example:
 
-	```
+	```console
 	$ cd ~/IOTstack/volumes/nextcloud/html/config/
 	$ sudo cp config.php config.php.bak
 	```
@@ -232,7 +232,7 @@ Search for "trusted_domains". To tell Nextcloud to trust **all** of the URLs abo
 
 Once you have finished editing the file, save your work then restart Nextcloud:
 
-```
+```console
 $ cd ~/IOTstack
 $ docker-compose restart nextcloud
 ```
@@ -253,7 +253,7 @@ Could not reliably determine the server's fully qualified domain name
 
 You can silence the warning by editing the Nextcloud service definition in `docker-compose.yml` to add your fully-qualified DNS alias to at `hostname` directive. For example:
 
-```
+```yaml
     hostname: nextcloud.mydomain.com
 ```
 
@@ -271,7 +271,7 @@ Because it is an instance of MariaDB, Nextcloud_DB inherits the health-check age
 
 To update the `nextcloud` container:
 
-```
+```console
 $ cd ~/IOTstack
 $ docker-compose pull nextcloud
 $ docker-compose up -d nextcloud
@@ -280,7 +280,7 @@ $ docker system prune
 
 To update the `nextcloud_db` container:
 
-```
+```console
 $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull nextcloud_db
 $ docker-compose up -d nextcloud_db
@@ -298,7 +298,7 @@ Nextcloud is currently excluded from the IOTstack-supplied backup scripts due to
 
 If you want to take a backup, something like the following will get the job done:
 
-```
+```console
 $ cd ~/IOTstack
 $ BACKUP_TAR_GZ=$PWD/backups/$(date +"%Y-%m-%d_%H%M").$HOSTNAME.nextcloud-backup.tar.gz
 $ touch "$BACKUP_TAR_GZ"
@@ -314,7 +314,7 @@ Notes:
 
 To restore, you first need to identify the name of the backup file by looking in the `backups` directory. Then:
 
-```
+```console
 $ cd ~/IOTstack
 $ RESTORE_TAR_GZ=$PWD/backups/2021-06-12_1321.sec-dev.nextcloud-backup.tar.gz
 $ docker-compose rm --force --stop -v nextcloud nextcloud_db
