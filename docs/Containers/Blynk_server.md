@@ -72,14 +72,14 @@ When you select Blynk Server in the IOTstack menu, the *template service definit
 
 On a first install of IOTstack, you run the menu, choose your containers, and are told to do this:
 
-```bash
+```console
 $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
 `docker-compose` reads the *Compose* file. When it arrives at the `blynk_server` fragment, it finds:
 
-```
+```yaml
   blynk_server:
     build:
       context: ./.templates/blynk_server/.
@@ -99,7 +99,7 @@ The `BLYNK_SERVER_VERSION` argument is passed into the build process. This impli
 
 The *Dockerfile* begins with:
 
-```
+```Dockerfile
 FROM ubuntu
 ```
 
@@ -117,7 +117,7 @@ The ***local image*** is instantiated to become your running container.
 
 When you run the `docker images` command after Blynk Server has been built, you *may* see two rows that are relevant:
 
-```bash
+```console
 $ docker images
 REPOSITORY              TAG      IMAGE ID       CREATED         SIZE
 iotstack_blynk_server   latest   3cd6445f8a7e   3 hours ago     652MB
@@ -135,7 +135,7 @@ You *may* see the same pattern in *Portainer*, which reports the ***base image**
 
 You can inspect Blynk Server's log by:
 
-```
+```console
 $ docker logs blynk_server
 ```
 
@@ -153,7 +153,7 @@ The first time you launch the `blynk_server` container, the following structure 
 
 The two `.properties` files can be used to alter Blynk Server's configuration. When you make change to these files, you activate then by restarting the container:
 
-```
+```console
 $ cd ~/IOTstack
 $ docker-compose restart blynk_server
 ```
@@ -162,7 +162,7 @@ $ docker-compose restart blynk_server
 
 Erasing Blynk Server's persistent storage area triggers self-healing and restores known defaults:
 
-```
+```console
 $ cd ~/IOTstack
 $ docker-compose rm --force --stop -v blynk_server
 $ sudo rm -rf ./volumes/blynk_server
@@ -172,7 +172,7 @@ Note:
 
 * You can also remove individual configuration files and then trigger self-healing. For example, if you decide to edit `server.properties` and make a mess, you can restore the original default version like this:
 
-	```
+	```console
 	$ cd ~/IOTstack
 	$ rm volumes/blynk_server/config/server.properties
 	$ docker-compose restart blynk_server
@@ -186,7 +186,7 @@ At the time of writing, version 0.41.16 was the most up-to-date. Suppose that ve
 
 1. Edit your *Compose* file to change the version nuumber:
 
-	```
+	```yaml
 	  blynk_server:
 	    build:
 	      context: ./.templates/blynk_server/.
@@ -202,7 +202,7 @@ At the time of writing, version 0.41.16 was the most up-to-date. Suppose that ve
 
 	- If you only want to reconstruct the **local** image:
 
-		```
+		```console
 		$ cd ~/IOTstack
 		$ docker-compose up --build -d blynk_server
 		$ docker system prune -f
@@ -210,7 +210,7 @@ At the time of writing, version 0.41.16 was the most up-to-date. Suppose that ve
 
 	- If you want to update the Ubuntu **base** image at the same time:
 
-		```
+		```console
 		$ cd ~/IOTstack
 		$ docker-compose build --no-cache --pull blynk_server
 		$ docker-compose up -d blynk_server
@@ -243,7 +243,7 @@ You may encounter browser security warnings which you will have to acknowledge i
 2. Save changes.
 3. Restart the container using either Portainer or the command line:
 
-	```
+	```console
 	$ cd ~/IOTstack
 	$ docker-compose restart blynk_server
 	```
