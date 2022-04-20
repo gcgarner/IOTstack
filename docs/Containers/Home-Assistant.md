@@ -63,23 +63,40 @@ $ docker-compose up -d
 
 ## <a name="usingBluetooth"></a>Using bluetooth from the container
 
-In order to be able to use BT & BLE devices from HA integrations, make sure that bluetooth is enabled and powered on at the start of the (Rpi) host by editing `/etc/bluetooth/main.conf`:
+In order to be able to use BT & BLE devices from HA integrations, make sure that Bluetooth is enabled:
 
-```conf
-....
-[Policy]
+``` { .console linenums="1" }
+$ hciconfig
+hci0:	Type: Primary  Bus: UART
+	BD Address: DC:89:FB:A6:32:4B  ACL MTU: 1021:8  SCO MTU: 64:1
+	UP RUNNING 
+	RX bytes:2003 acl:0 sco:0 events:159 errors:0
+	TX bytes:11583 acl:0 sco:0 commands:159 errors:0
+```
+
+The "UP" in line 4 indicates that Bluetooth is enabled. If Bluetooth is not enabled, check:
+
+```console
+$ grep "^AutoEnable" /etc/bluetooth/main.conf
 AutoEnable=true
 ```
 
-After a reboot, check that BT is up:
+If `AutoEnable` is either missing or not set to `true`, then:
 
-```sh
-(root) # hciconfig
-...
-UP
-...
-```
-ref: https://scribles.net/auto-power-on-bluetooth-adapter-on-boot-up/
+1. Use `sudo` to and your favouring text editor to open:
+
+	```
+	/etc/bluetooth/main.conf
+	```
+
+2. Find `AutoEnable` and make it `true`.
+
+	> If `AutoEnable` is missing, it needs to be added to the `[Policy]` section.
+	
+3. Reboot your Raspberry Pi.
+4. Check that the Bluetooth interface is enabled.
+
+See also: [Scribles: Auto Power On Bluetooth Adapter on Boot-up](https://scribles.net/auto-power-on-bluetooth-adapter-on-boot-up/).
 
 ## <a name="httpsWithSSLcert"></a>HTTPS with a valid SSL certificate
 
