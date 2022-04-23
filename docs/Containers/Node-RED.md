@@ -79,7 +79,7 @@ $ docker-compose up -d
 
 `docker-compose` reads the *Compose* file. When it arrives at the `nodered` fragment, it finds:
 
-```
+``` yaml
   nodered:
     container_name: nodered
     build: ./services/nodered/.
@@ -94,7 +94,7 @@ The `build` statement tells `docker-compose` to look for:
 
 The *Dockerfile* begins with:
 
-```
+``` Dockerfile
 FROM nodered/node-red:latest-12
 ```
 
@@ -214,7 +214,7 @@ Node-RED can run in two modes. By default, it runs in "non-host mode" but you ca
 
 1. Add the following directive:
 
-	```
+	``` yml
 	network_mode: host
 	```
 	
@@ -295,7 +295,7 @@ Key point:
 
 The Node-RED service definition in the *Compose* file includes the following:
 
-```
+``` yaml
 volumes:
   - ./volumes/nodered/data:/data
 ```
@@ -699,7 +699,7 @@ $ touch config
 
 Select the following text, copy it to the clipboard.
 
-```
+``` sshconfig
 host «HOSTNAME»
   hostname «HOSTADDR»
   user «USERID»
@@ -713,7 +713,7 @@ Replace the «delimited» keys. Completed examples:
 
 * If you are using the `«HOSTFQDN»` form:
 
-	```
+	``` sshconfig
 	host iot-dev
 	  hostname iot-dev.mydomain.com
 	  user pi
@@ -723,7 +723,7 @@ Replace the «delimited» keys. Completed examples:
 
 * If you are using the `«HOSTIP»` form:
 
-	```
+	``` sshconfig
 	host iot-dev
 	  hostname 192.168.132.9
 	  user pi
@@ -885,7 +885,7 @@ The `--build` option on the `up` command (as distinct from a `docker-compose bui
 
 Out of the box, IOTstack starts the Node-RED *Dockerfile* with:
 
-```
+``` Dockerfile
 FROM nodered/node-red:latest-12
 ```
 
@@ -899,7 +899,7 @@ $ docker exec nodered node --version
 
 In the unlikely event that you need to run an add-on node that needs version 10 of `node.js`, you can pin to version 10.x.x by changing the first line of your *Dockerfile* like this:
 
-```
+``` Dockerfile
 FROM nodered/node-red:latest-10
 ```
 
@@ -921,7 +921,7 @@ Packages installed this way will persist until the container is re-created (eg a
 
 The second method changes the *Dockerfile* to add the packages permanently to your build. You just append the packages to the end of the existing `apk add`:
 
-```
+``` Dockerfile
 RUN apk update && apk add --no-cache eudev-dev mosquitto-clients bind-tools tcpdump
 ```
 
@@ -1013,7 +1013,7 @@ Add-on nodes installed via Manage Palette wind up at the **external** path:
 
 The *Compose* file volumes mapping:
 
-```
+``` yaml
 ./volumes/nodered/data:/data
 ```
 

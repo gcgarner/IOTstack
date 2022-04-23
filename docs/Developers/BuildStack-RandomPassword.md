@@ -9,7 +9,7 @@ Many services often set a password on their initial spin up and store it interna
 
 ## A basic example
 Inside the service's `service.yml` file, a special string can be added in for the build script to find and replace. Commonly the string is `%randomPassword%`, but technically any string can be used. The same string can be used multiple times for the same password to be used multiple times, and/or multiple difference strings can be used for multiple passwords.
-```
+``` yaml
   mariadb:
     image: linuxserver/mariadb
     container_name: mariadb

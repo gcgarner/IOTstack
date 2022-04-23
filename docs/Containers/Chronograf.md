@@ -52,13 +52,13 @@ If you need to pin to a particular version:
 1. Use your favourite text editor to open `docker-compose.yml`.
 2. Find the line:
 
-	```
+	``` yaml
 	image: chronograf:latest
 	```
 
 3. Replace `latest` with the version you wish to pin to. For example, to pin to version 1.9.0:
 
-	```
+	``` yaml
 	image: chronograf:1.9.0
 	```
 

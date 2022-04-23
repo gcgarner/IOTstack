@@ -16,12 +16,12 @@ Check the docker-compose.yml to see which ports have been used
 Many containers try to use popular ports such as 80,443,8080. For example openHAB and Adminer both want to use port 8080 for their web interface. Adminer's port has been moved 9080 to accommodate this. Please check the description of the container in the README to see if there are any changes as they may not be the same as the port you are used to.
 
 Port mapping is done in the docker-compose.yml file. Each service should have a section that reads like this:
-```
+``` yaml
     ports:
       - HOST_PORT:CONTAINER_PORT
 ```
 For adminer:
-```
+``` yaml
     ports:
       - 9080:8080
 ```
