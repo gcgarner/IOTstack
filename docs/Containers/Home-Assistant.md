@@ -65,7 +65,7 @@ $ docker-compose up -d
 
 In order to be able to use BT & BLE devices from HA integrations, make sure that Bluetooth is enabled:
 
-``` { .console linenums="1" }
+```console
 $ hciconfig
 hci0:	Type: Primary  Bus: UART
 	BD Address: DC:89:FB:A6:32:4B  ACL MTU: 1021:8  SCO MTU: 64:1
@@ -74,7 +74,7 @@ hci0:	Type: Primary  Bus: UART
 	TX bytes:11583 acl:0 sco:0 commands:159 errors:0
 ```
 
-The "UP" in line 4 indicates that Bluetooth is enabled. If Bluetooth is not enabled, check:
+The "UP" in the third line of output indicates that Bluetooth is enabled. If Bluetooth is not enabled, check:
 
 ```console
 $ grep "^AutoEnable" /etc/bluetooth/main.conf
