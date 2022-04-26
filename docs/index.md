@@ -12,13 +12,13 @@ hide:
 Welcome to the IOTstack Wiki:
 
 * <span class="show-when-wide-layout">
-  Use the header tabs and content list at the left to explore this Wiki.
+  Use the top tabs and then the left list to explore this Wiki.
   </span>
   <label class="show-when-narrow-layout">
   Click the "≡" icon to navigate this Wiki.
   </label>
 
-* If you are just getting started with IOTstack, see [Getting Started](Basic_setup/).
+* If you are just getting started with IOTstack, see [Getting Started](Basic_setup/index.md).
     * If you're running gcgarner/IOTstack see [Migrating to SensorsIot](Updates/gcgarner-migration.md).
 
 * You're always welcome to ask questions on the [IOTStack Discord](https://discord.gg/ZpKHnks).
