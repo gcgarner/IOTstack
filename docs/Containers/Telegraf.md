@@ -78,7 +78,7 @@ $ docker-compose up -d
 
 `docker-compose` reads the *Compose* file. When it arrives at the `telegraf` fragment, it finds:
 
-```
+``` yaml
   telegraf:
     container_name: telegraf
     build: ./.templates/telegraf/.

@@ -84,7 +84,7 @@ This is what happens:
 1. *docker-compose* reads your `docker-compose.yml`.
 2. When it finds the service definition for Python, it encounters:
 
-	```
+	``` yaml
 	build: ./services/python/.
 	```
 
@@ -437,7 +437,7 @@ Proceed like this:
 
 4. Edit the `python` service definition in `docker-compose.yml` and replace references to `python` with the name of your project. In the following, the original is on the left, the edited version on the right, and the lines that need to change are indicated with a "|": 
 
-	```
+	``` yaml
 	python:                                  |  wishbone:
 	  container_name: python                 |    container_name: wishbone
 	  build: ./services/python/.             |    build: ./services/wishbone/.

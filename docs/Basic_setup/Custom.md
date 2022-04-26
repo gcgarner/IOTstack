@@ -17,7 +17,7 @@ The `compose-override.yml` file has been added to the `.gitignore` file, so it s
 If you specify an override for a service, and then rebuild the `docker-compose.yml` file, but deselect the service from the list, then the YAML merging will still produce that override.
 
 For example, lets say NodeRed was selected to have have the following override specified in `compose-override.yml`:
-```
+``` yaml
 services:
   nodered:
     restart: always
@@ -36,7 +36,7 @@ Either remove the override for NodeRed in `compose-override.yml` and rebuild the
 
 ### Overriding default settings
 Lets assume you put the following into the `compose-override.yml` file:
-```
+``` yaml
 services:
   mosquitto:
     ports:
@@ -45,7 +45,7 @@ services:
 ```
 
 Normally the mosquitto service would be built like this inside the `docker-compose.yml` file:
-```
+``` yaml
 version: '3.6'
 services:
   mosquitto:
@@ -67,7 +67,7 @@ services:
 Take special note of the ports list.
 
 If you run the build script with the `compose-override.yml` file in place, and open up the final `docker-compose.yml` file, you will notice that the port list have been replaced with the ones you specified in the `compose-override.yml` file.
-```
+``` yaml
 version: '3.6'
 services:
   mosquitto:
@@ -87,7 +87,7 @@ services:
 ```
 
 Do note that it will replace the entire list, if you were to specify
-```
+``` yaml
 services:
   mosquitto:
     ports:
@@ -95,7 +95,7 @@ services:
 ```
 
 Then the final output will be:
-```
+``` yaml
 version: '3.6'
 services:
   mosquitto:
@@ -117,7 +117,7 @@ services:
 
 If you need or prefer to use *.env files for docker-compose environment variables in a separate file instead of using overrides, you can do so like this:
 
-```
+``` yaml
 services:
   grafana:
     env_file:
@@ -131,7 +131,7 @@ This will remove the default environment variables set in the template, and tell
 
 Custom services can be added in a similar way to overriding default settings for standard services. Lets add a Minecraft and rcon server to IOTstack.
 Firstly, put the following into `compose-override.yml`:
-```
+``` yaml
 services:
   mosquitto:
     ports:
@@ -182,7 +182,7 @@ Then simply run the `./menu.sh` command, and rebuild the stack with what ever se
 
 Using the Mosquitto example above, the final `docker-compose.yml` file will look like:
 
-```
+``` yaml
 version: '3.6'
 services:
   mosquitto:

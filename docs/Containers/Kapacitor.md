@@ -30,13 +30,13 @@ If you need to pin to a particular version:
 1. Use your favourite text editor to open `docker-compose.yml`.
 2. Find the line:
 
-	```
+	``` yaml
    image: kapacitor:1.5
 	```
 
 3. Replace `1.5` with the version you wish to pin to. For example, to pin to version 1.5.9:
 
-	```
+	``` yaml
    image: kapacitor:1.5.9
 	```
 	

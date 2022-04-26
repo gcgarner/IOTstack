@@ -9,7 +9,7 @@ A service only requires 2 files:
 
 ### A basic service
 Inside the `service.yml` is where the service data for docker-compose is housed, for example:
-```
+``` yaml
 adminer:
   container_name: adminer
   image: adminer

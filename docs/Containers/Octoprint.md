@@ -14,7 +14,7 @@ title: Octoprint
 
 When you select "OctoPrint" in the IOTstack menu, the service definition in your `docker-compose.yml`, contains the following under the `devices:` heading:
 
-```
+``` yaml
 devices:
   - /dev/ttyAMA0:/dev/ttyACM0
 # - /dev/video0:/dev/video0
@@ -57,7 +57,7 @@ Note:
 
 Assuming the above example output was the answer, edit `docker-compose.yml` to look like this:
 
-```
+``` yaml
 devices:
   - /dev/serial/by-id/usb-Silicon_Labs_CP2102N_USB_to_UART_Bridge_Controller_3b14eaa48a154d5e87032d59459d5206-if00-port0:/dev/ttyACM0
 ```
@@ -136,7 +136,7 @@ $ ls /dev
 
 You should expect to see the human-readable name you chose in the list of devices. You can then edit `docker-compose.yml` to use the name in the device mapping.
 
-```
+``` yaml
 devices:
   - /dev/MasterDisaster5000Pro:/dev/ttyACM0
 ```
@@ -160,7 +160,7 @@ To activate a Raspberry Pi camera attached via ribbon cable:
 2. Confirm the presence of `/dev/video0`.
 3. Edit `docker-compose.yml` and uncomment **all** of the commented-out lines in the following:
 
-	```
+	``` yaml
 	devices:
 	# - /dev/video0:/dev/video0
 	environment:
@@ -175,7 +175,7 @@ To activate a Raspberry Pi camera attached via ribbon cable:
 
 The three environment variables are required:
 
-```
+``` yaml
 environment:
   - ENABLE_MJPG_STREAMER=true
   - MJPG_STREAMER_INPUT=-r 640x480 -f 10 -y
@@ -193,7 +193,7 @@ The typical specs for a baseline Raspberry Pi camera are:
 
 For that type of camera, the following is probably more appropriate:
 
-```
+``` yaml
   - MJPG_STREAMER_INPUT=-r 1152x648 -f 10
 ```
 
@@ -395,7 +395,7 @@ To silence the warning:
 
 3. Implement the following pattern:
 
-	```
+	``` yaml
 	server:
 	  …
 	  ipCheck:
