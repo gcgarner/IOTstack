@@ -1,0 +1,20 @@
+  syncthing:
+    image: linuxserver/syncthing:latest
+    container_name: syncthing
+    hostname: raspberrypi #optional
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - HOME=/app
+      - TZ=Etc/UTC
+    volumes:
+      - ./volumes/syncthing/config:/config
+      - ./volumes/syncthing/data:/app
+    #ports:
+    #  - 8384:8384 # Web UI
+    #  - 22000:22000/tcp # TCP file transfers
+    #  - 22000:22000/udp # QUIC file transfers
+    #  - 21027:21027/udp # Receive local discovery broadcasts
+    network_mode: host
+
+
