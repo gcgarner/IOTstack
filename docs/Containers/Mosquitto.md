@@ -224,10 +224,12 @@ Using `mosquitto.conf` as the example, assume you wish to use your existing file
 
 Mosquitto logging is controlled by `mosquitto.conf`. This is the default configuration:
 
-```
+```apacheconf
 #log_dest file /mosquitto/log/mosquitto.log
 log_dest stdout
 log_timestamp_format %Y-%m-%dT%H:%M:%S
+# Reduce size and SD-card flash wear, safe to remove if using a SSD
+connection_messages false
 ```
 
 When `log_dest` is set to 	`stdout`, you inspect Mosquitto's logs like this:
@@ -236,7 +238,9 @@ When `log_dest` is set to 	`stdout`, you inspect Mosquitto's logs like this:
 $ docker logs mosquitto
 ```
 
-Logs written to `stdout` are ephemeral and will disappear when your Mosquitto container is rebuilt, but this type of configuration reduces wear and tear on your SD card.
+Logs written to `stdout` are stored and persisted to disk as managed by Docker.
+They are kept over reboots, but are lost when your Mosquitto container is
+removed or updated.
 
 The alternative, which *may* be more appropriate if you are running on an SSD or HD, is to change `mosquitto.conf` to be like this:
 
@@ -261,7 +265,7 @@ $ sudo tail ~/IOTstack/volumes/mosquitto/log/mosquitto.log
 
 > You need to use `sudo` because the log is owned by userID 1883 and Mosquitto creates it without "world" read permission.
 
-Logs written to `mosquitto.log` do not disappear when your IOTstack is restarted. They persist until you take action to prune the file.
+Logs written to `mosquitto.log` persist until you take action to prune the file.
 
 ## Security
 
@@ -755,7 +759,7 @@ If you have a use-case that needs port 9001, you can re-enable support by:
 
 2. Inserting the additional listener in `mosquitto.conf`:
 
-	```
+	```apacheconf
 	listener 1883
 	listener 9001
 	```
