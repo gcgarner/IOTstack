@@ -43,7 +43,7 @@ A behind-the-router technique usually relies on sending updates according to a s
 
 IOTstack provides a solution for DuckDNS. The best approach to running it is:
 
-```bash
+``` console
 $ mkdir -p ~/.local/bin
 $ cp ~/IOTstack/duck/duck.sh ~/.local/bin
 ```
@@ -74,7 +74,7 @@ Note:
 
 Once your credentials are in place, test the result by running:
 
-```bash
+``` console
 $ ~/.local/bin/duck.sh
 ddd, dd mmm yyyy hh:mm:ss ±zzzz - updating DuckDNS
 OK
@@ -89,7 +89,7 @@ Check your work if you get "KO" or any other errors.
 
 Next, assuming `dig` is installed on your Raspberry Pi (`sudo apt install dnsutils`), you can test propagation by sending a directed query to a DuckDNS name server. For example, assuming the domain name you registered was `downunda.duckdns.org`, you would query like this:
 
-```bash
+``` console
 $ dig @ns1.duckdns.org downunda.duckdns.org +short
 ```
 
@@ -132,7 +132,7 @@ If you wish to keep a log of `duck.sh` activity, the following will get the job 
 
 1. Make a directory to hold log files:
 
-	```bash
+	``` console
 	$ mkdir -p ~/Logs
 	```
 
@@ -144,7 +144,7 @@ If you wish to keep a log of `duck.sh` activity, the following will get the job 
 
 Remember to prune the log from time to time. The generally-accepted approach is:
 
-```
+``` console
 $ cat /dev/null >~/Logs/duck.log
 ```
 
@@ -174,7 +174,7 @@ Zerotier is an alternative to PiVPN that doesn't require port forwarding on your
 
 Kevin Zhang has written a how to guide [here](https://iamkelv.in/blog/2017/06/zerotier.html). Just note that the install link is outdated and should be:
 
-```bash
-curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && \
+``` console
+$ curl -s 'https://raw.githubusercontent.com/zerotier/ZeroTierOne/master/doc/contact%40zerotier.com.gpg' | gpg --import && \
 if z=$(curl -s 'https://install.zerotier.com/' | gpg); then echo "$z" | sudo bash; fi
 ```

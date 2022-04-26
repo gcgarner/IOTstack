@@ -72,7 +72,7 @@ Choosing add-on nodes in the menu causes the *Dockerfile* to be created.
 
 On a first install of IOTstack, you are told to do this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose up -d
 ```
@@ -117,7 +117,7 @@ Notes:
 
 When you run the `docker images` command after Node-RED has been built, you *may* see two rows for Node-RED:
 
-```bash
+``` console
 $ docker images
 REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE
 iotstack_nodered         latest              b0b21a97b8bb        4 days ago          462MB
@@ -141,7 +141,7 @@ You should not remove the *base* image, even though it appears to be unused.
 
 After you install Node-RED, you should set an encryption key. Completing this step will silence the warning you will see when you run:
 
-```bash
+``` console
 $ docker logs nodered
 …
 ---------------------------------------------------------------------
@@ -162,7 +162,7 @@ Setting an encryption key also means that any credentials you create will be *po
 
 The encryption key can be any string. For example, if you have UUID support installed (`sudo apt install -y uuid-runtime`), you could generate a UUID as your key:
 
-```bash
+``` console
 $ uuidgen
 2deb50d4-38f5-4ab3-a97e-d59741802e2d
 ```
@@ -187,7 +187,7 @@ Un-comment the line and replace `a-secret-key` with your chosen key. Do not remo
 
 Save the file and then restart Node-RED:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose restart nodered
 ```
@@ -196,7 +196,7 @@ $ docker-compose restart nodered
 
 To secure Node-RED you need a password hash. Run the following command, replacing `PASSWORD` with your own password:
 
-```bash
+``` console
 $ docker exec nodered node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8));" PASSWORD
 ```
 
@@ -260,7 +260,7 @@ To communicate with your Raspberry Pi's GPIO you need to do the following:
 
 1. Install dependencies:
 
-	```bash
+	``` console
 	$ sudo apt update
 	$ sudo apt install pigpio python-pigpio python3-pigpio
 	```
@@ -312,7 +312,7 @@ The leading "." on the external path implies "the folder containing the *Compose
 
 If you write to the **internal** path from **inside** the Node-RED container, the Raspberry Pi will see the results at the **external** path, and vice versa. Example:
 
-```bash
+``` console
 $ docker exec -it nodered bash
 # echo "The time now is $(date)" >/data/example.txt
 # cat /data/example.txt 
@@ -380,7 +380,7 @@ An "exec" node works as expected when Node-RED is running as a native service bu
 
 To help you understand the difference, consider this command:
 
-```bash
+``` console
 $ grep "^PRETTY_NAME=" /etc/os-release
 ```
 
@@ -404,7 +404,7 @@ Docker doesn't provide any mechanism for a container to execute an arbitrary com
 
 Be able to use a Node-RED `exec` node to perform the equivalent of:
 
-```bash
+``` console
 $ ssh «HOSTNAME» «COMMAND»
 ```
 
@@ -424,7 +424,7 @@ These instructions are specific to IOTstack but the underlying concepts should a
 
 These instructions make frequent use of the ability to run commands "inside" the Node-RED container. For example, suppose you want to execute:
 
-```bash
+``` console
 $ grep "^PRETTY_NAME=" /etc/os-release
 ```
 
@@ -432,13 +432,13 @@ You have several options:
 
 1. You can do it from the normal Raspberry Pi command line using a Docker command. The basic syntax is:
 
-	```bash
+	``` console
 	$ docker exec {-it} «containerName» «command and parameters»
 	```
 
 	The actual command you would need would be:
 	
-	```bash
+	``` console
 	$ docker exec nodered grep "^PRETTY_NAME=" /etc/os-release
 	```
 	
@@ -448,7 +448,7 @@ You have several options:
 	
 2. You can open a shell into the container, run as many commands as you like inside the container, and then exit. For example:
 
-	```bash
+	``` console
 	$ docker exec -it nodered bash
 	# grep "^PRETTY_NAME=" /etc/os-release
 	# whoami
@@ -519,7 +519,7 @@ pi
 
 Create a key-pair for Node-RED. This is done by executing the `ssh-keygen` command **inside** the container:
 
-```bash
+``` console
 $ docker exec -it nodered ssh-keygen -q -t ed25519 -C "Node-RED container key-pair" -N ""
 ```
 
@@ -535,13 +535,13 @@ Notes:
 
 Node-RED's public key needs to be copied to the user account on *each* target machine where you want a Node-RED "exec" node to be able to execute commands. At the same time, the Node-RED container needs to learn the public host key of the target machine. The `ssh-copy-id` command does both steps. The required syntax is:
 
-```bash
+``` console
 $ docker exec -it nodered ssh-copy-id «USERID»@«HOSTADDR»
 ```
 
 * Examples:
 
-	```bash
+	``` console
 	$ docker exec -it nodered ssh-copy-id pi@iot-dev.mydomain.com
 	$ docker exec -it nodered ssh-copy-id pi@192.168.132.9
 	```
@@ -585,13 +585,13 @@ If you do not see an indication that a key has been added, you may need to retra
 
 The output above recommends a test. The test needs to be run **inside** the Node-RED container so the syntax is:
 
-```bash
+``` console
 $ docker exec -it nodered ssh «USERID»@«HOSTADDR» ls -1 /home/pi/IOTstack
 ```
 
 * Examples:
 
-	```bash
+	``` console
 	$ docker exec -it nodered ssh pi@iot-dev.mydomain.com ls -1 /home/pi/IOTstack
 	$ docker exec -it nodered ssh pi@192.168.132.9 ls -1 /home/pi/IOTstack
 	```
@@ -670,13 +670,13 @@ You don't **have** to do this step but it will simplify your exec node commands 
 
 At this point, SSH commands can be executed from **inside** the container using this syntax:
 
-```bash
+``` console
 # ssh «USERID»@«HOSTADDR» «COMMAND»
 ```
 
 A `config` file is needed to achieve the task goal of the simpler syntax:
 
-```bash
+``` console
 # ssh «HOSTNAME» «COMMAND»
 ```
 
@@ -692,7 +692,7 @@ The file needs the ownership and permissions shown. There are several ways of go
 
 Start in a directory where you can create a file without needing `sudo`. The IOTstack folder is just as good as anywhere else:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ touch config
 ```
@@ -735,7 +735,7 @@ Save the file.
 
 Change the config file's ownership and permissions, and move it into the correct directory:
 
-```bash
+``` console
 $ chmod 644 config
 $ sudo chown root:root config
 $ sudo mv config ./volumes/nodered/ssh
@@ -745,19 +745,19 @@ $ sudo mv config ./volumes/nodered/ssh
 
 The previous test used this syntax:
 
-```bash
+``` console
 $ docker exec nodered ssh «USERID»@«HOSTADDR» ls -1 /home/pi/IOTstack
 ```
 
 Now that the config file is in place, the syntax changes to:
 
-```bash
+``` console
 $ docker exec nodered ssh «HOSTNAME» ls -1 /home/pi/IOTstack
 ```
 
 * Example:
 
-	```bash
+	``` console
 	$ docker exec nodered ssh iot-dev ls -1 /home/pi/IOTstack
 	```
 
@@ -809,7 +809,7 @@ In the Node-RED GUI:
 
 1. Exchange keys with the new target host using:
 
-	```bash
+	``` console
 	$ docker exec -it nodered ssh-copy-id «USERID»@«HOSTADDR»
 	```
 
@@ -825,7 +825,7 @@ In the Node-RED GUI:
 
 You can update most containers like this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose pull
 $ docker-compose up -d
@@ -844,7 +844,7 @@ The only way to know when an update to Node-RED is available is to check the [no
 
 Once a new version appears on [*DockerHub*](https://hub.docker.com), you can upgrade Node-RED like this:
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull nodered
 $ docker-compose up -d nodered
@@ -873,7 +873,7 @@ You customise your *local* image of Node-RED by making changes to:
 
 <a name="applyDockerfileChange">You apply a Dockerfile change like this:</a>
 
-```bash
+``` console
 $ cd ~/IOTstack
 $ docker-compose up --build -d nodered
 $ docker system prune
@@ -893,7 +893,7 @@ The `-12` suffix means "`node.js` is pinned at version 12.x.x". That's the lates
 
 If you want to check which version of `node.js` is installed on your system, you can do it like this:
 
-```bash
+``` console
 $ docker exec nodered node --version
 ```
 
@@ -911,7 +911,7 @@ As well as providing the Node-RED service, the nodered container is an excellent
 
 There are two ways to add extra packages. The first method is to add them to the running container. For example, to add the Mosquitto clients:
 
-```bash
+``` console
 $ docker exec nodered apk add --no-cache mosquitto-clients
 ```
 
@@ -939,7 +939,7 @@ You can install nodes by:
 
 2. Adding, removing or updating nodes in Manage Palette. Node-RED will remind you to restart Node-RED and that is something you have to do by hand:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose restart nodered
 	```
@@ -948,7 +948,7 @@ You can install nodes by:
 	
 	* Some users have reported misbehaviour from Node-RED if they do too many iterations of:
 	
-		```bash
+		``` console
 		[make a single change in Manage Palette]
 		$ docker-compose restart nodered
 
@@ -960,14 +960,14 @@ You can install nodes by:
 
 		It is better to:
 
-		```bash
+		``` console
 		[do ALL your Manage Palette changes]
 		$ docker-compose restart nodered
 		```
 
 3. Installing nodes inside the container via npm:
 
-	```bash
+	``` console
 	$ docker exec -it nodered bash
 	# cd /data
 	# npm install «node-name» /data
@@ -982,7 +982,7 @@ You can install nodes by:
 	* See also the note above about restarting too frequently.
 	* You can use this approach if you need to force the installation of a specific version (which you don't appear to be able to do in Manage Palette). For example, to install version 4.0.0 of the "moment" node:
 
-		```bash
+		``` console
 		# npm install node-red-contrib-moment@4.0.0 /data
 		```
 
@@ -1049,7 +1049,7 @@ The problem this creates is that a later version of an add-on node installed via
 
 The `nodered_list_installed_nodes.sh` script helps discover when this situation exists. For example:
 
-```bash
+``` console
 $ ~/IOTstack/scripts/nodered_list_installed_nodes.sh 
 
 Nodes installed by Dockerfile INSIDE the container at /usr/src/node-red/node_modules
@@ -1078,31 +1078,31 @@ Notice how `node-red-node-email` appears in both lists. To fix this problem:
 
 1. Move into the correct external directory:
 
-	```bash
+	``` console
 	$ cd ~/IOTstack/volumes/nodered/data/node_modules
 	```
 	
 2. Create a sub-directory to be the equivalent of a local trash can:
 
-	```bash
+	``` console
 	$ sudo mkdir duplicates
 	```
 	
 3. Move each duplicate node into the `duplicates` directory. For example, to move `node-red-node-email` you would:
 
-	```bash
+	``` console
 	$ sudo mv node-red-node-email duplicates
 	```
 	
 4. Tell Node-RED to restart. This causes it to forget about the nodes which have just been moved out of the way:
 
-	```bash
+	``` console
 	$ docker-compose -f ~/IOTstack/docker-compose.yml restart nodered
 	```
 	
 5. Finish off by erasing the `duplicates` folder:
 
-	```bash
+	``` console
 	$ sudo rm -rf duplicates
 	```
 

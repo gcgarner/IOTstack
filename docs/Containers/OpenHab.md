@@ -24,7 +24,7 @@ If you want to change either of the first two:
 
 2. Recreate the openHAB container:
 
-	```
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose up -d openhab
 	```

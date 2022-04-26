@@ -5,6 +5,13 @@
     display: none;
 }
 
+/* prevent selection of prefix and output for console syntax */
+.language-console .gp, .language-console .go {
+  user-select: none;
+  -webkit-user-select: none; /* Chrome/Safari */
+  -ms-user-select: none; /* IE10+ */
+}
+
 @media screen and (max-width:76.25em) {
   .show-when-wide-layout {
     display:none

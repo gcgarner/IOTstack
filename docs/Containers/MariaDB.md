@@ -35,7 +35,7 @@ You only get the opportunity to change the `MQSL_` prefixed environment variable
 
 	* Stop the container and remove the persistent storage area:
 
-		```
+		``` console
 		$ cd ~/IOTstack
 		$ docker-compose rm --force --stop -v mariadb
 		$ sudo rm -rf ./volumes/mariadb
@@ -44,8 +44,8 @@ You only get the opportunity to change the `MQSL_` prefixed environment variable
 	* Edit `docker-compose.yml` and change the variables.
 	* Bring up the container:
 
-		```
-		$ docker-compose up -d mariadb 
+		``` console
+		$ docker-compose up -d mariadb
 		```
 
 2. Open a terminal window within the container (see below) and change the values by hand.
@@ -56,7 +56,7 @@ You only get the opportunity to change the `MQSL_` prefixed environment variable
 
 You can open a terminal session within the mariadb container via:
 
-```
+``` console
 $ docker exec -it mariadb bash
 ```
 
@@ -97,7 +97,7 @@ Portainer's *Containers* display contains a *Status* column which shows health-c
 
 You can also use the `docker ps` command to monitor health-check results. The following command narrows the focus to mariadb:
 
-```bash
+``` console
 $ docker ps --format "table {{.Names}}\t{{.Status}}"  --filter name=mariadb
 ```
 
@@ -168,7 +168,7 @@ You can customise the operation of the health-check agent by editing the `mariad
 
 To update the `mariadb` container:
 
-```
+``` console
 $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull mariadb
 $ docker-compose up -d mariadb
