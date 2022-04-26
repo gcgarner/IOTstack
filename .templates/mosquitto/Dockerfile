@@ -1,5 +1,12 @@
+# supported build argument
+ARG MOSQUITTO_BASE=eclipse-mosquitto:latest
+
 # Download base image
-FROM eclipse-mosquitto:latest
+FROM $MOSQUITTO_BASE
+
+# re-reference supported argument and copy to environment var
+ARG MOSQUITTO_BASE
+ENV MOSQUITTO_BASE=${MOSQUITTO_BASE}
 
 # see https://github.com/alpinelinux/docker-alpine/issues/98
 RUN sed -i 's/https/http/' /etc/apk/repositories
@@ -33,5 +40,14 @@ ENV IOTSTACK_ENTRY_POINT=
 
 # IOTstack also declares these paths
 VOLUME ["/mosquitto/config", "/mosquitto/pwfile"]
+
+# set container metadata
+LABEL com.github.SensorsIot.IOTstack.Dockerfile.build-args="${MOSQUITTO_BASE}"
+LABEL com.github.SensorsIot.IOTstack.Dockerfile.based-on="https://github.com/eclipse/mosquitto"
+
+# don't need these variables in the running container
+ENV MOSQUITTO_BASE=
+ENV HEALTHCHECK_SCRIPT=
+ENV IOTSTACK_ENTRY_POINT=
 
 # EOF
