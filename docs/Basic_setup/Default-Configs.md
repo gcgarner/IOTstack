@@ -21,7 +21,7 @@ Do note that the ports listed are not all of the ports containers use. They are 
 | gitea          | *none*           | *none*     | 7920   | No |
 | grafana        | *none*           | *none*     | 3000   | No |
 | home_assistant | *none*           | *none*     | 8123   | No |
-| homebridge     | *none*           | *none*     | 4040   | No |
+| homebridge     | *none*           | *none*     | 8581   | No |
 | influxdb       | *none*           | *none*     | *none* | Yes |
 | mariadb        | mariadbuser      | IOtSt4ckmariaDbPw | *none* | Yes |
 | mosquitto      | *none*           | *none*     | *none* | No |
