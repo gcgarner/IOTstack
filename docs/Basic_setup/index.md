@@ -258,7 +258,7 @@ $ git status
 
 Check the results to see if any files are marked as "modified". For example:
 
-```
+``` output
 modified:   .templates/mosquitto/Dockerfile
 ```
 
@@ -352,13 +352,13 @@ Cannot create container for service [service name here]: unknown log opt 'max-fi
 
 2. change:
 
-	```
+	``` json
 	"log-driver": "journald",
 	```
 
 	to:
 
-	```
+	``` json
 	"log-driver": "json-file",
 	```
 
