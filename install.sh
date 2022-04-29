@@ -3,9 +3,6 @@
 # Minimum Software Versions
 REQ_DOCKER_VERSION=18.2.0
 REQ_PYTHON_VERSION=3.6.9
-REQ_PIP_VERSION=3.6.9
-REQ_PYAML_VERSION=0.16.12
-REQ_BLESSED_VERSION=1.17.5
 
 PYTHON_CMD=python3
 
@@ -105,39 +102,23 @@ function user_in_group()
 
 function install_python3_and_deps() {
 	CURR_PYTHON_VER="${1:-Unknown}"
+	CURR_VIRTUALENV="${2:-Unknown}"
   if [ "$NOASKCONFIRM" == "true" ]; then
-    echo "Installing Python3"
-    sudo apt install -y python3-pip python3-dev
+    echo "Installing Python3 and virtualenv"
+    sudo apt install -y python3-dev python3-virtualenv
     if [ $? -eq 0 ]; then
       PYTHON_VERSION_GOOD="true"
     else
-      echo "Failed to install Python" >&2
-      exit 1
-    fi
-    echo "Installing ruamel.yaml and blessed"
-    pip3 install -U ruamel.yaml==0.16.12 blessed
-    if [ $? -eq 0 ]; then
-      PYAML_VERSION_GOOD="true"
-      BLESSED_GOOD="true"
-    else
-      echo "Failed to install ruamel.yaml and Blessed" >&2
+      echo "Failed to install Python and virtualenv" >&2
       exit 1
     fi
   else
-    if (whiptail --title "Python 3 and Dependencies" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER), ruamel.yaml 0.16.12 or later, blessed and pip3 are required for the main menu and compose-overrides.yml file to merge into the docker-compose.yml file. Install these now?" 20 78); then
-      sudo apt install -y python3-pip python3-dev
+    if (whiptail --title "Python 3 and virtualenv" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER) and virtualenv (Installed = $CURR_VIRTUALENV) are required for the main menu. Install these now?" 20 78); then
+      sudo apt install -y python3-dev python3-virtualenv
       if [ $? -eq 0 ]; then
         PYTHON_VERSION_GOOD="true"
       else
-        echo "Failed to install Python" >&2
-        exit 1
-      fi
-      pip3 install -U ruamel.yaml==0.16.12 blessed
-      if [ $? -eq 0 ]; then
-        PYAML_VERSION_GOOD="true"
-        BLESSED_GOOD="true"
-      else
-        echo "Failed to install ruamel.yaml and Blessed" >&2
+        echo "Failed to install Python and virtualenv" >&2
         exit 1
       fi
     fi
@@ -169,23 +150,25 @@ function update_docker() {
 }
 
 function do_python3_checks() {
+	VIRTUALENV_GOOD="false"
+	if command_exists virtualenv; then
+		VIRTUALENV_GOOD="true"
+		echo "Python virtualenv found." >&2
+	fi
 	PYTHON_VERSION_GOOD="false"
-	PYAML_VERSION_GOOD="false"
-	BLESSED_GOOD="false"
-
-	if command_exists $PYTHON_CMD && command_exists pip3; then
-		PYTHON_VERSION=$($PYTHON_CMD --version)
-		PYTHON_VERSION_MAJOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 1)
+	if command_exists $PYTHON_CMD; then
+		PYTHON_VERSION=$($PYTHON_CMD --version 2>/dev/null)
+		PYTHON_VERSION_MAJOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d' ' -f 2 | cut -d'.' -f 1)
 		PYTHON_VERSION_MINOR=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 2)
 		PYTHON_VERSION_BUILD=$(echo "$PYTHON_VERSION"| cut -d' ' -f 2 | cut -d'.' -f 3)
 
 		printf "Python Version: '${PYTHON_VERSION:-Unknown}'. "
-		if [ "$(minimum_version_check $REQ_PYTHON_VERSION $PYTHON_VERSION_MAJOR $PYTHON_VERSION_MINOR $PYTHON_VERSION_BUILD)" == "true" ]; then
+		if [ "$(minimum_version_check $REQ_PYTHON_VERSION $PYTHON_VERSION_MAJOR $PYTHON_VERSION_MINOR $PYTHON_VERSION_BUILD)" == "true" -a "$VIRTUALENV_GOOD" == "true" ]; then
 			PYTHON_VERSION_GOOD="true"
-			echo "Python is up to date." >&2
+			echo "Python and virtualenv is up to date." >&2
 		else
-			echo "Python is outdated." >&2
-			install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$PYAML_VERSION_MAJOR.$PYAML_VERSION_MINOR.$PYAML_VERSION_BUILD"
+			echo "Python is outdated or virtualenv is missing" >&2
+			install_python3_and_deps "$PYTHON_VERSION_MAJOR.$PYTHON_VERSION_MINOR.$PYTHON_VERSION_BUILD" "$VIRTUALENV_GOOD"
 			return 1
 		fi
 	else
