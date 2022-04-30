@@ -9,7 +9,7 @@ hide:
     IOTstack is a builder for docker-compose to easily make and maintain IoT
     stacks on the Raspberry Pi
 
-Welcome to the IOTstack Wiki:
+Welcome to IOTstack:
 
 * <span class="show-when-wide-layout">
   Use the top tabs and then the left list to explore this Wiki.
@@ -24,3 +24,7 @@ Welcome to the IOTstack Wiki:
 * You're always welcome to ask questions on the [IOTStack Discord](https://discord.gg/ZpKHnks).
 
 * Fixes and improvements welcome, see [Contributing](Developers/)
+
+!!! cite inline end "Full site page listing"
+
+    {nav}

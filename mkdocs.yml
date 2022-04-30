@@ -27,6 +27,8 @@ theme:
     - navigation.sections
 
 plugins:
+  - awesome-pages # Required for pagenav-generator
+  - pagenav-generator
   - search
   - redirects:
       # Forward renamed pages to avoid breaking old links.
