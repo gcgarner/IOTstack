@@ -1,6 +1,7 @@
 telegraf:
   container_name: telegraf
   build: ./.templates/telegraf/.
+  hostname: iotstack # optional
   restart: unless-stopped
   environment:
     - TZ=Etc/UTC
