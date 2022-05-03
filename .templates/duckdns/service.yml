@@ -1,0 +1,13 @@
+  duckdns:
+    container_name: duckdns
+    build: https://github.com/ukkopahis/docker-duckdns.git
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      PUID: 1000
+      PGID: 1000
+      # Required variables, define here on in docker-compose.override.yml
+      #TOKEN: token from duckdns.org
+      #SUBDOMAINS: your domain added to duckdns.org (without .duckdns.org)
+      # Optional
+      #PRIVATE_SUBDOMAINS: your domain added to duckdns.org (without .duckdns.org)
