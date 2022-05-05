@@ -55,10 +55,6 @@ Everything in the persistent storage area ❼:
 
 ## How Telegraf gets built for IOTstack { #howTelegrafIOTstackGetsBuilt }
 
-### Telegraf images ([*DockerHub*](https://hub.docker.com)) { #dockerHubImages }
-
-Periodically, the source code is recompiled and the resulting image is pushed to [influxdata Telegraf](https://hub.docker.com/_/telegraf?tab=tags&page=1&ordering=last_updated) on *DockerHub*.
- 
 ### IOTstack menu { #iotstackMenu }
 
 When you select Telegraf in the IOTstack menu, the *template service definition* is copied into the *Compose* file.
@@ -101,7 +97,7 @@ FROM telegraf:latest
 
 > If you need to pin to a particular version of Telegraf, the *Dockerfile* is the place to do it. See [Telegraf version pinning](#versionPinning).
 
-The `FROM` statement tells the build process to pull down the ***base image*** from [*DockerHub*](https://hub.docker.com).
+The `FROM` statement tells the build process to pull down the ***base image*** from [*DockerHub*](https://hub.docker.com/_/telegraf?tab=tags&page=1&ordering=last_updated&name=latest).
 
 > It is a ***base*** image in the sense that it never actually runs as a container on your Raspberry Pi.
 
