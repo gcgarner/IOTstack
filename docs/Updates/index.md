@@ -10,7 +10,9 @@ flowchart TD
   GIT       --- GITPULL([$ git pull -r])
   GITPULL   --> TEMPLATES["~/IOTstack/.templates"]
   TEMPLATES --- MENU([$ ./menu.sh -> Build stack])
-  MENU      --> COMPOSE["~/IOTstack/docker-compose.yml\n~/IOTstack/services/*/Dockerfile"]
+  MENU      --> COMPOSE["~/IOTstack/docker-compose.yml
+                         ~/IOTstack/.templates/*/Dockerfile
+                         ~/IOTstack/services/*/Dockerfile"]
   COMPOSE   --- UP(["$ docker-compose up --build -d"])
 
   HUB[hub.docker.com images and tags]
@@ -19,22 +21,29 @@ flowchart TD
   PULL      --> CACHE[local Docker image cache]
   CACHE     --- UP
 
-  UP        --> CONTAINER[updated Docker containers]
+  UP        --> CONTAINER[running Docker containers based on the latest cached images]
 
   classDef command fill:#9996,stroke-width:0px
   class GITPULL,MENU,UP,PULL command
 ```
 
-!!! note "Minor details"
+??? note "Minor details fudged in the graph"
 
-    In order to keep the graph simple, some minor details fudged:
+    In order to keep the graph simple, some minor details were left unprecise:
 
-    - `$ docker-compose pull` will read `docker-compose.yml`, in order to know
-      what image tags to check for updates.
-    - `docker-compose build --pull --no-cache` will use
-      `~/IOTstack/.templates/*/Dockerfile` and
-      `~/IOTstack/services/*/Dockerfile` and pull their referenced Docker
-      images, if there are selected services using these Dockerfiles.
+    -   `$ docker-compose pull` will read `docker-compose.yml`, in order to know
+        what image tags to check for updates.
+    -   `$ docker-compose build --pull --no-cache` will use `docker-compose.yml`
+        to find which of the "build:" sources are in use:
+
+        * `~/IOTstack/.templates/*/Dockerfile`
+        * `~/IOTstack/services/*/Dockerfile`
+        * remote repositories with Dockerfiles
+
+        and pull Docker images referenced in these while building.
+    -   `$ docker-compose up --build -d` may not require the "--build"-flag,
+        but having it won't hurt (and may help keep some corner-case problems
+        away, docker may be a bit finicky).
 
 ## Backup and rollback
 
@@ -54,13 +63,24 @@ save a complete disk image backup of its storage using another machine.
 For a hobby project, not having perfect rollback may be a risk you're willing
 to take. Usually container image problems have fixes/workarounds within a day.
 
+## Update Raspberry Pi OS
+
+You should keep your Raspberry Pi up-to-date. Despite the word "container"
+suggesting that containers are fully self-contained, they sometimes depend on
+operating system components (WireGuard is an example).
+
+``` console
+$ sudo apt update
+$ sudo apt upgrade -y
+```
+
 ## Recommended: Update only Docker images
 
 When you built the stack using the menu, it created the Docker Compose file
-`docker-compose.yml`. This file uses tag references (e.g. `:latest`) to get the
-image for that tag from hub.docker.com. Thus when Docker is told to pull
-images, it will download and update it's local cache to the newest image. No
-need to update `docker-compose.yml` or `Dockerfile`s.
+`docker-compose.yml`. This file or its linked `Dockerfile`s, use image name and
+tag references (a missing tag defaults to `:latest`) to get the images from
+hub.docker.com. Likewise, when Docker is told to pull updated images, it will
+download the newest image for the tags into its local cache.
 
 Updating the IOTstack project templates and recreating your
 `docker-compose.yml` isn't usually necessary. Doing so isn't likely to provide
@@ -69,10 +89,12 @@ recommended when there is a new feature or change you need.
 
 !!! tip "Recommended update procedure"
 
-    1. Shutdown your RPi, remove its storage medium and backup a full image
-       of the storage to another machine. Reattach your storage and power up
-       your RPi. To skip this step may cause a long downtime as you debug the
-       problem.
+    1. Shutdown your RPi, remove the storage medium and do a full backup
+       [image](https://www.howtogeek.com/341944/how-to-clone-your-raspberry-pi-sd-card-for-foolproof-backup/)
+       of the storage to another machine. Reattach the storage back and power
+       up your RPi.<br />
+       NOTE: To skip this step may cause days of downtime as you debug a
+       problem or wait for fixes.
     2. Get latest images from the web:
        ``` console
        $ docker-compose pull
@@ -110,7 +132,7 @@ Periodically updates are made to project which include new or modified container
    it to another machine. Reinstall your storage and power up your RPi.
 2. backup your current settings: `cp docker-compose.yml docker-compose.yml.bak`
 3. check `git status` for any local changes you may have made to project files, ignore any reported "Untracked files". Save and preserve your changes by doing a commit: `git commit -a -m "local customization"`. Or revert them using: `git checkout -- path/to/changed_file`.
-4. update project files from github: `git pull origin master -r`
+4. update project files from github: `git pull -r origin master`
 5. recreate the compose file and Dockerfile:s: `./menu.sh`, select Build Stack, don't change selections, press enter to build, and then exit.
 4. get latest images from the web: `docker-compose pull`
 5. rebuild localy created images from new Dockerfiles: `docker-compose build --pull --no-cache`
