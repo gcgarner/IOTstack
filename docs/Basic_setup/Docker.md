@@ -7,15 +7,15 @@ logs internally together with other data associated to the container image.
 
 This has the effect that when recreating or updating a container, logs shown by
 `docker-compose logs` won't show anything associated with the previous
-instance. Use `docker system prune` to remove old instances and free up disc
+instance. Use `docker system prune` to remove old instances and free up disk
 space. Keeping logs only for the latest instance is helpful when testing, but
 may not be desirable for production.
 
-By default there is no limit on the log size. When using a SD-card this is
-exactly what you want. If a runaway container floods the log with output,
-writing will stop when the disc becomes full. Without a mechanism to prevent
-excessive disc-writes, the SD-card would keep being written to until the flash
-hardware [program-erase cycle](
+By default there is no limit on the log size. Surprisingly, when using a
+SD-card this is exactly what you want. If a runaway container floods the log
+with output, writing will stop when the disk becomes full. Without a mechanism
+to prevent such excessive writing, the SD-card would keep being written to
+until the flash hardware [program-erase cycle](
 https://www.techtarget.com/searchstorage/definition/P-E-cycle) limit is
 reached, after which it is permanently broken.
 
