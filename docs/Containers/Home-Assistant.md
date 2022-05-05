@@ -2,7 +2,7 @@
 
 Home Assistant is a home automation platform. It is able to track and control all devices at your home and offer a platform for automating control.
 
-## <a name="references"></a>References
+## References { #references }
 
 - [Home Assistant home page](https://www.home-assistant.io/)
 
@@ -13,7 +13,7 @@ Home Assistant is a home automation platform. It is able to track and control al
 - [DockerHub](https://hub.docker.com/r/homeassistant/home-assistant/)
 
 
-## <a name="twoVersions"></a>Home Assistant: two versions
+## Home Assistant: two versions { #twoVersions }
 
 There are two versions of Home Assistant:
 
@@ -36,7 +36,7 @@ If Home Assistant Container will not do what you want then, basically, you will 
 * One running Raspberry Pi OS ("Raspbian") hosting IOTstack; and
 * Another dedicated to running [Home Assistant Operating System](https://www.home-assistant.io/installation/raspberrypi).
 
-## <a name="installHAContainer"></a>Installing Home Assistant Container
+## Installing Home Assistant Container { #installHAContainer }
 
 Home Assistant (Container) can be found in the `Build Stack` menu. Selecting it in this menu results in a service definition being added to:
 
@@ -61,7 +61,7 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
-## <a name="usingBluetooth"></a>Using bluetooth from the container
+## Using bluetooth from the container { #usingBluetooth }
 
 In order to be able to use BT & BLE devices from HA integrations, make sure that Bluetooth is enabled:
 
@@ -98,7 +98,7 @@ If `AutoEnable` is either missing or not set to `true`, then:
 
 See also: [Scribles: Auto Power On Bluetooth Adapter on Boot-up](https://scribles.net/auto-power-on-bluetooth-adapter-on-boot-up/).
 
-## <a name="httpsWithSSLcert"></a>HTTPS with a valid SSL certificate
+## HTTPS with a valid SSL certificate { #httpsWithSSLcert }
 
 Some HA integrations (e.g google assistant) require your HA API to be
 accessible via https with a valid certificate. You can configure HA to do this:
@@ -227,7 +227,7 @@ your RPi hostname is raspberrypi)
     `https://homeassistant.<yourdomain>.duckdns.org/` Now the certificate
     should work without any warnings.
 
-## <a name="hassioBackground"></a>about Supervised Home Assistant
+## about Supervised Home Assistant { #hassioBackground }
 
 IOTstack used to offer a menu entry leading to a convenience script that could install Supervised Home Assistant. That script stopped working when Home Assistant changed their approach. The script's author [made it clear](https://github.com/Kanga-Who/home-assistant/blob/master/Supervised%20on%20Raspberry%20Pi%20with%20Debian.md) that script's future was bleak so the affordance was [removed from IOTstack](https://github.com/SensorsIot/IOTstack/pull/493).
 

@@ -2,7 +2,7 @@
 
 This document discusses an IOTstack-specific version of Blynk-Server. It is built on top of an [Ubuntu](https://hub.docker.com/_/ubuntu) base image using a *Dockerfile*.
 
-## <a name="references"></a>References
+## References { #references }
 
 - [Ubuntu base image](https://hub.docker.com/_/ubuntu) at DockerHub
 - [Peter Knight Blynk-Server fork](https://github.com/Peterkn2001/blynk-server) at GitHub (includes documentation)
@@ -18,7 +18,7 @@ Acknowledgement:
 
 - Original writeup from @877dev
 
-## <a name="significantFiles"></a>Significant directories and files
+## Significant directories and files { #significantFiles }
 
 ```
 ~/IOTstack
@@ -56,19 +56,19 @@ Everything in ❽:
 * will be replaced if it is not present when the container starts; but
 * will never be overwritten if altered by you.
 
-## <a name="howBlynkServerIOTstackGetsBuilt"></a>How Blynk Server gets built for IOTstack
+## How Blynk Server gets built for IOTstack { #howBlynkServerIOTstackGetsBuilt }
 
-### <a name="dockerHubImages"></a>GitHub Updates 
+### GitHub Updates  { #dockerHubImages }
 
 Periodically, the source code is updated and a new version is released. You can check for the latest version at the [releases page](https://github.com/Peterkn2001/blynk-server/releases/).
  
-### <a name="iotstackMenu"></a>IOTstack menu
+### IOTstack menu { #iotstackMenu }
 
 When you select Blynk Server in the IOTstack menu, the *template service definition* is copied into the *Compose* file.
 
 > Under old menu, it is also copied to the *working service definition* and then not really used.
 
-### <a name="iotstackFirstRun"></a>IOTstack first run 
+### IOTstack first run  { #iotstackFirstRun }
 
 On a first install of IOTstack, you run the menu, choose your containers, and are told to do this:
 
@@ -131,7 +131,7 @@ You *may* see the same pattern in *Portainer*, which reports the ***base image**
 
 > Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-## <a name="logging"></a>Logging
+## Logging { #logging }
 
 You can inspect Blynk Server's log by:
 
@@ -139,7 +139,7 @@ You can inspect Blynk Server's log by:
 $ docker logs blynk_server
 ```
 
-## <a name="editConfiguration"></a>Changing Blynk Server's configuration
+## Changing Blynk Server's configuration { #editConfiguration }
 
 The first time you launch the `blynk_server` container, the following structure will be created in the persistent storage area:
 
@@ -158,7 +158,7 @@ $ cd ~/IOTstack
 $ docker-compose restart blynk_server
 ```
 
-## <a name="cleanSlate"></a>Getting a clean slate
+## Getting a clean slate { #cleanSlate }
 
 Erasing Blynk Server's persistent storage area triggers self-healing and restores known defaults:
 
@@ -178,7 +178,7 @@ Note:
 	$ docker-compose restart blynk_server
 	```
 
-## <a name="upgradingBlynkServer"></a>Upgrading Blynk Server
+## Upgrading Blynk Server { #upgradingBlynkServer }
 
 To find out when a new version has been released, you need to visit the [Blynk-Server releases](https://github.com/Peterkn2001/blynk-server/releases/) page at GitHub.
 
@@ -220,11 +220,11 @@ At the time of writing, version 0.41.16 was the most up-to-date. Suppose that ve
 
 		The second `prune` will only be needed if there is an old *base image* and that, in turn, depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-## <a name="usingBlynkServer"></a>Using Blynk Server
+## Using Blynk Server { #usingBlynkServer }
 
 See the [References](#references) for documentation links.
 
-### <a name="blynkAdmin"></a>Connecting to the administrative UI
+### Connecting to the administrative UI { #blynkAdmin }
 
 To connect to the administrative interface, navigate to:
 
@@ -237,7 +237,7 @@ You may encounter browser security warnings which you will have to acknowledge i
 - username = `admin@blynk.cc`
 - password = `admin`
 
-### <a name="changePassword"></a>Change username and password
+### Change username and password { #changePassword }
 
 1. Click on Users > "email address" and edit email, name and password. 
 2. Save changes.
@@ -248,19 +248,19 @@ You may encounter browser security warnings which you will have to acknowledge i
 	$ docker-compose restart blynk_server
 	```
 
-### <a name="gmailSetup"></a>Setup gmail
+### Setup gmail { #gmailSetup }
 
 Optional step, useful for getting the auth token emailed to you.
 (To be added once confirmed working....)
 
-### <a name="mobileSetup"></a>iOS/Android app setup
+### iOS/Android app setup { #mobileSetup }
 
 1. When setting up the application on your mobile be sure to select "custom" setup [see](https://github.com/Peterkn2001/blynk-server#app-and-sketch-changes).
 2. Press "New Project"
 3. Give it a name, choose device "Raspberry Pi 3 B" so you have plenty of [virtual pins](http://help.blynk.cc/en/articles/512061-what-is-virtual-pins) available, and lastly select WiFi.
 4. Create project and the [auth token](https://docs.blynk.cc/#getting-started-getting-started-with-the-blynk-app-4-auth-token) will be emailed to you (if emails configured). You can also find the token in app under the phone app settings, or in the admin web interface by clicking Users>"email address" and scroll down to token.
 
-### <a name="quickAppGuide"></a>Quick usage guide for app
+### Quick usage guide for app { #quickAppGuide }
 
 1. Press on the empty page, the widgets will appear from the right.
 2. Select your widget, let's say a button.
@@ -273,7 +273,7 @@ Optional step, useful for getting the auth token emailed to you.
 
 Enter Node-Red.....
 
-### <a name="enterNodeRed"></a>Node-RED
+### Node-RED { #enterNodeRed }
 
 1. Install `node-red-contrib-blynk-ws` from Manage Palette.
 2. Drag a "write event" node into your flow, and connect to a debug node

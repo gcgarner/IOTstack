@@ -1,11 +1,11 @@
 # Portainer CE
 
-## <a name="references"></a>References
+## References { #references }
  
 - [Docker](https://hub.docker.com/r/portainer/portainer-ce/)
 - [Website](https://www.portainer.io/portainer-ce/)
 
-## <a name="definitions"></a>Definition
+## Definition { #definitions }
 
 - "#yourip" means any of the following:
 
@@ -13,7 +13,7 @@
 	- the multicast domain name of your Raspberry Pi (eg `iot-hub.local`)
 	- the domain name of your Raspberry Pi (eg `iot-hub.mydomain.com`) 
 
-## <a name="about"></a>About *Portainer CE*
+## About *Portainer CE* { #about }
 
 *Portainer CE* (Community Edition) is an application for managing Docker. It is a successor to *Portainer*. According to [the *Portainer CE* documentation](https://www.portainer.io/2020/08/portainer-ce-2-0-what-to-expect/)
 
@@ -21,7 +21,7 @@
 
 From that it should be clear that *Portainer* is deprecated and that *Portainer CE* is the way forward.
 
-## <a name="installation"></a>Installing *Portainer CE*
+## Installing *Portainer CE* { #installation }
 
 Run the menu:
 
@@ -40,7 +40,7 @@ Ignore any message like this:
 
 > WARNING: Found orphan containers (portainer) for this project …
 
-## <a name="firstRun"></a>First run of *Portainer CE*
+## First run of *Portainer CE* { #firstRun }
 
 In your web browser navigate to `#yourip:9000/`:
 
@@ -51,7 +51,7 @@ From there, you can click on the "Local" group and take a look around. One of th
 
 There are 'Quick actions' to view logs and other stats. This can all be done from terminal commands but *Portainer CE* makes it easier. 
 
-## <a name="setPublicIP"></a>Setting the Public IP address for your end-point
+## Setting the Public IP address for your end-point { #setPublicIP }
 
 If you click on a "Published Port" in the "Containers" list, your browser may return an error saying something like "can't connect to server" associated with an IP address of "0.0.0.0".
 
@@ -79,7 +79,7 @@ Keep in mind that clicking on a "Published Port" does not guarantee that your br
 
 > All things considered, you will get more consistent behaviour if you simply bookmark the URLs you want to use for your IOTstack services.
 
-## <a name="forgotPassword"></a>If you forget your password
+## If you forget your password { #forgotPassword }
 
 If you forget the password you created for *Portainer CE*, you can recover by doing the following:
 

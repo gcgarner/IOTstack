@@ -1,13 +1,13 @@
 # Node-RED
 
-## <a name=references></a>References
+## References { #references }
 
 - [nodered.org home](https://nodered.org/)
 - [GitHub: node-red/node-red-docker](https://github.com/node-red/node-red-docker)
 - [DockerHub: nodered/node-red](https://hub.docker.com/r/nodered/node-red)
 - [Tutorial: from MQTT to InfluxDB via Node-Red](https://gist.github.com/Paraphraser/c9db25d131dd4c09848ffb353b69038f)
 
-## <a name="significant-files"></a>Significant files
+## Significant files { #significant-files }
 
 ```
 ~/IOTstack
@@ -33,13 +33,13 @@
 6. Data directory (mapped volume).
 7. SSH directory (mapped volume).
 
-## <a name="iotstackBuild"></a>How Node-RED gets built for IOTstack
+## How Node-RED gets built for IOTstack { #iotstackBuild }
 
-### <a name="gitHubSource"></a>Node-RED source code ([GitHub](https://github.com))
+### Node-RED source code ([GitHub](https://github.com)) { #gitHubSource }
 
 The source code for Node-RED lives at [GitHub node-red/node-red-docker](https://github.com/node-red/node-red-docker).
 
-### <a name="dockerHubImages"></a>Node-RED images ([DockerHub](https://hub.docker.com))
+### Node-RED images ([DockerHub](https://hub.docker.com)) { #dockerHubImages }
 
 Periodically, the source code is recompiled and pushed to [nodered/node-red](https://hub.docker.com/r/nodered/node-red/tags?page=1&ordering=last_updated) on *DockerHub*. There's a lot of stuff at that page but it boils down to variations on two basic themes:
 
@@ -53,7 +53,7 @@ The suffixes refer to the version of "Node.js" installed when the image was buil
 
 As you will see a bit further down, the current default for IOTstack is an image tag of `latest-12` which means Node-RED 2.x.x with Node.js version 12. 
  
-### <a name="iotstackMenu"></a>IOTstack menu
+### IOTstack menu { #iotstackMenu }
 
 When you select Node-RED in the IOTstack menu, the *template service definition* is copied into the *Compose* file.
 
@@ -68,7 +68,7 @@ Key points:
 
 Choosing add-on nodes in the menu causes the *Dockerfile* to be created.
 
-### <a name="iotstackFirstRun"></a>IOTstack first run
+### IOTstack first run { #iotstackFirstRun }
 
 On a first install of IOTstack, you are told to do this:
 
@@ -135,9 +135,9 @@ You should not remove the *base* image, even though it appears to be unused.
 
 > Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-## <a name="securingNodeRed"></a>Securing Node-RED
+## Securing Node-RED { #securingNodeRed }
 
-### <a name="encryptionKey"></a>Setting an encryption key for your credentials
+### Setting an encryption key for your credentials { #encryptionKey }
 
 After you install Node-RED, you should set an encryption key. Completing this step will silence the warning you will see when you run:
 
@@ -192,7 +192,7 @@ $ cd ~/IOTstack
 $ docker-compose restart nodered
 ```
 
-### <a name="credentials"></a>Setting a username and password for Node-RED
+### Setting a username and password for Node-RED { #credentials }
 
 To secure Node-RED you need a password hash. Run the following command, replacing `PASSWORD` with your own password:
 
@@ -208,7 +208,7 @@ $2a$08$gTdx7SkckJVCw1U98o4r0O7b8P.gd5/LAPlZI6geg5LRg4AUKuDhS
 
 Copy that text to your clipboard, then follow the instructions at [Node-RED User Guide - Securing Node-RED - Username & Password-based authentication](https://nodered.org/docs/user-guide/runtime/securing-node-red#usernamepassword-based-authentication).
 
-## <a name="containerNames"></a>Referring to other containers
+## Referring to other containers { #containerNames }
 
 Node-RED can run in two modes. By default, it runs in "non-host mode" but you can also move the container to "host mode" by editing the Node-RED service definition in your *Compose* file to:
 
@@ -220,7 +220,7 @@ Node-RED can run in two modes. By default, it runs in "non-host mode" but you ca
 	
 2. Remove the `ports` directive and the mapping of port 1880.
 
-### <a name="nonHostMode"></a>When Node-RED is not in host mode
+### When Node-RED is not in host mode { #nonHostMode }
 
 Most examples on the web assume Node-RED and other services in the MING (Mosquitto, InfluxDB, Node-RED, Grafana) stack have been installed natively, rather than in Docker containers. Those examples typically include the loopback address + port syntax, like this:
 
@@ -244,7 +244,7 @@ influxdb:8086
 
 Behind the scenes, Docker maintains a table similar to an `/etc/hosts` file mapping container names to the IP addresses on the internal bridged network that are assigned, dynamically, by Docker when it spins up each container.
 
-### <a name="hostmode"></a>When Node-RED is in host mode
+### When Node-RED is in host mode { #hostmode }
 
 This is where you use loopback+port syntax, such as the following to communicate with Mosquitto:
 
@@ -254,7 +254,7 @@ This is where you use loopback+port syntax, such as the following to communicate
 
 What actually occurs is that Docker is listening to external port 1883 on behalf of Mosquitto. It receives the packet and routes it (layer three) to the internal bridged network, performing network address translation (NAT) along the way to map the external port to the internal port. Then the packet is delivered to Mosquitto. The reverse happens when Mosquitto replies. It works but is less efficient than when all containers are in non-host mode. 
 
-## <a name="accessGPIO"></a>GPIO Access
+## GPIO Access { #accessGPIO }
 
 To communicate with your Raspberry Pi's GPIO you need to do the following:
 
@@ -281,7 +281,7 @@ To communicate with your Raspberry Pi's GPIO you need to do the following:
 
 4. Drag a gpio node onto the canvas and configure it using the IP address of your Raspberry Pi (eg 192.168.1.123). Don't try to use 127.0.0.1 because that is the loopback address of the Node-RED container.
 
-## <a name="fileSharing"></a>Sharing files between Node-RED and the Raspberry Pi
+## Sharing files between Node-RED and the Raspberry Pi { #fileSharing }
 
 Containers run in a sandboxed environment. A process running inside a container can't see the Raspberry Pi's file system. Neither can a process running outside a container access files inside the container.
 
@@ -372,7 +372,7 @@ Deploying the flow and clicking on the Inject node results in the debug message 
 
 You can reverse this process. Any file you place within the path `~/IOTstack/volumes/nodered/data` can be read by a "File in" node.
 
-## <a name="sshOutside"></a>Executing commands outside the Node-RED container
+## Executing commands outside the Node-RED container { #sshOutside }
 
 A reasonably common requirement in a Node-RED flow is the ability to execute a command on the host system. The standard tool for this is an "exec" node.
 
@@ -400,7 +400,7 @@ The same thing will happen if a Node-RED "exec" node executes that `grep` comman
 
 Docker doesn't provide any mechanism for a container to execute an arbitrary command **outside** of its container. A workaround is to utilise SSH. This remainder of this section explains how to set up the SSH scaffolding so that "exec" nodes running in a Node-RED container can invoke arbitrary commands **outside** container-space.
 
-### <a name="sshTaskGoal"></a>Task Goal
+### Task Goal { #sshTaskGoal }
 
 Be able to use a Node-RED `exec` node to perform the equivalent of:
 
@@ -413,14 +413,14 @@ where:
 * `«HOSTNAME»` is any host under your control (not just the Raspberry Pi running IOTstack); and
 * `«COMMAND»` is any command known to the target host.
 
-### <a name="sshAssumptions"></a>Assumptions
+### Assumptions { #sshAssumptions }
 
 * [SensorsIot/IOTstack](https://github.com/SensorsIot/IOTstack) is installed on your Raspberry Pi.
 * The Node-RED container is running.
 
 These instructions are specific to IOTstack but the underlying concepts should apply to any installation of Node-RED in a Docker container. 
 
-### <a name="dockerExec"></a>Executing commands "inside" a container
+### Executing commands "inside" a container { #dockerExec }
 
 These instructions make frequent use of the ability to run commands "inside" the Node-RED container. For example, suppose you want to execute:
 
@@ -466,11 +466,11 @@ You have several options:
 
 3. Run the command from Portainer by selecting the container, then clicking the ">_ console" link. This is identical to opening a shell.
 
-### <a name="variableDefinitions"></a>Variable definitions
+### Variable definitions { #variableDefinitions }
 
 You will need to have a few concepts clear in your mind before you can set up SSH successfully. I use double-angle quote marks (guillemets) to mean "substitute the appropriate value here".  
 
-#### <a name="sshHostname"></a>«HOSTNAME» (required)
+#### «HOSTNAME» (required) { #sshHostname }
 
 The name of your Raspberry Pi. When you first booted your RPi, it had the name "raspberrypi" but you probably changed it using `raspi-config`. Example:
 
@@ -478,7 +478,7 @@ The name of your Raspberry Pi. When you first booted your RPi, it had the name "
 iot-dev
 ```
 
-#### <a name="sshHostAddr"></a>«HOSTADDR» (required)
+#### «HOSTADDR» (required) { #sshHostAddr }
 
 Either or both of the following:
 
@@ -507,7 +507,7 @@ Either or both of the following:
 	* a static DHCP assignment configured on your DHCP server (eg your router) which always returns the same IP address for a given MAC address; or
 	* a static IP address configured on your Raspberry Pi.
 
-#### <a name="sshUserID"></a>«USERID» (required)
+#### «USERID» (required) { #sshUserID }
 
 The user ID of the account on «HOSTNAME» where you want Node-RED flows to be able to run commands. Example:
 
@@ -515,7 +515,7 @@ The user ID of the account on «HOSTNAME» where you want Node-RED flows to be a
 pi
 ```
 
-### <a name="sshStep1"></a>Step 1: *Generate SSH key-pair for Node-RED* (one time)
+### Step 1: *Generate SSH key-pair for Node-RED* (one time) { #sshStep1 }
 
 Create a key-pair for Node-RED. This is done by executing the `ssh-keygen` command **inside** the container:
 
@@ -531,7 +531,7 @@ Notes:
 	* press "y" to overwrite (and lose the old keys)
 	* press "n" to terminate the command, after which you can investigate why a key-pair already exists.
 
-### <a name="sshStep2"></a>Step 2: *Exchange keys with target hosts* (once per target host)
+### Step 2: *Exchange keys with target hosts* (once per target host) { #sshStep2 }
 
 Node-RED's public key needs to be copied to the user account on *each* target machine where you want a Node-RED "exec" node to be able to execute commands. At the same time, the Node-RED container needs to learn the public host key of the target machine. The `ssh-copy-id` command does both steps. The required syntax is:
 
@@ -581,7 +581,7 @@ and check to make sure that only the key(s) you wanted were added.
 
 If you do not see an indication that a key has been added, you may need to retrace your steps.
 
-### <a name="sshStep3"></a>Step 3: *Perform the recommended test*
+### Step 3: *Perform the recommended test* { #sshStep3 }
 
 The output above recommends a test. The test needs to be run **inside** the Node-RED container so the syntax is:
 
@@ -602,9 +602,9 @@ If everything works as expected, you should see a list of the files in your IOTs
 
 Assuming success, think about what just happened? You told SSH **inside** the Node-RED container to run the `ls` command **outside** the container on your Raspberry Pi. You broke through the containerisation.
 
-### <a name="sshWhatsWhere"></a>Understanding what's where and what each file does
+### Understanding what's where and what each file does { #sshWhatsWhere }
 
-#### <a name="sshFileLocations"></a>What files are where
+#### What files are where { #sshFileLocations }
 
 Six files are relevant to Node-RED's ability to execute commands outside of container-space:
 
@@ -654,7 +654,7 @@ Six files are relevant to Node-RED's ability to execute commands outside of cont
 		
 		Note that providing the correct password at the command line will auto-repair the `authorized_keys` file.
 
-#### <a name="sshFilePurpose"></a>What each file does
+#### What each file does { #sshFilePurpose }
 
 SSH running **inside** the Node-RED container uses the Node-RED container's private key to provide assurance to SSH running **outside** the container that it (the Node-RED container) is who it claims to be.
 
@@ -664,7 +664,7 @@ SSH running **outside** container-space uses the Raspberry Pi's private host key
 
 SSH running **inside** the Node-RED container verifies that assurance by using its copy of the Raspberry Pi's public host key stored in `known_hosts`.
 
-### <a name="sshConfig"></a>Config file (optional)
+### Config file (optional) { #sshConfig }
 
 You don't **have** to do this step but it will simplify your exec node commands and reduce your maintenance problems if you do.
 
@@ -741,7 +741,7 @@ $ sudo chown root:root config
 $ sudo mv config ./volumes/nodered/ssh
 ```
 
-#### <a name="sshConfigTest"></a>Re-test with config file in place
+#### Re-test with config file in place { #sshConfigTest }
 
 The previous test used this syntax:
 
@@ -763,7 +763,7 @@ $ docker exec nodered ssh «HOSTNAME» ls -1 /home/pi/IOTstack
 
 The result should be the same as the earlier test. 
 
-### <a name="sshTestFlow"></a>A test flow
+### A test flow { #sshTestFlow }
 
 ![node-red-exec-node-ssh-test](./images/nodered-exec-node-ssh-test.jpeg)
 
@@ -805,7 +805,7 @@ In the Node-RED GUI:
 	
 	The first line is the result of running the command inside the Node-RED container. The second line is the result of running the same command outside the Node-RED container on the Raspberry Pi.
 
-### <a name="addHostname"></a>Suppose you want to add another «HOSTNAME»
+### Suppose you want to add another «HOSTNAME» { #addHostname }
 
 1. Exchange keys with the new target host using:
 
@@ -821,7 +821,7 @@ In the Node-RED GUI:
 	
 	to define the new host. Remember to use `sudo` to edit the file. There is no need to restart Node-RED or recreate the container.
 
-## <a name="upgradeNodeRed"></a>Upgrading Node-RED
+## Upgrading Node-RED { #upgradeNodeRed }
 
 You can update most containers like this:
 
@@ -863,7 +863,7 @@ Your existing Node-RED container continues to run while the rebuild proceeds. On
 The `prune` is the simplest way of cleaning up old images. Sometimes you need to run this twice, the first time to clean up the old local image, the second time for the old base image. Whether an old base image exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
 
-## <a name="customiseNodeRed"></a>Customising Node-RED
+## Customising Node-RED { #customiseNodeRed }
 
 You customise your *local* image of Node-RED by making changes to:
 
@@ -871,7 +871,7 @@ You customise your *local* image of Node-RED by making changes to:
 ~/IOTstack/services/nodered/Dockerfile
 ```
 
-<a name="applyDockerfileChange">You apply a Dockerfile change like this:</a>
+##### Apply Dockerfile changes { #applyDockerfileChange }
 
 ``` console
 $ cd ~/IOTstack
@@ -881,7 +881,7 @@ $ docker system prune
 
 The `--build` option on the `up` command (as distinct from a `docker-compose build` command) works in this situation because you've made a substantive change to your *Dockerfile*.
 
-### <a name="nodeJSversion"></a>Node.js version
+### Node.js version { #nodeJSversion }
 
 Out of the box, IOTstack starts the Node-RED *Dockerfile* with:
 
@@ -905,7 +905,7 @@ FROM nodered/node-red:latest-10
 
 Once you have made that change, follow the steps at [apply *Dockerfile* changes](#applyDockerfileChange).
 
-### <a name="addPackage"></a>Adding extra packages
+### Adding extra packages { #addPackage }
 
 As well as providing the Node-RED service, the nodered container is an excellent testbed. Installing the DNS tools, Mosquitto clients and tcpdump will help you to figure out what is going on **inside** container-space.
 
@@ -929,7 +929,7 @@ You can add as many extra packages as you like. They will persist until you chan
 
 Once you have made this change, follow the steps at [apply *Dockerfile* changes](#applyDockerfileChange).
 
-### <a name="addNodes"></a>Adding extra nodes
+### Adding extra nodes { #addNodes }
 
 You can install nodes by:
 
@@ -997,7 +997,7 @@ If you're wondering about "backup", nodes installed via:
 
 Basically, if you're running IOTstack backups then your add-on nodes will be backed-up.
 
-### <a name="nodePrecedence"></a>Node precedence
+### Node precedence { #nodePrecedence }
 
 Add-on nodes that are installed via *Dockerfile* wind up at the **internal** path:
 
@@ -1037,7 +1037,7 @@ take precedence over those installed at:
 
 Or, to put it more simply: in any contest, Manage Palette prevails over *Dockerfile*.
 
-### <a name="fixDuplicateNodes"></a>Resolving node duplication
+### Resolving node duplication { #fixDuplicateNodes }
 
 Sometimes, even when you are 100% certain that **you** didn't do it, an add-on node will turn up in both places. There is probably some logical reason for this but I don't know what it is.
 
