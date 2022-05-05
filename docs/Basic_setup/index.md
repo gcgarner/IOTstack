@@ -116,9 +116,8 @@ Please don't read these assumptions as saying that IOTstack will not run on othe
 
 ### scripted
 
-If you prefer to automate your installations using scripts, see:
-
-* [Installing Docker for IOTstack](https://gist.github.com/Paraphraser/d119ae81f9e60a94e1209986d8c9e42f#scripting-iotstack-installations).
+If you prefer to automate your installations using scripts, see
+[PiBuilder](https://github.com/Paraphraser/PiBuilder).
 
 ## Required system patches
 
@@ -130,7 +129,6 @@ Run the following commands:
 
 ``` console
 $ sudo bash -c '[ $(egrep -c "^allowinterfaces eth\*,wlan\*" /etc/dhcpcd.conf) -eq 0 ] && echo "allowinterfaces eth*,wlan*" >> /etc/dhcpcd.conf'
-$ sudo reboot
 ```
 
 See [Issue 219](https://github.com/SensorsIot/IOTstack/issues/219) and [Issue 253](https://github.com/SensorsIot/IOTstack/issues/253) for more information.
@@ -139,32 +137,32 @@ See [Issue 219](https://github.com/SensorsIot/IOTstack/issues/219) and [Issue 25
 
 This patch is **ONLY** for Raspbian Buster. Do **NOT** install this patch if you are running Raspbian Bullseye.
 
-#### step 1: check your OS release
+1.  check your OS release
 
-Run the following command:
+    Run the following command:
 
-``` console
-$ grep "PRETTY_NAME" /etc/os-release
-PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
-```
+    ``` console
+    $ grep "PRETTY_NAME" /etc/os-release
+    PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
+    ```
 
-If you see the word "buster", proceed to step 2. Otherwise, skip this patch.
+    If you see the word "buster", proceed to step 2. Otherwise, skip this patch.
 
-#### step 2: if you are indeed running "buster"
+2.  if you are indeed running "buster"
 
-Without this patch on Buster, Docker images will fail if:
+    Without this patch on Buster, Docker images will fail if:
 
-* the image is based on Alpine and the image's maintainer updates to [Alpine 3.13](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirement); and/or
-* an image's maintainer updates to a library that depends on 64-bit values for *Unix epoch time* (the so-called Y2038 problem).
+    * the image is based on Alpine and the image's maintainer updates to [Alpine 3.13](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.13.0#time64_requirement); and/or
+    * an image's maintainer updates to a library that depends on 64-bit values for *Unix epoch time* (the so-called Y2038 problem).
 
-To install the patch:
+    To install the patch:
 
-``` console
-$ sudo apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
-$ echo "deb http://httpredir.debian.org/debian buster-backports main contrib non-free" | sudo tee -a "/etc/apt/sources.list.d/debian-backports.list"
-$ sudo apt update
-$ sudo apt install libseccomp2 -t buster-backports
-```
+    ``` console
+    $ sudo apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 04EE7237B7D453EC 648ACFD622F3D138
+    $ echo "deb http://httpredir.debian.org/debian buster-backports main contrib non-free" | sudo tee -a "/etc/apt/sources.list.d/debian-backports.list"
+    $ sudo apt update
+    $ sudo apt install libseccomp2 -t buster-backports
+    ```
 
 ### patch 3 - kernel control groups
 
@@ -173,10 +171,11 @@ usage. This makes commands like `docker stats` fully work. Also needed for full
 monitoring of docker resource usage by the telegraf container.
 
 Enable by running (takes effect after reboot):
-```
-echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
-```
 
+``` console
+$ echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
+$ sudo reboot
+```
 
 ## the IOTstack menu
 
@@ -501,33 +500,15 @@ You read this as two paths, separated by a colon. The:
 * external path is `./volumes/nodered/data`
 * internal path is `/data`
 
-In this context, the leading "." means "the folder containing `docker-compose.yml`", so the external path is actually:
+In this context, the leading "." means "the folder containing`docker-compose.yml`", so the external path is actually:
 
 * `~/IOTstack/volumes/nodered/data`
 
-If a process running **inside** the container modifies any file or folder within:
-
-```
-/data
-```
-
-the change is mirrored **outside** the container at the same relative path within:
-
-```
-~/IOTstack/volumes/nodered/data
-```
-
-The same is true in reverse. Any change made to any file or folder **outside** the container within:
-
-```
-~/IOTstack/volumes/nodered/data
-```
-
-is mirrored at the same relative path **inside** the container at:
-
-```
-/data
-```
+This type of volume is a
+[bind-mount](https://docs.docker.com/storage/bind-mounts/), where the
+container's internal path is directly linked to the external path. All
+file-system operations, reads and writes, are mapped to directly to the files
+and folders at the external path.
 
 ### deleting persistent data
 
