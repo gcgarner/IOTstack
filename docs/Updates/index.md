@@ -122,7 +122,7 @@ Periodically updates are made to project which include new or modified container
 
 !!! danger "Breaking update"
     Recent changes will require [manual steps](
-    https://github.com/SensorsIot/IOTstack/blob/master/README.md#significant-change-to-networking)
+    ../Updates/migration-network-change.md)
     or you may get an error like:  
     `ERROR: Service "influxdb" uses an undefined network "iotstack_nw"`
 

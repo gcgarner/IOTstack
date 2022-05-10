@@ -23,5 +23,4 @@
 ## 2022-01-18
 
 - Networking change **requiring** [migration](
-  https://github.com/SensorsIot/IOTstack/#significant-change-to-networking).
-
+  ../Updates/migration-network-change.md).
