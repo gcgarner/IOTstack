@@ -12,4 +12,10 @@ grafana:
   volumes:
     - ./volumes/grafana/data:/var/lib/grafana
     - ./volumes/grafana/log:/var/log/grafana
+  healthcheck:
+    test: ["CMD", "wget", "-O", "/dev/null", "http://localhost:3000"]
+    interval: 30s
+    timeout: 10s
+    retries: 3
+    start_period: 30s
 
