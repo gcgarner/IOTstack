@@ -1,8 +1,11 @@
 # Updating the project
 
-There are two different sources: the IOTstack project (github.com) and
-the Docker Hub (hub.docker.com). Both the initial stack creation and updates
-come from these. To illustrate the steps and artifacts of the *update* process:
+There are two different update sources: the IOTstack project (github.com) and
+Docker image registries (e.g. hub.docker.com). Both the initial stack creation
+and updates use both of these. Initial creation is a bit simpler, as the
+intermediate steps are done automatically. For a full update they need to be
+performed explicitly. To illustrate the steps and artifacts of the *update*
+process:
 
 ``` mermaid
 flowchart TD
@@ -21,7 +24,7 @@ flowchart TD
   PULL      --> CACHE[local Docker image cache]
   CACHE     --- UP
 
-  UP        --> CONTAINER[running Docker containers based on the latest cached images]
+  UP        --> CONTAINER[recreated Docker containers based on the latest cached images]
 
   classDef command fill:#9996,stroke-width:0px
   class GITPULL,MENU,UP,PULL command
@@ -57,11 +60,12 @@ fetch the latest images, but it's not unheard of that the latest image may
 break [something](
 https://github.com/node-red/node-red/issues/3461#issuecomment-1076348639).
 
-Thus to *guarantee* a successful rollback, you have to shutdown your RPi and
-save a complete disk image backup of its storage using another machine.
+Thus to *guarantee* a successful rollback to the pre-update state, you have to
+shutdown your RPi and save a complete disk image backup of its storage using
+another machine.
 
-For a hobby project, not having perfect rollback may be a risk you're willing
-to take. Usually container image problems have fixes/workarounds within a day.
+For a hobby project, not having a perfect rollback may be a risk you're willing
+to take. Usually image problems will have fixes/workarounds within a day.
 
 ## Update Raspberry Pi OS
 
@@ -77,10 +81,12 @@ $ sudo apt upgrade -y
 ## Recommended: Update only Docker images
 
 When you built the stack using the menu, it created the Docker Compose file
-`docker-compose.yml`. This file or its linked `Dockerfile`s, use image name and
-tag references (a missing tag defaults to `:latest`) to get the images from
-hub.docker.com. Likewise, when Docker is told to pull updated images, it will
-download the newest image for the tags into its local cache.
+`docker-compose.yml`. This file and any used build instructions
+(`Dockerfile`s), use image name and tag references to images on hub.docker.com
+or other registries. An undefined tag defaults to `:latest`. When Docker is
+told to pull updated images, it will download the images into the local
+cache, based upon what is currently stored at the registry for the used names
+and tags.
 
 Updating the IOTstack project templates and recreating your
 `docker-compose.yml` isn't usually necessary. Doing so isn't likely to provide
@@ -176,7 +182,7 @@ Full update steps:
 * Go to the [IOTstack Discord](https://discord.gg/ZpKHnks) and describe your
   problem. We're happy to help.
 
-## Details, partly outdated
+## Old-menu
 
 !!! warning
     If you ran `git checkout -- 'git ls-files -m'` as suggested in the old wiki entry then please check your duck.sh because it removed your domain and token
