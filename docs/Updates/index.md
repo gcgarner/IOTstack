@@ -118,38 +118,61 @@ encountered the same problem and reported the fix.
 
 ## Full update
 
-Periodically updates are made to project which include new or modified container template, changes to backups or additional features. As these are released your local copy of this project will become out of date. This section deals with how to bring your project to the latest published state.
+Periodically updates are made to project which include new or updated container
+template, changes to backups or additional features. To evaluate if this is
+really needed, see the [changelog](Changelog.md) or [merged pull requests](
+https://github.com/SensorsIot/IOTstack/pulls?q=is%3Amerged). To apply all these
+changes all service definitions are recreated. As a drawback, this will wipe
+any custom changes to docker-compose.yml, may change semantics or even require
+manual migration steps.
 
 !!! danger "Breaking update"
-    Recent changes will require [manual steps](
+    A change done 2022-01-18 will require [manual steps](
     ../Updates/migration-network-change.md)
     or you may get an error like:  
     `ERROR: Service "influxdb" uses an undefined network "iotstack_nw"`
 
-## Quick instructions
+Full update steps:
 
-1. shutdown your RPi, remove its storage medium and do a full image backup of
-   it to another machine. Reinstall your storage and power up your RPi.
-2. backup your current settings: `cp docker-compose.yml docker-compose.yml.bak`
-3. check `git status` for any local changes you may have made to project files, ignore any reported "Untracked files". Save and preserve your changes by doing a commit: `git commit -a -m "local customization"`. Or revert them using: `git checkout -- path/to/changed_file`.
-4. update project files from github: `git pull -r origin master`
-5. recreate the compose file and Dockerfile:s: `./menu.sh`, select Build Stack, don't change selections, press enter to build, and then exit.
-4. get latest images from the web: `docker-compose pull`
-5. rebuild localy created images from new Dockerfiles: `docker-compose build --pull --no-cache`
-6. update running containers to latest: `docker-compose up --build -d`
+1. Shutdown your RPi, remove the storage medium and do a [full backup
+   image](https://www.howtogeek.com/341944/how-to-clone-your-raspberry-pi-sd-card-for-foolproof-backup/)
+   of the storage to another machine. Reattach the storage back and power up
+   your RPi.<br />
+   NOTE: To skip this step may cause days of downtime as you debug a problem or
+   wait for fixes.
+2.  check `git status --untracked-files no` for any local changes you may have
+    made to project files. For any listed changes, either:
+
+    1. Save and preserve your change by doing a local commit: `git commit -m
+       "local customization" -- path/to/changed_file`, or
+    2. Revert it using: `git checkout -- path/to/changed_file`
+
+3. Update project files from github: `git pull -r origin master`
+4. Save your current compose file: `cp docker-compose.yml
+   docker-compose.yml.bak`. NOTE: this is really useful, as the next step will
+   overwrite all your previous manual changes to docker-compose.yml.
+5. Recreate the compose file and Dockerfile:s: `./menu.sh`, select Build Stack,
+   for each of your selected services: de- and re-select it, press enter to
+   build, and then exit.
+6. check the changes for obvious errors (e.g. passwords): `diff
+   docker-compose.yml docker-compose.yml.bak`
+7. Perform the Docker image update procedure: ``` console $ docker-compose pull
+   $ docker-compose build --pull --no-cache $ docker-compose up --build -d ```
 
 ### Troubleshooting: if a container fails to start after update
 
 * try restarting the whole stack: `docker-compose restart`
-* backup your stack settings: `cp docker-compose.yml docker-compose.yml.bak`
 * Check log output of the failing service: `docker-compose logs *service-name*`
     * try googling and fixing problems in docker-compose.yml manually.
-* try recreating the failing service definition using menu.sh:
-    1. `./menu.sh`, select Build Stack, unselect the failing service, press
-       enter to build, and then exit.
-    2. `./menu.sh`, select Build Stack, select the service back again, press
-       enter to build, and then exit.
-    3. Try starting now: `docker-compose up -d`
+* check how the container definitions have changed: `diff docker-compose.yml
+    docker-compose.yml.bak`
+* try rebuilding your complete stack from scratch:
+    1. check that you have a backup.
+    2. stop and remove Docker containers: `docker-compose down`
+    3. remove all menu generated files: `rm -r docker-compose.yml services`
+    4. recreate the stack: `./menu.sh`, select Build Stack, select all your
+       services, press enter to build, and then exit.
+    5. try starting: `docker-compose up -d`
 * Go to the [IOTstack Discord](https://discord.gg/ZpKHnks) and describe your
   problem. We're happy to help.
 
