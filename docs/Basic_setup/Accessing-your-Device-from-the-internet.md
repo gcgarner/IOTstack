@@ -35,11 +35,23 @@ If you have the choice, your router is to be preferred. That's because your rout
 
 Nevertheless, your router may not support the Dynamic DNS service provider you wish to use, or may come with constraints that you find unsatisfactory so any behind-the-router technique is always a viable option, providing you understand its limitations.
 
-A behind-the-router technique usually relies on sending updates according to a schedule. An example is a `cron` job that runs every five minutes. That means any router WAN IP address changes won't be propagated until the next scheduled update. In the event of network interruptions or service provider outages, it may take some time before everything is back in sync. Moreover, given that WAN IP address changes are infrequent events, most scheduled updates will be sending information unnecessarily, contributing unnecessarily to server load.
+A behind-the-router technique usually relies on sending updates according to a schedule. An example is a `cron` job that runs every five minutes. That means any router WAN IP address changes won't be propagated until the next scheduled update. In the event of network interruptions or service provider outages, it may take close to ten minutes before everything is back in sync. Moreover, given that WAN IP address changes are infrequent events, most scheduled updates will be sending information unnecessarily.
 
-> This seems to be a problem for DuckDNS which takes a beating because almost every person using it is sending an update bang-on five minutes.
+### DuckDNS container
 
-### DuckDNS client
+The recommended and easiest solution is to install the Duckdns docker-container
+from the menu. It includes the cron service and logs are handled by Docker.
+
+For configuration see [Containers/Duck DNS]( ../Containers/Duckdns.md).
+
+!!! note
+    This is a recently added container, please don't hesitate to report any
+    possible faults to Discord or as Github issues.
+
+### DuckDNS client script { #duckdns-client }
+
+!!! info
+    This method will soon be deprecated in favor of the DuckDNS container.
 
 IOTstack provides a solution for DuckDNS. The best approach to running it is:
 
