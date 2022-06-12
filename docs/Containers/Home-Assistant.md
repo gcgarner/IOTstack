@@ -163,7 +163,9 @@ your RPi hostname is raspberrypi)
 7. Forward to correct IP when target is a container running in "network_mode:
    host" (like Home Assistant does):
 
-	```console
+    <!-- Note to documentation writers: using the console-highlighter would
+    make the '#!/bin/sh'-line an unselectable "prompt". -->
+	``` bash title="Note: in order for copy-paste to work properly, the usual $-prompts are omitted"
 	cd ~/IOTstack
 	cat << 'EOF' | sudo tee volumes/swag/config/custom-cont-init.d/add-host.docker.internal.sh
 	#!/bin/sh
