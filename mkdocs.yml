@@ -13,10 +13,12 @@ theme:
   favicon: stack-24.svg
   palette:
     - scheme: default
+      media: "(prefers-color-scheme: light)"
       toggle:
         icon: material/weather-sunny
         name: Switch to dark mode
     - scheme: slate
+      media: "(prefers-color-scheme: dark)"
       toggle:
         icon: material/weather-night
         name: Switch to light mode
@@ -69,6 +71,7 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.details
   - pymdownx.tabbed:
       alternate_style: true
   - toc:
