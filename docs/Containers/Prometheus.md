@@ -1,6 +1,6 @@
 # Prometheus
 
-## <a name="references"></a>References
+## References { #references }
 
 * [*Prometheus* home](https://prometheus.io)
 * *GitHub*:
@@ -15,7 +15,7 @@
 	- [*CAdvisor*](https://hub.docker.com/r/zcube/cadvisor)
 	- [*Node Exporter*](https://hub.docker.com/r/prom/node-exporter)
 
-## <a name="overview"></a>Overview
+## Overview { #overview }
 
 Prometheus is a collection of three containers:
 
@@ -25,9 +25,9 @@ Prometheus is a collection of three containers:
 
 The [default configuration](#activeConfig) for *Prometheus* supplied with IOTstack scrapes information from all three containers.
 
-## <a name="installProm"></a>Installing Prometheus
+## Installing Prometheus { #installProm }
 
-### <a name="installPromNewMenu"></a>*if you are running New Menu …*
+### *if you are running New Menu …* { #installPromNewMenu }
 
 When you select *Prometheus* in the IOTstack menu, you must also select:
 
@@ -36,7 +36,7 @@ When you select *Prometheus* in the IOTstack menu, you must also select:
 
 If you do not select all three containers, Prometheus will not start.
 
-### <a name="installPromOldMenu"></a>*if you are running Old Menu …*
+### *if you are running Old Menu …* { #installPromOldMenu }
 
 When you select *Prometheus* in the IOTstack menu, the service definition includes the three containers:
 
@@ -44,7 +44,7 @@ When you select *Prometheus* in the IOTstack menu, the service definition includ
 *	*prometheus-cadvisor;* and
 * 	*prometheus-nodeexporter*.
 
-## <a name="significantFiles"></a>Significant directories and files
+## Significant directories and files { #significantFiles }
 
 ```
 ~/IOTstack
@@ -77,23 +77,23 @@ When you select *Prometheus* in the IOTstack menu, the service definition includ
 7. The *persistent storage area*.
 8. The [configuration directory](#configDir).
 
-## <a name="howPrometheusIOTstackGetsBuilt"></a>How *Prometheus* gets built for IOTstack
+## How *Prometheus* gets built for IOTstack { #howPrometheusIOTstackGetsBuilt }
 
-### <a name="githubSourceCode"></a>*Prometheus* source code ([*GitHub*](https://github.com))
+### *Prometheus* source code ([*GitHub*](https://github.com)) { #githubSourceCode }
 
 The source code for *Prometheus* lives at [*GitHub* prometheus/prometheus](https://github.com/prometheus/prometheus).
 
-### <a name="dockerHubImages"></a>*Prometheus* images ([*DockerHub*](https://hub.docker.com))
+### *Prometheus* images ([*DockerHub*](https://hub.docker.com)) { #dockerHubImages }
 
 Periodically, the source code is recompiled and the resulting image is pushed to [prom/prometheus](https://hub.docker.com/r/prom/prometheus) on *DockerHub*.
  
-### <a name="iotstackMenu"></a>IOTstack menu
+### IOTstack menu { #iotstackMenu }
 
 When you select *Prometheus* in the IOTstack menu, the *template service definition* is copied into the *Compose* file.
 
 > Under old menu, it is also copied to the *working service definition* and then not really used.
 
-### <a name="iotstackFirstRun"></a>IOTstack first run
+### IOTstack first run { #iotstackFirstRun }
 
 On a first install of IOTstack, you run the menu, choose *Prometheus* as one of your containers, and are told to do this:
 
@@ -158,15 +158,15 @@ You *may* see the same pattern in Portainer, which reports the *base image* as "
 
 > Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-### <a name="dependencies"></a>Dependencies: *CAdvisor* and *Node Exporter*
+### Dependencies: *CAdvisor* and *Node Exporter* { #dependencies }
 
 The *CAdvisor* and *Node Exporter* are included in the *Prometheus* service definition as dependent containers. What that means is that each time you start *Prometheus*, `docker-compose` ensures that *CAdvisor* and *Node Exporter* are already running, and keeps them running.
 
 The [default configuration](#activeConfig) for *Prometheus* assumes *CAdvisor* and *Node Exporter* are running and starts scraping information from those targets as soon as it launches.
 
-## <a name="configuringPrometheus"></a>Configuring **Prometheus**
+## Configuring **Prometheus** { #configuringPrometheus }
 
-### <a name="configDir"></a>Configuration directory
+### Configuration directory { #configDir }
 
 The configuration directory for the IOTstack implementation of *Prometheus* is at the path:
 
@@ -183,7 +183,7 @@ If you delete either file, *Prometheus* will replace it with a default the next 
 
 Unless you [decide to change it](#environmentVars), the `config` folder and its contents are owned by "pi:pi". This means you can edit the files in the configuration directory without needing the `sudo` command. Ownership is enforced each time the container restarts.
 
-#### <a name="activeConfig"></a>Active configuration file
+#### Active configuration file { #activeConfig }
 
 The file named `config.yml` is the active configuration. This is the file you should edit if you want to make changes. The default structure of the file is:
 
@@ -213,7 +213,7 @@ Note:
 
 * The YAML parser used by *Prometheus* seems to be ***exceptionally*** sensitive to syntax errors (far less tolerant than `docker-compose`). For this reason, you should **always** check the *Prometheus* log after any configuration change.
 
-#### <a name="referenceConfig"></a>Reference configuration file
+#### Reference configuration file { #referenceConfig }
 
 The file named `prometheus.yml` is a reference configuration. It is a **copy** of the original configuration file that ships inside the *Prometheus* container at the path:
 
@@ -231,7 +231,7 @@ $ docker-compose restart prometheus
 $ docker logs prometheus
 ```
 
-### <a name="environmentVars"></a>Environment variables
+### Environment variables { #environmentVars }
 
 The IOTstack implementation of *Prometheus* supports two environment variables:
 
@@ -245,7 +245,7 @@ Those variables control ownership of the [Configuration directory](#configDir) a
 
 If you delete those environment variables from your *Compose* file, the [Configuration directory](#configDir) will be owned by "nobody:nobody"; otherwise the directory and its contents will be owned by whatever values you pass for those variables.
 
-### <a name="migration"></a>Migration considerations
+### Migration considerations { #migration }
 
 Under the original IOTstack implementation of *Prometheus* (just "as it comes" from *DockerHub*), the service definition expected the configuration file to be at:
 
@@ -276,7 +276,7 @@ Note:
 
 * The YAML parser used by *Prometheus* is very sensitive to syntax errors. Always check the *Prometheus* log after any configuration change.
 
-## <a name="upgradingPrometheus"></a>Upgrading *Prometheus*
+## Upgrading *Prometheus* { #upgradingPrometheus }
 
 You can update `cadvisor` and `nodeexporter` like this:
 
@@ -320,7 +320,7 @@ The `prune` is the simplest way of cleaning up. The first call removes the old *
 
 > Whether an old *base image* exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
-### <a name="versionPinning"></a>*Prometheus* version pinning
+### *Prometheus* version pinning { #versionPinning }
 
 If you need to pin *Prometheus* to a particular version:
 

@@ -9,7 +9,7 @@
 
 AdGuard Home and PiHole perform similar functions. They use the same ports so you can **not** run both at the same time. You must choose one or the other.
 
-## <a name="quickStart"></a>Quick Start
+## Quick Start { #quickStart }
 
 When you first install AdGuard Home:
 

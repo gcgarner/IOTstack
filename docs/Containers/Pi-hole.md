@@ -2,13 +2,13 @@
 
 Pi-hole is a fantastic utility to reduce ads.
 
-## <a name="references"></a>References
+## References { #references }
 
 * [Pi-hole on GitHub](https://github.com/pi-hole/docker-pi-hole)
 * [Pi-hole on Dockerhub](https://hub.docker.com/r/pihole/pihole)
 * [Pi-hole environment variables](https://github.com/pi-hole/docker-pi-hole#environment-variables)
 
-## <a name="envVars"></a>Environment variables 
+## Environment variables  { #envVars }
 
 In conjunction with controls in Pi-hole's web GUI, environment variables govern much of Pi-hole's behaviour. If you are running new menu (master branch), the variables are inline in `docker-compose.yml`. If you are running old menu, the variables will be in:
 
@@ -23,7 +23,7 @@ Pi-hole's authoritative list of environment variables can be found [here](https:
 1. If you ever need to reset Pi-hole by [erasing its persistent storage area](#cleanSlate), configuration options set using environment variables will persist while those set through the GUI may be lost; and
 2. On at least two occasions in its history, Pi-hole upgrades have had the effect of wiping configuration options set through the GUI, whereas options set using environment variables survived. 
 
-### <a name="adminPassword"></a>Admin password
+### Admin password { #adminPassword }
 
 The first time Pi-hole is launched, it checks for the `WEBPASSWORD` environment variable. If found, the right hand side becomes the administrative password.
 
@@ -82,7 +82,7 @@ $ docker exec pihole pihole -a -p mybigsecret
 
 > replacing "mybigsecret" with your choice of password.
 
-### <a name="otherVars"></a>Other variables
+### Other variables { #otherVars }
 
 Most of Pi-hole's environment variables are self-explanatory but some can benefit from elaboration.
 
@@ -162,9 +162,9 @@ Pi-hole has its own built-in DNS server which can answer both kinds of queries. 
 
 	When you set `REV_SERVER_CIDR=192.168.1.0/24` you are telling Pi-hole that *reverse queries* for the host range 192.168.1.1 through 192.168.1.254 should be sent to the `REV_SERVER_TARGET=192.168.1.5`.
 
-## <a name="webGUI"></a>Pi-hole Web GUI
+## Pi-hole Web GUI { #webGUI }
 
-### <a name="connectGUI"></a>Connecting to the GUI
+### Connecting to the GUI { #connectGUI }
 
 Point your browser to:
 
@@ -178,7 +178,7 @@ where «your_ip» can be:
 * The domain name of the Raspberry Pi running Pi-hole.
 * The multicast DNS name (eg "raspberrypi.local") of the Raspberry Pi running Pi-hole.
 
-### <a name="localNames"></a>Adding local domain names
+### Adding local domain names { #localNames }
 
 Login to the Pi-hole web interface: `http://raspberrypi.local:8089/admin`:
 
@@ -190,15 +190,15 @@ Now you can use `raspberrypi.home.arpa` as the domain name for the Raspberry Pi
 in your whole local network. You can also add domain names for your other
 devices, provided they too have static IPs.
 
-#### <a name="homeArpa"></a>why .home.arpa?
+#### why .home.arpa? { #homeArpa }
 
 Instead of `.home.arpa` - which is the real standard, but a mouthful - you may
 use `.internal`. Using `.local` would technically also work, but it should be
 reserved only for mDNS use.
 
-## <a name="rpiConfig"></a>Configuring the Raspberry Pi running Pi-hole
+## Configuring the Raspberry Pi running Pi-hole { #rpiConfig }
 
-### <a name="rpiFixedIP"></a>Assign a fixed IP address
+### Assign a fixed IP address { #rpiFixedIP }
 
 If you want clients on your network to use Pi-hole for their DNS, the Raspberry Pi running Pi-hole **must** have a fixed IP address. It does not have to be a *static* IP address (in the sense of being hard-coded into the Raspberry Pi). The Raspberry Pi can still obtain its IP address from DHCP at boot time, providing your DHCP server (usually your home router) always returns the same IP address. This is usually referred to as a *static binding* and associates the Raspberry Pi's MAC address with a fixed IP address.
 
@@ -221,7 +221,7 @@ In the above:
 
 If a physical interface does not exist, the command returns "Device does not exist" for that interface. If you prefer, you can also substitute the `ifconfig` command for `ip link show`. It's just a little more wordy.
 
-### <a name="rpiDNS"></a>Decide how the Raspberry Pi obtains its own DNS
+### Decide how the Raspberry Pi obtains its own DNS { #rpiDNS }
 
 The Raspberry Pi itself does **not** have to use the Pi-hole container for its own DNS services. Some chicken-and-egg situations can exist if, for example, the Pi-hole container is down when another process (eg `apt` or `docker-compose`) needs to do something that depends on DNS services being available.
 
@@ -257,7 +257,7 @@ In words:
 3. `resolv_conf_local_only=NO` is needed so that 127.0.0.1 and 8.8.8.8 can coexist.
 4. The `resolvconf -u` command instructs Raspberry Pi OS to rebuild the active resolver configuration. In principle, that means parsing `/etc/resolvconf.conf` to derive `/etc/resolv.conf`. This command can sometimes return the error "Too few arguments". You should ignore that error.
 
-#### <a name="rpiDNSExample"></a>Example configuration
+#### Example configuration { #rpiDNSExample }
 
 Make these assumptions:
 
@@ -315,7 +315,7 @@ Notes:
 
 	Then, when you refer to a host by a short name (eg "fred") the Raspberry Pi will also consider "fred.home.arpa" when trying to discover the IP address.
 
-## <a name="piholePrimary"></a>Using Pi-hole as your DNS resolver
+## Using Pi-hole as your DNS resolver { #piholePrimary }
 
 In order for Pi-hole to block ads or resolve anything, clients need to be told to use it as their DNS server. You can either:
 
@@ -334,7 +334,7 @@ Option 1 (whole-of-network) is the simplest approach. Assuming your Raspberry Pi
 
 Option 2 (case-by-case) generally involves finding the IP configuration options for each host and setting the DNS server manually. Manual changes are usually effective immediately without needing a reboot.
 
-### <a name="advancedConfig"></a>advanced configurations
+### advanced configurations { #advancedConfig }
 
 Setting up a combination of Pi-hole (for ad-blocking services), and/or a local upstream DNS resolver (eg BIND9) to be authoritative for a local domain and reverse-resolution for your local IP addresses, and decisions about where each DNS server forwards queries it can't answer (eg your ISP's DNS servers, or Google's 8.8.8.8, or Cloudflare's 1.1.1.1) is a complex topic and depends on your specific needs.
 
@@ -342,7 +342,7 @@ The same applies to setting up a DHCP server (eg DHCPD) which is capable of dist
 
 If you need help, try asking questions on the [IOTstack Discord channel](https://discord.gg/ZpKHnks).
 
-## <a name="debugging"></a>Testing and Troubleshooting
+## Testing and Troubleshooting { #debugging }
 
 Install dig:
 
@@ -370,17 +370,17 @@ If this fails to resolve the IP, check that the server in the response is
 `192.168.1.10`. If it's `127.0.0.xx` check `/etc/resolv.conf` begins with
 `nameserver 192.168.1.10`.
 
-## <a name="iotConfig"></a>Microcontrollers
+## Microcontrollers { #iotConfig }
 
 If you want to avoid hardcoding your Raspberry Pi IP to your ESPhome devices,
 you need a DNS server that will do the resolving. This can be done using the
 Pi-hole container as described above.
 
-### <a name="esp32mDNS"></a>`*.local` won't work for ESPhome
+### `*.local` won't work for ESPhome { #esp32mDNS }
 
 There is a special case for resolving `*.local` addresses. If you do a `ping raspberrypi.local` on your desktop Linux or the Raspberry Pi, it will first try using mDNS/bonjour to resolve the IP address raspberrypi.local. If this fails it will then ask the DNS server. ESPhome devices can't use mDNS to resolve an IP address. You need a proper DNS server to respond to queries made by an ESP. As such, `dig raspberrypi.local` will fail, simulating ESPhome device behavior. This is as intended, and you should use raspberrypi.home.arpa as the address on your ESP-device.
 
-## <a name="cleanSlate"></a>Getting a clean slate
+## Getting a clean slate { #cleanSlate }
 
 If Pi-hole misbehaves, you can always try starting from a clean slate by erasing Pi-hole's persistent storage area. Erasing the persistent storage area causes PiHole to re-initialise its data structures on the next launch. You will lose:
 

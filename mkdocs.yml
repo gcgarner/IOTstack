@@ -63,6 +63,7 @@ extra_javascript:
   - javascript/fix-codeblock-console-copy-button.js
 
 markdown_extensions:
+  - attr_list
   - pymdownx.highlight:
       pygments_lang_class: true
   - admonition
