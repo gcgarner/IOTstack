@@ -10,11 +10,7 @@ Pi-hole is a fantastic utility to reduce ads.
 
 ## Environment variables  { #envVars }
 
-In conjunction with controls in Pi-hole's web GUI, environment variables govern much of Pi-hole's behaviour. If you are running new menu (master branch), the variables are inline in `docker-compose.yml`. If you are running old menu, the variables will be in:
-
-```
-~/IOTstack/services/pihole/pihole.env
-```
+In conjunction with controls in Pi-hole's web GUI, environment variables govern much of Pi-hole's behaviour. If you are running new menu (master branch), the variables are inline in `docker-compose.yml`. If you are running old menu, the variables will be in `~/IOTstack/services/pihole/pihole.env`
 
 > There is nothing about old menu which *requires* the variables to be stored in the `pihole.env` file. You can migrate everything to `docker-compose.yml` if you wish.
 
@@ -86,83 +82,88 @@ $ docker exec pihole pihole -a -p mybigsecret
 
 Most of Pi-hole's environment variables are self-explanatory but some can benefit from elaboration.
 
-First, understand that there are two basic types of DNS query:
+??? info "(advanced) reverse DNS query handling"
 
-* *forward queries*:
+    First, understand that there are two basic types of DNS query:
 
-	- question: "what is the IP address of fred.yourdomain.com?"
-	- answer: 192.168.1.100
+    * *forward queries*:
 
-* *reverse queries*:
+        - question: "what is the IP address of fred.yourdomain.com?"
+        - answer: 192.168.1.100
 
-	- question: "what is the domain name for 192.168.1.100?"
-	- answer: fred.yourdomain.com
+    * *reverse queries*:
 
-Pi-hole has its own built-in DNS server which can answer both kinds of queries. The implementation is useful but doesn't offer all the features of a full-blown DNS server like BIND9. If you decide to implement a more capable DNS server to work alongside Pi-hole, you will need to understand the following Pi-hole environment variables:
+        - question: "what is the domain name for 192.168.1.100?"
+        - answer: fred.yourdomain.com
 
-* `REV_SERVER=`
+    Pi-hole has its own built-in DNS server which can answer both kinds of queries. The implementation is useful but doesn't offer all the features of a full-blown DNS server like BIND9. If you decide to implement a more capable DNS server to work alongside Pi-hole, you will need to understand the following Pi-hole environment variables:
 
-	If you configure Pi-hole's built-in DNS server to be authoritative for your local domain name, `REV_SERVER=false` is appropriate, in which case none of the variables discussed below has any effect.
+    * `REV_SERVER=`
 
-	Setting `REV_SERVER=true` allows Pi-hole to forward queries that it can't answer to a local upstream DNS server, typically running inside your network.
+        If you configure Pi-hole's built-in DNS server to be authoritative for your local domain name, `REV_SERVER=false` is appropriate, in which case none of the variables discussed below has any effect.
 
-* `REV_SERVER_DOMAIN=yourdomain.com` (where "yourdomain.com" is an example)
+        Setting `REV_SERVER=true` allows Pi-hole to forward queries that it can't answer to a local upstream DNS server, typically running inside your network.
 
-	The Pi-hole documentation says:
+    * `REV_SERVER_DOMAIN=yourdomain.com` (where "yourdomain.com" is an example)
 
-	> *"If conditional forwarding is enabled, set the domain of the local network router".*
+        The Pi-hole documentation says:
 
-	The words "if conditional forwarding is enabled" mean "when `REV_SERVER=true`".
+        > *"If conditional forwarding is enabled, set the domain of the local network router".*
 
-	However, this option really has little-to-nothing to do with the "domain of the local network **router**". Your router *may* have an IP address that reverse-resolves to a local domain name (eg gateway.mydomain.com) but this is something most routers are unaware of, even if you have configured your router's DHCP server to inform clients that they should assume a default domain of "yourdomain.com".
+        The words "if conditional forwarding is enabled" mean "when `REV_SERVER=true`".
 
-	This variable actually tells Pi-hole the name of your local domain. In other words, it tells Pi-hole to consider the possibility that an *unqualified* name like "fred" could be the fully-qualified domain name "fred.yourdomain.com".
+        However, this option really has little-to-nothing to do with the "domain of the local network **router**". Your router *may* have an IP address that reverse-resolves to a local domain name (eg gateway.mydomain.com) but this is something most routers are unaware of, even if you have configured your router's DHCP server to inform clients that they should assume a default domain of "yourdomain.com".
 
-* `REV_SERVER_TARGET=192.168.1.5` (where 192.168.1.5 is an example):
+        This variable actually tells Pi-hole the name of your local domain. In other words, it tells Pi-hole to consider the possibility that an *unqualified* name like "fred" could be the fully-qualified domain name "fred.yourdomain.com".
 
-	The Pi-hole documentation says:
+    * `REV_SERVER_TARGET=192.168.1.5` (where 192.168.1.5 is an example):
 
-	> *"If conditional forwarding is enabled, set the IP of the local network router".*
+        The Pi-hole documentation says:
 
-	This option tells Pi-hole where to direct *forward queries* that it can't answer. In other words, Pi-hole will send a forward query for fred.yourdomain.com to 192.168.1.5.
+        > *"If conditional forwarding is enabled, set the IP of the local network router".*
 
-	It *may* be appropriate to set `REV_SERVER_TARGET` to the IP address of your router (eg 192.168.1.1) but, unless your router is running as a DNS server (not impossible but uncommon), the router will likely just relay any queries to your ISP's DNS servers (or other well-known DNS servers like 8.8.8.8 or 1.1.1.1 if you have configured those). Those external DNS servers are unlikely to be able to resolve queries for names in your private domain, and won't be able to do anything sensible with reverse queries if your home network uses RFC1918 addressing (which most do: 182.168.x.x being the most common example).
+        This option tells Pi-hole where to direct *forward queries* that it can't answer. In other words, Pi-hole will send a forward query for fred.yourdomain.com to 192.168.1.5.
 
-	Forwarding doesn't guarantee that 192.168.1.5 will be able to answer the query. The DNS server at 192.168.1.5 may well relay the query to yet another server. In other words, this environment variable does no more than set the next hop.
+        It *may* be appropriate to set `REV_SERVER_TARGET` to the IP address of your router (eg 192.168.1.1) but, unless your router is running as a DNS server (not impossible but uncommon), the router will likely just relay any queries to your ISP's DNS servers (or other well-known DNS servers like 8.8.8.8 or 1.1.1.1 if you have configured those). Those external DNS servers are unlikely to be able to resolve queries for names in your private domain, and won't be able to do anything sensible with reverse queries if your home network uses RFC1918 addressing (which most do: 182.168.x.x being the most common example).
 
-	If you are planning on using this option, the target needs to be a DNS server that is authoritative for your local domain and that, pretty much, is going to be a local upstream DNS server inside your home network like another Raspberry Pi running BIND9.
+        Forwarding doesn't guarantee that 192.168.1.5 will be able to answer the query. The DNS server at 192.168.1.5 may well relay the query to yet another server. In other words, this environment variable does no more than set the next hop.
 
-* `REV_SERVER_CIDR=192.168.1.0/24` (where 192.168.1.0/24 is an example)
+        If you are planning on using this option, the target needs to be a DNS server that is authoritative for your local domain and that, pretty much, is going to be a local upstream DNS server inside your home network like another Raspberry Pi running BIND9.
 
-	The Pi-hole documentation says:
+    * `REV_SERVER_CIDR=192.168.1.0/24` (where 192.168.1.0/24 is an example)
 
-	> *"If conditional forwarding is enabled, set the reverse DNS zone (e.g. 192.168.0.0/24)".*
+        The Pi-hole documentation says:
 
-	This is correct but it lacks detail.
+        > *"If conditional forwarding is enabled, set the reverse DNS zone (e.g. 192.168.0.0/24)".*
 
-	The string "192.168.1.0/24" defines your local subnet using Classless Inter-Domain Routing (CIDR) notation. Most home subnets use a subnet-mask of 255.255.255.0. If you write that out in binary, it is 24 1-bits followed by 8 0-bits, as in:
+        This is correct but it lacks detail.
 
-	```
-	   255  .   255  .   255  .   0
-	11111111 11111111 11111111 00000000
-	```
+        The string "192.168.1.0/24" defines your local subnet using Classless Inter-Domain Routing (CIDR) notation. Most home subnets use a subnet-mask of 255.255.255.0. If you write that out in binary, it is 24 1-bits followed by 8 0-bits, as in:
 
-	Those 24 one-bits are where the `/24` comes from in `192.168.1.0/24`. When you perform a bitwise logical AND between that subnet mask and 192.168.1.0, the ".0" is removed (conceptually), as in:
+        ```
+           255  .   255  .   255  .   0
+        11111111 11111111 11111111 00000000
+        ```
 
-	```
-	192.168.1.0 AND 255.255.255.0 = 192.168.1
-	```
+        Those 24 one-bits are where the `/24` comes from in `192.168.1.0/24`. When you perform a bitwise logical AND between that subnet mask and 192.168.1.0, the ".0" is removed (conceptually), as in:
 
-	What it **means** is:
+        ```
+        192.168.1.0 AND 255.255.255.0 = 192.168.1
+        ```
 
-	1. The network *prefix* is "192.168.1".
-	2. *This* host on the 192.168.1 network is the reserved address "192.168.1.0". It is better to think of this as "the network prefix followed by all-zero bits in the host portion". It is not common to see the .0 address used in practice. A device either knows its IP address or it doesn't. If it doesn't then it won't know its prefix so it will use 0.0.0.0 as a substitute for "this".
-	3. The *range* of IP addresses available for allocation to hosts on this subnet is 192.168.1.1 through 192.168.1.254 inclusive.
-	4. *All* hosts on the 192.168.1 network (ie broadcast) is the reserved address "192.168.1.255". It is better to think of this as "the network prefix followed by all-one bits in the host portion".
+        What it **means** is:
 
-	When you set `REV_SERVER_CIDR=192.168.1.0/24` you are telling Pi-hole that *reverse queries* for the host range 192.168.1.1 through 192.168.1.254 should be sent to the `REV_SERVER_TARGET=192.168.1.5`.
+        1. The network *prefix* is "192.168.1".
+        2. *This* host on the 192.168.1 network is the reserved address "192.168.1.0". It is better to think of this as "the network prefix followed by all-zero bits in the host portion". It is not common to see the .0 address used in practice. A device either knows its IP address or it doesn't. If it doesn't then it won't know its prefix so it will use 0.0.0.0 as a substitute for "this".
+        3. The *range* of IP addresses available for allocation to hosts on this subnet is 192.168.1.1 through 192.168.1.254 inclusive.
+        4. *All* hosts on the 192.168.1 network (ie broadcast) is the reserved address "192.168.1.255". It is better to think of this as "the network prefix followed by all-one bits in the host portion".
+
+        When you set `REV_SERVER_CIDR=192.168.1.0/24` you are telling Pi-hole that *reverse queries* for the host range 192.168.1.1 through 192.168.1.254 should be sent to the `REV_SERVER_TARGET=192.168.1.5`.
 
 ## Pi-hole Web GUI { #webGUI }
+
+Note: in order for Web GUI settings to have any effects, you need to configure
+the RPi or other machines to use it. This is described in the next topics.
 
 ### Connecting to the GUI { #connectGUI }
 
@@ -190,15 +191,102 @@ Now you can use `raspberrypi.home.arpa` as the domain name for the Raspberry Pi
 in your whole local network. You can also add domain names for your other
 devices, provided they too have static IPs.
 
-#### why .home.arpa? { #homeArpa }
+!!! help "why .home.arpa?"
 
-Instead of `.home.arpa` - which is the real standard, but a mouthful - you may
-use `.internal`. Using `.local` would technically also work, but it should be
-reserved only for mDNS use.
+    Instead of `.home.arpa` - which is the real standard, but a mouthful - you
+    can use `.internal`. Using `.local` would technically work, but it should
+    be reserved for mDNS use only.
+    { #homeArpa }
 
-## Configuring the Raspberry Pi running Pi-hole { #rpiConfig }
+## Configure the Raspberry Pi to use Pi-hole { #rpiDNS }
 
-### Assign a fixed IP address { #rpiFixedIP }
+The Raspberry Pi itself does **not** have to use the Pi-hole container for its own DNS services. Some chicken-and-egg situations can exist if, for example, the Pi-hole container is down when another process (eg `apt` or `docker-compose`) needs to do something that depends on DNS services being available.
+
+Nevertheless, if you configure Pi-hole to be local DNS resolver, then you will probably want to configure your Raspberry Pi to use the Pi-hole container in the first instance, and then fall back to a public DNS server if the container is down. As a beginner, this is probably what you want regardless. Do this by running the commands:
+
+```console
+$ echo "name_servers=127.0.0.1" | sudo tee -a /etc/resolvconf.conf
+$ echo "name_servers_append=8.8.8.8" | sudo tee -a /etc/resolvconf.conf
+$ echo "resolv_conf_local_only=NO" | sudo tee -a /etc/resolvconf.conf
+$ sudo resolvconf -u
+```
+
+This results in a configuration that will continue working, even if the Pi-hole
+container isn't running.
+
+??? info "Detailed explanations of these commands"
+
+    1. `name_servers=127.0.0.1` instructs the Raspberry Pi to direct DNS queries to the loopback address. Port 53 is implied. If the Pi-hole container is running in:
+
+        - non-host mode, Docker is listening to port 53 and forwards the queries to the Pi-hole container;
+        - host mode, the Pi-hole container is listening to port 53.
+
+    2. `name_servers_append=8.8.8.8` instructs the Raspberry Pi to fail-over to 8.8.8.8 if Pi-hole does not respond. You can replace `8.8.8.8` (a Google service) with:
+
+        * Another well-known public DNS server like `1.1.1.1` (Cloudflare).
+        * The IP address(es) of your ISP's DNS hosts (generally available from your ISP's web site).
+        * The IP address of another DNS server running in your local network (eg BIND9).
+        * The IP address of your home router. Most home routers default to the ISP's DNS hosts but you can usually change your router's configuration to bypass your ISP in favour of public servers like 8.8.8.8 and 1.1.1.1.
+
+        You need slightly different syntax if you want to add multiple fallback servers. For example, suppose your fallback hosts are a local server (eg 192.168.1.2) running BIND9 and 8.8.8.8. The command would be:
+
+        ```console
+        $ echo 'name_servers_append="192.168.1.2 8.8.8.8"' | sudo tee -a /etc/resolvconf.conf
+        ```
+
+    3. `resolv_conf_local_only=NO` is needed so that 127.0.0.1 and 8.8.8.8 can coexist.
+    4. The `resolvconf -u` command instructs Raspberry Pi OS to rebuild the active resolver configuration. In principle, that means parsing `/etc/resolvconf.conf` to derive `/etc/resolv.conf`. This command can sometimes return the error "Too few arguments". You should ignore that error.
+
+    ``` mermaid
+    flowchart LR
+      RERECONF["/etc/resolvconf.conf"] --- UP([resolvconf -u])
+      DHCP[DHCP provided DNS-server] --- UP
+      UP -- "generates" --> RECONF["/etc/resolv.conf"]
+      classDef command fill:#9996,stroke-width:0px
+      class UP command
+    ```
+
+??? note "Advanced options: ignoring DHCP provided DNS-servers, local domain name search"
+
+    * If you wish to prevent the Raspberry Pi from including the address(es) of DNS servers learned from DHCP, you can instruct the DHCP client running on the Raspberry Pi to ignore the information coming from the DHCP server:
+
+        ```console
+        $ echo 'nooption domain_name_servers' | sudo tee -a /etc/dhcpcd.conf
+        $ sudo service dhcpcd reload
+        $ sudo resolvconf -u
+        ```
+
+    * If you have followed the steps in [Adding local domain names](#localNames) to define names for your local hosts, you can inform the Raspberry Pi of that fact like this:
+
+        ```console
+        $ echo 'search_domains=home.arpa' | sudo tee -a /etc/resolvconf.conf
+        $ sudo resolvconf -u
+        ```
+
+        That will add the following line to `/etc/resolv.conf`:
+
+        ```
+        search home.arpa
+        ```
+
+        Then, when you refer to a host by a short name (eg "fred") the Raspberry Pi will also consider "fred.home.arpa" when trying to discover the IP address.
+
+??? note "Interaction with other containers"
+
+    Docker provides a special IP 127.0.0.11, which listens to DNS queries and
+    resolves them according to the host RPi's resolv.conf. Containers usually
+    rely on this to perform DNS lookups. This is nice as it won't present any
+    surprises as DNS lookups on both the host and in the containers will yeild
+    the same results.
+
+    It's possible to make DNS queries directly cross-container, and even
+    supported in some [rare use-cases](WireGuard.md#customContInit).
+
+## Configure Pi-hole as your local DNS resolver
+
+To use the Pi-hole in your LAN, you need to assign the RPi a fixed IP-address and configure this IP as your DNS server.
+
+### 1. Assign the RPi a fixed IP address { #rpiFixedIP }
 
 If you want clients on your network to use Pi-hole for their DNS, the Raspberry Pi running Pi-hole **must** have a fixed IP address. It does not have to be a *static* IP address (in the sense of being hard-coded into the Raspberry Pi). The Raspberry Pi can still obtain its IP address from DHCP at boot time, providing your DHCP server (usually your home router) always returns the same IP address. This is usually referred to as a *static binding* and associates the Raspberry Pi's MAC address with a fixed IP address.
 
@@ -221,43 +309,36 @@ In the above:
 
 If a physical interface does not exist, the command returns "Device does not exist" for that interface. If you prefer, you can also substitute the `ifconfig` command for `ip link show`. It's just a little more wordy.
 
-### Decide how the Raspberry Pi obtains its own DNS { #rpiDNS }
 
-The Raspberry Pi itself does **not** have to use the Pi-hole container for its own DNS services. Some chicken-and-egg situations can exist if, for example, the Pi-hole container is down when another process (eg `apt` or `docker-compose`) needs to do something that depends on DNS services being available.
+### 2. Configuring other machines to use the Raspberry Pi running Pi-hole { #rpiConfig }
 
-Nevertheless, if you configure Pi-hole to be [authoritative for local domain names](#localNames) (eg `raspberrypi.home.arpa`) then you will probably want to configure your Raspberry Pi to use the Pi-hole container in the first instance, and then fall back to an alternative if the container is down. Here is an example of how to do that:
+In order for Pi-hole to block ads or resolve anything, clients need to be told to use it as their DNS server. You can either:
 
-```console
-$ echo "name_servers=127.0.0.1" | sudo tee -a /etc/resolvconf.conf
-$ echo "name_servers_append=8.8.8.8" | sudo tee -a /etc/resolvconf.conf
-$ echo "resolv_conf_local_only=NO" | sudo tee -a /etc/resolvconf.conf
-$ sudo resolvconf -u
-```
+1. Adopt a whole-of-network approach and edit the DNS settings in your DHCP server so that all clients are given the IP address of the Raspberry Pi running Pi-hole to use for DNS services when a lease is issued.
+2. Adopt a case-by-case (manual) approach where you instruct particular clients to obtain DNS services from the IP address of the Raspberry Pi running Pi-hole.
 
-In words:
+Option 1 (whole-of-network) is the simplest approach. Assuming your Raspberry Pi has the static IP `192.168.1.10`:
 
-1. `name_servers=127.0.0.1` instructs the Raspberry Pi to direct DNS queries to the loopback address. Port 53 is implied. If the Pi-hole container is running in:
+1. Go to your network's DHCP server. In most home networks, this will be your Wireless Access Point/WLAN Router:
 
-	- non-host mode, Docker is listening to port 53 and forwards the queries to the Pi-hole container;
-	- host mode, the Pi-hole container is listening to port 53.
+	* Login into its web-interface
+	* Find where DNS servers are defined (generally with DHCP controls)
+	* Change all DNS fields to `192.168.1.10`
 
-2. `name_servers_append=8.8.8.8` instructs the Raspberry Pi to fail-over to 8.8.8.8 if Pi-hole does not respond. You can replace `8.8.8.8` (a Google service) with:
+2. All local clients have to be rebooted. Without this they will continue to use the old DNS setting from an old DHCP lease for quite some time.
 
-	* Another well-known public DNS server like `1.1.1.1` (Cloudflare).
-	* The IP address(es) of your ISP's DNS hosts (generally available from your ISP's web site).
-	* The IP address of another DNS server running in your local network (eg BIND9).
-	* The IP address of your home router. Most home routers default to the ISP's DNS hosts but you can usually change your router's configuration to bypass your ISP in favour of public servers like 8.8.8.8 and 1.1.1.1.
+Option 2 (case-by-case) generally involves finding the IP configuration options for each host and setting the DNS server manually. Manual changes are usually effective immediately without needing a reboot.
 
-	You need slightly different syntax if you want to add multiple fallback servers. For example, suppose your fallback hosts are a local server (eg 192.168.1.2) running BIND9 and 8.8.8.8. The command would be:
+??? note "advanced configurations"
 
-	```console
-	$ echo 'name_servers_append="192.168.1.2 8.8.8.8"' | sudo tee -a /etc/resolvconf.conf
-	```
+    Setting up a combination of Pi-hole (for ad-blocking services), and/or a local upstream DNS resolver (eg BIND9) to be authoritative for a local domain and reverse-resolution for your local IP addresses, and decisions about where each DNS server forwards queries it can't answer (eg your ISP's DNS servers, or Google's 8.8.8.8, or Cloudflare's 1.1.1.1) is a complex topic and depends on your specific needs.
+    { #advancedConfig }
 
-3. `resolv_conf_local_only=NO` is needed so that 127.0.0.1 and 8.8.8.8 can coexist.
-4. The `resolvconf -u` command instructs Raspberry Pi OS to rebuild the active resolver configuration. In principle, that means parsing `/etc/resolvconf.conf` to derive `/etc/resolv.conf`. This command can sometimes return the error "Too few arguments". You should ignore that error.
+    The same applies to setting up a DHCP server (eg DHCPD) which is capable of distinguishing between the various clients on your network (ie by MAC address) to make case-by-case decisions as to where each client should obtain its DNS services. 
 
-#### Example configuration { #rpiDNSExample }
+    If you need help, try asking questions on the [IOTstack Discord channel](https://discord.gg/ZpKHnks).
+
+## Testing and Troubleshooting { #debugging }
 
 Make these assumptions:
 
@@ -290,64 +371,12 @@ Interpretation:
 
 The fact that the Raspberry Pi is effectively represented twice (once as 127.0.0.1, and again as 192.168.1.10) does not matter. If the Pi-hole container stops running, the Raspberry Pi will bypass 192.168.1.10 and fail over to 8.8.8.8, failing back to 127.0.0.1 when the Pi-hole container starts again.
 
-Notes:
 
-* If you wish to prevent the Raspberry Pi from including the address(es) of DNS servers learned from DHCP, you can instruct the DHCP client running on the Raspberry Pi to ignore the information coming from the DHCP server:
-
-	```console
-	$ echo 'nooption domain_name_servers' | sudo tee -a /etc/dhcpcd.conf
-	$ sudo service dhcpcd reload
-	$ sudo resolvconf -u 
-	```
-
-* If you have followed the steps in [Adding local domain names](#localNames) to define names for your local hosts, you can inform the Raspberry Pi of that fact like this:
-
-	```console
-	$ echo 'search_domains=home.arpa' | sudo tee -a /etc/resolvconf.conf
-	$ sudo resolvconf -u 
-	```
-
-	That will add the following line to `/etc/resolv.conf`:
-
-	```
-	search home.arpa
-	```
-
-	Then, when you refer to a host by a short name (eg "fred") the Raspberry Pi will also consider "fred.home.arpa" when trying to discover the IP address.
-
-## Using Pi-hole as your DNS resolver { #piholePrimary }
-
-In order for Pi-hole to block ads or resolve anything, clients need to be told to use it as their DNS server. You can either:
-
-1. Adopt a whole-of-network approach and edit the DNS settings in your DHCP server so that all clients are given the IP address of the Raspberry Pi running Pi-hole to use for DNS services when a lease is issued.
-2. Adopt a case-by-case (manual) approach where you instruct particular clients to obtain DNS services from the IP address of the Raspberry Pi running Pi-hole.
-
-Option 1 (whole-of-network) is the simplest approach. Assuming your Raspberry Pi has the static IP `192.168.1.10`:
-
-1. Go to your network's DHCP server. In most home networks, this will be your Wireless Access Point/WLAN Router:
-
-	* Login into its web-interface
-	* Find where DNS servers are defined (generally with DHCP controls)
-	* Change all DNS fields to `192.168.1.10`
-
-2. All local clients have to be rebooted. Without this they will continue to use the old DNS setting from an old DHCP lease for quite some time.
-
-Option 2 (case-by-case) generally involves finding the IP configuration options for each host and setting the DNS server manually. Manual changes are usually effective immediately without needing a reboot.
-
-### advanced configurations { #advancedConfig }
-
-Setting up a combination of Pi-hole (for ad-blocking services), and/or a local upstream DNS resolver (eg BIND9) to be authoritative for a local domain and reverse-resolution for your local IP addresses, and decisions about where each DNS server forwards queries it can't answer (eg your ISP's DNS servers, or Google's 8.8.8.8, or Cloudflare's 1.1.1.1) is a complex topic and depends on your specific needs.
-
-The same applies to setting up a DHCP server (eg DHCPD) which is capable of distinguishing between the various clients on your network (ie by MAC address) to make case-by-case decisions as to where each client should obtain its DNS services. 
-
-If you need help, try asking questions on the [IOTstack Discord channel](https://discord.gg/ZpKHnks).
-
-## Testing and Troubleshooting { #debugging }
 
 Install dig:
 
 ```console
-$ apt install dnsutils
+$ sudo apt install dnsutils
 ```
 
 Test that Pi-hole is correctly configured (should respond 192.168.1.10):
@@ -356,9 +385,9 @@ Test that Pi-hole is correctly configured (should respond 192.168.1.10):
 $ dig raspberrypi.home.arpa @192.168.1.10
 ```
 
-To test on your desktop if your network configuration is correct, and an ESP
-will resolve its DNS queries correctly, restart your desktop machine to ensure
-DNS changes are updated and then use:
+To test on another machine if your network's DNS configuration is correct, and
+an ESP will resolve its DNS queries correctly, restart the other machine to
+ensure DNS changes are updated and then use:
 
 ```console
 $ dig raspberrypi.home.arpa
@@ -368,7 +397,8 @@ This should produce the same result as the previous command.
 
 If this fails to resolve the IP, check that the server in the response is
 `192.168.1.10`. If it's `127.0.0.xx` check `/etc/resolv.conf` begins with
-`nameserver 192.168.1.10`.
+`nameserver 192.168.1.10`. If not, check the machine is configured to use DHCP
+and revisit [Pi-hole as DNS](#rpiConfig).
 
 ## Microcontrollers { #iotConfig }
 
