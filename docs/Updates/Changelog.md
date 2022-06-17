@@ -1,11 +1,22 @@
 ## Latest
-<!-- what's in open pull requests that will be merged at an unknown date -->
+(may include items not yet merged)
+<!-- List what's in open pull requests to be merged at an unknown date -->
 
+- Fixes to [bash aliases](../Basic_setup/Docker.md#aliases).
+- Timescaledb template fixed and public port now mapped to 5433.
+<!-- PR-560 still a draft
+- Documentation development made easier: [Writing documentation](
+  ../Developers/index.md#writing-documentation) -->
+
+## 2022-06-12
+
+- Dockerfile based Zigbee2MQTT **deprecated**, requiring [migration](
+  ../Containers/Zigbee2MQTT.md#update202204).
 - New service: [Duckdns](../Containers/Duckdns.md), deprecates the
   `duck/duck.sh` script.
-- Fixes to [bash aliases](../Basic_setup/Docker.md#aliases)
-- Documentation development made easier: [Writing documentation](
-  ../Developers/index.md#writing-documentation)
+- New service: [Influxdb 2](../Containers/InfluxDB2.md), supported only on
+  fully 64bit systems.
+- Docker health checks added to Grafana and InfluxDB.
 
 ## 2022-04-26
 
