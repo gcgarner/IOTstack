@@ -177,8 +177,8 @@ your RPi hostname is raspberrypi)
 	sudo chmod u+x volumes/swag/config/custom-cont-init.d/add-host.docker.internal.sh
 	```
 
-   (This needs to be copy-pasted/entered as-is, ignore any "> "-prefixes printed
-   by bash)
+    (This needs to be copy-pasted/entered as-is, ignore any "> "-prefixes printed
+    by bash)
 
 8. (optional) Add reverse proxy password protection if you don't want to rely
    on the HA login for security, doesn't affect API-access:
@@ -195,14 +195,14 @@ your RPi hostname is raspberrypi)
    file is at `volumes/home_assistant/configuration.yaml` For a default install
    the resulting http-section should be:
 
-   ```yaml
-   http:
-      use_x_forwarded_for: true
-      trusted_proxies:
-        - 192.168.0.0/16
-        - 172.16.0.0/12
-        - 10.77.0.0/16
-   ```
+    ```yaml
+    http:
+       use_x_forwarded_for: true
+       trusted_proxies:
+         - 192.168.0.0/16
+         - 172.16.0.0/12
+         - 10.77.0.0/16
+    ```
 
 10. Refresh the stack: `cd ~/IOTstack && docker-compose stop && docker-compose
     up -d` (again may take 1-3 minutes for swag to start if it recreates
