@@ -1,14 +1,36 @@
 # PostgreSQL
 ## References
-- [Docker](https://hub.docker.com/_/postgres)
-- [Website](https://www.postgresql.org/)
+- [Docker image](https://hub.docker.com/_/postgres)
+- [Postgre SQL Homepage](https://www.postgresql.org/)
+- [Postgre SQL docs](https://www.postgresql.org/docs/current/index.html)
+
 ## About
-PostgreSQL is an SQL server, for those that need an SQL database. The database credentials can be found in the file `./volumes/postgres/postgres.env`. It is highly recommended to change the user, password and default database
 
-If you left the docker-compose.yml file with the default values, you can interact with the postgress in the container with the follwoing command, replacing `<<raspberypi ip>>` with the ip address to your RasperyPi.  
-`docker exec -it postgres psql -h <<raspberypi ip>> -d postdb -U postuser`
+PostgreSQL is an SQL server, for those that need an SQL database.
 
-Once you have logged in you should change the default password to postuser replacing `<<password>>` with your new password.
-`ALTER USER postuser WITH PASSWORD '<<password>>';`
+The database is available on port `5432`
 
-You can find more information about working with postgres at https://www.postgresql.org/docs/8.0/.  
+## Configuration
+
+Optional variables to define in `~/IOTstack/.env`:
+
+* `IOTSTACK_postgres_PASSWORD` database password, defaults to
+  *IOtSt4ckpostgresDbPw*.
+* `IOTSTACK_postgres_user` database user, defaults to *postuser*.
+
+It is highly recommended to change the password. (For old-menu the database
+credentials can be found in the file `./volumes/postgres/postgres.env`.)
+
+## Management
+
+You can interact with the postgress in the container with the command:
+``` console
+$ docker exec -it postgres psql -d postdb -U postuser
+```
+
+Once you have logged in you can reset the password for postuser replacing
+`<<password>>` with your new password:
+``` sql
+ALTER USER postuser WITH PASSWORD '<<password>>';
+```
+
