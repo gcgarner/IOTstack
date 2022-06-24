@@ -4,6 +4,9 @@ IOTstack is a builder for docker-compose to easily make and maintain IoT stacks 
 
 ## introduction to IOTstack - videos
 
+These are from 2019 and 2020. Though IOTstack has changed quite a bit, they are
+still a great overview
+
 Andreas Spiess Video #295: Raspberry Pi Server based on Docker, with VPN, Dropbox backup, Influx, Grafana, etc: IOTstack
 
 [![#295 Raspberry Pi Server based on Docker, with VPN, Dropbox backup, Influx, Grafana, etc: IOTstack](http://img.youtube.com/vi/a6mjt8tWUws/0.jpg)](https://www.youtube.com/watch?v=a6mjt8tWUws)
