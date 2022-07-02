@@ -103,7 +103,8 @@ function user_in_group()
 function install_python3_and_deps() {
 	CURR_PYTHON_VER="${1:-Unknown}"
 	CURR_VIRTUALENV="${2:-Unknown}"
-  if [ "$NOASKCONFIRM" == "true" ]; then
+  if ([ "$NOASKCONFIRM" == "true" ] ||
+      whiptail --title "Python 3 and virtualenv" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER) and virtualenv (Installed = $CURR_VIRTUALENV) are required for the main menu. Install these now?" 20 78); then
     echo "Installing Python3 and virtualenv"
     sudo apt install -y python3-dev python3-virtualenv
     if [ $? -eq 0 ]; then
@@ -111,16 +112,6 @@ function install_python3_and_deps() {
     else
       echo "Failed to install Python and virtualenv" >&2
       exit 1
-    fi
-  else
-    if (whiptail --title "Python 3 and virtualenv" --yesno "Python 3.6.9 or later (Current = $CURR_PYTHON_VER) and virtualenv (Installed = $CURR_VIRTUALENV) are required for the main menu. Install these now?" 20 78); then
-      sudo apt install -y python3-dev python3-virtualenv
-      if [ $? -eq 0 ]; then
-        PYTHON_VERSION_GOOD="true"
-      else
-        echo "Failed to install Python and virtualenv" >&2
-        exit 1
-      fi
     fi
   fi
 }
