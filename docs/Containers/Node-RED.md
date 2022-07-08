@@ -41,18 +41,8 @@ The source code for Node-RED lives at [GitHub node-red/node-red-docker](https://
 
 ### Node-RED images ([DockerHub](https://hub.docker.com)) { #dockerHubImages }
 
-Periodically, the source code is recompiled and pushed to [nodered/node-red](https://hub.docker.com/r/nodered/node-red/tags?page=1&ordering=last_updated) on *DockerHub*. There's a lot of stuff at that page but it boils down to variations on two basic themes:
+Periodically, the source code is recompiled and pushed to [nodered/node-red](https://hub.docker.com/r/nodered/node-red/tags?page=1&ordering=last_updated) on *DockerHub*. See [Node-RED and `node.js` versions](#containerVersions) for an explanation of the versioning tags associated with images on *DockerHub*.
 
-* images with a suffix like `-10`, `-12` or `-14`; and
-* images without a numeric suffix.
-
-The suffixes refer to the version of "Node.js" installed when the image was built. In the case of images without a numeric suffix:
-
-* If the version of Node-RED is 1.3.x then a suffix of `-10` is implied. In other words, Node.js defaults to version 10.
-* If the version of Node-RED is 2.x.x then a suffix of `-14` is implied. In other words, Node.js defaults to version 14.
-
-As you will see a bit further down, the current default for IOTstack is an image tag of `latest-12` which means Node-RED 2.x.x with Node.js version 12. 
- 
 ### IOTstack menu { #iotstackMenu }
 
 When you select Node-RED in the IOTstack menu, the *template service definition* is copied into the *Compose* file.
@@ -64,7 +54,7 @@ You choose add-on nodes from a supplementary menu. We recommend accepting the de
 Key points: 
 
 * Under new menu, you must press the right arrow to access the supplementary menu. Under old menu, the list of add-on nodes is displayed automatically. 
-* Do not be concerned if you can't find an add-on node you need in the list. You can also add nodes via Manage Palette once Node-RED is running. See [adding extra nodes](#addNodes).
+* Do not be concerned if you can't find an add-on node you need in the list. You can also add nodes via Manage Palette once Node-RED is running. See [node management](#nodeManagement).
 
 Choosing add-on nodes in the menu causes the *Dockerfile* to be created.
 
@@ -77,36 +67,37 @@ $ cd ~/IOTstack
 $ docker-compose up -d
 ```
 
-`docker-compose` reads the *Compose* file. When it arrives at the `nodered` fragment, it finds:
+`docker-compose` reads the *Compose* file. When it arrives at the `nodered` service definition, it finds:
 
-``` yaml
+``` yaml linenums="1"
   nodered:
     container_name: nodered
-    build: ./services/nodered/.
-    …
+    build:
+      context: ./services/nodered/.
+      args:
+      - DOCKERHUB_TAG=latest
+      - EXTRA_PACKAGES=
 ```
 
-The `build` statement tells `docker-compose` to look for:
+Note:
+
+* Prior to July 2022, IOTstack used the following one-line syntax for the `build` directive:
+
+	``` yaml linenums="3"
+	    build: ./services/nodered/.
+	```
+
+	The older syntax meant all local customisations (version-pinning and adding extra packages) needed manual edits to the *Dockerfile*. Those edits would be overwritten each time the menu was re-run to alter the selected add-on nodes. The newer multi-line syntax avoids that problem.
+	
+	See also [updating to July 2022 syntax](#july2022syntax).
+
+In either case, the path `./services/nodered/.` tells `docker-compose` to look for:
 
 ```
 ~/IOTstack/services/nodered/Dockerfile
 ```
 
-The *Dockerfile* begins with:
-
-``` Dockerfile
-FROM nodered/node-red:latest-12
-```
-
-Note:
-
-* IOTstack switched to the `-12` suffix in March 2021. Existing IOTstack installations will not update unless you re-create the service from its template, or hand-edit the *Dockerfile*.
-
-The `FROM` statement tells the build process to pull down the latest ***base image*** from [*DockerHub*](https://hub.docker.com).
-
-> It is a ***base*** image in the sense that it never actually runs as a container on your Raspberry Pi.
-
-The remaining instructions in the *Dockerfile* customise the *base image* to produce a ***local image***. The *local image* is instantiated to become your running container.
+which contains instructions to download a *base* image from [*DockerHub*](https://hub.docker.com) and then apply local customisations such as the add-on nodes you chose in the IOTstack menu. The result is a *local* image which is instantiated to become your running container.
 
 Notes:
 
@@ -133,7 +124,7 @@ You *may* see the same pattern in Portainer, which reports the *base image* as "
 
 You should not remove the *base* image, even though it appears to be unused.
 
-> Whether you see one or two rows depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
+> Whether you see one or two rows depends on the version of Docker you are using and how your version of `docker-compose` builds local images.
 
 ## Securing Node-RED { #securingNodeRed }
 
@@ -242,7 +233,7 @@ Similarly, if a flow writes to an InfluxDB database maintained by the influxdb c
 influxdb:8086
 ```
 
-Behind the scenes, Docker maintains a table similar to an `/etc/hosts` file mapping container names to the IP addresses on the internal bridged network that are assigned, dynamically, by Docker when it spins up each container.
+Behind the scenes, Docker maintains a table, similar to an `/etc/hosts` file, mapping container names to the IP addresses on the internal bridged network that are assigned, dynamically, by Docker, when it spins up each container.
 
 ### When Node-RED is in host mode { #hostmode }
 
@@ -265,7 +256,7 @@ To communicate with your Raspberry Pi's GPIO you need to do the following:
 	$ sudo apt install pigpio python-pigpio python3-pigpio
 	```
 
-2. Install the `node-red-node-pi-gpiod` node. See [Adding extra nodes](#addNodes). It allows you to connect to multiple Pis from the same Node-RED service.
+2. Install the `node-red-node-pi-gpiod` node. See [node management](#nodeManagement). It allows you to connect to multiple Pis from the same Node-RED service.
 3. Make sure that the `pigpdiod` daemon is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod). In essence, you need to:
 
 	- Use `sudo` to edit `/etc/rc.local`;
@@ -333,7 +324,7 @@ In words:
 2. Use the `echo` command to create a small file which embeds the current timestamp. The path is in the `/data` directory which is mapped to the Raspberry Pi's file system.
 3. Show that the file has been created inside the container.
 4. Exit the shell:
-	* You can either type the `exit` command and press return, or press Control+D.
+	* You can either type the `exit` command and press <kbd>return</kbd>, or press <kbd>Control</kbd>+<kbd>D</kbd>.
 	* Exiting the shell drops you out of the container so the "$" prompt returns, indicating that you are **outside** the Node-Red container, running as a non-root user ("pi").
 5. Show that the same file can be seen from **outside** the container.
 6. Tidy-up by removing the file. You need `sudo` to do that because the persistent storage area at the **external** path is owned by root, and you are running as user "pi".
@@ -384,13 +375,13 @@ To help you understand the difference, consider this command:
 $ grep "^PRETTY_NAME=" /etc/os-release
 ```
 
-When you run that command on a Raspberry Pi **outside** container-space, the answer is:
+When you run that command on a Raspberry Pi **outside** container-space, the answer will be something like:
 
 ```
-PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
+PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
 ```
 
-If you run the same command **inside** a Node-RED container, the output will be:
+If you run the same command **inside** a Node-RED container, the output will reflect the operating system upon which the container is based, such as:
 
 ```
 PRETTY_NAME="Alpine Linux v3.11"
@@ -461,7 +452,7 @@ You have several options:
 	* Run the `bash` shell inside the Node-RED container. You need to be able to interact with the shell to type commands so the `-it` flag is required.
 	* The "#" prompt is coming from `bash` running inside the container. It also signals that you are running as the root user inside the container.
 	* You run the `grep`, `whoami` and any other commands.
-	* You finish with the `exit` command (or Control+D).
+	* You finish with the `exit` command (or <kbd>Control</kbd>+<kbd>D</kbd>).
 	* The "$" prompt means you have left the container and are back at the normal Raspberry Pi command line.
 
 3. Run the command from Portainer by selecting the container, then clicking the ">_ console" link. This is identical to opening a shell.
@@ -470,50 +461,50 @@ You have several options:
 
 You will need to have a few concepts clear in your mind before you can set up SSH successfully. I use double-angle quote marks (guillemets) to mean "substitute the appropriate value here".  
 
-#### «HOSTNAME» (required) { #sshHostname }
+* «HOSTNAME» (required)
 
-The name of your Raspberry Pi. When you first booted your RPi, it had the name "raspberrypi" but you probably changed it using `raspi-config`. Example:
-
-```
-iot-dev
-```
-
-#### «HOSTADDR» (required) { #sshHostAddr }
-
-Either or both of the following:
-
-* «HOSTFQDN» (optional)
-
-	If you have a local Domain Name System server, you may have defined a fully-qualified domain name (FQDN) for your Raspberry Pi. Example:
-
-	```
-	iot-dev.mydomain.com
-	```
-
-	Note:
+	The name of your Raspberry Pi. When you first booted your RPi, it had the name "raspberrypi" but you probably changed it using `raspi-config`. Example:
 	
-	* Docker's internal networks do not support multicast traffic. You can't use a multicast DNS name (eg "raspberrypi.local") as a substitute for a fully-qualified domain name.
-
-* «HOSTIP» (required)
-
-	Even if you don't have a fully-qualified domain name, you will still have an IP address for your Raspberry Pi. Example:
-
 	```
-	192.168.132.9
+	iot-dev
 	```
 
-	Keep in mind that a Raspberry Pi running IOTstack is operating as a *server*. A dynamic DHCP address is not appropriate for a server. The server's IP address needs to be fixed. The two standard approaches are:
+* «HOSTADDR» (required)
 
-	* a static DHCP assignment configured on your DHCP server (eg your router) which always returns the same IP address for a given MAC address; or
-	* a static IP address configured on your Raspberry Pi.
+	Either or both of the following:
+	
+	* «HOSTFQDN» (optional)
+	
+		If you have a local Domain Name System server, you may have defined a fully-qualified domain name (FQDN) for your Raspberry Pi. Example:
+	
+		```
+		iot-dev.mydomain.com
+		```
+	
+		Note:
+		
+		* Docker's internal networks do not support multicast traffic. You can't use a multicast DNS name (eg "raspberrypi.local") as a substitute for a fully-qualified domain name.
+	
+	* «HOSTIP» (required)
+	
+		Even if you don't have a fully-qualified domain name, you will still have an IP address for your Raspberry Pi. Example:
+	
+		```
+		192.168.132.9
+		```
+	
+		Keep in mind that a Raspberry Pi running IOTstack is operating as a *server*. A dynamic DHCP address is not appropriate for a server. The server's IP address needs to be fixed. The two standard approaches are:
+	
+		* a static DHCP assignment configured on your DHCP server (eg your router) which always returns the same IP address for a given MAC address; or
+		* a static IP address configured on your Raspberry Pi.
 
-#### «USERID» (required) { #sshUserID }
+* «USERID» (required)
 
-The user ID of the account on «HOSTNAME» where you want Node-RED flows to be able to run commands. Example:
-
-```
-pi
-```
+	The user ID of the account on «HOSTNAME» where you want Node-RED flows to be able to run commands. Example:
+	
+	```
+	pi
+	```
 
 ### Step 1: *Generate SSH key-pair for Node-RED* (one time) { #sshStep1 }
 
@@ -526,10 +517,10 @@ $ docker exec -it nodered ssh-keygen -q -t ed25519 -C "Node-RED container key-pa
 Notes:
 
 * The "ed25519" elliptic curve algorithm is recommended (generally described as quicker and more secure than RSA) but you can use the default RSA algorithm if you prefer.
-* Respond to the "Enter file in which to save the key" prompt by pressing return to accept the default location.
+* Respond to the "Enter file in which to save the key" prompt by pressing <kbd>return</kbd> to accept the default location.
 * If `ssh-keygen` displays an "Overwrite (y/n)?" message, it implies that a key-pair already exists. You will need to decide what to do:
-	* press "y" to overwrite (and lose the old keys)
-	* press "n" to terminate the command, after which you can investigate why a key-pair already exists.
+	* press <kbd>y</kbd> to overwrite (and lose the old keys)
+	* press <kbd>n</kbd> to terminate the command, after which you can investigate why a key-pair already exists.
 
 ### Step 2: *Exchange keys with target hosts* (once per target host) { #sshStep2 }
 
@@ -555,7 +546,7 @@ ED25519 key fingerprint is SHA256:HVoeowZ1WTSG0qggNsnGwDA6acCd/JfVLZsNUv4hjNg.
 Are you sure you want to continue connecting (yes/no/[fingerprint])? 
 ```
 
-Respond to the prompt by typing "yes" and press return.
+Respond to the prompt by typing "yes" and pressing <kbd>return</kbd>.
 
 The output continues:
 
@@ -568,7 +559,7 @@ pi@iot-dev.mydomain.com's password:
 ```
 The response may look like it contains errors but those can be ignored. 
 
-Enter the password you use to login as «USERID» on «HOSTADDR» and press return.
+Enter the password you use to login as «USERID» on «HOSTADDR» and press <kbd>return</kbd>.
 
 Normal completion looks similar to this:
 
@@ -800,7 +791,7 @@ In the Node-RED GUI:
 
 	```
 	PRETTY_NAME="Alpine Linux v3.11"
-	PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
+	PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
 	```
 	
 	The first line is the result of running the command inside the Node-RED container. The second line is the result of running the same command outside the Node-RED container on the Raspberry Pi.
@@ -821,24 +812,69 @@ In the Node-RED GUI:
 	
 	to define the new host. Remember to use `sudo` to edit the file. There is no need to restart Node-RED or recreate the container.
 
-## Upgrading Node-RED { #upgradeNodeRed }
+## Maintaining Node-RED { #maintainNodeRed }
 
-You can update most containers like this:
+### Starting Node-RED { #startNodeRed }
+
+Use these commands to:
+
+1. Start the container; or
+2. Re-create the container if you have made a material change to the container's service definition in your *Compose* file.
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose pull
-$ docker-compose up -d
+$ docker-compose up -d nodered
+```
+
+The first time you execute this command, the *base* image of Node-RED is downloaded from DockerHub, and then the *Dockerfile* is run to produce a *local* image. The *local* image is then instantiated to become the running container.
+
+
+### Stopping Node-RED { #stopNodeRed }
+
+To stop the running container:
+
+``` console
+$ cd ~/IOTstack
+$ docker-compose rm --force --stop -v nodered
+```
+
+Alternatively, you can stop the entire stack:
+
+``` console
+$ cd ~/IOTstack
+$ docker-compose down
+```
+
+### Restarting Node-RED { #restartNodeRed }
+
+The `restart` command sends a signal to the processes running within the container. The container itself does not stop.
+
+``` console
+$ cd ~/IOTstack
+$ docker-compose restart nodered
+```
+
+### Re-building the local image { #rebuildNodeRed }
+
+You need to rebuild the *local* image if you do any of the following:
+
+1. Change either of the build arguments (`DOCKERHUB_TAG` or `EXTRA_PACKAGES`) in your *Compose* file.
+2. Make a material change to your Node-RED *Dockerfile*, such as re-running the menu to change your selection of add-on nodes.
+
+To rebuild your *local* image:
+
+``` console
+$ cd ~/IOTstack
+$ docker-compose up --build -d nodered
 $ docker system prune
 ```
 
-In words:
+Think of these commands as "re-running the *Dockerfile*". The only time a *base* image will be downloaded from *DockerHub is when a *base* image with a tag matching the value of `DOCKERHUB_TAG` can't be found on your Raspberry Pi.
 
-* `docker-compose pull` downloads any newer images;
-* `docker-compose up -d` causes any newly-downloaded images to be instantiated as containers (replacing the old containers); and
-* the `prune` gets rid of the outdated images.
+Your existing Node-RED container continues to run while the rebuild proceeds. Once the freshly-built *local* image is ready, the `up` tells `docker-compose` to do a new-for-old swap. There is barely any downtime for your Node-RED service.
 
-This strategy doesn't work for Node-RED. The *local image* (`iotstack_nodered`) does not exist on [*DockerHub*](https://hub.docker.com) so there is no way for the `pull` to sense when a newer version becomes available.
+
+### Upgrading Node-RED { #upgradeNodeRed }
 
 The only way to know when an update to Node-RED is available is to check the [nodered/node-red tags page](https://hub.docker.com/r/nodered/node-red/tags?page=1&ordering=last_updated) on *DockerHub*.
 
@@ -858,84 +894,117 @@ Breaking it down into parts:
 * `--pull` tells the Dockerfile process to actually check with [*DockerHub*](https://hub.docker.com) to see if there is a later version of the *base image* and, if so, to download it before starting the build;
 * `nodered` is the named container argument required by the `build` command.
 
-Your existing Node-RED container continues to run while the rebuild proceeds. Once the freshly-built *local image* is ready, the `up` tells `docker-compose` to do a new-for-old swap. There is barely any downtime for your Node-RED service.
+Your existing Node-RED container continues to run while the rebuild proceeds. Once the freshly-built *local* image is ready, the `up` tells `docker-compose` to do a new-for-old swap. There is barely any downtime for your Node-RED service.
 
-The `prune` is the simplest way of cleaning up old images. Sometimes you need to run this twice, the first time to clean up the old local image, the second time for the old base image. Whether an old base image exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
+The `prune` is the simplest way of cleaning up old images. Sometimes you need to run this twice, the first time to clean up the old *local* image, the second time for the old *base* image. Whether an old *base* image exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
 
 
-## Customising Node-RED { #customiseNodeRed }
+## Node-RED and `node.js` versions { #containerVersions }
 
-You customise your *local* image of Node-RED by making changes to:
+### Checking versions { #checkingVersions }
 
-```
-~/IOTstack/services/nodered/Dockerfile
-```
-
-##### Apply Dockerfile changes { #applyDockerfileChange }
+You can use the `npm version` command to check which versions of Node-RED and `node.js` are running in your container:
 
 ``` console
-$ cd ~/IOTstack
-$ docker-compose up --build -d nodered
-$ docker system prune
+$ docker exec nodered npm version
+{
+  'node-red-docker': '2.2.2',
+  npm: '6.14.15',
+  ares: '1.18.1',
+  brotli: '1.0.9',
+  cldr: '37.0',
+  http_parser: '2.9.4',
+  icu: '67.1',
+  llhttp: '2.1.4',
+  modules: '72',
+  napi: '8',
+  nghttp2: '1.41.0',
+  node: '12.22.8',
+  openssl: '1.1.1m',
+  tz: '2019c',
+  unicode: '13.0',
+  uv: '1.40.0',
+  v8: '7.8.279.23-node.56',
+  zlib: '1.2.11'
+}
 ```
 
-The `--build` option on the `up` command (as distinct from a `docker-compose build` command) works in this situation because you've made a substantive change to your *Dockerfile*.
+In the above:
 
-### Node.js version { #nodeJSversion }
+* `'node-red-docker': '2.2.2'` indicates that version 2.2.2 of Node-RED is running. This is the version number you see at the bottom of the main menu when you click on the "hamburger" icon ("≡") at the top, right of the *Node-Red* window in your browser.
+* `node: '12.22.8'` indicates that version 12.x of `node.js` is installed.
 
-Out of the box, IOTstack starts the Node-RED *Dockerfile* with:
+### Controlling versions { #versionControl }
 
-``` Dockerfile
-FROM nodered/node-red:latest-12
+IOTstack uses a service definition for Node-RED that includes these lines:
+
+``` yaml linenums="3"
+    build:
+      context: ./services/nodered/.
+      args:
+      - DOCKERHUB_TAG=latest
 ```
 
-The `-12` suffix means "`node.js` is pinned at version 12.x.x". That's the latest version of `node.js` that Node-RED currently supports.
+> If you do not see this structure in your *Compose* file, refer to [updating to July 2022 syntax](#july2022syntax).
 
-If you want to check which version of `node.js` is installed on your system, you can do it like this:
+The value of the `DOCKERHUB_TAG` gives you the ability to control, from your *Compose* file, which versions of Node-RED and `node.js` run within your Node-RED container.
 
-``` console
-$ docker exec nodered node --version
-```
+The allowable values of `DOCKERHUB_TAG` can be found on the [*DockerHub* Node-RED tags page](https://hub.docker.com/r/nodered/node-red/tags). The table below contains examples of tags that were available on *DockerHub* at the time of writing (2022-07-06):
 
-In the unlikely event that you need to run an add-on node that needs version 10 of `node.js`, you can pin to version 10.x.x by changing the first line of your *Dockerfile* like this:
+tag       | Node-RED version | `node.js` version
+----------|------------------|------------------
+latest    | 2.2.2            | 14.x
+latest-14 | 2.2.2            | 14.x 📌
+2.2.2     | 2.2.2 📌         | 14.x
+2.2.2-14  | 2.2.2 📌         | 14.x 📌
 
-``` Dockerfile
-FROM nodered/node-red:latest-10
-```
+Interpreting the tag:
 
-Once you have made that change, follow the steps at [apply *Dockerfile* changes](#applyDockerfileChange).
+1. The sub-string to the left of the hyphen determines the version of Node-RED:
 
-### Adding extra packages { #addPackage }
+	- "latest" means the most up-to-date version, implying that the actual version number can change any time you follow the process to [upgrade Node-RED](#upgradeNodeRed).
+	- "2.2.2" pins your container to that specific version of Node-RED, implying that the version number will be frozen until you change the pin.
 
-As well as providing the Node-RED service, the nodered container is an excellent testbed. Installing the DNS tools, Mosquitto clients and tcpdump will help you to figure out what is going on **inside** container-space.
+2. The sub-string to the right of the hyphen determines the version of `node.js`:
 
-There are two ways to add extra packages. The first method is to add them to the running container. For example, to add the Mosquitto clients:
+	- "-14" refers to `node.js` version 14.x and pins your container to that specific version of `node.js`.
+	- If the hyphen and suffix are omitted, it implies that the actual version of `node.js` can change any time you follow the process to [upgrade Node-RED](#upgradeNodeRed).
 
-``` console
-$ docker exec nodered apk add --no-cache mosquitto-clients
-```
+In short:
 
-> The "apk" implies that the Node-RED container is based on Alpine Linux. Keep that in mind when you search for instructions on installing packages.
+* If you pin both sides to specific values (eg "2.2.2-14") then all decisions about when to upgrade and which versions to use are under **your** control; but
+* If you use "latest" then all timing and version decisions are under the control of the maintainers of the *DockerHub* images.
 
-Packages installed this way will persist until the container is re-created (eg a `down` and `up` of the stack, or a reboot of your Raspberry Pi). This is a good choice if you only want to run a quick experiment.
+IOTstack defaults to "latest". Although this appears to cede control to the maintainers of the *DockerHub* images, in practice it is no different to any other container where you pull its image directly from *DockerHub* using the `latest` tag (irrespective of whether `latest` is explicit or implied by omission).
 
-The second method changes the *Dockerfile* to add the packages permanently to your build. You just append the packages to the end of the existing `apk add`:
+The `DOCKERHUB_TAG` argument for Node-RED merely gives you the ability to pin to specific versions of Node-RED from within your *Compose* file, in the same way as you can use tags on `image` directives for other containers.
 
-``` Dockerfile
-RUN apk update && apk add --no-cache eudev-dev mosquitto-clients bind-tools tcpdump
-```
+For example, suppose you wanted to pin to Node-RED version 2.2.2 with `node.js` version 12:
 
-You can add as many extra packages as you like. They will persist until you change the *Dockerfile* again.
+1. Edit your *Compose* file so that the `DOCKERHUB_TAG` looks like this:
 
-Once you have made this change, follow the steps at [apply *Dockerfile* changes](#applyDockerfileChange).
+	``` yaml
+	- DOCKERHUB_TAG=2.2.2-12
+	``` 
 
-### Adding extra nodes { #addNodes }
+2. Run the [re-building the local Node-RED image](#rebuildNodeRed) commands.
+
+Changing a pinned version and rebuilding *may* result in a new *base* image being downloaded from *DockerHub*.
+
+## Node management { #nodeManagement }
+
+### Installing nodes { #addNodes }
 
 You can install nodes by:
 
-1. Adding nodes to the *Dockerfile* and then following the steps at [apply *Dockerfile* changes](#applyDockerfileChange).
+1. Adjusting the Node-RED *Dockerfile*. This can be done by:
 
-	This is also what will happen if you re-run the menu and change the selected nodes, except that the menu will also blow away any other customisations you may have made to your *Dockerfile*.
+	* Running the IOTstack menu and changing the selected Node-RED nodes; or
+	* Editing your Node-RED *Dockerfile* using a text editor.
+
+	Using the IOTstack menu limits your choice of nodes to those presented in the menu. Editing the *Dockerfile* with a text editor is more flexible but carries the risk that your changes could be lost if you subsequently use the menu method.
+
+	To apply changes made to your *Dockerfile*, run the [re-building the local Node-RED image](#rebuildNodeRed) commands.
 
 2. Adding, removing or updating nodes in Manage Palette. Node-RED will remind you to restart Node-RED and that is something you have to do by hand:
 
@@ -986,7 +1055,7 @@ You can install nodes by:
 		# npm install node-red-contrib-moment@4.0.0 /data
 		```
 
-There is no real difference between the methods. Some nodes (eg "node-red-contrib-generic-ble" and "node-red-node-sqlite" **must** be installed by *Dockerfile* but the only way of finding out if a node **must** be installed via *Dockerfile* is to try Manage Palette and find that it doesn't work.
+There is no real difference between the methods. Some nodes (eg "node-red-contrib-generic-ble" and "node-red-node-sqlite") **must** be installed by *Dockerfile* but the only way of finding out if a node **must** be installed via *Dockerfile* is to try Manage Palette and find that it doesn't work.
 
 Aside from the exception cases that require *Dockerfile* or where you need to force a specific version, it is quicker to install nodes via Manage Palette and applying updates is a bit easier too. But it's really up to you.
 
@@ -1106,4 +1175,160 @@ Notice how `node-red-node-email` appears in both lists. To fix this problem:
 	$ sudo rm -rf duplicates
 	```
 
-	Always be extremely careful with any `rm -rf`, particularly when it is coupled with a `sudo`. Double-check your work **before** you press return.
+	Always be extremely careful with any `rm -rf`, particularly when it is coupled with a `sudo`. Double-check your work **before** you press <kbd>return</kbd>.
+
+
+## Package management { #packageManagement }
+
+As well as providing the Node-RED service, the nodered container is an excellent testbed. Installing the DNS tools, Mosquitto clients and tcpdump will help you to figure out what is going on **inside** container-space.
+
+There are two ways to add extra packages. The first method is to add them to the running container. For example, to add the Mosquitto clients:
+
+``` console
+$ docker exec nodered apk add --no-cache mosquitto-clients
+```
+
+> The "apk" implies that the Node-RED container is based on Alpine Linux. Keep that in mind when you search for instructions on installing packages.
+
+Packages installed this way will persist until the container is re-created (eg a `down` and `up` of the stack, or a reboot of your Raspberry Pi). This is a good choice if you only want to run a quick experiment.
+
+The second method adds the packages to your *local* image every time you rebuild. Because the packages are in the *local* image, they are always in the running container. For example, to include the Mosquitto clients in every build:
+
+1. Edit your *Compose* file to include the package on the `EXTRA_PACKAGES` argument:
+
+	``` yaml
+	- EXTRA_PACKAGES=mosquitto-clients
+	```
+
+	> If you do not see the `EXTRA_PACKAGES` argument in your *Compose* file, refer to [updating to July 2022 syntax](#july2022syntax).
+
+2. Rebuild your *local* image by running the [re-building the local Node-RED image](#rebuildNodeRed) commands.
+
+You can specify multiple packages on the same line. For example:
+
+``` yaml
+- EXTRA_PACKAGES=mosquitto-clients bind-tools tcpdump
+```
+
+Notes:
+
+1. Use a space to separate package names.
+2. Do **not** encapsulate the list in quote marks.
+
+## Updating to July 2022 syntax { #july2022syntax }
+
+The primary benefit of the new syntax is that you no longer risk the IOTstack menu overwriting any custom changes you may have made to your Node-RED *Dockerfile*.
+
+If you install a clean copy of IOTstack, run the menu, enable Node-RED and select one or more add-on nodes then both your *Compose* file and *Dockerfile* will use the latest syntax automatically.
+
+If you have an older version of IOTstack installed, the syntax used in your *Compose* file and *Dockerfile* will depend on when you last ran the menu and manipulated Node-RED.
+
+To avoid any uncertainties, you can use a text editor to update your existing *Compose* file and *Dockerfile* to adopt the latest syntax.
+
+### Updating your *Compose* file  { #july2022compose }
+
+* Step 1: Implement the new syntactic scaffolding:
+
+	The first three lines of the old syntax are:
+
+	``` yaml linenums="1"
+	  nodered:
+	    container_name: nodered
+	    build: ./services/nodered/.
+	```
+	
+	Replace line 3 (the one-line `build:` directive) with the following lines:
+	
+	``` yaml linenums="3"
+	    build:
+	      context: ./services/nodered/.
+	      args:
+	      - DOCKERHUB_TAG=latest
+	      - EXTRA_PACKAGES=
+	```
+
+* Step 2: Pin to the desired version (optional):
+
+	If your existing *Dockerfile* pins to a specific version, edit the value of `DOCKERHUB_TAG` (line 6 of your updated *Compose* file) to use the tag from your *Dockerfile*. For example, if your existing *Dockerfile* begins with:
+
+	``` Dockerfile
+	FROM nodered/node-red:latest-12
+	```
+	
+	then line 6 of your *Compose* file should be:
+	 
+	
+	``` yaml linenums="6"
+	      - DOCKERHUB_TAG=latest-12
+	```
+	
+	Note:
+	
+	* IOTstack switched to `latest-12` in March 2021. The default for July 2022 syntax is `latest`. At the time of writing, that is the same as `latest-14`, which is what is recommended by Node-RED. If any of your flows has a dependence on `node.js` version 12 (or if you do not want to take the risk), use `latest-12`.
+
+* Step 3: Define extra packages (optional):
+
+	If your existing *Dockerfile* includes extra packages, edit the value of `EXTRA_PACKAGES` (line 7 of your updated *Compose* file) to list the same packages. For example, if your existing *Dockerfile* includes:
+
+	``` Dockerfile
+	RUN apk update && apk add --no-cache eudev-dev mosquitto-clients bind-tools tcpdump
+	```
+	
+	then everything *after* `eudev-dev` should appear on line 7 of your *Compose* file: 
+	
+	``` yaml linenums="6"
+	      - EXTRA_PACKAGES=mosquitto-clients bind-tools tcpdump
+	```
+
+	Notes:
+	
+	* use spaces between package names.
+	* do **not** enclose the list of packages in quotes.
+	* do **not** include `eudev-dev` (it is specified in the [updated *Dockerfile*](#july2022dockerfile)).
+
+### Updating your *Dockerfile*  { #july2022dockerfile }
+
+The first four lines of your existing *Dockerfile* will have a structure similar to this:
+
+``` Dockerfile linenums="1"
+FROM nodered/node-red:latest-12
+USER root
+RUN apk update && apk add --no-cache eudev-dev
+USER node-red
+```
+
+> The actual text will depend on whether you have modified the tag in the first line or added extra packages to the third line.
+
+Replace the first four lines of your *Dockerfile* with the following lines:
+
+``` Dockerfile linenums="1"
+# reference argument - omitted defaults to latest
+ARG DOCKERHUB_TAG=latest
+
+# Download base image
+FROM nodered/node-red:${DOCKERHUB_TAG}
+
+# reference argument - omitted defaults to null
+ARG EXTRA_PACKAGES
+ENV EXTRA_PACKAGES=${EXTRA_PACKAGES}
+
+# default user is node-red - need to be root to install packages
+USER root
+
+# install packages
+RUN apk update && apk add --no-cache eudev-dev ${EXTRA_PACKAGES}
+
+# switch back to default user
+USER node-red
+
+# variable not needed inside running container
+ENV EXTRA_PACKAGES=
+
+# add-on nodes follow
+```
+
+All remaining lines of your original *Dockerfile* should be left as-is.
+
+### Applying the new syntax { #july2022build }
+
+Run the [re-building the local Node-RED image](#rebuildNodeRed) commands.
