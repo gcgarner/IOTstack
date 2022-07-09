@@ -1135,39 +1135,13 @@ Components in persistent store at
   node-red-contrib-pushsafer
 ```
 
-Notice how `node-red-node-email` appears in both lists. To fix this problem:
+Notice how the `node-red-node-email` instance installed in the Dockerfile is being blocked. To fix this problem:
 
-1. Move into the correct external directory:
-
-	``` console
-	$ cd ~/IOTstack/volumes/nodered/data/node_modules
-	```
-	
-2. Create a sub-directory to be the equivalent of a local trash can:
-
-	``` console
-	$ sudo mkdir duplicates
-	```
-	
-3. Move each duplicate node into the `duplicates` directory. For example, to move `node-red-node-email` you would:
-
-	``` console
-	$ sudo mv node-red-node-email duplicates
-	```
-	
-4. Tell Node-RED to restart. This causes it to forget about the nodes which have just been moved out of the way:
-
-	``` console
-	$ docker-compose -f ~/IOTstack/docker-compose.yml restart nodered
-	```
-	
-5. Finish off by erasing the `duplicates` folder:
-
-	``` console
-	$ sudo rm -rf duplicates
-	```
-
-	Always be extremely careful with any `rm -rf`, particularly when it is coupled with a `sudo`. Double-check your work **before** you press <kbd>return</kbd>.
+``` console
+$ cd ~/IOTstack
+$ docker exec -w /data nodered npm uninstall node-red-node-email
+$ docker-compose restart nodered
+```
 
 
 ## Package management { #packageManagement }
