@@ -54,7 +54,7 @@ You choose add-on nodes from a supplementary menu. We recommend accepting the de
 Key points: 
 
 * Under new menu, you must press the right arrow to access the supplementary menu. Under old menu, the list of add-on nodes is displayed automatically. 
-* Do not be concerned if you can't find an add-on node you need in the list. You can also add nodes via Manage Palette once Node-RED is running. See [node management](#nodeManagement).
+* Do not be concerned if you can't find an add-on node you need in the list. You can also add nodes via Manage Palette once Node-RED is running. See [component management](#componentManagement).
 
 Choosing add-on nodes in the menu causes the *Dockerfile* to be created.
 
@@ -256,7 +256,7 @@ To communicate with your Raspberry Pi's GPIO you need to do the following:
 	$ sudo apt install pigpio python-pigpio python3-pigpio
 	```
 
-2. Install the `node-red-node-pi-gpiod` node. See [node management](#nodeManagement). It allows you to connect to multiple Pis from the same Node-RED service.
+2. Install the `node-red-node-pi-gpiod` node. See [component management](#componentManagement). It allows you to connect to multiple Pis from the same Node-RED service.
 3. Make sure that the `pigpdiod` daemon is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod). In essence, you need to:
 
 	- Use `sudo` to edit `/etc/rc.local`;
@@ -991,71 +991,78 @@ For example, suppose you wanted to pin to Node-RED version 2.2.2 with `node.js` 
 
 Changing a pinned version and rebuilding *may* result in a new *base* image being downloaded from *DockerHub*.
 
-## Node management { #nodeManagement }
+## Component management { #componentManagement }
 
-### Installing nodes { #addNodes }
+### via Dockerfile { #viaDockerfile }
 
-You can install nodes by:
+You can install components by adjusting the Node-RED *Dockerfile*. This can be done by:
 
-1. Adjusting the Node-RED *Dockerfile*. This can be done by:
+* Running the IOTstack menu and changing the selected Node-RED nodes; or
+* Editing your Node-RED *Dockerfile* using a text editor.
 
-	* Running the IOTstack menu and changing the selected Node-RED nodes; or
-	* Editing your Node-RED *Dockerfile* using a text editor.
+Using the IOTstack menu limits your choice of components to those presented in the menu. Editing the *Dockerfile* with a text editor is more flexible but carries the risk that your changes could be lost if you subsequently use the menu method.
 
-	Using the IOTstack menu limits your choice of nodes to those presented in the menu. Editing the *Dockerfile* with a text editor is more flexible but carries the risk that your changes could be lost if you subsequently use the menu method.
+To apply changes made to your *Dockerfile*, run the [re-building the local Node-RED image](#rebuildNodeRed) commands.
 
-	To apply changes made to your *Dockerfile*, run the [re-building the local Node-RED image](#rebuildNodeRed) commands.
+### via Manage Palette { #viaDockerfile }
 
-2. Adding, removing or updating nodes in Manage Palette. Node-RED will remind you to restart Node-RED and that is something you have to do by hand:
+You can add, remove or update components in Manage Palette. Node-RED will remind you to restart Node-RED and that is something you have to do by hand:
+
+``` console
+$ cd ~/IOTstack
+$ docker-compose restart nodered
+```
+	
+Note:
+	
+* Some users have reported misbehaviour from Node-RED if they do too many iterations of:
+
+	- make a change in Manage Palette
+	- restart Node-RED
+	
+	It is better to make **all** the changes you intend to make, and only *then* restart Node-RED.
+
+### via `npm` { #viaNPM }
+
+You can also run `npm` inside the container to install any component that could be installed by `npm` in a non-container environment. This is the basic syntax:
+
+``` console
+$ cd ~/IOTstack
+$ docker exec -w /data nodered npm «command» «arguments…»
+$ docker-compose restart nodered
+```
+
+Examples:
+
+* To add the "find my iphone" node:
 
 	``` console
-	$ cd ~/IOTstack
+	$ docker exec -w /data nodered npm install find-my-iphone-node
 	$ docker-compose restart nodered
 	```
-	
-	Note:
-	
-	* Some users have reported misbehaviour from Node-RED if they do too many iterations of:
-	
-		``` console
-		[make a single change in Manage Palette]
-		$ docker-compose restart nodered
 
-		[make a single change in Manage Palette]
-		$ docker-compose restart nodered
-		
-		…
-		```
-
-		It is better to:
-
-		``` console
-		[do ALL your Manage Palette changes]
-		$ docker-compose restart nodered
-		```
-
-3. Installing nodes inside the container via npm:
+* To remove the "find my iphone" node:
 
 	``` console
-	$ docker exec -it nodered bash
-	# cd /data
-	# npm install «node-name» /data
-	# exit
-	$ cd ~/IOTstack
+	$ docker exec -w /data nodered npm uninstall find-my-iphone-node
 	$ docker-compose restart nodered
 	```
-	
-	Note:
-	
-	* You **must** put the `/data` onto the end of the `npm install` command. Any formula you find on the web will not include this. You have to remember to do it yourself!
-	* See also the note above about restarting too frequently.
-	* You can use this approach if you need to force the installation of a specific version (which you don't appear to be able to do in Manage Palette). For example, to install version 4.0.0 of the "moment" node:
 
-		``` console
-		# npm install node-red-contrib-moment@4.0.0 /data
-		```
+Note:
+	
+* You **must** include `-w /data` on each command. Any formula you find on the web will not include this. You have to remember to do it yourself!
+* Many web examples include the `--save` flag on the `npm` command. That flag is not needed (it is ignored because the behaviour it used to control has been the default since NPM version 5. Node-RED containers have been using NPM version 6 for some time.
+* See also the note above about restarting too frequently.
+* You can use this approach if you need to force the installation of a specific version (which you don't appear to be able to do in Manage Palette). For example, to install version 4.0.0 of the "moment" node:
 
-There is no real difference between the methods. Some nodes (eg "node-red-contrib-generic-ble" and "node-red-node-sqlite") **must** be installed by *Dockerfile* but the only way of finding out if a node **must** be installed via *Dockerfile* is to try Manage Palette and find that it doesn't work.
+	``` console
+	$ docker exec -w /data nodered npm install node-red-contrib-moment@4.0.0
+	$ docker-compose restart nodered
+	```
+
+### Comparison of methods { #viaWhich }
+
+In terms of outcome, there is no real difference between the various methods. However, some nodes (eg "node-red-contrib-generic-ble" and "node-red-node-sqlite") **must** be installed by *Dockerfile*. The only way of finding out if a component **must** be installed via *Dockerfile* is to try Manage Palette and find that it doesn't work.
 
 Aside from the exception cases that require *Dockerfile* or where you need to force a specific version, it is quicker to install nodes via Manage Palette and applying updates is a bit easier too. But it's really up to you.
 
@@ -1066,62 +1073,44 @@ If you're wondering about "backup", nodes installed via:
 
 Basically, if you're running IOTstack backups then your add-on nodes will be backed-up.
 
-### Node precedence { #nodePrecedence }
+### Component precedence { #componentPrecedence }
 
-Add-on nodes that are installed via *Dockerfile* wind up at the **internal** path:
-
-```
-/usr/src/node-red/node_modules
-```
-
-Add-on nodes installed via Manage Palette wind up at the **external** path:
+Components that are installed via *Dockerfile* wind up at the **internal** path:
 
 ```
-~/IOTstack/volumes/nodered/data/node_modules
+/usr/src/node-red
 ```
 
-The *Compose* file volumes mapping:
-
-``` yaml
-./volumes/nodered/data:/data
-```
-
-implies that add-on nodes installed via Manage Palette are made available to Node-RED at the **internal** path:
+Components installed via Manage Palette or `docker exec -w /data` wind up at the **internal** path:
 
 ```
-/data/node_modules
+/data
 ```
 
-Because there are two places, this invites the question of what happens if a given node is installed in both? The answer is that add-ons installed at:
+which is the same as the **external** path:
 
 ```
-/data/node_modules
+~/IOTstack/volumes/nodered/data
 ```
 
-take precedence over those installed at:
+Because there are two places, this invites the question of what happens if a given component is installed in both? The answer is that components installed in `/data` take precedence.
 
-```
-/usr/src/node-red/node_modules
-```
-
-Or, to put it more simply: in any contest, Manage Palette prevails over *Dockerfile*.
+Or, to put it more simply: in any contest between methods, *Dockerfile* comes last.
 
 ### Resolving node duplication { #fixDuplicateNodes }
 
-Sometimes, even when you are 100% certain that **you** didn't do it, an add-on node will turn up in both places. There is probably some logical reason for this but I don't know what it is.
+Sometimes, even when you are 100% certain that **you** didn't do it, a component will turn up in both places. There is probably some logical reason for this but I don't know what it is.
 
-The problem this creates is that a later version of an add-on node installed via *Dockerfile* will be blocked by the presence of an older version of that node in:
-
-```
-~/IOTstack/volumes/nodered/data/node_modules
-```
+The problem this creates is that a later version of a component installed via *Dockerfile* will be blocked by the presence of an older version of that component installed by a different method.
 
 The `nodered_list_installed_nodes.sh` script helps discover when this situation exists. For example:
 
 ``` console
-$ ~/IOTstack/scripts/nodered_list_installed_nodes.sh 
+$ nodered_list_installed_nodes.sh 
 
-Nodes installed by Dockerfile INSIDE the container at /usr/src/node-red/node_modules
+Fetching list of candidates installed via Dockerfile
+
+Components built into the image (via Dockerfile)
   ACTIVE: node-red-admin
   ACTIVE: node-red-configurable-ping
   ACTIVE: node-red-contrib-boolean-logic
@@ -1134,13 +1123,16 @@ Nodes installed by Dockerfile INSIDE the container at /usr/src/node-red/node_mod
   ACTIVE: node-red-node-sqlite
   ACTIVE: node-red-node-tail
 
-Nodes installed by «Manage Palette» OUTSIDE the container at /home/pi/IOTstack/volumes/nodered/data/node_modules
- node-red-contrib-boolean-logic-ultimate
- node-red-contrib-chartjs
- node-red-node-email
- node-red-contrib-md5
- node-red-contrib-moment
- node-red-contrib-pushsafer
+Fetching list of candidates installed via Manage Palette or npm
+
+Components in persistent store at
+ /home/pi/IOTstack/volumes/nodered/data/node_modules
+  node-red-contrib-boolean-logic-ultimate
+  node-red-contrib-chartjs
+  node-red-node-email
+  node-red-contrib-md5
+  node-red-contrib-moment
+  node-red-contrib-pushsafer
 ```
 
 Notice how `node-red-node-email` appears in both lists. To fix this problem:
