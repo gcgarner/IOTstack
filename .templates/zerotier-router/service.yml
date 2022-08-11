@@ -1,0 +1,22 @@
+zerotier-router:
+  image: zyclonite/zerotier:router
+  container_name: zerotier
+  devices:
+    - /dev/net/tun
+  network_mode: host
+  volumes:
+    - /var/lib/zerotier-one:/var/lib/zerotier-one
+  cap_add:
+    - NET_ADMIN
+    - SYS_ADMIN
+    - NET_RAW
+  restart: unless-stopped
+  environment:
+    - TZ=Etc/UTC
+    - ZEROTIER_ONE_LOCAL_PHYS=eth0
+  # - ZEROTIER_ONE_NETWORK_IDS=yourNetworkID
+    - ZEROTIER_ONE_USE_IPTABLES_NFT=true
+    - ZEROTIER_ONE_GATEWAY_MODE=both
+    - PUID=1000
+    - PGID=1000
+
