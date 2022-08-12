@@ -176,7 +176,7 @@ Now that you understand what the ZeroTier-client will and won't do, if you want 
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose up -d zerotier
+	$ docker-compose up -d zerotier-client
 	```
 
 3. Tell the container to join your ZeroTier network by replacing «NetworkID» with your ZeroTier Network ID:
@@ -209,7 +209,7 @@ The ZeroTier-router container is just the ZeroTier-client container with some `i
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v zerotier
+	$ docker-compose rm --force --stop -v zerotier-client
 	```
 
 2. Remove the existing service definition, either by:
@@ -275,7 +275,7 @@ To install Zerotier-router:
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose up -d zerotier
+	$ docker-compose up -d zerotier-router
 	```
 
 4. If the Raspberry Pi running the service has not previously been authorised in [ZeroTier Central](https://my.zerotier.com), authorise it. Make a note of the IP address assigned to the device in ZeroTier Central. In [Topology&nbsp;2](#topology2) it is 10.244.0.1.
@@ -919,7 +919,7 @@ You can erase ZeroTier's persistent storage area like this:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v zerotier
+$ docker-compose rm --force --stop -v {zerotier-client | zerotier-router}
 $ sudo rm -rf ./volumes/zerotier-one
 ```
 
