@@ -10,9 +10,15 @@ PERSISTENT_EXTERNAL="$HOME/IOTstack/volumes/nodered/data"
 # the folder in each case containing node modules
 MODULES="node_modules"
 
+# assume no modules are blocked
+unset BLOCKED
+
+# start the command hint
+UNBLOCK="docker exec -w /data nodered npm uninstall"
+
 # fetch what npm knows about components that form part of the image
 echo -e "\nFetching list of candidates installed via Dockerfile"
-CANDIDATES=$(docker exec nodered bash -c "cd \"$DOCKERFILE\" ; npm list --depth=0 --parseable")
+CANDIDATES=$(docker exec nodered bash -c "cd \"$DOCKERFILE\" ; npm list --depth=0 --parseable 2>/dev/null")
 
 # report
 echo -e "\nComponents built into the image (via Dockerfile)"
@@ -23,6 +29,8 @@ for CANDIDATE in $CANDIDATES; do
       if [ -d "$PERSISTENT_EXTERNAL/$MODULES/$COMPONENT" ] ; then
          # yes! the internal node is blocked by the external node
          echo "  BLOCKED: $COMPONENT"
+         BLOCKED=true
+         UNBLOCK="$UNBLOCK $COMPONENT"
       else
          # no! so that means it's active
          echo "   ACTIVE: $COMPONENT"
@@ -45,3 +53,9 @@ for CANDIDATE in $CANDIDATES; do
 done
 
 echo ""
+
+if [ -n "$BLOCKED" ] ; then
+   echo "Blocking nodes can be removed by running the following commands"
+   echo "\$ $UNBLOCK"
+   echo "\$ docker-compose -f ~/IOTstack/docker-compose.yml restart nodered"
+fi
