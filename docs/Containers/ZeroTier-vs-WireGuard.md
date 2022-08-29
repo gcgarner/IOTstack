@@ -72,7 +72,7 @@ Nothing in that list is routable. That list is also far from complete (see [wiki
 * 172.16/12 - commonly used by Docker to allocate its internal networks.
 * 192.168/16 - used by a lot of consumer equipment such as home routers.
 
-| <a name="figure2"></a>Figure 2: Router WAN port using CGNAT range |
+| <a name="figure1"></a>Figure 1: Router WAN port using CGNAT range |
 |:--:|
 | ![Image title](images/zerotier-cgnat-topology-dark.png#only-dark)![Image title](images/zerotier-cgnat-topology-light.png#only-light) |
 
