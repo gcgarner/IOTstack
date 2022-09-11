@@ -82,9 +82,9 @@ The Build Stack menu will execute the `runPostBuildHook()` function in the final
 The selected services' yaml configuration is already loaded into memory before the build stack process is started.
 
 1. Run prebuildHooks.
-2. Create a new in memory `docker-compose.yml` structure.
-3. Merge the `./.templates/env.yml` file into `docker-compose.yml` memory.
+2. Read `./.templates/docker-compose-base.yml` file into a in memory yaml structure.
+3. Add selected services into the in memory structure.
 4. If it exists merge the `./compose-override.yml` file into memory
-5. Write the docker-compose in memory yaml structure to disk.
+5. Write the in memory yaml structure to disk `./docker-compose.yml`.
 6. Run postbuildHooks.
 7. Run `postbuild.sh` if it exists, with the list of services built.

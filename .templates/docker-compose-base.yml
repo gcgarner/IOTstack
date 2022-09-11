@@ -1,13 +1,14 @@
-networks:
+version: '3.6'
 
+networks:
   default:
     driver: bridge
     ipam:
       driver: default
-
   nextcloud:
     driver: bridge
     internal: true
     ipam:
       driver: default
 
+services:

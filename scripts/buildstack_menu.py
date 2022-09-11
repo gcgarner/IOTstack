@@ -52,19 +52,12 @@ def main():
     global dockerComposeServicesYaml
     try:
       runPrebuildHook()
-      dockerFileYaml = {}
       menuStateFileYaml = {}
-      dockerFileYaml["version"] = "3.6"
-      dockerFileYaml["services"] = {}
-      menuStateFileYaml["services"] = {}
-      dockerFileYaml["services"] = dockerComposeServicesYaml
       menuStateFileYaml["services"] = dockerComposeServicesYaml
 
-      if os.path.exists(envFile):
-        with open(r'%s' % envFile) as fileEnv:
-          envSettings = yaml.load(fileEnv)
-        mergedYaml = mergeYaml(envSettings, dockerFileYaml)
-        dockerFileYaml = mergedYaml
+      with open(r'%s' % envFile) as fileEnv:
+        dockerFileYaml = yaml.load(fileEnv)
+      dockerFileYaml["services"] = dockerComposeServicesYaml
 
       if os.path.exists(composeOverrideFile):
         with open(r'%s' % composeOverrideFile) as fileOverride:

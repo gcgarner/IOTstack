@@ -33,16 +33,16 @@ If you maintain your `docker-compose.yml` by hand, you can adopt the networking 
 3. Append the contents of the following file to your `docker-compose.yml`:
 
 	```
-	~/IOTstack/.templates/env.yml
+	~/IOTstack/.templates/docker-compose-base.yml
 	```
 
 	For example:
 	
 	```
-	$ cat ~/IOTstack/.templates/env.yml >>~/IOTstack/docker-compose.yml
+	$ cat ~/IOTstack/.templates/docker-compose-base.yml >>~/IOTstack/docker-compose.yml
 	```
 	
-	The `env.yml` file is the same for both *old-menu* and *master* branches.
+	The `docker-compose-base.yml` file is named `env.yml` in the *old-menu* branch.
 
 4. If you run the NextCloud service then:
 
