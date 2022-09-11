@@ -98,4 +98,4 @@ Links:
 * [Password configuration for Services](BuildStack-RandomPassword.md)
 * [Build Stack Menu System](Menu-System.md)
 * [Coding a new service](BuildStack-Services.md)
-* [IOTstack issues](htps://github.com/SensorsIot/IOTstack/issues)
+* [IOTstack issues](https://github.com/SensorsIot/IOTstack/issues)

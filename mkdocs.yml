@@ -23,6 +23,7 @@ theme:
         icon: material/weather-night
         name: Switch to light mode
   features:
+    - content.code.annotate
     - tabs
     - navigation.tabs
     - navigation.tabs.sticky

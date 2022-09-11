@@ -1,16 +1,6 @@
 # Getting Started
 
-## introduction to IOTstack - videos
-
-Andreas Spiess Video #295: Raspberry Pi Server based on Docker, with VPN, Dropbox backup, Influx, Grafana, etc: IOTstack
-
-[![#295 Raspberry Pi Server based on Docker, with VPN, Dropbox backup, Influx, Grafana, etc: IOTstack](http://img.youtube.com/vi/a6mjt8tWUws/0.jpg)](https://www.youtube.com/watch?v=a6mjt8tWUws)
-
-Andreas Spiess Video #352: Raspberry Pi4 Home Automation Server (incl. Docker, OpenHAB, HASSIO, NextCloud)
-
-[![#352 Raspberry Pi4 Home Automation Server (incl. Docker, OpenHAB, HASSIO, NextCloud)](http://img.youtube.com/vi/KJRMjUzlHI8/0.jpg)](https://www.youtube.com/watch?v=KJRMjUzlHI8)
-
-## Assumptions
+## Requirements
 
 IOTstack makes the following assumptions:
 
@@ -748,49 +738,3 @@ To pin an image to a specific version:
 	$ docker-compose up -d --build mosquitto
 	```
 
-## the nuclear option - use with caution
-
-If you create a mess and can't see how to recover, try proceeding like this:
-
-``` console
-$ cd ~/IOTstack
-$ docker-compose down
-$ cd
-$ mv IOTstack IOTstack.old
-$ git clone https://github.com/SensorsIot/IOTstack.git IOTstack
-```
-
-In words:
-
-1. Be in the right directory.
-2. Take the stack down.
-3. The `cd` command without any arguments changes your working directory to your home directory (variously known as `~` or `$HOME` or `/home/pi`).
-4. Move your existing IOTstack directory out of the way. If you get a permissions problem:
-
-	* Re-try the command with `sudo`; and
-	* Read [a word about the `sudo` command](#a-word-about-the-sudo-command). Needing `sudo` in this situation is an example of over-using `sudo`.
-
-5. Check out a clean copy of IOTstack.
-
-Now, you have a clean slate. You can either start afresh by running the menu:
-
-``` console
-$ cd ~/IOTstack
-$ ./menu.sh
-```
-
-Alternatively, you can mix and match by making selective copies from the old directory. For example:
-
-``` console
-$ cd
-$ cp IOTstack.old/docker-compose.yml IOTstack/
-```
-
-The `IOTstack.old` directory remains available as a reference for as long as you need it. Once you have no further use for it, you can clean it up via:
-
-``` console
-$ cd
-$ sudo rm -rf ./IOTstack.old
-```
-
-The `sudo` command is needed in this situation because some files and folders (eg the "volumes" directory and most of its contents) are owned by root.
