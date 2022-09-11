@@ -1,6 +1,6 @@
 domoticz:
   container_name: domoticz
-  image: linuxserver/domoticz:stable
+  image: lscr.io/linuxserver/domoticz:latest
   ports:
     - "8083:8080"
     - "6144:6144"
@@ -8,10 +8,9 @@ domoticz:
   volumes:
     - ./volumes/domoticz/data:/config
   restart: unless-stopped
-  network_mode: bridge
   environment:
     - PUID=1000
     - PGID=1000
-    # - TZ=
+    # - TZ=Etc/UTC
     # - WEBROOT=domoticz
 
