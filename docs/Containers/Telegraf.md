@@ -181,7 +181,6 @@ The first time you launch the Telegraf container, the following structure will b
 ```
 ~/IOTstack/volumes/telegraf
 ├── [drwxr-xr-x root    ]  additions
-│   ├── [-rw-r--r-- root    ]  inputs.docker.conf
 │   └── [-rw-r--r-- root    ]  inputs.mqtt_consumer.conf
 ├── [-rw-r--r-- root    ]  telegraf.conf
 └── [-r--r--r-- root    ]  telegraf-reference.conf
@@ -200,7 +199,7 @@ The file:
 	- is created by removing all comment lines and blank lines from `telegraf-reference.conf`, leaving only the "active" configuration options, and then adding options necessary for IOTstack.
 	- is less than 30 lines and is significantly easier to understand than `telegraf-reference.conf`.
 
-* `inputs.docker.conf` – see [Applying optional additions](#optionalAdditions) below.
+* `inputs.mqtt_consumer.conf` – see [Applying optional additions](#optionalAdditions) below.
 
 The intention of this structure is that you:
 
@@ -223,7 +222,7 @@ $ docker-compose restart telegraf
   ``` console
   $ echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee /boot/cmdline.txt
   ```
-* `inputs.cpu_temp.conf' collects cpu temperature.
+* `inputs.cpu_temp.conf` collects cpu temperature.
  
 ### Applying optional additions { #optionalAdditions }
 
