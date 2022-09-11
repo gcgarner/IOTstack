@@ -136,7 +136,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 8. Create an administrator account and then click "Finish Setup".
 
-9. There is a long delay. In most cases, the "Recommended apps" screen appears and you can ignored the instructions in this section. However, if you see the following error:
+9. There is a long delay. In most cases, the "Recommended apps" screen appears and you can ignore the instructions in this step. However, if your browser returns a "Not Found" error like the following:
 
 	![Mal-formed URL](./images/nextcloud-malformedurl.png)
 	
@@ -251,7 +251,7 @@ The examples above include using a DNS alias (a CNAME record) for your Nextcloud
 Could not reliably determine the server's fully qualified domain name
 ```
 
-You can silence the warning by editing the Nextcloud service definition in `docker-compose.yml` to add your fully-qualified DNS alias to at `hostname` directive. For example:
+You can silence the warning by editing the Nextcloud service definition in `docker-compose.yml` to add your fully-qualified DNS alias using a `hostname` directive. For example:
 
 ```yaml
     hostname: nextcloud.mydomain.com
@@ -285,16 +285,15 @@ $ cd ~/IOTstack
 $ docker-compose build --no-cache --pull nextcloud_db
 $ docker-compose up -d nextcloud_db
 $ docker system prune
-$ docker system prune
 ```
 
-The first "prune" removes the old *local* image, the second removes the old *base* image. Whether an old *base image* exists depends on the version of `docker-compose` you are using and how your version of `docker-compose` builds local images.
+> You may need to run the `prune` command twice if you are using a 1.x version of `docker-compose`.
 
 ## Backups { #backups }
 
 Nextcloud is currently excluded from the IOTstack-supplied backup scripts due to its potential size.
 
-> This is also true for [Paraphraser/IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup).
+> [Paraphraser/IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup) includes backup and restore for NextCloud.
 
 If you want to take a backup, something like the following will get the job done:
 
