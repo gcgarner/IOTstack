@@ -5,6 +5,7 @@ WireGuard is a fast, modern, secure Virtual Private Network (VPN) tunnel. It can
 Reference:
 
 * [WireGuard home page](https://www.wireguard.com)
+* [IOTstack discussion paper : ZeroTier vs WireGuard](ZeroTier-vs-WireGuard.md)
 
 Assumptions:
 
@@ -475,7 +476,7 @@ You also need to make a few assumptions:
 
 Here's a reference model to help explain what occurs:
 
-![WireGuard port model](./images/wireguard-portmodel.png)
+![WireGuard port model](./images/wireguard-portmodel.jpeg)
 
 The remote WireGuard client:
 

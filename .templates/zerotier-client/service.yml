@@ -1,0 +1,12 @@
+zerotier-client:
+  image: zyclonite/zerotier
+  container_name: zerotier
+  devices:
+    - /dev/net/tun
+  network_mode: host
+  volumes:
+    - /var/lib/zerotier-one:/var/lib/zerotier-one
+  cap_add:
+    - NET_ADMIN
+    - SYS_ADMIN
+
