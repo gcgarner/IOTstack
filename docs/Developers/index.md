@@ -17,21 +17,17 @@ approval.
 !!! tip inline end
     For simple changes you can straight-up just use the edit link available on
     every documentation page. It's the pen-icon to the right of the top
-    heading. Write your changes, preview everything looks as expected and
-    submit as proposed changes.
+    heading. Write your changes, check the preview-tab everything looks as
+    expected and submit as proposed changes.
 
 Documentation is is written as markdown, processed using mkdocs ([docs](https://www.mkdocs.org/user-guide/writing-your-docs/#writing-your-docs)) and the Material theme ([docs](https://squidfunk.github.io/mkdocs-material/reference/)). The Material theme is not just styling, but provides additional syntax extensions.
 
-Setup your system for mkdocs and Material:
+To test your local changes while writing them and before making a pull-request,
+start a local mkdocs server:
+``` console
+$ ~/IOTstack/scripts/development/mkdocs-serve.sh
 ```
-pip3 install -r requirements-mkdocs.txt
-```
-
-To test your local changes while writing them and before making a pull-request:
-```
-cd ~/IOTstack
-mkdocs serve
-```
+And then open [http://127.0.0.1:8000/](http://127.0.0.1:8000/) in a browser.
 
 ## Creating a new service
 
