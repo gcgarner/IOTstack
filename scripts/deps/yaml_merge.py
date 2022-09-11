@@ -1,5 +1,7 @@
 
 def mergeYaml(priorityYaml, defaultYaml):
+  if not priorityYaml:
+      return defaultYaml
   finalYaml = {}
   if isinstance(defaultYaml, dict):
     for dk, dv in defaultYaml.items():
