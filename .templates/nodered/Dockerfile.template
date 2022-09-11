@@ -1,6 +1,25 @@
-FROM nodered/node-red:latest-12
+# reference argument - omitted defaults to latest
+ARG DOCKERHUB_TAG=latest
+
+# Download base image
+FROM nodered/node-red:${DOCKERHUB_TAG}
+
+# reference argument - omitted defaults to null
+ARG EXTRA_PACKAGES
+ENV EXTRA_PACKAGES=${EXTRA_PACKAGES}
+
+# default user is node-red - need to be root to install packages
 USER root
-RUN apk update && apk add --no-cache eudev-dev
+
+# install packages
+RUN apk update && apk add --no-cache eudev-dev ${EXTRA_PACKAGES}
+
+# switch back to default user
 USER node-red
+
+# variable not needed inside running container
+ENV EXTRA_PACKAGES=
+
+# add-on nodes follow
 
 %run npm install modules list%
