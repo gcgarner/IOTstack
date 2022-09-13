@@ -61,7 +61,7 @@ The default service definition provided with IOTstack exposes the following envi
 	- `INFLUX_USERNAME=dba`
 	- `INFLUX_PASSWORD=supremo`
 
-	Misunderstanding the purpose and scope of these variables is a common mistake made by new users. Please do not guess! Please read [Authentication](authentication) **before** you enable or change any of these variables. In particular, `dba` and `supremo` are **not** defaults for database access.
+	Misunderstanding the purpose and scope of these variables is a common mistake made by new users. Please do not guess! Please read [Authentication](#authentication) **before** you enable or change any of these variables. In particular, `dba` and `supremo` are **not** defaults for database access.
 
 - UDP data acquisition variables:
 
@@ -276,7 +276,7 @@ $
 
 ### activate authentication { #authStep4 }
 
-Make sure you read the [warning](#activateWithCare) above, then edit the InfluxDB environment variables to enable this key:
+Make sure you read the [warning](#authWarning) above, then edit the InfluxDB environment variables to enable this key:
 
 ``` yaml
 - INFLUXDB_HTTP_AUTH_ENABLED=true
