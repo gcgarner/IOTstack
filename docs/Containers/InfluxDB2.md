@@ -39,7 +39,7 @@ When an InfluxDB&nbsp;1.8 *database* is migrated, it becomes an InfluxDB&nbsp;2 
 
 * Version 2.0, the user interface has a "Bucket" field which is independent of the connection. For example:
 
-	- <kbd>[v2.0] influxdb:8086</kbd> (set up in the connection sheet)
+	- <kbd>[v2.0] influxdb2:8086</kbd> (set up in the connection sheet)
 	- <kbd>Bucket</kbd><kbd>power/autogen</kbd> (set up in the node)
 
 	This implies that you need one *connection* per *engine*. It is a subtle but important difference.
