@@ -140,7 +140,7 @@ For those reasons, it is better to take the time to identify your Zigbee adapter
 
 	The default from the IOTstack template maps the *external* (Raspberry Pi) device `/dev/ttyAMA0` to the *internal* (Zigbee2MQTT container) device `/dev/ttyACM0`.
 
-	> On the Raspberry Pi, the *external* device `/dev/ttyAMA0` is the Bluetooth adapter. It was chosen as the default because it normally exists and its presence avoids sending Zigbee2MQTT into a restart loop if you start the container before completing these steps.
+	> On the Raspberry Pi, the *external* device `/dev/ttyAMA0` is the Bluetooth adapter. It was chosen as the default because it normally exists and its presence avoids docker-compose refusing to bring up the container. However, a Bluetooth adapter doesn't actually respond like a Zigbee adapter so the Zigbee2MQTT container will go into a restart loop if you start it before completing these steps. A side-effect of the container entering a restart loop is the web GUI never starts.
 
 9. Replace `/dev/ttyAMA0` with your *by-id* path. Example:
 
