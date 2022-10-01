@@ -6,11 +6,12 @@ Reference:
 
 * [WireGuard home page](https://www.wireguard.com)
 * [IOTstack discussion paper : ZeroTier vs WireGuard](ZeroTier-vs-WireGuard.md)
+* [2022-10-01 WireGuard migration](#migrateWireguard)
 
 Assumptions:
 
 * These instructions assume that you have privileges to configure your network's gateway (router). If you are not able to make changes to your network's firewall settings, then you will not be able to finish this setup.
-* In common with most VPN technologies, WireGuard assumes that the WAN side of your network's gateway has a public IP address which is reachable directly. WireGuard may not work if that assumption does not hold. If you strike this problem, you have to take it up with your ISP.
+* In common with most VPN technologies, WireGuard assumes that the WAN side of your network's gateway has a public IP address which is reachable directly. WireGuard may not work if that assumption does not hold. If you strike this problem, read [ZeroTier vs WireGuard](ZeroTier-vs-WireGuard.md).
 
 ## Installing WireGuard under IOTstack { #installWireguard }
 
@@ -54,7 +55,9 @@ wireguard:
   ports:
   - "51820:51820/udp"
   volumes:
-  - ./volumes/wireguard:/config
+  - ./volumes/wireguard/config:/config
+  - ./volumes/wireguard/custom-cont-init.d:/custom-cont-init.d
+  - ./volumes/wireguard/custom-services.d:/custom-services.d
   - /lib/modules:/lib/modules:ro
   cap_add:
   - NET_ADMIN
@@ -316,8 +319,8 @@ You will need to create the `compose-override.yml` **before** running the menu t
 	you would expect a result something like this:
 
 	``` console
-	$ tree ./volumes/wireguard
-	volumes/wireguard/
+	$ tree ./volumes/wireguard/config
+	volumes/wireguard/config
 	├── coredns
 	│   └── Corefile
 	├── custom-cont-init.d
@@ -369,7 +372,7 @@ If, however, your Raspberry Pi is running headless, you will need to copy the `.
 For example, to copy **all** PNG files from your Raspberry Pi to a target system:
 
 ``` console
-$ find ~/IOTstack/volumes/wireguard -name "*.png" -exec scp {} user@hostorip:. \;
+$ find ~/IOTstack/volumes/wireguard/config -name "*.png" -exec scp {} user@hostorip:. \;
 ```
 
 Note:
@@ -594,6 +597,67 @@ If a new image comes down, then:
 $ docker-compose up -d wireguard
 $ docker system prune
 ```
+
+### 2022-10-01 WireGuard migration { #migrateWireguard }
+
+WireGuard's designers have redefined the structure they expect in the persistent storage area. Before the change, a single volume-mapping got the job done:
+
+``` yml
+volumes:
+- ./volumes/wireguard:/config
+```
+
+After the change, three mappings are required:
+
+``` yml
+volumes:
+- ./volumes/wireguard/config:/config
+- ./volumes/wireguard/custom-cont-init.d:/custom-cont-init.d
+- ./volumes/wireguard/custom-services.d:/custom-services.d
+```
+
+In essence, inside the container:
+
+* old: `custom-cont-init.d` and `custom-services.d` directories were subdirectories of `/config`;
+* new: `custom-cont-init.d` and `custom-services.d` are top-level directories alongside `/config`.
+
+The new `custom-cont-init.d` and `custom-services.d` directories also need to be owned by root. Previously, they could be owned by "pi".
+
+IOTstack users implementing WireGuard for the first time will get the correct structure. Existing users need to migrate. The process is a little messy so IOTstack provides a script to automate the restructure:
+
+``` console
+$ cd ~/IOTstack
+$ docker-compose rm --force --stop -v wireguard
+$ ./scripts/2022-10-01-wireguard-restructure.sh
+```
+
+In words:
+
+* Be in the correct directory
+* Stop WireGuard (the script won't run if you don't do this)
+* Run the script
+
+The script:
+
+1. Renames `./volumes/wireguard` to `./volumes/wireguard.bak`; then
+2. Builds the new `./volumes/wireguard` structure using `./volumes/wireguard.bak` for its source material.
+3. Finishes by reminding you to update your `docker-compose.yml` to adopt the new service definition.
+
+Your WireGuard client configurations (QR codes) are not affected by the migration.
+
+Once the migration is complete **and** you have adopted the new service definition, you can start WireGuard again:
+
+``` console
+$ docker-compose up -d wireguard
+``` 
+
+You should test that your remote clients can still connect. Assuming a successful migration, you can safely delete the backup directory:
+
+``` console
+$ sudo rm -rf ./volumes/wireguard.bak
+```
+
+> Always be careful when using `sudo` in conjunction with recursive remove. Double-check everything before pressing <kbd>return</kbd>.
 
 ## Getting a clean slate { #cleanSlate }
 
