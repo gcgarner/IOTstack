@@ -97,12 +97,13 @@ With most containers, you can continue to tweak environment variables and settin
 * `PEERS=` should be a comma-separated list of your client devices (all the phones, tablets, laptops, desktops you want to use remotely to get back into your home network). Example:
 
 	```yml
-	- PEERS=jill-macbook,jack-chromebook,alex-nokia-g10
+	- PEERS=jillMacbook,jackChromebook,alexNokiaG10
 	```
 
-	Note:
+	Notes:
 
 	- Many examples on the web use "PEERS=n" where "n" is a number. In practice, that approach seems to be a little fragile and is not recommended for IOTstack.
+	- Each name needs to start with a letter and be followed by one or more letters and/or digits. Letters can be upper- or lower-case. Do not use any other characters.
 
 #### Optional configuration - DNS resolution for peers { #configurePeerDNS }
 
@@ -313,33 +314,34 @@ You will need to create the `compose-override.yml` **before** running the menu t
 3. Confirm that WireGuard has generated the expected configurations. For example, given the following setting in `docker-compose.yml`:
 
 	```yml
-	- PEERS=jill-macbook,jack-chromebook,alex-nokia-g10
+	- PEERS=jillMacbook,jackChromebook,alexNokiaG10
 	```
 
 	you would expect a result something like this:
 
 	``` console
 	$ tree ./volumes/wireguard/config
-	volumes/wireguard/config
+	./volumes/wireguard/config
 	├── coredns
 	│   └── Corefile
-	├── custom-cont-init.d
-	├── custom-services.d
-	├── peer_jack-chromebook
-	│   ├── peer_jack-chromebook.conf
-	│   ├── peer_jack-chromebook.png
-	│   ├── privatekey-peer_jack-chromebook
-	│   └── publickey-peer_jack-chromebook
-	├── peer_jill-macbook
-	│   ├── peer_jill-macbook.conf
-	│   ├── peer_jill-macbook.png
-	│   ├── privatekey-peer_jill-macbook
-	│   └── publickey-peer_jill-macbook
-	├── peer_alex-nokia-g10
-	│   ├── peer_alex-nokia-g10.conf
-	│   ├── peer_alex-nokia-g10.png
-	│   ├── privatekey-peer_alex-nokia-g10
-	│   └── publickey-peer_alex-nokia-g10
+	├── peer_alexNokiaG10
+	│   ├── peer_alexNokiaG10.conf
+	│   ├── peer_alexNokiaG10.png
+	│   ├── presharedkey-peer_alexNokiaG10
+	│   ├── privatekey-peer_alexNokiaG10
+	│   └── publickey-peer_alexNokiaG10
+	├── peer_jackChromebook
+	│   ├── peer_jackChromebook.conf
+	│   ├── peer_jackChromebook.png
+	│   ├── presharedkey-peer_jackChromebook
+	│   ├── privatekey-peer_jackChromebook
+	│   └── publickey-peer_jackChromebook
+	├── peer_jillMacbook
+	│   ├── peer_jillMacbook.conf
+	│   ├── peer_jillMacbook.png
+	│   ├── presharedkey-peer_jillMacbook
+	│   ├── privatekey-peer_jillMacbook
+	│   └── publickey-peer_jillMacbook
 	├── server
 	│   ├── privatekey-server
 	│   └── publickey-server
