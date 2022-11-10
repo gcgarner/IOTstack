@@ -93,6 +93,35 @@ Assume you are running the Node-RED container in macOS Docker Desktop, and that 
 
 In other words, the *«external»* (real world) device `cu.SLAB_USBtoUART` is mapped to the *«internal»* (container) device `ttyAMA0`. The flow running in the container is expecting to communicate with `ttyAMA0` and is none-the-wiser.
 
+## Needing to use `sudo` to run docker commands
+
+You should never (repeat **never**) use `sudo` to run docker or docker compose commands. Forcing docker to do something with `sudo` almost always creates more problems than it solves. Please see [What is sudo?](https://sensorsiot.github.io/IOTstack/Basic_setup/What-is-sudo/) to understand how `sudo` actually works.
+
+If `docker` or `docker-compose` commands *seem* to need elevated privileges, the most likely explanation is incorrect group membership. Please read the [next section](#dockerGroup) about errors involving `docker.sock`. The solution (two `usermod` commands) is the same.
+
+If, however, the current user *is* a member of the `docker` group *but* you still get error responses that *seem* to imply a need for `sudo`, it implies that something fundamental is broken. Rather than resorting to `sudo`, you are better advised to rebuild your system.
+
+## Errors involving `docker.sock` { #dockerGroup }
+
+If you encounter permission errors that mention `/var/run/docker.sock`, the most likely explanation is the current user (usually "pi") not being a member of the "docker" group.
+
+You can check membership with the `groups` command:
+
+``` console
+$ groups
+pi adm dialout cdrom sudo audio video plugdev games users input render netdev bluetooth lpadmin docker gpio i2c spi
+```
+
+In that list, you should expect to see both `bluetooth` and `docker`. If you do not, you can fix the problem like this:
+
+``` console
+$ sudo usermod -G docker -a $USER
+$ sudo usermod -G bluetooth -a $USER
+$ exit
+```
+
+The `exit` statement is **required**. You must logout and login again for the two `usermod` commands to take effect. An alternative is to reboot.
+
 ## System freezes or SSD problems
 
 You should read this section if you experience any of the following problems:
