@@ -1,0 +1,17 @@
+scrypted:
+  container_name: scrypted
+  image: koush/scrypted
+  restart: unless-stopped
+  environment:
+  - SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION=Bearer ${SCRYPTED_WEBHOOK_UPDATE_AUTHORIZATION:?see instructions for generating a token}
+  - SCRYPTED_WEBHOOK_UPDATE=http://localhost:10444/v1/update
+  network_mode: host
+  x-ports:
+  - "10443:10443"
+  volumes:
+  - ./volumes/scrypted:/server/volume
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"
+      max-file: "10"
