@@ -435,7 +435,7 @@ You have several options:
 	
 	Note:
 	
-	* The `-it` flag is *optional*. It means "interactive terminal". Its presence tells Docker that the command may need user interaction, such as entering a password or typing "yes" to a question.
+	* The `-it` flags are *optional*. They mean "interactive" and "allocate pseudo-TTY". Their presence tells Docker that the command may need user interaction, such as entering a password or typing "yes" to a question.
 	
 2. You can open a shell into the container, run as many commands as you like inside the container, and then exit. For example:
 
