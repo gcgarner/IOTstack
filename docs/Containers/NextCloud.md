@@ -381,7 +381,7 @@ Each network is assigned a /16 IPv4 subnet. Unless you override it, the subnet r
 
 The logical router on each network takes the `.0.1` address.
 
-> The reason why two octets are devoted to the host address is because a /16 network prefix implies a 16-bit host portion, and each octet describes 8 bits.
+> The reason why two octets are devoted to the host address is because a /16 network prefix implies a 16-bit host portion. Each octet describes 8 bits.
 
 As each container is brought up, the network(s) it joins are governed by the following rules:
 
@@ -394,9 +394,9 @@ Assuming that the `mariadb` and `wireguard` containers do not have `networks:` c
 
 Each container is assigned an IPv4 address on each network it joins. In general, the addresses are assigned in the order in which the containers start.
 
-No container can easily predict either the network prefix of the networks it joins or the IP address of any other containers. Inside *Dockerspace,* Docker provides a mechanism for any container to reach any other container with which it shares a network by using the destination container's name.
+No container can easily predict either the network prefix of the networks it joins or the IP address of any other containers. However, Docker provides a mechanism for any container to reach any other container with which it shares a network by using the destination container's name.
 
-In this model there are two MariaDB instances, one named `nextcloud_db` and the other named `mariadb`. How does the `nextcloud` container know which **name** to use. Simple. It's passed in an environment variable:
+In this model there are two MariaDB instances, one named `nextcloud_db` and the other named `mariadb`. How does the `nextcloud` container know which **name** to use? Simple. It's passed in an environment variable:
 
 ```
 environment:
@@ -405,8 +405,8 @@ environment:
 
 At runtime, the `nextcloud` container references `nextcloud_db:3306`. Docker resolves `nextcloud_db` to 172.19.0.2 so the traffic traverses the 172.19/16 internal bridged network and arrives at the `nextcloud_db` container.
 
-The `nextcloud` container *could* reach the `mariadb` container via `mariadb:3306` but there's no ambiguity because Docker resolves `mariadb` to 172.18.0.2, which is a different subnet and an entirely different internal bridged network.
+The `nextcloud` container *could* reach the `mariadb` container via `mariadb:3306`. There's no ambiguity because Docker resolves `mariadb` to 172.18.0.2, which is a different subnet and an entirely different internal bridged network. 
 
-Moreover, even if the `iotstack_nextcloud` network were to be removed with all containers joining the `iotstack_default` network, there would still be no ambiguity because each container operates as a separate logical computer. `nextcloud_db:3306` and `mariadb:3306` are the equivalent of two physically different computers, each listening on port 3306.
+> There would still be no ambiguity even if all containers attached to the `iotstack_default` network because each container name still resolves to a distinct IP address.
 
-In terms of **external** ports, only `mariadb` exposes port 3306 so an external process trying to reach 192.168.203.60:3306 will be port-forwarded to the `mariadb` container. If it was necessary for an external process to reach the `nextcloud_db` container, a port mapping using a different and non-conflicting external port would have to be added to the `nextcloud_db` service definition.
+In terms of **external** ports, only `mariadb` exposes port 3306. Any external process trying to reach 192.168.203.60:3306 will always be port-forwarded to the `mariadb` container. The `iotstack_nextcloud` is declared "internal" which means it is unreachable from beyond the Raspberry Pi. Any port-mappings associated with that network are ignored.
