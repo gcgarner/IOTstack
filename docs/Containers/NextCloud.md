@@ -20,6 +20,9 @@ nextcloud:
     - ./volumes/nextcloud/html:/var/www/html
   depends_on:
     - nextcloud_db
+  networks:
+    - default
+    - nextcloud
 
 nextcloud_db:
   container_name: nextcloud_db
@@ -36,11 +39,16 @@ nextcloud_db:
   volumes:
     - ./volumes/nextcloud/db:/config
     - ./volumes/nextcloud/db_backup:/backup
+  networks:
+    - nextcloud
 ```
 
 There are two containers, one for the cloud service itself, and the other for the database. Both containers share the same persistent storage area in the volumes subdirectory so they are treated as a unit. This will not interfere with any other MariaDB containers you might wish to run.
 
-Depending on the IOTstack branch you are running, there may also be `networks:` directives. Other than to note that new menu dedicates a network to inter-container communications, those directives make no difference for this discussion.
+Key points:
+
+* You do **not** need to select MariaDB in the IOTstack menu just to run NextCloud. Some tutorials suggest you do. They are wrong!
+* If you *choose* to select MariaDB in the IOTstack menu, understand that it is a *separate* instance of the relational database management system. It has no relationship with NextCloud.  
 
 Under old-menu, you are responsible for setting passwords. The passwords are "internal use only" and it is unlikely that you will need them unless you plan to go ferreting-about in the database using SQL. The rules are:
 
@@ -52,7 +60,7 @@ Under new-menu, the menu can generate random passwords for you. You can either u
 * Two instances of `%randomMySqlPassword%` (the `«user_password»`)
 * One instance of `%randomPassword%` (the `«root_password»`)
 
-The passwords need to be set before you bring up the Nextcloud service for the first time but the following initialisation steps assume you might not have done that and always start over from a clean slate.
+The passwords need to be set before you bring up the Nextcloud service for the first time. However, the following initialisation steps assume you might not have done that and always start from a clean slate.
 
 ## Initialising Nextcloud  { #initialisation }
 
@@ -134,7 +142,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 	![Create Administrator Account](./images/nextcloud-createadminaccount.png)
 
-8. Create an administrator account and then click "Finish Setup".
+8. Create an administrator account and then click "Install".
 
 9. There is a long delay. In most cases, the "Recommended apps" screen appears and you can ignore the instructions in this step. However, if your browser returns a "Not Found" error like the following:
 
@@ -158,7 +166,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 	
 		* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
 
-10. The "Recommended apps" screen appears. A spinner moves down the list of apps as they are loaded:
+10. The "Recommended apps" screen appears. Click "Install recommended apps". A spinner moves down the list of apps as they are loaded:
 
 	![Recommended Apps](./images/nextcloud-recommendedapps.png)
 
@@ -168,7 +176,7 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 	![Post-initialisation](./images/nextcloud-postinitialisation.png)
 
-	Hover your mouse to the right of the floating window and keep clicking on the right-arrow button until you reach the last screen, then click "Start using Nextcloud".
+	Keep clicking on the right-arrow button until you reach the last screen, then click "Start using Nextcloud".
 
 12. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
 
@@ -331,3 +339,74 @@ The external drive will have to be an ext4 formatted drive because smb, fat32 an
 Finally, a warning:
 
 * If your database gets corrupted then your Nextcloud is pretty much stuffed.
+
+## Network Model { #networkModel }
+
+A walkthrough of a network model may help you to understand how Nextcloud and its database communicate. To help set the scene, the following model shows a Raspberry Pi with Docker running four containers:
+
+* `nextcloud` and `nextcloud_db` - both added when you select "NextCloud"
+* `mariadb` - optional container added when you select "MariaDB"
+* `wireguard` - optional container added when you select "WireGuard"
+
+![Network Model](./images/nextcloud-network-model.jpeg)
+
+The first thing to understand is that the `nextcloud_db` and `mariadb` containers are both instances of MariaDB. They are instantiated from the same *image* but they have completely separate existences. They have different persistent storage areas (ie databases) and they do not share data.
+
+The second thing to understand is how the networks inside the "Docker" rectangle shown in the model are created. The `networks` section of your compose file defines the networks:
+
+``` yaml
+networks:
+
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+
+  nextcloud:
+    driver: bridge
+    internal: true
+    ipam:
+      driver: default
+```
+
+At run time, the lower-case representation of the directory containing the compose file (ie "iotstack") is prepended to the network names, resulting in:
+
+* `default` ⟹ `iotstack_default`
+* `nextcloud` ⟹ `iotstack_nextcloud`
+
+Each network is assigned a /16 IPv4 subnet. Unless you override it, the subnet ranges are chosen at random. This model assumes:
+
+* `iotstack_default` is assigned 172.18.0.0/16
+* `iotstack_nextcloud` is assigned 172.19.0.0/16
+
+The logical router on each network takes the `.0.1` address.
+
+> The reason why two octets are devoted to the host address is because a /16 network prefix implies a 16-bit host portion, and each octet describes 8 bits.
+
+As each container is brought up, the network(s) it joins are governed by the following rules:
+
+1. If there is an explicit `networks:` clause in the container's service definition then the container joins the network(s) listed in the body of the clause; otherwise
+2. The container joins the `default` network.
+
+Assuming that the `mariadb` and `wireguard` containers do not have `networks:` clauses, the result of applying those rules is shown in the following table.
+ 
+![Effect of networks clause](./images/nextcloud-networks-clause.jpeg)
+
+Each container is assigned an IPv4 address on each network it joins. In general, the addresses are assigned in the order in which the containers start.
+
+No container can easily predict either the network prefix of the networks it joins or the IP address of any other containers. Inside *Dockerspace,* Docker provides a mechanism for any container to reach any other container with which it shares a network by using the destination container's name.
+
+In this model there are two MariaDB instances, one named `nextcloud_db` and the other named `mariadb`. How does the `nextcloud` container know which **name** to use. Simple. It's passed in an environment variable:
+
+```
+environment:
+  - MYSQL_HOST=nextcloud_db
+```
+
+At runtime, the `nextcloud` container references `nextcloud_db:3306`. Docker resolves `nextcloud_db` to 172.19.0.2 so the traffic traverses the 172.19/16 internal bridged network and arrives at the `nextcloud_db` container.
+
+The `nextcloud` container *could* reach the `mariadb` container via `mariadb:3306` but there's no ambiguity because Docker resolves `mariadb` to 172.18.0.2, which is a different subnet and an entirely different internal bridged network.
+
+Moreover, even if the `iotstack_nextcloud` network were to be removed with all containers joining the `iotstack_default` network, there would still be no ambiguity because each container operates as a separate logical computer. `nextcloud_db:3306` and `mariadb:3306` are the equivalent of two physically different computers, each listening on port 3306.
+
+In terms of **external** ports, only `mariadb` exposes port 3306 so an external process trying to reach 192.168.203.60:3306 will be port-forwarded to the `mariadb` container. If it was necessary for an external process to reach the `nextcloud_db` container, a port mapping using a different and non-conflicting external port would have to be added to the `nextcloud_db` service definition.
