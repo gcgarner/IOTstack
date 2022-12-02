@@ -148,7 +148,7 @@ Table&nbsp;1 summarises what you can and can't do from the remote client <mark>G
 
 <mark>G</mark> *can* reach <mark>B</mark> and <mark>C</mark>, *indirectly,* by first connecting to <mark>A</mark>. An example would be <mark>G</mark> opening an SSH session on <mark>A</mark> then, within that session, opening another SSH session on <mark>B</mark> or <mark>C</mark>.
 
-It should be apparent that you can also solve this problem by installing ZeroTier client software on <mark>B</mark>. It would then have its own interface in the 10.244.0.0/16 network that forms the ZeroTier Cloud and be reachable directly from <mark>G</mark>. The two *no<sup>†</sup>* entries would then become *yes.*
+It should be apparent that you can also solve this problem by installing ZeroTier client software on <mark>B</mark>. It would then have its own interface in the 10.244.0.0/16 network that forms the ZeroTier Cloud and be reachable directly from <mark>G</mark>. The *no<sup>†</sup>* entries would then become *yes*, with the caveat that <mark>G</mark> would reach <mark>B</mark> via its interface in the 10.244.0.0/16 network.
 
 The same would be true for your router <mark>C</mark>, providing it was capable of running ZeroTier client software.
 
