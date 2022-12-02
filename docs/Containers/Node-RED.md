@@ -435,7 +435,7 @@ You have several options:
 	
 	Note:
 	
-	* The `-it` flag is *optional*. It means "interactive terminal". Its presence tells Docker that the command may need user interaction, such as entering a password or typing "yes" to a question.
+	* The `-it` flags are *optional*. They mean "interactive" and "allocate pseudo-TTY". Their presence tells Docker that the command may need user interaction, such as entering a password or typing "yes" to a question.
 	
 2. You can open a shell into the container, run as many commands as you like inside the container, and then exit. For example:
 
@@ -873,10 +873,27 @@ Think of these commands as "re-running the *Dockerfile*". The only time a *base*
 
 Your existing Node-RED container continues to run while the rebuild proceeds. Once the freshly-built *local* image is ready, the `up` tells `docker-compose` to do a new-for-old swap. There is barely any downtime for your Node-RED service.
 
+### Checking for Node-RED updates { #updateNodeRed }
+
+IOTstack provides a convenience script which can help you work out if a new version of Node-RED is available. You can run it like this:
+
+``` console
+$ ~/IOTstack/scripts/nodered_version_check.sh
+```
+
+The script is not infallible. It works by comparing the version number in the Node-RED image on your system with a version number stored on GitHub.
+
+GitHub is always updated *before* a new image appears on *DockerHub*. Sometimes there is a delay of weeks between the two events. For that reason, the script should be viewed more like a meteorological forecast than hard fact.
+
+The script assumes that your local image builds as `iotstack-nodered:latest`. If you use different tags, you can pass that information to the script. Example:
+
+``` console
+$ ~/IOTstack/scripts/nodered_version_check.sh iotstack-nodered:3.0.2
+```
 
 ### Upgrading Node-RED { #upgradeNodeRed }
 
-The only way to know when an update to Node-RED is available is to check the [nodered/node-red tags page](https://hub.docker.com/r/nodered/node-red/tags?page=1&ordering=last_updated) on *DockerHub*.
+The only way to know, for certain, when an update to Node-RED is available is to check the [nodered/node-red tags page](https://hub.docker.com/r/nodered/node-red/tags?page=1&ordering=last_updated) on *DockerHub*.
 
 Once a new version appears on [*DockerHub*](https://hub.docker.com), you can upgrade Node-RED like this:
 
