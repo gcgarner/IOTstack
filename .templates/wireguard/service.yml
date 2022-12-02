@@ -15,7 +15,9 @@ wireguard:
   ports:
   - "51820:51820/udp"
   volumes:
-  - ./volumes/wireguard:/config
+  - ./volumes/wireguard/config:/config
+  - ./volumes/wireguard/custom-cont-init.d:/custom-cont-init.d
+  - ./volumes/wireguard/custom-services.d:/custom-services.d
   - /lib/modules:/lib/modules:ro
   cap_add:
   - NET_ADMIN
