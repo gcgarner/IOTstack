@@ -15,6 +15,71 @@
 	- [*CAdvisor*](https://hub.docker.com/r/zcube/cadvisor)
 	- [*Node Exporter*](https://hub.docker.com/r/prom/node-exporter)
 
+
+## Special note 2022-11-08 { #configUpdate }
+
+[Issue 620](https://github.com/SensorsIot/IOTstack/issues/620) pointed out there was an error in the default configuration file. That has been fixed. To adopt it, please do the following:
+
+1. If Prometheus and/or any of its associated containers are running, take them down:
+
+	```
+	$ cd ~/IOTstack
+	$ docker-compose rm --force --stop -v prometheus prometheus-cadvisor prometheus-nodeexporter
+	```
+
+2. Move the existing active configuration out of the way:
+
+	```
+	$ cd ~/IOTstack/volumes/prometheus/data/config
+	$ mv config.yml config.yml.old
+	```
+
+3. Make sure that the service definitions in your `docker-compose.yml` are up-to-date by comparing them with the template versions:
+
+	- `~/IOTstack/.templates/prometheus/service.yml`
+	- `~/IOTstack/.templates/prometheus-cadvisor/service.yml`
+	- `~/IOTstack/.templates/prometheus-nodeexporter/service.yml`
+
+	Your service definitions and those in the templates do not need to be *identical*, but you should be able to explain any differences.
+
+4. Rebuild your Prometheus container by following the instructions in [Upgrading *Prometheus*](#upgradingPrometheus). Rebuilding will import the updated *default* configuration into the container's image.
+
+5. Start the service:
+
+	```
+	$ cd ~/IOTstack
+	$ docker-compose up -d prometheus
+	```
+
+	Starting `prometheus` should start `prometheus-cadvisor` and `prometheus-nodeexporter` automatically. Because the old configuration has been moved out of the way, the container will supply a new version as a default.
+
+6. Compare the configurations:
+
+	```
+	$ cd ~/IOTstack/volumes/prometheus/data/config
+	$ diff -y config.yml.old config.yml
+	global:                          global:
+	  scrape_interval: 10s             scrape_interval: 10s
+	  evaluation_interval: 10s         evaluation_interval: 10s
+
+	scrape_configs:                  scrape_configs:
+	  - job_name: "iotstack"           - job_name: "iotstack"
+	    static_configs:                  static_configs:
+	      - targets:                       - targets:
+	        - localhost:9090                 - localhost:9090
+	        - cadvisor:8080        |         - prometheus-cadvisor:8080
+	        - nodeexporter:9100    |         - prometheus-nodeexporter:9100
+	```
+
+	In the output above, the vertical bars (`|`) in the last two lines indicate that those lines have changed. The "old" version is on the left, "new" on the right.
+
+	If you have made other alterations to your config then you should see other change indicators including `<`, `|` and `>`. If so, you should hand-merge your own changes from `config.yml.old` into `config.yml` and then restart the container:
+
+	```
+	$ cd ~/IOTstack
+	$ docker-compose restart prometheus
+	```
+
 ## Overview { #overview }
 
 Prometheus is a collection of three containers:
