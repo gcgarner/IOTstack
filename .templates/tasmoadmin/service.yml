@@ -1,7 +1,9 @@
 tasmoadmin:
   container_name: tasmoadmin
-  image: raymondmm/tasmoadmin
+  image: ghcr.io/tasmoadmin/tasmoadmin:latest
   restart: unless-stopped
+  environment:
+    - TZ=Etc/UTC
   ports:
     - "8088:80"
   volumes:
