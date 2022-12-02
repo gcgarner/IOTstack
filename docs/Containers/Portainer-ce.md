@@ -51,7 +51,7 @@ From there, you can click on the "Local" group and take a look around. One of th
 
 There are 'Quick actions' to view logs and other stats. This can all be done from terminal commands but *Portainer CE* makes it easier. 
 
-## Setting the Public IP address for your end-point { #setPublicIP }
+## Setting the Public IP address { #setPublicIP }
 
 If you click on a "Published Port" in the "Containers" list, your browser may return an error saying something like "can't connect to server" associated with an IP address of "0.0.0.0".
 
@@ -59,13 +59,13 @@ To fix that problem, proceed as shown below:
 
 ![Set Public IP address](./images/portainer-ce-set-public-ip.png)
 
-1. Click "Endpoints" in the left hand panel.
-2. Click the name "local" in the list of Endpoints.
+1. Click "Environments" in the left hand panel.
+2. Click the name "local" in the list of Environments.
 3. Click in the "Public IP" field. Enter one of the following:
 	- The multicast DNS (MDNS) name of your Raspberry Pi (eg `iot-hub.local`)
 	- The fully-qualified domain name (FQDN) of your Raspberry Pi (eg `iot-hub.mydomain.com`)
 	- The IP address of your Raspberry Pi (eg `192.168.1.10`)
-4. Click "Update endpoint".
+4. Click "Update environment".
 
 > To remove the Public IP address, repeat the above steps but clear the "Public IP" field in step 3.
 
@@ -78,6 +78,11 @@ Keep in mind that clicking on a "Published Port" does not guarantee that your br
 * Port 1880 for NodeRed will respond normally.
 
 > All things considered, you will get more consistent behaviour if you simply bookmark the URLs you want to use for your IOTstack services.
+
+Notes:
+
+* Earlier documentation for Portainer-CE used the term "endpoint" for what is now being called the "environment".
+* The "environment" being discussed in this section is Portainer-CE's environment. It should not be confused with the tools Portainer-CE provides for managing a container's environment (eg setting environment variables).
 
 ## If you forget your password { #forgotPassword }
 
@@ -93,4 +98,4 @@ $ docker-compose start portainer-ce
 Then, follow the steps in:
 
 1. [First run of *Portainer CE*](#firstRun); and
-2. [Setting the Public IP address for your end-point](#setPublicIP).
+2. [Setting the Public IP address](#setPublicIP).
