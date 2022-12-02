@@ -7,9 +7,7 @@ IOTstack makes the following assumptions:
 1. Your hardware is a Raspberry Pi (typically a 3B+ or 4B).
 
 	* The Raspberry Pi Zero W2 has been tested with IOTstack. It works but the 512MB RAM means you should not try to run too many containers concurrently.
-    * Users have also [reported success
-      ](https://github.com/SensorsIot/IOTstack/issues/375) on Orange Pi
-      Win/Plus.
+	* Users have also [reported success](https://github.com/SensorsIot/IOTstack/issues/375) on Orange Pi Win/Plus.
 
 2. Your Raspberry Pi has a reasonably-recent version of 32-bit or 64-bit Raspberry Pi OS (aka "Raspbian") installed. You can download operating-system images:
 
@@ -104,10 +102,23 @@ Please don't read these assumptions as saying that IOTstack will not run on othe
 	$ docker-compose up -d
 	```
 
-### scripted
+### scripted – PiBuilder { #scripted }
 
-If you prefer to automate your installations using scripts, see
-[PiBuilder](https://github.com/Paraphraser/PiBuilder).
+If you prefer to automate your installations using scripts, see [PiBuilder](https://github.com/Paraphraser/PiBuilder). Beginning with your choice of Raspberry Pi OS starting point (eg Buster or Bullseye), PiBuilder:
+
+1. Satisfies all dependencies likely to be needed for IOTstack.
+3. Installs all required system patches (see next section).
+3. Installs Docker and docker-compose.
+4. Clones:
+
+	* IOTstack (this repository);
+	* [IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup) which is an alternative to the backup script supplied with IOTstack but does not require your stack to be taken down to perform backups; and
+	* [IOTstackAliases](https://github.com/Paraphraser/IOTstackAliases) which provides shortcuts for common IOTstack operations.
+
+After PiBuilder has finished, your system is ready to either:
+
+* Run the IOTstack menu to build your first stack; or
+* Restore a backup and bring up your stack.
 
 ## Required system patches
 
@@ -120,6 +131,8 @@ Run the following commands:
 ``` console
 $ sudo bash -c '[ $(egrep -c "^allowinterfaces eth\*,wlan\*" /etc/dhcpcd.conf) -eq 0 ] && echo "allowinterfaces eth*,wlan*" >> /etc/dhcpcd.conf'
 ```
+
+This patch prevents the `dhcpcd` daemon from trying to allocate IP addresses to Docker's `docker0` and `veth` interfaces. Docker assigns the IP addresses itself and `dhcpcd` trying to get in on the act can lead to a deadlock condition which can freeze your Pi.
 
 See [Issue 219](https://github.com/SensorsIot/IOTstack/issues/219) and [Issue 253](https://github.com/SensorsIot/IOTstack/issues/253) for more information.
 
