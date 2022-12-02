@@ -3,6 +3,13 @@
 # support user renaming of script
 SCRIPT=$(basename "$0")
 
+# dependency check
+if [ -z "$(which rsync)" -o -z "$(which jq)" ] ; then
+   echo "This script depends on jq and rsync. Please run"
+   echo "   sudo apt update && sudo apt install jq rsync"
+   exit -1
+fi
+
 # useful function
 isContainerRunning() {
    if STATUS=$(curl -s --unix-socket /var/run/docker.sock http://localhost/containers/$1/json | jq .State.Status) ; then
@@ -16,6 +23,13 @@ isContainerRunning() {
 
 # should not run as root
 [ "$EUID" -eq 0 ] && echo "$SCRIPT should NOT be run using sudo" && exit -1
+
+# dependency check
+if [ -z "$(which rsync)" -o -z "$(which jq)" ] ; then
+   echo "This script depends on jq and rsync. Please run"
+   echo "   sudo apt update && sudo apt install jq rsync"
+   exit -1
+fi
 
 read -r -d '' RUNNINGNOTES <<-EOM
 \n
