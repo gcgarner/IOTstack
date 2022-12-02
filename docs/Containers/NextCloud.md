@@ -394,7 +394,7 @@ Assuming that the `mariadb` and `wireguard` containers do not have `networks:` c
 
 Each container is assigned an IPv4 address on each network it joins. In general, the addresses are assigned in the order in which the containers start.
 
-No container can easily predict either the network prefix of the networks it joins or the IP address of any other containers. However, Docker provides a mechanism for any container to reach any other container with which it shares a network by using the destination container's name.
+No container can easily predict either the network prefix of the networks it joins or the IP address of any other container. However, Docker provides a mechanism for any container to reach any other container with which it shares a network by using the destination container's name.
 
 In this model there are two MariaDB instances, one named `nextcloud_db` and the other named `mariadb`. How does the `nextcloud` container know which **name** to use? Simple. It's passed in an environment variable:
 
@@ -409,4 +409,4 @@ The `nextcloud` container *could* reach the `mariadb` container via `mariadb:330
 
 > There would still be no ambiguity even if all containers attached to the `iotstack_default` network because each container name still resolves to a distinct IP address.
 
-In terms of **external** ports, only `mariadb` exposes port 3306. Any external process trying to reach 192.168.203.60:3306 will always be port-forwarded to the `mariadb` container. The `iotstack_nextcloud` is declared "internal" which means it is unreachable from beyond the Raspberry Pi. Any port-mappings associated with that network are ignored.
+In terms of **external** ports, only `mariadb` exposes port 3306. Any external process trying to reach 192.168.203.60:3306 will always be port-forwarded to the `mariadb` container. The `iotstack_nextcloud` network is declared "internal" which means it is unreachable from beyond the Raspberry Pi. Any port-mappings associated with that network are ignored.
