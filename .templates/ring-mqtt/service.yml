@@ -7,6 +7,7 @@ ring-mqtt:
   - DEBUG=ring-*
   ports:
   - 8554:8554
+  - 55123:55123
   volumes:
   - ./volumes/ring-mqtt/data:/data
   logging:

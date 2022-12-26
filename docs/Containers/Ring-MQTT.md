@@ -84,7 +84,24 @@
 	$ docker-compose restart ring-mqtt
 	```
 
-6. Check the logs:
+6. Launch your browser (eg Chrome, Firefox, Safari) and open the following URL:
+
+	```
+	http://«ip-or-name»:55123
+	```
+	
+	where `«ip-or-name»` is the IP address or domain name of the Raspberry Pi where your ring-mqtt container is running. Examples:
+	
+	* `http://192.168.1.100:55123`
+	* `http://iot-hub.my.domain.com`
+
+	You should see the following screen:
+	
+	![x](./images/ring-mqtt-token.png)
+
+	Follow the instructions.
+	
+7. Check the logs:
 
 	``` console
 	$ docker logs ring-mqtt
