@@ -13,6 +13,7 @@ Do note that the ports listed are not all of the ports containers use. They are 
 | -------------- | ---------------- | ---------------- | -------------------------------- | ------------------ |
 | adminer        | *none*           | *none*     | 9080   | No |
 | blynk_server   | *none*           | *none*     | 8180   | No |
+| dashmachine    | *none*           | *none*     | 5000   | No |
 | deconz         | *none*           | IOtSt4ckDec0nZ | 8090 | No |
 | diyhue         | *none*           | *none*     | 8070   | No |
 | domoticz       | *none*           | *none*     | 8883   | No |
