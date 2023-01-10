@@ -4,7 +4,7 @@ heimdall:
   environment:
     - PUID=1000
     - PGID=1000
-    - TZ=Europe/Paris
+    - TZ=Etc/UTC
   volumes:
     - ./volumes/heimdall/config:/config
   ports:
