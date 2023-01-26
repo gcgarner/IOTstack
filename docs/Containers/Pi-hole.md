@@ -10,7 +10,13 @@ Pi-hole is a fantastic utility to reduce ads.
 
 ## Environment variables  { #envVars }
 
-In conjunction with controls in Pi-hole's web GUI, environment variables govern much of Pi-hole's behaviour. If you are running new menu (master branch), the variables are inline in `docker-compose.yml`. If you are running old menu, the variables will be in `~/IOTstack/services/pihole/pihole.env`
+In conjunction with controls in Pi-hole's web GUI, environment variables govern much of Pi-hole's behaviour.
+
+If you are running new menu (master branch), environment variables are inline in your compose file. If you are running old menu, the variables will be in:
+
+```
+~/IOTstack/services/pihole/pihole.env
+```
 
 > There is nothing about old menu which *requires* the variables to be stored in the `pihole.env` file. You can migrate everything to `docker-compose.yml` if you wish.
 
@@ -21,62 +27,79 @@ Pi-hole's authoritative list of environment variables can be found [here](https:
 
 ### Admin password { #adminPassword }
 
-The first time Pi-hole is launched, it checks for the `WEBPASSWORD` environment variable. If found, the right hand side becomes the administrative password.
+By default, Pi-hole does not have an administrator password. That is because the default service definition provided by IOTstack contains the following environment variable with no value on its right hand side:
 
-You can set the value of `WEBPASSWORD` in the IOTstack menu by:
+``` yaml
+- WEBPASSWORD=
+``` 
 
-1. Placing the cursor on top of "pihole".
-2. If Pi-hole is not already selected as a container, press <kbd>space</kbd> to select it.
-3. Press the right arrow, and then
-4. Choose "PiHole Password Options".
+Each time the Pi-hole container is launched, it checks for the presence or absence of the `WEBPASSWORD` environment variable, then reacts like this:
 
-From there, you have the choice of:
+* If `WEBPASSWORD` is *defined* but does **not** have a value:
 
-* *Use default password for this build*
+	- No admin password is set;
+	- Any previous admin password is cleared;
+	- You will be able to [connect to Pi-hole's web interface](#connectGUI) without providing a password (you won't even see the login screen); and
+	- The main menu (≡) will not contain a logout command.
 
-	Choosing this option results in:
+	This is the default situation for IOTstack.
 
-	```yaml
-	- WEBPASSWORD=IOtSt4ckP1Hol3
-	```
+* If `WEBPASSWORD` is *defined* **and** has a value, that value will become the admin password. For example, to change your admin password to be "IOtSt4ckP1Hol3":
 
-* *Randomise password for this build*
+	1. Edit your compose file so that Pi-hole's service definition contains:
 
-	Choosing this option results in a randomly-generated password which you can find by inspecting your `docker-compose.yml`.
+		``` yaml
+		- WEBPASSWORD=IOtSt4ckP1Hol3
+		```
 
-* *Do nothing*
+	2. Run:
 
-	Choosing this option results in:
+		``` console
+		$ cd ~/IOTstack
+		$ docker-compose up -d pihole
+		```
 
-	```yaml
-	- WEBPASSWORD=%randomAdminPassword%
-	```
+		docker-compose will notice the change to the environment variable and re-create the container. The container will see that `WEBPASSWORD` has a value and will change the admin password to "IOtSt4ckP1Hol3".
 
-	which is a valid password string so "%randomAdminPassword%" will become the password.
+		You will be prompted for a password whenever you [connect to Pi-hole's web interface](#connectGUI).
 
-Regardless of which option you choose, you can always edit your `docker-compose.yml` to change the value of the environment variable. For example:
+* If `WEBPASSWORD` is *undefined* (absent from your compose file), Pi-hole behaves like this:
 
-```yaml
-- WEBPASSWORD=mybigsecret
-```
+	- If this is the first time Pi-hole has been launched, a random password is generated.
 
-It is important to realise that `WEBPASSWORD` only has any effect on the very **first** launch. Once Pi-hole has been run at least once, the value of `WEBPASSWORD` is ignored and any changes you make will have no effect.
+		Pi-hole senses "first launch" if it has to initialise its persistent storage area. See also [getting a clean slate](#cleanSlate). You can discover the password by running:
 
-If `WEBPASSWORD` is **not** set on first launch, Pi-hole defaults to a randomly-generated password which you can discover after the first launch like this:
+		``` console
+		$ docker logs pihole | grep random
+		```
+
+		Remember, docker logs are cleared each time a container is terminated or re-created so you need to run that command before the log disappears!
+
+	- Otherwise, whatever password was set on the previous launch will be re-used.
+
+#### about `pihole -a -p` { #adminPassChange }
+
+Some Pi-hole documentation on the web recommends using the following command to change Pi-hole's admin password:
 
 ```console
-$ docker logs pihole | grep random 
+$ docker exec pihole pihole -a -p «yourPasswordHere»
 ```
 
-> Remember, docker logs are ephemeral so you need to run that command before the log disappears!
+That command works but its effect will always be overridden by `WEBPASSWORD`. For example, suppose your service definition contains:
 
-If you ever need to reset Pi-hole's admin password to a known value, use the following command:
-
-```console
-$ docker exec pihole pihole -a -p mybigsecret
+``` yaml
+- WEBPASSWORD=myFirstPassword
 ```
 
-> replacing "mybigsecret" with your choice of password.
+When you start the container, the admin password will be "myFirstPassword". If you run:
+
+``` console
+$ docker exec pihole pihole -a -p mySecondPassword
+```
+
+then "mySecondPassword" will become the admin password **until** the next time the container is re-created by docker-compose, at which point the password will be reset to "myFirstPassword".
+
+Given this behaviour, we recommend that you ignore the `pihole -a -p` command.
 
 ### Other variables { #otherVars }
 
