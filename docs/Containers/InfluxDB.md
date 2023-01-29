@@ -662,7 +662,9 @@ SSD-drives have pretty good controllers spreading out writes, so this isn't a th
 
   This is especially important if you plan on having Grafana or Chronograf displaying up-to-date data on a dashboard, making queries all the time.
 
-## Container won't start { #debugging }
+### Debugging { #debugging }
+
+### Container won't start { #debugInspection }
 
 Sometimes you need start the container without starting influxdb to access its maintenance tools. Usually when influx crashes on startup.
 
@@ -677,18 +679,72 @@ influxdb:
 Recreate the container using the new entrypoint:
 
 ``` console
-pi@raspberrypi:~/IOTstack $ docker-compose up -d influxdb
+$ docker-compose up -d influxdb
 Recreating influxdb ... done
 ```
 
-Now it should start and you can get a shell to poke around and try the `influx_inspect`:
+Now the container should start and you can get a shell to poke around and try the `influx_inspect` command:
 
 ``` console
 $ docker exec -it influxdb bash
-root@5ecc8536174f:/# influx_inspect
+# influx_inspect
 Usage: influx_inspect [[command] [arguments]]
 ```
 
-You may need to do `apt update` and `apt install` some tools you need. The container is pretty bare-bones by default.
+Once you have finished poking around, you should undo the change by removing the custom entrypoint and `up -d` again to return to normal container behaviour where you can then test to see if your fixes worked.
 
-Of course remove the custom entrypoint and "up -d" again to test if your fixes worked.
+### Adding packages { #debugPackages }
+
+The container is pretty bare-bones by default. It is OK to install additional tools. Start by running:
+
+``` console
+# apt update
+```
+
+and then use `apt install` to add whatever you need. Packages you add will persist until the next time the container is re-created.  
+
+### Sniffing traffic { #debugSniff }
+
+If you need to see the actual packets being sent to Influx for insertion into your database, you can set it up like this:
+
+``` console
+$ docker exec influxdb bash -c 'apt update && apt install tcpdump -y'
+```
+
+That adds `tcpdump` to the running container and, as noted above, that will persist until you re-create the container.
+
+To capture traffic:
+
+``` console
+$ docker exec influxdb tcpdump -i eth0 -s 0 -n -c 100 -w /var/lib/influxdb/capture.pcap dst port 8086
+```
+
+Breaking that down:
+
+* `-i eth0` is the container's internal virtual Ethernet network interface (attached to the internal bridged network)
+* `-s 0` means "capture entire packets"
+* `-n` means "do not try to resolve IP addresses to domain names
+* `-c 100` is optional and means "capture 100 packets then stop". If you omit this option, `tcpdump` will capture packets until you press <kbd>control</kbd>+<kbd>C</kbd>.
+* `-w /var/lib/influxdb/capture.pcap` is the internal path to the file where captured packets are written. You can, of course, substitute any filename you like for `capture.pcap`.
+* `dst port 8086` captures all packets where the destination port field is 8086, which is the InfluxDB internal port number.
+
+The internal path:
+
+```
+/var/lib/influxdb/capture.pcap
+```
+
+maps to the external path:
+
+```
+~/IOTstack/volumes/influxdb/data/capture.pcap
+```
+
+You can copy that file to another system where you have a tool like WireShark installed. WireShark will open the file and you can inspect packets and verify that the information being sent to InfluxDB is what you expect.
+
+Do not forget to clean-up any packet capture files:
+
+```
+$ cd ~/IOTstack/volumes/influxdb/data
+$ sudo rm capture.pcap
+```
