@@ -63,7 +63,3 @@ For services in host mode, only the external port is shown(if required).
 | zerotier-router| *none*           | *none*     |        |      | No |
 | zigbee2mqtt    | *none*           | *none*     | 8080   | 8080 | No |
 | zigbee2mqtt_assistant | *none*    | *none*     | 8880   | 80   | No |
-
-
-
-
