@@ -39,6 +39,7 @@ For services in host mode, only the external port is shown(if required).
 | nodered        | *none*           | *none*     | 1880   | 1880 | No  |
 | octoprint      | *none*           | *none*     | 9980   | 80   | No  |
 | openhab        | *none*           | *none*     | 4050   |      | No  |
+| pgadmin4       | *none*           | *none*     | 5050   |      | No  |
 | pihole         | *none*           | *none*     | 8089<br>53<br>67 | 80<br>53<br>67 | No  |
 | plex           | *none*           | *none*     | 32400  |      | No  |
 | portainer-agent| *none*           | *none*     | 9001   | 9001 | No  |
