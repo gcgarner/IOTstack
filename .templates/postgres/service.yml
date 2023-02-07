@@ -1,13 +1,14 @@
-  postgres:
-    container_name: postgres
-    image: postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=${IOTSTACK_POSTGRES_USER:-postuser}
-      - POSTGRES_PASSWORD=${IOTSTACK_POSTGRES_INITIAL_PASSWORD:-IOtSt4ckpostgresDbPw} # Initial password when creating container, to change later see https://sensorsiot.github.io/IOTstack/Containers/PostgreSQL/
-      - POSTGRES_DB=postdb
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./volumes/postgres/data:/var/lib/postgresql/data
-
+postgres:
+  container_name: postgres
+  image: postgres
+  restart: unless-stopped
+  environment:
+  - TZ=${TZ:-Etc/UTC}
+  - POSTGRES_USER=${POSTGRES_USER:-postuser}
+  - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-IOtSt4ckpostgresDbPw}
+  - POSTGRES_DB=${POSTGRES_DB:-postdb}
+  ports:
+  - "5432:5432"
+  volumes:
+  - ./volumes/postgres/data:/var/lib/postgresql/data
+  - ./volumes/postgres/db_backup:/backup
