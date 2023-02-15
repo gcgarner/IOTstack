@@ -88,7 +88,7 @@ Note:
 	```
 
 	The older syntax meant all local customisations (version-pinning and adding extra packages) needed manual edits to the *Dockerfile*. Those edits would be overwritten each time the menu was re-run to alter the selected add-on nodes. The newer multi-line syntax avoids that problem.
-	
+
 	See also [updating to July 2022 syntax](#july2022syntax).
 
 In either case, the path `./services/nodered/.` tells `docker-compose` to look for:
@@ -208,7 +208,7 @@ Node-RED can run in two modes. By default, it runs in "non-host mode" but you ca
 	``` yml
 	network_mode: host
 	```
-	
+
 2. Remove the `ports` directive and the mapping of port 1880.
 
 ### When Node-RED is not in host mode { #nonHostMode }
@@ -256,21 +256,153 @@ To communicate with your Raspberry Pi's GPIO you need to do the following:
 	$ sudo apt install pigpio python-pigpio python3-pigpio
 	```
 
+	Notes:
+
+	* `pigpio` and `python3-pigpio` are usually installed by default in standard releases of Raspberry Pi OS.
+	* Only `pigpio` is actually *required*.
+	* The Python packages are *optional*.
+
 2. Install the `node-red-node-pi-gpiod` node. See [component management](#componentManagement). It allows you to connect to multiple Pis from the same Node-RED service.
-3. Make sure that the `pigpdiod` daemon is running. The recommended method is listed [here](https://github.com/node-red/node-red-nodes/tree/master/hardware/pigpiod). In essence, you need to:
 
-	- Use `sudo` to edit `/etc/rc.local`;
-	- **Before** the `exit 0` statement, insert the line:
-	
+	Note:
+
+	* Unless you explicitly removed `node-red-node-pi-gpiod` from the list of add-on nodes added to your [Dockerfile](#viaDockerfile) by the IOTstack menu, it will be installed already. You can confirm this by examining your Node-RED Dockerfile&nbsp;❷.
+
+3. Configure the `pigpdiod` daemon:
+
+	* copy the following text to the clipboard:
+
+		``` ini linenums="1"
+		[Unit]
+		Requires=default.target
+		After=default.target
+		[Service]
+		ExecStart=
+		ExecStart=/usr/bin/pigpiod
+		[Install]
+		WantedBy=
+		WantedBy=default.target
 		```
-		/usr/bin/pigpiod
+
+		> Acknowledgement: some of the above from [joan2937/pigpio issue 554](https://github.com/joan2937/pigpio/issues/554#issuecomment-1405364041)
+
+	* execute the following commands:
+
+		``` console
+		$ sudo systemctl stop pigpiod
+		$ sudo systemctl revert pigpiod
+		$ sudo systemctl edit pigpiod
 		```
-		
-	- Reboot.
 
-	You can also pass parameters to `pigpiod` to secure the service. See the writeup for further instructions.
+	* follow the on-screen instructions and paste the contents of the clipboard into the blank area between the lines. The final result should be (lines 4…12 are the pasted material):
 
-4. Drag a gpio node onto the canvas and configure it using the IP address of your Raspberry Pi (eg 192.168.1.123). Don't try to use 127.0.0.1 because that is the loopback address of the Node-RED container.
+		``` ini linenums="1"
+		### Editing /etc/systemd/system/pigpiod.service.d/override.conf
+		### Anything between here and the comment below will become the new contents of the file
+
+		[Unit]
+		Requires=default.target
+		After=default.target
+		[Service]
+		ExecStart=
+		ExecStart=/usr/bin/pigpiod
+		[Install]
+		WantedBy=
+		WantedBy=default.target
+
+		### Lines below this comment will be discarded
+
+		### /lib/systemd/system/pigpiod.service
+		# [Unit]
+		# Description=Daemon required to control GPIO pins via pigpio
+		# [Service]
+		# ExecStart=/usr/bin/pigpiod -l
+		# ExecStop=/bin/systemctl kill pigpiod
+		# Type=forking
+		# [Install]
+		# WantedBy=multi-user.target
+		```
+
+	* Save your work by pressing:
+
+		- <kbd>control</kbd>+<kbd>O</kbd> (letter O not zero)
+		- <kbd>return</kbd>
+		- <kbd>control</kbd>+<kbd>X</kbd>
+
+	* Check your work by running:
+
+		``` console
+		$ sudo systemctl cat pigpiod
+		```
+
+		The expected result is:
+
+		``` ini linenums="1"
+		# /lib/systemd/system/pigpiod.service
+		[Unit]
+		Description=Daemon required to control GPIO pins via pigpio
+		[Service]
+		ExecStart=/usr/bin/pigpiod -l
+		ExecStop=/bin/systemctl kill pigpiod
+		Type=forking
+		[Install]
+		WantedBy=multi-user.target
+
+		# /etc/systemd/system/pigpiod.service.d/override.conf
+		[Unit]
+		Requires=default.target
+		After=default.target
+		[Service]
+		ExecStart=
+		ExecStart=/usr/bin/pigpiod
+		[Install]
+		WantedBy=
+		WantedBy=default.target
+		```
+
+		Lines 12…20 should be those you copied to the clipboard at the start of this step. If you do not see the expected result, go back and start from the beginning of this step.
+
+	* Activate the daemon:
+
+		``` console
+		$ sudo systemctl enable pigpiod
+		$ sudo systemctl start pigpiod
+		```
+
+	* Reboot.
+
+	* Check that the daemon is running:
+
+		``` console
+		$ sudo systemctl status pigpiod
+		```
+
+		Once you have configured `pigpiod` correctly and it has come up after a reboot, you should not need to worry about it again.
+
+		`pigpiod` provides open access to your Raspberry Pi's GPIO via port 8888. Consult the `man` pages if you want to make it more secure. Once you have decided what to do, start over from the beginning of this step, and add your parameters to the line:
+
+		``` ini linenums="6"
+		ExecStart=/usr/bin/pigpiod
+		```
+
+4. Drag a `pi gpio` node onto the canvas. Configure it according to your needs.
+
+	The `Host` field should be set to the IP address of the default gateway on the docker bridge network. This is usually "172.17.0.1". You can confirm the address by running:
+
+	``` console
+	$ docker network inspect bridge | jq .[0].IPAM.Config[0].Gateway
+	"172.17.0.1"
+	```
+
+	Notes:
+
+	* If `jq` is not installed on your system, you can install it by running:
+
+		``` console
+		$ sudo apt install -y jq
+		```
+
+	* Don't try to use 127.0.0.1 because that is the loopback address of the Node-RED container.
 
 ## Sharing files between Node-RED and the Raspberry Pi { #fileSharing }
 
@@ -356,7 +488,7 @@ The flow comprises:
 	```
 	/data/flow-example.txt
 	```
-	
+
 	- *When this node runs, it writes the payload to the specified file. Remember that `/data` is an internal path within the Node-RED container.*
 
 Deploying the flow and clicking on the Inject node results in the debug message shown on the right hand side of the screen shot. The embedded terminal window shows that the same information is accessible from outside the container.
@@ -428,15 +560,15 @@ You have several options:
 	```
 
 	The actual command you would need would be:
-	
+
 	``` console
 	$ docker exec nodered grep "^PRETTY_NAME=" /etc/os-release
 	```
-	
+
 	Note:
-	
+
 	* The `-it` flags are *optional*. They mean "interactive" and "allocate pseudo-TTY". Their presence tells Docker that the command may need user interaction, such as entering a password or typing "yes" to a question.
-	
+
 2. You can open a shell into the container, run as many commands as you like inside the container, and then exit. For example:
 
 	``` console
@@ -446,9 +578,9 @@ You have several options:
 	# exit
 	$
 	```
-	
+
 	In words:
-	
+
 	* Run the `bash` shell inside the Node-RED container. You need to be able to interact with the shell to type commands so the `-it` flag is required.
 	* The "#" prompt is coming from `bash` running inside the container. It also signals that you are running as the root user inside the container.
 	* You run the `grep`, `whoami` and any other commands.
@@ -464,7 +596,7 @@ You will need to have a few concepts clear in your mind before you can set up SS
 * «HOSTNAME» (required)
 
 	The name of your Raspberry Pi. When you first booted your RPi, it had the name "raspberrypi" but you probably changed it using `raspi-config`. Example:
-	
+
 	```
 	iot-dev
 	```
@@ -472,36 +604,36 @@ You will need to have a few concepts clear in your mind before you can set up SS
 * «HOSTADDR» (required)
 
 	Either or both of the following:
-	
+
 	* «HOSTFQDN» (optional)
-	
+
 		If you have a local Domain Name System server, you may have defined a fully-qualified domain name (FQDN) for your Raspberry Pi. Example:
-	
+
 		```
 		iot-dev.mydomain.com
 		```
-	
+
 		Note:
-		
+
 		* Docker's internal networks do not support multicast traffic. You can't use a multicast DNS name (eg "raspberrypi.local") as a substitute for a fully-qualified domain name.
-	
+
 	* «HOSTIP» (required)
-	
+
 		Even if you don't have a fully-qualified domain name, you will still have an IP address for your Raspberry Pi. Example:
-	
+
 		```
 		192.168.132.9
 		```
-	
+
 		Keep in mind that a Raspberry Pi running IOTstack is operating as a *server*. A dynamic DHCP address is not appropriate for a server. The server's IP address needs to be fixed. The two standard approaches are:
-	
+
 		* a static DHCP assignment configured on your DHCP server (eg your router) which always returns the same IP address for a given MAC address; or
 		* a static IP address configured on your Raspberry Pi.
 
 * «USERID» (required)
 
 	The user ID of the account on «HOSTNAME» where you want Node-RED flows to be able to run commands. Example:
-	
+
 	```
 	pi
 	```
@@ -605,44 +737,44 @@ Six files are relevant to Node-RED's ability to execute commands outside of cont
 	- `ssh_host_ed25519_key.pub` is the Raspberry Pi's public host key
 
 		Those keys were created when your Raspberry Pi was initialised. They are unique to the host.
-		
+
 		Unless you take precautions, those keys will change whenever your Raspberry Pi is rebuilt from scratch and that **will** stop SSH from working.
-		
+
 		You can recover by re-running [`ssh-copy-id`](#sshStep2).
-	
+
 * in `~/IOTstack/volumes/nodered/ssh`:
 
 	- `id_ed25519` is the Node-RED container's private key 
 	- `id_ed25519.pub` is the Node-RED container's public key
-	
+
 		Those keys were created when you generated the SSH key-pair for Node-RED.
-		
+
 		They are unique to Node-RED but will follow the container in backups and will work on the same machine, or other machines, if you restore the backup.
-		
+
 		It does not matter if the Node-RED container is rebuilt or if a new version of Node-RED comes down from DockerHub. These keys will remain valid until lost or overwritten.
-	
+
 		If you lose or destroy these keys, SSH **will** stop working.
-		
+
 		You can recover by [generating new keys](#sshStep1) and then re-running [`ssh-copy-id`](#sshStep2).
 
 	- `known_hosts`
 
 		The `known_hosts` file contains a copy of the Raspberry Pi's public host key. It was put there by `ssh-copy-id`.
-		
+
 		If you lose this file or it gets overwritten, SSH **will** still work but will re-prompt for authorisation to connect. This works when you are running commands from `docker exec -it` but not when running commands from an `exec` node.
-		
+
 		Note that authorising the connection at the command line ("Are you sure you want to continue connecting?") will auto-repair the `known_hosts` file.
-	
+
 * in `~/.ssh/`:
 
 	- `authorized_keys`
 
 		That file contains a copy of the Node-RED container's public key. It was put there by `ssh-copy-id`.
-		
+
 		Pay attention to the path. It implies that there is one `authorized_keys` file per user, per target host.
-	
+
 		If you lose this file or it gets overwritten, SSH **will** still work but will ask for the password for «USERID». This works when you are running commands from `docker exec -it` but not when running commands from an `exec` node.
-		
+
 		Note that providing the correct password at the command line will auto-repair the `authorized_keys` file.
 
 #### What each file does { #sshFilePurpose }
@@ -793,7 +925,7 @@ In the Node-RED GUI:
 	PRETTY_NAME="Alpine Linux v3.11"
 	PRETTY_NAME="Debian GNU/Linux 11 (bullseye)"
 	```
-	
+
 	The first line is the result of running the command inside the Node-RED container. The second line is the result of running the same command outside the Node-RED container on the Raspberry Pi.
 
 ### Suppose you want to add another «HOSTNAME» { #addHostname }
@@ -809,7 +941,7 @@ In the Node-RED GUI:
 	```
 	~/IOTstack/volumes/nodered/ssh/config
 	```
-	
+
 	to define the new host. Remember to use `sudo` to edit the file. There is no need to restart Node-RED or recreate the container.
 
 ## Maintaining Node-RED { #maintainNodeRed }
@@ -1029,14 +1161,14 @@ You can add, remove or update components in Manage Palette. Node-RED will remind
 $ cd ~/IOTstack
 $ docker-compose restart nodered
 ```
-	
+
 Note:
-	
+
 * Some users have reported misbehaviour from Node-RED if they do too many iterations of:
 
 	- make a change in Manage Palette
 	- restart Node-RED
-	
+
 	It is better to make **all** the changes you intend to make, and only *then* restart Node-RED.
 
 ### via `npm` { #viaNPM }
@@ -1066,7 +1198,7 @@ Examples:
 	```
 
 Note:
-	
+
 * You **must** include `-w /data` on each command. Any formula you find on the web will not include this. You have to remember to do it yourself!
 * Many web examples include the `--save` flag on the `npm` command. That flag is not needed (it is ignored because the behaviour it used to control has been the default since NPM version 5. Node-RED containers have been using NPM version 6 for some time.
 * See also the note above about restarting too frequently.
@@ -1219,9 +1351,9 @@ To avoid any uncertainties, you can use a text editor to update your existing *C
 	    container_name: nodered
 	    build: ./services/nodered/.
 	```
-	
+
 	Replace line 3 (the one-line `build:` directive) with the following lines:
-	
+
 	``` yaml linenums="3"
 	    build:
 	      context: ./services/nodered/.
@@ -1237,16 +1369,16 @@ To avoid any uncertainties, you can use a text editor to update your existing *C
 	``` Dockerfile
 	FROM nodered/node-red:latest-12
 	```
-	
+
 	then line 6 of your *Compose* file should be:
 	 
-	
+
 	``` yaml linenums="6"
 	      - DOCKERHUB_TAG=latest-12
 	```
-	
+
 	Note:
-	
+
 	* IOTstack switched to `latest-12` in March 2021. The default for July 2022 syntax is `latest`. At the time of writing, that is the same as `latest-14`, which is what is recommended by Node-RED. If any of your flows has a dependence on `node.js` version 12 (or if you do not want to take the risk), use `latest-12`.
 
 * Step 3: Define extra packages (optional):
@@ -1256,15 +1388,15 @@ To avoid any uncertainties, you can use a text editor to update your existing *C
 	``` Dockerfile
 	RUN apk update && apk add --no-cache eudev-dev mosquitto-clients bind-tools tcpdump
 	```
-	
+
 	then everything *after* `eudev-dev` should appear on line 7 of your *Compose* file: 
-	
+
 	``` yaml linenums="6"
 	      - EXTRA_PACKAGES=mosquitto-clients bind-tools tcpdump
 	```
 
 	Notes:
-	
+
 	* use spaces between package names.
 	* do **not** enclose the list of packages in quotes.
 	* do **not** include `eudev-dev` (it is specified in the [updated *Dockerfile*](#july2022dockerfile)).
