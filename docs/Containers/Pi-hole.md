@@ -147,7 +147,7 @@ Most of Pi-hole's environment variables are self-explanatory but some can benefi
 
         This option tells Pi-hole where to direct *forward queries* that it can't answer. In other words, Pi-hole will send a forward query for fred.yourdomain.com to 192.168.1.5.
 
-        It *may* be appropriate to set `REV_SERVER_TARGET` to the IP address of your router (eg 192.168.1.1) but, unless your router is running as a DNS server (not impossible but uncommon), the router will likely just relay any queries to your ISP's DNS servers (or other well-known DNS servers like 8.8.8.8 or 1.1.1.1 if you have configured those). Those external DNS servers are unlikely to be able to resolve queries for names in your private domain, and won't be able to do anything sensible with reverse queries if your home network uses RFC1918 addressing (which most do: 182.168.x.x being the most common example).
+        It *may* be appropriate to set `REV_SERVER_TARGET` to the IP address of your router (eg 192.168.1.1) but, unless your router is running as a DNS server (not impossible but uncommon), the router will likely just relay any queries to your ISP's DNS servers (or other well-known DNS servers like 8.8.8.8 or 1.1.1.1 if you have configured those). Those external DNS servers are unlikely to be able to resolve queries for names in your private domain, and won't be able to do anything sensible with reverse queries if your home network uses RFC1918 addressing (which most do: 192.168.x.x being the most common example).
 
         Forwarding doesn't guarantee that 192.168.1.5 will be able to answer the query. The DNS server at 192.168.1.5 may well relay the query to yet another server. In other words, this environment variable does no more than set the next hop.
 
