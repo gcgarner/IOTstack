@@ -404,6 +404,95 @@ To communicate with your Raspberry Pi's GPIO you need to do the following:
 
 	* Don't try to use 127.0.0.1 because that is the loopback address of the Node-RED container.
 
+## Serial Port Access { #accessSerial }
+
+Node-RED running in a container *can* communicate with serial devices attached to your Raspberry Pi's USB ports. However, it does not work "out of the box". You need to set it up.
+
+Let's make an assumption. A device connected to one of your Raspberry Pi's USB ports presents itself as:
+
+```
+/dev/ttyUSB0
+```
+
+You have three basic options:
+
+1. You can map the device into the container using that name:
+
+	``` yaml
+	devices:
+	- …
+	  - "/dev/ttyUSB0:/dev/ttyUSB0"
+	```
+
+	This is simple and effective but it suffers from a few problems:
+
+	* If the device is disconnected while the container is running, there's a good chance the container will crash.
+	* `docker-compose` will not start your container if the device is not present when you bring up your stack.
+	* You can't guarantee that the device will *always* enumerate as "ttyUSB0". It might come up as "ttyUSB1".
+
+	You can deal with the last problem by using the device's "by-id" path. There's an example of this in the [Zigbee2MQTT](https://sensorsiot.github.io/IOTstack/Containers/Zigbee2MQTT/#identifyAdapter) documentation.
+
+	Options 2 and 3 deal with the first two problems in the sense that:
+
+	* a device disconnection is unlikely to cause the container to crash (the flow might);
+	* `docker-compose` will always start the container, irrespective of whether devices are attached.
+
+	Options 2 and 3 can't provide a workaround for device enumeration but you can still deal with that by using the device's "by-id" path.
+
+2. You can map a *class* of devices.
+
+	* Modify the `volumes` clause to add a read-only mapping for `/dev`:
+
+		``` yaml
+		volumes:
+		- …
+		- /dev:/dev:ro
+		```
+
+		> The "read-only" flag prevents the container from doing dangerous things like destroying your Raspberry Pi's SD or SSD. Please don't omit that flag!
+
+	* discover the major number for your device:
+
+		``` console
+		$ ls -l /dev/ttyUSB0
+		crw-rw---- 1 root dialout 188, 0 Feb 18 15:30 /dev/ttyUSB0
+		```
+
+		In the above, "188" is the major number for ttyUSB0.
+
+	* add two device CGroup rules:
+
+		```	 yaml
+		device_cgroup_rules:
+		- 'c 1:* rw' # access to devices like /dev/null
+		- 'c 188:* rmw' # change numbers to your device
+		```
+
+		In the above:
+
+		* "188" is the major number for ttyUSB0 and you should substitute accordingly if your device has a different major number.
+
+		* the "*" is a wildcard for the minor number.
+
+3. Use the "privileged" flag by adding the following to your Node-RED service definition:
+
+	``` yaml
+	privileged: true
+	```
+
+	Please make sure you read the following references **BEFORE** you select this option:
+
+	* [Privileged vs root](https://www.howtogeek.com/devops/privileged-vs-root-in-docker-whats-the-difference/)
+	* [Mind the 'privileged' flag](https://betterprogramming.pub/docker-tips-mind-the-privileged-flag-d6e2ae71bdb4)
+
+### node-red-node-serialport { #nodeSerial }
+
+At the time of writing (Feb 2023), it was not possible to add `node-red-node-serialport` to the list of nodes in your Dockerfile. Attempting to do so crashed the Node-RED container with segmentation fault. The workaround is to add an extra line at the *end* of your Dockerfile: 
+
+``` Dockerfile
+RUN npm install node-red-node-serialport --build-from-source
+```
+
 ## Sharing files between Node-RED and the Raspberry Pi { #fileSharing }
 
 Containers run in a sandboxed environment. A process running inside a container can't see the Raspberry Pi's file system. Neither can a process running outside a container access files inside the container.
