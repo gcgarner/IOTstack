@@ -432,16 +432,16 @@ You have three basic options:
 
 	You can deal with the last problem by using the device's "by-id" path. There's an example of this in the [Zigbee2MQTT](https://sensorsiot.github.io/IOTstack/Containers/Zigbee2MQTT/#identifyAdapter) documentation.
 
-	Options 2 and 3 deal with the first two problems in the sense that:
+	Options 2 and 3 (below) deal with the first two problems in the sense that:
 
 	* a device disconnection is unlikely to cause the container to crash (the flow might);
-	* `docker-compose` will always start the container, irrespective of whether devices are attached.
+	* `docker-compose` will always start the container, irrespective of whether devices are actually attached to your USB ports.
 
-	Options 2 and 3 can't provide a workaround for device enumeration but you can still deal with that by using the device's "by-id" path.
+	Options 2 and 3 (below) can't provide a workaround for devices being given different names via enumeration but you can still deal with that by using the device's "by-id" path (as explained above).
 
-2. You can map a *class* of devices.
+2. You can map a *class* of devices:
 
-	* Modify the `volumes` clause to add a read-only mapping for `/dev`:
+	* modify the `volumes` clause to add a read-only mapping for `/dev`:
 
 		``` yaml
 		volumes:
@@ -449,7 +449,7 @@ You have three basic options:
 		- /dev:/dev:ro
 		```
 
-		> The "read-only" flag prevents the container from doing dangerous things like destroying your Raspberry Pi's SD or SSD. Please don't omit that flag!
+		> The "read-only" flag (`:ro`) prevents the container from doing dangerous things like destroying your Raspberry Pi's SD or SSD. Please don't omit that flag!
 
 	* discover the major number for your device:
 
@@ -458,7 +458,7 @@ You have three basic options:
 		crw-rw---- 1 root dialout 188, 0 Feb 18 15:30 /dev/ttyUSB0
 		```
 
-		In the above, "188" is the major number for ttyUSB0.
+		In the above, the `188, 0` string means the major number for ttyUSB0 is "188" and "0" the minor number.
 
 	* add two device CGroup rules:
 
@@ -469,7 +469,7 @@ You have three basic options:
 		```
 
 		In the above:
-
+		
 		* "188" is the major number for ttyUSB0 and you should substitute accordingly if your device has a different major number.
 
 		* the "*" is a wildcard for the minor number.
@@ -487,7 +487,7 @@ You have three basic options:
 
 ### node-red-node-serialport { #nodeSerial }
 
-At the time of writing (Feb 2023), it was not possible to add `node-red-node-serialport` to the list of nodes in your Dockerfile. Attempting to do so crashed the Node-RED container with segmentation fault. The workaround is to add an extra line at the *end* of your Dockerfile: 
+At the time of writing (Feb 2023), it was not possible to add `node-red-node-serialport` to the list of nodes in your Dockerfile. Attempting to do so crashed the Node-RED container with a *segmentation fault.* The workaround is to build the node from source by adding an extra line at the *end* of your Dockerfile: 
 
 ``` Dockerfile
 RUN npm install node-red-node-serialport --build-from-source
