@@ -12,7 +12,7 @@ blynk_server:
   ports:
     - "8180:8080"
     - "8440:8440"
-    - "9443:9443"
+    - "9444:9443"
   volumes:
     - ./volumes/blynk_server/data:/data
     - ./volumes/blynk_server/config:/config

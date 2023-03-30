@@ -229,7 +229,7 @@ See the [References](#references) for documentation links.
 To connect to the administrative interface, navigate to:
 
 ```
-https://<your pis IP>:9443/admin
+https://<your pis IP>:9444/admin
 ```
 
 You may encounter browser security warnings which you will have to acknowledge in order to be able to connect to the page. The default credentials are:
@@ -280,7 +280,7 @@ Enter Node-Red.....
 3. Configure the Blynk node for the first time:
 
 	```
-	URL: wss://youripaddress:9443/websockets
+	URL: wss://youripaddress:9444/websockets
 	```
 
 	There is more information [here](https://github.com/gablau/node-red-contrib-blynk-ws/blob/master/README.md#how-to-use).
