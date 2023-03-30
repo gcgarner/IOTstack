@@ -231,35 +231,21 @@ To install Zerotier-router:
 
 2. Use a text editor to open your `docker-compose.yml`. Find the ZeroTier service definition and the environment variables it contains: 
 
-	``` yaml linenums="14"
-    environment:
-      - TZ=Etc/UTC
-      - ZEROTIER_ONE_LOCAL_PHYS=eth0
-    # - ZEROTIER_ONE_NETWORK_IDS=yourNetworkID
-      - ZEROTIER_ONE_USE_IPTABLES_NFT=true
-      - ZEROTIER_ONE_GATEWAY_MODE=both
-      - PUID=1000
-      - PGID=1000
+	``` yaml linenums="5"
+	  environment:
+	  - TZ=${TZ:-Etc/UTC}
+	  - PUID=1000
+	  - PGID=1000
+	# - ZEROTIER_ONE_NETWORK_IDS=yourNetworkID
+	  - ZEROTIER_ONE_LOCAL_PHYS=eth0 wlan0
+	  - ZEROTIER_ONE_USE_IPTABLES_NFT=true
+	  - ZEROTIER_ONE_GATEWAY_MODE=both
 	```
 
 	You should:
 
 	1. Set your timezone.
-	2. If necessary, change line 16 to represent your active local interfaces. Examples:
-
-		- if your Raspberry Pi only connects to WiFi, you would use:
-
-			``` yaml linenums="16"
-			- ZEROTIER_ONE_LOCAL_PHYS=wlan0
-			```
-
-		- if both Ethernet and WiFi are active, use:
-
-			``` yaml linenums="16"
-			- ZEROTIER_ONE_LOCAL_PHYS=eth0 wlan0
-			```
-
-	3. Uncomment line 17 and replace "yourNetworkID" with your ZeroTier Network ID. This variable only has an effect the first time ZeroTier is launched. It is an alternative to executing the following command after the container has come up the first time:
+	2. Uncomment line 9 and replace "yourNetworkID" with your ZeroTier Network ID. This variable only has an effect the first time ZeroTier is launched. It is an alternative to executing the following command after the container has come up the first time:
 
 		``` console
 		$ docker exec zerotier zerotier-cli join «NetworkID»
@@ -267,9 +253,23 @@ To install Zerotier-router:
 
 		The reason for the plural variable name ("IDS") is because it supports joining multiple networks on first launch. Network IDs are space-separated, like this:
 	
-		``` yaml linenums="17"
+		``` yaml linenums="9"
 		- ZEROTIER_ONE_NETWORK_IDS=3926d64e8ff148b3 ef7a364a687c45e0
 		```
+
+	3. If necessary, change line 10 to represent your active local interfaces. Examples:
+
+		- if your Raspberry Pi only connects to WiFi, you would use:
+
+			``` yaml linenums="10"
+			- ZEROTIER_ONE_LOCAL_PHYS=wlan0
+			```
+
+		- if both Ethernet and WiFi are active, use:
+
+			``` yaml linenums="10"
+			- ZEROTIER_ONE_LOCAL_PHYS=eth0 wlan0
+			```
 
 3. Launch the container:
 
@@ -360,7 +360,7 @@ Enabling this feature is a two-step process:
 1. In ZeroTier Central, find the "Managed Routes" area and add:
 
 	```
-	Destination: 0.0.0.0 (via) 10.240.0.1
+	Destination: 0.0.0.0/0 (via) 10.240.0.1
 	```
 
 	This is setting up a "default route". 10.240.0.1 is the IP address of <mark>A</mark> in the ZeroTier network.
@@ -447,6 +447,29 @@ If the second route does not make sense, think of it like this:
 * Otherwise the packet will be dropped and the originator will receive an "ICMP destination network unreachable" message.
 
 In essence, both these static routes are "set and forget". They assume catenet growth is a *possibility,* and that it is preferable to set up schemes that will be robust and not need constant tweaking.
+
+### tunnelling remote clients { #topo4tunnel }
+
+The diagram above for Topology 4 does not include a default route in ZeroTier Central. If you implement Topology 4 according to the diagram:
+
+* traffic between <mark>G</mark> and your sites will travel via the ZeroTier Cloud (tunnelled, encrypted); but
+* traffic between <mark>G</mark> and the wider Internet will not be tunnelled, will not be encrypted by ZeroTier, and will reach the Internet via the ISP or cellular carrier.
+
+If you want remote clients like <mark>G</mark> to use full tunnelling, you can follow the same approach as for [Topology 3](#topology3). You simply need to decide which site should used by <mark>G</mark> to reach the Internet. Having made your decision, define an appropriate default route in ZeroTier Central. For example, if <mark>G</mark> should reach the Internet via:
+
+- the left-hand site, the default route should point to the ZeroTier-router running on <mark>A</mark>:
+
+	```
+	Destination: 0.0.0.0/0 (via) 10.240.0.1
+	```
+
+- the right-hand site, the default route should point to the ZeroTier-router running on <mark>F</mark>:
+
+	```
+	Destination: 0.0.0.0/0 (via) 10.240.0.2
+	```
+
+Once you implement the default route, everything else is the same as for [Topology 3](#topology3).
 
 ## Managed Routes { #managedRoutes }
 
@@ -631,6 +654,33 @@ Understanding how adjacent subnets can be aggregated easily by changing the pref
 You would need three /23 Managed Routes in ZeroTier Central. In addition, you would prevent anyone else in your private ZeroTier catenet from using 192.168.1.0/24, 192.168.101.0/24 and 192.168.201.0/24. It would be preferable to use a single /22 as shown in the [example](#subnetsThree) above.
 
 Sure, that third octet can range from 0..255 but it's still a finite resource which is best used wisely, particularly once you start to contemplate using ZeroTier to span multiple sites.
+
+## Host mode and ports { #hostPorts }
+
+The default service definition for ZeroTier-router contains the following lines:
+
+``` yaml linenums="13"
+  network_mode: host
+  x-ports:
+  - "9993:9993"
+```
+
+Line 13 tells ZeroTier to run in Docker's "host mode". This means the processes running inside the container bind to the Raspberry Pi's network ports.
+
+> Processes running inside non-host-mode containers bind to the container's ports, and then use Network Address Translation (NAT) to reach the Raspberry Pi's ports.
+
+The `x-` prefix on line 14 has the effect of commenting-out the entire clause. In other words, the single `x-` has exactly the same meaning as:
+
+``` yaml linenums="14"
+# ports:
+# - "9993:9993"
+```
+
+The `x-ports` clause is included to document the fact that ZeroTier uses the Raspberry Pi's port 9993.
+
+> Documenting the ports in use for host-mode containers helps IOTstack's maintainers avoid port conflicts when adding new containers.
+
+You should **not** remove the `x-` prefix. If docker-compose complains about the `x-ports` clause, the message is actually telling you that your copy of docker-compose is obsolete and that you should upgrade.
 
 ## The Domain Name System { #dnsConsiderations }
 
