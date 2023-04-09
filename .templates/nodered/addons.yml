@@ -23,7 +23,7 @@ addons:
     - "node-red-node-smooth"
     - "node-red-node-darksky"
     - "node-red-node-sqlite"
-    - "node-red-node-serialport"
+    - "node-red-node-serialport@0.15.0"
     - "node-red-contrib-config"
     - "node-red-contrib-grove"
     - "node-red-contrib-diode"
