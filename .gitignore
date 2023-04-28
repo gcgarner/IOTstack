@@ -19,5 +19,6 @@ post_restore.sh
 !.gitkeep
 
 .vscode
+.idea
 *.code-workspace
 
