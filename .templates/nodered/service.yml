@@ -3,21 +3,14 @@ nodered:
   build:
     context: ./services/nodered/.
     args:
-    - DOCKERHUB_TAG=latest
-    - EXTRA_PACKAGES=
+      - DOCKERHUB_TAG=latest
+      - EXTRA_PACKAGES=
   restart: unless-stopped
   user: "0"
   environment:
-    - TZ=Etc/UTC
+    - TZ=${TZ:-Etc/UTC}
   ports:
     - "1880:1880"
   volumes:
     - ./volumes/nodered/data:/data
     - ./volumes/nodered/ssh:/root/.ssh
-    - /var/run/docker.sock:/var/run/docker.sock
-    - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
-  devices:
-    - "/dev/ttyAMA0:/dev/ttyAMA0"
-    - "/dev/vcio:/dev/vcio"
-    - "/dev/gpiomem:/dev/gpiomem"
-
