@@ -5,5 +5,5 @@ comment: "Deconz hardware check list."
 hardwarePaths:
   - "/dev/ttyUSB0"
   - "/dev/ttyACM0"
-  - "/dev/ttyAMA0"
+  - "/dev/serial0"
   - "/dev/ttyS0"
