@@ -140,7 +140,7 @@ your RPi hostname is raspberrypi)
 	    environment:
 	      - PUID=1000
 	      - PGID=1000
-	      - TZ=Etc/UTC
+	      - TZ=${TZ:-Etc/UTC}
 	      - URL=<yourdomain>.duckdns.org
 	      - SUBDOMAINS=wildcard
 	      - VALIDATION=duckdns
