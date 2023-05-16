@@ -43,27 +43,24 @@ wireguard:
   image: ghcr.io/linuxserver/wireguard
   restart: unless-stopped
   environment:
-  - PUID=1000
-  - PGID=1000
-  - TZ=Etc/UTC
-  - SERVERURL=your.dynamic.dns.name
-  - SERVERPORT=51820
-  - PEERS=laptop,phone,tablet
-  - PEERDNS=auto
-  # - PEERDNS=172.30.0.1
-  - ALLOWEDIPS=0.0.0.0/0
+    - PUID=1000
+    - PGID=1000
+    - TZ=${TZ:-Etc/UTC}
+    - SERVERURL=your.dynamic.dns.name
+    - SERVERPORT=51820
+    - PEERS=laptop,phone,tablet
+    - PEERDNS=auto
+    - ALLOWEDIPS=0.0.0.0/0
   ports:
-  - "51820:51820/udp"
+    - "51820:51820/udp"
   volumes:
-  - ./volumes/wireguard/config:/config
-  - ./volumes/wireguard/custom-cont-init.d:/custom-cont-init.d
-  - ./volumes/wireguard/custom-services.d:/custom-services.d
-  - /lib/modules:/lib/modules:ro
+    - ./volumes/wireguard/config:/config
+    - ./volumes/wireguard/custom-cont-init.d:/custom-cont-init.d
+    - ./volumes/wireguard/custom-services.d:/custom-services.d
   cap_add:
-  - NET_ADMIN
-  - SYS_MODULE
+    - NET_ADMIN
   sysctls:
-  - net.ipv4.conf.all.src_valid_mark=1
+    - net.ipv4.conf.all.src_valid_mark=1
 ```
 
 Unfortunately, that service definition will not work "as is". It needs to be configured.
@@ -77,16 +74,6 @@ Key points:
 With most containers, you can continue to tweak environment variables and settings without upsetting the container's basic behaviour. WireGuard is a little different. You really need to think, carefully, about how you want to configure the service before you start. If you change your mind later, you generally have to [start from a clean slate](#cleanSlate).
 
 #### Fields that you should always configure { #configureAlways }
-
-* `TZ=` should be set to your local timezone. Example:
-
-	```yml
-	- TZ=Australia/Sydney
-	```
-
-	Note:
-
-	- Never use quote marks around the right hand side of a time-zone definition.
 
 * `SERVERURL=` should be set to the domain name you have registered with a Dynamic DNS service provider. Example:
 
@@ -255,7 +242,7 @@ You will need to create the `compose-override.yml` **before** running the menu t
 	    environment:
 	    - PUID=1000
 	    - PGID=1000
-	    - TZ=Australia/Sydney
+	    - TZ=${TZ:-Etc/UTC}
 	    - SERVERURL=downunda.duckdns.org
 	    - SERVERPORT=51820
 	    - PEERS=laptop,phone,tablet
