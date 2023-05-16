@@ -1,16 +1,9 @@
 home_assistant:
   container_name: home_assistant
   image: ghcr.io/home-assistant/home-assistant:stable
-  #image: ghcr.io/home-assistant/raspberrypi3-homeassistant:stable
-  #image: ghcr.io/home-assistant/raspberrypi4-homeassistant:stable
   restart: unless-stopped
   network_mode: host
   volumes:
     - /etc/localtime:/etc/localtime:ro
     - ./volumes/home_assistant:/config
-    - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
-  devices:
-    - "/dev/ttyAMA0:/dev/ttyAMA0"
-    - "/dev/vcio:/dev/vcio"
-    - "/dev/gpiomem:/dev/gpiomem"
   privileged: true
