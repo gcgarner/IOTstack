@@ -101,9 +101,9 @@ Both NAT engines "A" and "B" are building tables to make this work but, again, i
 
 Unlike the situation with your home router where you can add a port-forwarding rule to fool NAT into believing your WireGuard server originated the traffic, you don't control your ISP's NAT router so it's a problem you can't fix.
 
-Your remote WireGuard client can't bypass your ISP's NAT router by addressing the packet to "A" because that address is not routable so nothing on the Internet has any idea of where to send it, so the packet gets dropped.
+Your remote WireGuard client can't bypass your ISP's NAT router by addressing the packet to "A" because that address is not routable, so nothing on the Internet has any idea of where to send it, so the packet gets dropped.
 
-Due to the shortage of IPv4 addresses, it is increasingly common for ISPs to applying their own NAT service after yours. Generally, ISPs use the 100.64/10 range so, if you connect to your home router's user interface and see something like the IP address circled in [Figure 2](#figure2), you can be sure that you are the victim of "[CGNAT](https://datatracker.ietf.org/doc/html/rfc6598)".
+Due to the shortage of IPv4 addresses, it is increasingly common for ISPs to apply their own NAT service after yours. Generally, ISPs use the 100.64/10 range so, if you connect to your home router's user interface and see something like the IP address circled in [Figure 2](#figure2), you can be sure that you are the victim of "[CGNAT](https://datatracker.ietf.org/doc/html/rfc6598)".
 
 | <a name="figure2"></a>Figure 2: Router WAN port using CGNAT range |
 |:--:|
