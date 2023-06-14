@@ -3,13 +3,13 @@ ring-mqtt:
   image: tsightler/ring-mqtt
   restart: unless-stopped
   environment:
-  - TZ=Etc/UTC
-  - DEBUG=ring-*
+    - TZ=${TZ:-Etc/UTC}
+    - DEBUG=ring-*
   ports:
-  - 8554:8554
-  - 55123:55123
+    - "8554:8554"
+    - "55123:55123"
   volumes:
-  - ./volumes/ring-mqtt/data:/data
+    - ./volumes/ring-mqtt/data:/data
   logging:
     options:
       max-size: 10m

@@ -2,9 +2,9 @@ webthingsio_gateway:
   image: webthingsio/gateway:latest
   container_name: webthingsio_gateway
   network_mode: host
-  #ports:
-  #- "4060:4060"
-  #- "4061:4061"
+  x-ports:
+    - "4060:4060"
+    - "4061:4061"
   volumes:
     - ./volumes/webthingsio_gateway/share:/home/node/.mozilla-iot
 

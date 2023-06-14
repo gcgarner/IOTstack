@@ -3,11 +3,11 @@ timescaledb:
   image: timescale/timescaledb:latest-pg12
   restart: unless-stopped
   environment:
-  - POSTGRES_USER=${IOTSTACK_TIMESCALEDB_USER:-postgres}
-  - POSTGRES_PASSWORD={IOTSTACK_TIMESCALEDB_INITIAL_PASSWORD:-IOtSt4ckTim3Scale}
-  - POSTGRES_DB=postdb
+    - POSTGRES_USER=${IOTSTACK_TIMESCALEDB_USER:-postgres}
+    - POSTGRES_PASSWORD={IOTSTACK_TIMESCALEDB_INITIAL_PASSWORD:-IOtSt4ckTim3Scale}
+    - POSTGRES_DB=postdb
   ports:
-  - ${IOTSTACK_TIMESCALEDB_PORT_INT:-5433}:5432
+    - "${IOTSTACK_TIMESCALEDB_PORT_INT:-5433}:5432"
   volumes:
-  - ./volumes/timescaledb/data:/var/lib/postgresql/data
+    - ./volumes/timescaledb/data:/var/lib/postgresql/data
 

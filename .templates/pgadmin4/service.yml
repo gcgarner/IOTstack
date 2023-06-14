@@ -2,11 +2,12 @@ pgadmin4:
   container_name: pgadmin4
   image: gpongelli/pgadmin4-arm:latest-armv7
   platform: linux/arm/v7
-# image: gpongelli/pgadmin4-arm:latest-armv8
+  # image: gpongelli/pgadmin4-arm:latest-armv8
   restart: unless-stopped
   environment:
-  - TZ=${TZ:-Etc/UTC}
+    - TZ=${TZ:-Etc/UTC}
   ports:
-  - "5050:5050"
+    - "5050:5050"
   volumes:
-  - ./volumes/pgadmin4:/pgadmin4
+    - ./volumes/pgadmin4:/pgadmin4
+

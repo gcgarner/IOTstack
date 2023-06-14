@@ -3,22 +3,22 @@ zerotier-router:
   image: "zyclonite/zerotier:router"
   restart: unless-stopped
   environment:
-  - TZ=${TZ:-Etc/UTC}
-  - PUID=1000
-  - PGID=1000
-# - ZEROTIER_ONE_NETWORK_IDS=yourNetworkID
-  - ZEROTIER_ONE_LOCAL_PHYS=eth0 wlan0
-  - ZEROTIER_ONE_USE_IPTABLES_NFT=true
-  - ZEROTIER_ONE_GATEWAY_MODE=both
+    - TZ=${TZ:-Etc/UTC}
+    - PUID=1000
+    - PGID=1000
+    # - ZEROTIER_ONE_NETWORK_IDS=yourNetworkID
+    - ZEROTIER_ONE_LOCAL_PHYS=eth0 wlan0
+    - ZEROTIER_ONE_USE_IPTABLES_NFT=true
+    - ZEROTIER_ONE_GATEWAY_MODE=both
   network_mode: host
   x-ports:
-  - "9993:9993"
+    - "9993:9993"
   volumes:
-  - ./volumes/zerotier-one:/var/lib/zerotier-one
+    - ./volumes/zerotier-one:/var/lib/zerotier-one
   devices:
-  - "/dev/net/tun:/dev/net/tun"
+    - "/dev/net/tun:/dev/net/tun"
   cap_add:
-  - NET_ADMIN
-  - SYS_ADMIN
-  - NET_RAW
+    - NET_ADMIN
+    - SYS_ADMIN
+    - NET_RAW
 

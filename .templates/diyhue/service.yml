@@ -10,6 +10,6 @@ diyhue:
     - IP=%LAN_IP_Address%
     - MAC=%LAN_MAC_Address%
   volumes:
-      - ./volumes/diyhue:/opt/hue-emulator/export
+    - ./volumes/diyhue:/opt/hue-emulator/export
   restart: unless-stopped
 
