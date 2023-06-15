@@ -18,7 +18,7 @@ MotionEye is a web frontend for the Motion project.
 
 This is the default service definition:
 
-```yml
+``` yaml
 motioneye:
   image: dontobi/motioneye.rpi:latest
   container_name: "motioneye"
@@ -41,13 +41,13 @@ MotionEye's administrative interface is available on port 8765. For example:
 http://raspberrypi.local:8765
 ```
 
-The default username is `admin` (all lowercase) with no password.
+The default username is `admin` (all lower case) with no password.
 
 ## Camera streams
 
-The first camera is defined in the administrative interface is assigned to internal port 8081. The default service definition maps that to port 8766:
+The first camera you define in the administrative interface is assigned to internal port 8081. The default service definition maps that to port 8766:
 
-```yml
+``` yaml
 - "8766:8081"
 ```
 
@@ -65,7 +65,7 @@ Each subsequent camera you define in the administrative interface will be assign
 
 Each camera you define after the first will need its own port mapping in the service definition in your compose file. For example:
 
-```yml
+``` yaml
 - "8767:8082"
 - "8768:8083"
 - …
@@ -79,7 +79,13 @@ Key points:
 
 ## Clip Storage
 
-By default local camera data is stored at the internal path `/var/lib/motioneye/«camera_name»`. That maps to:
+By default local camera data is stored at the internal path:
+
+```
+/var/lib/motioneye/«camera_name»
+```
+
+That maps to the external path:
 
 ```
 ~/IOTstack/volumes/motioneye/var_lib_motioneye/«camera_name»
@@ -96,31 +102,31 @@ Although it depends on your exact settings, MotionEye's video storage can repres
 
 1. Be in the appropriate directory:
 
-	```
+	``` bash
 	$ cd ~/IOTstack
 	```
 
 2. Terminate the motioneye container:
 
-	```
+	``` bash
 	$ docker-compose rm --force --stop -v motioneye
 	```
 
 3. Move the video storage folder:
 
-	```
+	``` bash
 	$ sudo mv ./volumes/motioneye/var_lib_motioneye ~/motioneye-videos
 	```
 
 4. Open your `docker-compose.yml` in a text editor. Find this line in your `motioneye` service definition:
 
-	```yml
+	``` yaml
 	- ./volumes/motioneye/var_lib_motioneye:/var/lib/motioneye
 	```
 
 	and change it to be:
 
-	```yml
+	``` yaml
 	- /home/pi/motioneye-videos:/var/lib/motioneye
 	```
 
@@ -128,11 +134,15 @@ Although it depends on your exact settings, MotionEye's video storage can repres
 
 5. Start the container again:
 
-	```
+	``` bash
 	$ docker-compose up -d motioneye
 	```
 
 This change places video storage outside of the usual `~/IOTstack/volumes` path, where IOTstack backup scripts will not see it.
+
+An alternative approach is to omit the volume mapping for `/var/lib/motioneye` entirely. Clips will be still be recorded inside the container and you will be able to play and download the footage using the administrative interface. However, any saved clips will disappear each time the container is re-created (not just restarted). Clips stored inside the container also will not form part of any backup.
+
+If you choose this method, make sure you configure MotionEye to discard old footage using the "Preserve Movies" field of the "Movies" section in the administrative interface. This is a per-camera setting so remember to do it for **all** your cameras. If you do not do this, you are still at risk of running your Pi out of disk space, and it's a difficult problem to diagnose.
 
 ## Remote motioneye
 
