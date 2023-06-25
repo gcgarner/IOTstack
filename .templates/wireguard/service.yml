@@ -3,25 +3,21 @@ wireguard:
   image: ghcr.io/linuxserver/wireguard
   restart: unless-stopped
   environment:
-  - PUID=1000
-  - PGID=1000
-  - TZ=Etc/UTC
-  - SERVERURL=your.dynamic.dns.name
-  - SERVERPORT=51820
-  - PEERS=laptop,phone,tablet
-  - PEERDNS=auto
-  # - PEERDNS=172.30.0.1
-  - ALLOWEDIPS=0.0.0.0/0
+    - PUID=1000
+    - PGID=1000
+    - TZ=${TZ:-Etc/UTC}
+    - SERVERURL=your.dynamic.dns.name
+    - SERVERPORT=51820
+    - PEERS=laptop,phone,tablet
+    - PEERDNS=auto
+    - ALLOWEDIPS=0.0.0.0/0
   ports:
-  - "51820:51820/udp"
+    - "51820:51820/udp"
   volumes:
-  - ./volumes/wireguard/config:/config
-  - ./volumes/wireguard/custom-cont-init.d:/custom-cont-init.d
-  - ./volumes/wireguard/custom-services.d:/custom-services.d
-  - /lib/modules:/lib/modules:ro
+    - ./volumes/wireguard/config:/config
+    - ./volumes/wireguard/custom-cont-init.d:/custom-cont-init.d
+    - ./volumes/wireguard/custom-services.d:/custom-services.d
   cap_add:
-  - NET_ADMIN
-  - SYS_MODULE
+    - NET_ADMIN
   sysctls:
-  - net.ipv4.conf.all.src_valid_mark=1
-
+    - net.ipv4.conf.all.src_valid_mark=1
