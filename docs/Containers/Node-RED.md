@@ -1455,3 +1455,27 @@ All remaining lines of your original *Dockerfile* should be left as-is.
 ### Applying the new syntax { #july2022build }
 
 Run the [re-building the local Node-RED image](#rebuildNodeRed) commands.
+
+## Bluetooth support { #bluetoothSupport }
+
+If you enable the `node-red-contrib-generic-ble` add on node, you will also need to make the following changes to the Node-RED service definition in your `docker-compose.yml`:
+
+* Add the following mapping to the `volumes:` clause:
+
+	```yaml
+	- /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+	```
+
+* Add the following `devices:` clause:
+
+	```yaml
+	devices:
+	  - "/dev/serial1:/dev/serial1"
+	  - "/dev/vcio:/dev/vcio"
+	  - "/dev/gpiomem:/dev/gpiomem"
+	```
+
+Notes:
+
+* These changes are *specific* to the Raspberry Pi. If you need Bluetooth support on non-Pi hardware, you will need to figure out the details for your chosen platform.
+* Historically, `/dev/ttyAMA0` meant "the serial interface" on Raspberry Pis. Subsequently, it came to mean "the Bluetooth interface" where Bluetooth support was present. Now, `/dev/serial1` is used to mean "the Bluetooth interface".
