@@ -1,16 +1,48 @@
 # deCONZ
+
 ## References
 - [Docker](https://hub.docker.com/r/marthoc/deconz)
 - [Website](https://github.com/dresden-elektronik/deconz-rest-plugin/blob/master/README.md)
 
+## Setup
+
+### Old menu (old menu branch)
+
+If you use "old menu", you may get an error message similar to the following on first launch:
+
+```
+parsing ~/IOTstack/docker-compose.yml: error while interpolating services.deconz.devices.[]: required variable DECONZ_DEVICE_PATH is missing a value: eg echo DECONZ_DEVICE_PATH=/dev/serial0 >>~/IOTstack/.env
+```
+
+The message is telling you that you need to define the path to your deCONZ device. Common examples are:
+
+- Raspbee at `/dev/serial0`
+- Conbee at `/dev/ttyUSB0`
+- Conbee II at `/dev/ttyACM0`
+
+Once you have identified the appropriate device path, you can define it like this:
+
+```console
+$ echo DECONZ_DEVICE_PATH=/dev/serial0 >>~/IOTstack/.env
+```
+
+This example uses `/dev/serial0`. Substitute your actual device path if it is different. 
+
+### New menu (master branch)
+
+New menu offers a sub-menu (place the cursor on `deconz` and press the right arrow) where you can select the appropriate device path.
+
+## Dialout group
+
+Before running `docker-compose up -d`, make sure your Linux user is part of the dialout group, which allows the user access to serial devices (i.e. Conbee/Conbee II/RaspBee). If you are not certain, simply add your user to the dialout group by running the following command (username "pi" being used as an example):
+
+```console
+$ sudo usermod -a -G dialout pi
+```
+
 ## Troubleshooting
-Make sure your Conbee/Conbee II/RaspBee gateway is connected. If your gateway is not detected, or no lights can be paired, try moving the device to another usb port, reboot your computer and build the stack from the menu again `cd ~/IOTstack && bash ./menu.sh` (select "Pull full service from template" if prompted). The gateway must be plugged in when the deCONZ Docker container is being built.
 
-Before running `docker-compose up -d`, make sure your Linux user is part of the dialout group, which allows the user access to serial devices (i.e. Conbee/Conbee II/RaspBee). If you are not certain, simply add your user to the dialout group by running the following command (username "pi" being used as an example): `sudo usermod -a -G dialout pi`
-
-Now run `docker-compose up -d` to build the stack.
-
-If you are still experiencing issues, run `docker-compose down` to remove all containers from the stack and then `docker-compose up -d` to build them again.
+Your Conbee/Conbee II/RaspBee gateway must be plugged in when the deCONZ Docker container is being brought up. If your gateway is not detected, or no lights can be paired, try moving the device to another usb port. A reboot may help too.
 
 Use a 0.5-1m usb extension cable with ConBee (II) to avoid wifi and bluetooth noise/interference from your Raspberry Pi (recommended by the manufacturer and often the solution to poor performance).
 
