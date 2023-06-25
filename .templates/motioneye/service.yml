@@ -1,12 +1,13 @@
 motioneye:
-  image: "ccrisan/motioneye:master-armhf"
+  image: dontobi/motioneye.rpi:latest
   container_name: "motioneye"
   restart: unless-stopped
   ports:
     - "8765:8765"
-    - "8081:8081"
+    - "8766:8081"
+  environment:
+    - TZ=${TZ:-Etc/UTC}
   volumes:
-    - /etc/localtime:/etc/localtime:ro
     - ./volumes/motioneye/etc_motioneye:/etc/motioneye
     - ./volumes/motioneye/var_lib_motioneye:/var/lib/motioneye
 
