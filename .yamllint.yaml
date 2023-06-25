@@ -1,0 +1,11 @@
+---
+
+extends: default
+
+rules:
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 1
+  line-length:
+    max: 200

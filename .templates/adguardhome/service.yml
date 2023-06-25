@@ -3,7 +3,7 @@ adguardhome:
   image: adguard/adguardhome
   restart: unless-stopped
   environment:
-    - TZ=Etc/UTC
+    - TZ=${TZ:-Etc/UTC}
   # enable host mode to activate DHCP server on ports 67/udp & 68/tcp+udp
   # note that you must also disable all other ports if you enable host mode
   # network_mode: host
@@ -28,6 +28,6 @@ adguardhome:
     # - "5443:5443/tcp"
     # - "5443:5443/udp"
   volumes:
-     - ./volumes/adguardhome/workdir:/opt/adguardhome/work
-     - ./volumes/adguardhome/confdir:/opt/adguardhome/conf
+    - ./volumes/adguardhome/workdir:/opt/adguardhome/work
+    - ./volumes/adguardhome/confdir:/opt/adguardhome/conf
 

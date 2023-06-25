@@ -1,10 +1,10 @@
 telegraf:
   container_name: telegraf
   build: ./.templates/telegraf/.
-  hostname: iotstack # optional
+  hostname: iotstack  # optional
   restart: unless-stopped
   environment:
-    - TZ=Etc/UTC
+    - TZ=${TZ:-Etc/UTC}
   ports:
     - "8092:8092/udp"
     - "8094:8094/tcp"

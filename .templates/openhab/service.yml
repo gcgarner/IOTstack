@@ -4,17 +4,17 @@ openhab:
   restart: unless-stopped
   network_mode: host
   volumes:
-  - "/etc/localtime:/etc/localtime:ro"
-  - "/etc/timezone:/etc/timezone:ro"
-  - "./volumes/openhab/addons:/openhab/addons"
-  - "./volumes/openhab/conf:/openhab/conf"
-  - "./volumes/openhab/userdata:/openhab/userdata"
+    - "/etc/localtime:/etc/localtime:ro"
+    - "/etc/timezone:/etc/timezone:ro"
+    - "./volumes/openhab/addons:/openhab/addons"
+    - "./volumes/openhab/conf:/openhab/conf"
+    - "./volumes/openhab/userdata:/openhab/userdata"
   environment:
     - OPENHAB_HTTP_PORT=4050
     - OPENHAB_HTTPS_PORT=4051
     - EXTRA_JAVA_OPTS=-Duser.timezone=Etc/UTC
-# logging:
-#   options:
-#     max-size: "5m"
-#     max-file: "3"
+  x-logging:
+    options:
+      max-size: "5m"
+      max-file: "3"
 

@@ -1,6 +1,6 @@
 dozzle:
   container_name: dozzle
-  image: amir20/dozzle:latest 
+  image: amir20/dozzle:latest
   restart: unless-stopped
   ports:
     - "8889:8080"
