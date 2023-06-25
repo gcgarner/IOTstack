@@ -162,8 +162,12 @@ Full update steps:
    build, and then exit.
 6. check the changes for obvious errors (e.g. passwords): `diff
    docker-compose.yml docker-compose.yml.bak`
-7. Perform the Docker image update procedure: ``` console $ docker-compose pull
-   $ docker-compose build --pull --no-cache $ docker-compose up --build -d ```
+7. Perform the Docker image update procedure: 
+   ``` console 
+   $ docker-compose pull
+   $ docker-compose build --pull --no-cache 
+   $ docker-compose up --build -d 
+   ```
 
 ### Troubleshooting: if a container fails to start after update
 
