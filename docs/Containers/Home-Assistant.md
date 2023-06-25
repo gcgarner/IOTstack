@@ -44,16 +44,6 @@ Home Assistant (Container) can be found in the `Build Stack` menu. Selecting it 
 ~/IOTstack/docker-compose.yml
 ```
 
-When you choose "Home Assistant", the service definition added to your `docker-compose.yml` includes the following:
-
-```yaml
-image: ghcr.io/home-assistant/home-assistant:stable
-#image: ghcr.io/home-assistant/raspberrypi3-homeassistant:stable
-#image: ghcr.io/home-assistant/raspberrypi4-homeassistant:stable
-```
-
-The active image is *generic* in the sense that it should work on any platform. You may wish to edit your `docker-compose.yml` to deactivate the generic image in favour of an image tailored to your hardware.
-
 The normal IOTstack commands apply to Home Assistant Container such as:
 
 ```console
@@ -98,6 +88,30 @@ If `AutoEnable` is either missing or not set to `true`, then:
 
 See also: [Scribles: Auto Power On Bluetooth Adapter on Boot-up](https://scribles.net/auto-power-on-bluetooth-adapter-on-boot-up/).
 
+### Possible service definition changes { #serviceDefinition }
+
+Although the [Home Assistant documentation](https://www.home-assistant.io/installation/raspberrypi#docker-compose) does not mention this, it is *possible* that you may also need to make the following changes to the Home Assistant service definition in your `docker-compose.yml`:
+
+* Add the following mapping to the `volumes:` clause:
+
+	```yaml
+	- /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+	```
+
+* Add the following `devices:` clause:
+
+	```yaml
+	devices:
+	  - "/dev/serial1:/dev/ttyAMA0"
+	  - "/dev/vcio:/dev/vcio"
+	  - "/dev/gpiomem:/dev/gpiomem"
+	```
+
+Notes:
+
+* These changes are *specific* to the Raspberry Pi. If you need Bluetooth support on non-Pi hardware, you will need to figure out the details for your chosen platform.
+* Historically, `/dev/ttyAMA0` meant "the serial interface" on Raspberry Pis. Subsequently, it came to mean "the Bluetooth interface" where Bluetooth support was present. Now, `/dev/serial1` is used to mean "the Raspberry Pi's Bluetooth interface". The example above maps that to the internal device `/dev/ttyAMA0` because that is **probably** what the container expects. There are no guarantees and you may need to experiment with internal device names.
+
 ## HTTPS with a valid SSL certificate { #httpsWithSSLcert }
 
 Some HA integrations (e.g google assistant) require your HA API to be
@@ -126,7 +140,7 @@ your RPi hostname is raspberrypi)
 	    environment:
 	      - PUID=1000
 	      - PGID=1000
-	      - TZ=Etc/UTC
+	      - TZ=${TZ:-Etc/UTC}
 	      - URL=<yourdomain>.duckdns.org
 	      - SUBDOMAINS=wildcard
 	      - VALIDATION=duckdns
