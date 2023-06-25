@@ -987,3 +987,11 @@ $ docker-compose pull
 $ docker-compose up -d
 $ docker system prune -f
 ```
+
+## iOS tip
+
+On iOS, you must decide whether to select "Custom DNS"  when you define the VPN. If you want to change your mind, you need to delete the connection and start over.
+
+> Providing you don't delete the Zerotier app, the client's identity remains unchanged so you won't need to re-authorise the client in ZeroTier Central.
+
+An example of when you might want to enable Custom DNS is if you want your remote clients to use PiHole for name services. If PiHole is running on the same Raspberry Pi as your Zerotier instance, you should use the IP address associated with the Raspberry Pi's interface to the ZeroTier Cloud (ie 10.244.0.1 in the example topologies).
