@@ -2,23 +2,25 @@ pihole:
   container_name: pihole
   image: pihole/pihole:latest
   ports:
-  - "8089:80/tcp"
-  - "53:53/tcp"
-  - "53:53/udp"
-  - "67:67/udp"
+    - "8089:80/tcp"
+    - "53:53/tcp"
+    - "53:53/udp"
+    - "67:67/udp"
   environment:
-  - TZ=${TZ:-Etc/UTC}
-  - WEBPASSWORD=
+    - TZ=${TZ:-Etc/UTC}
+    - WEBPASSWORD=
     # see https://sensorsiot.github.io/IOTstack/Containers/Pi-hole/#adminPassword
-  - INTERFACE=eth0
+    - INTERFACE=eth0
+    - FTLCONF_MAXDBDAYS=365
+    - PIHOLE_DNS_=8.8.8.8;8.8.4.4
     # see https://github.com/pi-hole/docker-pi-hole#environment-variables
   volumes:
-  - ./volumes/pihole/etc-pihole:/etc/pihole
-  - ./volumes/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+    - ./volumes/pihole/etc-pihole:/etc/pihole
+    - ./volumes/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
   dns:
-  - 127.0.0.1
-  - 1.1.1.1
+    - 127.0.0.1
+    - 1.1.1.1
   cap_add:
-  - NET_ADMIN
+    - NET_ADMIN
   restart: unless-stopped
 

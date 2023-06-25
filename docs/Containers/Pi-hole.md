@@ -81,7 +81,7 @@ Each time the Pi-hole container is launched, it checks for the presence or absen
 
 Some Pi-hole documentation on the web recommends using the following command to change Pi-hole's admin password:
 
-```console
+``` console
 $ docker exec pihole pihole -a -p «yourPasswordHere»
 ```
 
@@ -101,9 +101,56 @@ then "mySecondPassword" will become the admin password **until** the next time t
 
 Given this behaviour, we recommend that you ignore the `pihole -a -p` command.
 
-### Other variables { #otherVars }
+### Logging { #loggingVar }
 
-Most of Pi-hole's environment variables are self-explanatory but some can benefit from elaboration.
+You can control the amount of information Pi-hole retains about your DNS queries using the "Privacy Settings" tab of the "Settings" group. The default is "Show & record everything".
+
+If you choose any option except "Anonymous mode", then Pi-hole divides the logging store into two parts:
+
+* Entries which are more recent than 24 hours; and
+* Entries which are older than 24 hours.
+
+In the "System" tab of the "Settings" group is a <kbd>Flush logs (last 24 hours)</kbd> button. Clicking that button erases all log entries which are more recent than 24 hours. The button does **not** erase entries which are older than 24 hours.
+
+Retention of log entries older than 24 hours is controlled by the following environment variable:
+
+``` yaml
+- FTLCONF_MAXDBDAYS=365
+```
+
+The default (which applies if the variable is omitted) is to retain log entries for 365 days.
+
+Depending on your DNS activity, the database where the log entries are stored can become quite large. Setting this variable to a shorter period will help you control the amount of storage Pi-hole consumes on disk and in your backups.
+
+Tip:
+
+* Adding this variable to an existing service definition, or changing the number of days to be less than the previous setting will **not** reduce the size of the logging database. Although Pi-hole will implement the change, the SQLite database where the logs are written retains the released storage for subsequent re-use. If you want to reclaim that space, run the following command:   
+
+	``` console
+	$ sqlite3 ~/IOTstack/volumes/pihole/etc-pihole/pihole-FTL.db "vacuum;"
+	```
+	
+	The command should not need `sudo` because `pi` is the owner by default. There is no need to terminate Pi-hole before running this command (SQLite handles any contention).
+
+### Recursive resolvers { #upstreamDNS }
+
+You can control which public DNS servers are used by PiHole when it needs to refer queries to the Internet. You do this by enabling or disabling checkboxes in the "Upstream DNS Servers" panel of the "DNS" tab in the "Settings" group.
+
+The default is to use the two Google IPv4 DNS servers which correspond with 8.8.8.8 and 8.8.4.4, respectively.
+
+An alternative to toggling checkboxes in the Pi-hole GUI is to use an environment variable:
+
+``` yaml
+- PIHOLE_DNS_=8.8.8.8;8.8.4.4
+```
+
+> The variable *does* end with an underscore!
+
+This variable takes a semi-colon-separated list of DNS servers. You can discover the IP address associated with a checkbox by hovering your mouse pointer over the checkbox and waiting for a tool-tip to appear:
+
+![](./images/pihole-server-ip-discovery.png)
+
+### Advanced variables { #advancedVars }
 
 ??? info "(advanced) reverse DNS query handling"
 
@@ -221,13 +268,13 @@ devices, provided they too have static IPs.
     be reserved for mDNS use only.
     { #homeArpa }
 
-## Configure the Raspberry Pi to use Pi-hole { #rpiDNS }
+## Configure your Pi to use Pi-hole { #rpiDNS }
 
 The Raspberry Pi itself does **not** have to use the Pi-hole container for its own DNS services. Some chicken-and-egg situations can exist if, for example, the Pi-hole container is down when another process (eg `apt` or `docker-compose`) needs to do something that depends on DNS services being available.
 
 Nevertheless, if you configure Pi-hole to be local DNS resolver, then you will probably want to configure your Raspberry Pi to use the Pi-hole container in the first instance, and then fall back to a public DNS server if the container is down. As a beginner, this is probably what you want regardless. Do this by running the commands:
 
-```console
+``` console
 $ echo "name_servers=127.0.0.1" | sudo tee -a /etc/resolvconf.conf
 $ echo "name_servers_append=8.8.8.8" | sudo tee -a /etc/resolvconf.conf
 $ echo "resolv_conf_local_only=NO" | sudo tee -a /etc/resolvconf.conf
@@ -253,7 +300,7 @@ container isn't running.
 
         You need slightly different syntax if you want to add multiple fallback servers. For example, suppose your fallback hosts are a local server (eg 192.168.1.2) running BIND9 and 8.8.8.8. The command would be:
 
-        ```console
+        ``` console
         $ echo 'name_servers_append="192.168.1.2 8.8.8.8"' | sudo tee -a /etc/resolvconf.conf
         ```
 
@@ -273,7 +320,7 @@ container isn't running.
 
     * If you wish to prevent the Raspberry Pi from including the address(es) of DNS servers learned from DHCP, you can instruct the DHCP client running on the Raspberry Pi to ignore the information coming from the DHCP server:
 
-        ```console
+        ``` console
         $ echo 'nooption domain_name_servers' | sudo tee -a /etc/dhcpcd.conf
         $ sudo service dhcpcd reload
         $ sudo resolvconf -u
@@ -281,7 +328,7 @@ container isn't running.
 
     * If you have followed the steps in [Adding local domain names](#localNames) to define names for your local hosts, you can inform the Raspberry Pi of that fact like this:
 
-        ```console
+        ``` console
         $ echo 'search_domains=home.arpa' | sudo tee -a /etc/resolvconf.conf
         $ sudo resolvconf -u
         ```
@@ -305,11 +352,11 @@ container isn't running.
     It's possible to make DNS queries directly cross-container, and even
     supported in some [rare use-cases](WireGuard.md#customContInit).
 
-## Configure Pi-hole as your local DNS resolver
+## Using Pi-hole as your local DNS
 
-To use the Pi-hole in your LAN, you need to assign the RPi a fixed IP-address and configure this IP as your DNS server.
+To use the Pi-hole in your LAN, you need to assign the Raspberry Pi a fixed IP-address and configure this IP as your DNS server.
 
-### 1. Assign the RPi a fixed IP address { #rpiFixedIP }
+### Fixed IP address for Pi-hole { #rpiFixedIP }
 
 If you want clients on your network to use Pi-hole for their DNS, the Raspberry Pi running Pi-hole **must** have a fixed IP address. It does not have to be a *static* IP address (in the sense of being hard-coded into the Raspberry Pi). The Raspberry Pi can still obtain its IP address from DHCP at boot time, providing your DHCP server (usually your home router) always returns the same IP address. This is usually referred to as a *static binding* and associates the Raspberry Pi's MAC address with a fixed IP address.
 
@@ -317,7 +364,7 @@ Keep in mind that many Raspberry Pis have both Ethernet and WiFi interfaces. It 
 
 You can use the following command to discover the MAC addresses for your Raspberry Pi's Ethernet and WiFi interfaces:
 
-```console
+``` console
 $ for I in eth0 wlan0 ; do ip link show $I ; done
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
     link/ether dc:a6:32:4c:89:f9 brd ff:ff:ff:ff:ff:ff
@@ -332,8 +379,7 @@ In the above:
 
 If a physical interface does not exist, the command returns "Device does not exist" for that interface. If you prefer, you can also substitute the `ifconfig` command for `ip link show`. It's just a little more wordy.
 
-
-### 2. Configuring other machines to use the Raspberry Pi running Pi-hole { #rpiConfig }
+### Configure clients to use Pi-hole { #rpiConfig }
 
 In order for Pi-hole to block ads or resolve anything, clients need to be told to use it as their DNS server. You can either:
 
@@ -378,7 +424,7 @@ Make these assumptions:
 
 The result of the configuration appears in `/etc/resolv.conf`:
 
-```console
+``` console
 $ cat /etc/resolv.conf
 # Generated by resolvconf
 nameserver 127.0.0.1
@@ -394,17 +440,15 @@ Interpretation:
 
 The fact that the Raspberry Pi is effectively represented twice (once as 127.0.0.1, and again as 192.168.1.10) does not matter. If the Pi-hole container stops running, the Raspberry Pi will bypass 192.168.1.10 and fail over to 8.8.8.8, failing back to 127.0.0.1 when the Pi-hole container starts again.
 
-
-
 Install dig:
 
-```console
+``` console
 $ sudo apt install dnsutils
 ```
 
 Test that Pi-hole is correctly configured (should respond 192.168.1.10):
 
-```console
+``` console
 $ dig raspberrypi.home.arpa @192.168.1.10
 ```
 
@@ -412,7 +456,7 @@ To test on another machine if your network's DNS configuration is correct, and
 an ESP will resolve its DNS queries correctly, restart the other machine to
 ensure DNS changes are updated and then use:
 
-```console
+``` console
 $ dig raspberrypi.home.arpa
 ```
 
@@ -450,7 +494,7 @@ The recommended approach is:
 3. Logout of the Web GUI.
 4. Run the following commands:
 
-	```console
+	``` console
 	$ cd ~/IOTstack
 	$ docker-compose rm --force --stop -v pihole
 	$ sudo rm -rf ./volumes/pihole
@@ -459,3 +503,13 @@ The recommended approach is:
 
 5. Login to Pi-hole's web GUI and navigate to Settings » Teleporter.
 6. Use the checkboxes to select the settings you wish to restore, and click the <kbd>Browse</kbd> and <kbd>Restore</kbd> buttons.
+
+## Docker Desktop { #dockerDesktop }
+
+If you run Pi-hole using Docker Desktop for macOS, all client activity will be logged against the IP address of the default gateway on the internal bridged network.
+
+It appears that Docker Desktop for macOS interposes an additional level of Network Address Translation (NAT) between clients and the Pi-hole service. This does not affect  Pi-hole's ability to block ads. It just makes the GUI reports a little less useful.
+
+It is not known whether this is peculiar to Docker Desktop for macOS or also affects other variants of Docker Desktop.
+
+This problem does not affect Pi-hole running in a container on a Raspberry Pi.
