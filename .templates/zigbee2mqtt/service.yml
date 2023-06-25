@@ -2,16 +2,17 @@ zigbee2mqtt:
   container_name: zigbee2mqtt
   image: koenkk/zigbee2mqtt:latest
   environment:
-    - TZ=Etc/UTC
+    - TZ=${TZ:-Etc/UTC}
     - ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mosquitto:1883
     - ZIGBEE2MQTT_CONFIG_FRONTEND=true
     - ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_SYMLINK_CURRENT=true
+    # - DEBUG=zigbee-herdsman*
   ports:
     - "8080:8080"
   volumes:
     - ./volumes/zigbee2mqtt/data:/app/data
   devices:
-    - /dev/ttyAMA0:/dev/ttyACM0
+    - "${ZIGBEE2MQTT_DEVICE_PATH:?eg echo ZIGBEE2MQTT_DEVICE_PATH=/dev/ttyACM0 >>~/IOTstack/.env}:/dev/ttyACM0"
   restart: unless-stopped
   depends_on:
     - mosquitto

@@ -131,25 +131,21 @@ For those reasons, it is better to take the time to identify your Zigbee adapter
 
 	What the output is telling you is that the *by-id* path is a symbolic link to `/dev/ttyACM0`. Although this *may* always be true on your Raspberry Pi, the only part that is actually *guaranteed* to be true is the *by-id* path, which is why you should use it.
 
-7. Use your favourite text editor to open your *compose file*.
-8. Find your `zigbee2mqtt` service definition and identify this line:
+7. Once you have identified the path to your adapter, you communicate that information to docker-compose like this:
 
-	```yaml
-	- /dev/ttyAMA0:/dev/ttyACM0
+	```console
+	$ echo ZIGBEE2MQTT_DEVICE_PATH=/dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00 >>~/IOTstack/.env
 	```
 
-	The default from the IOTstack template maps the *external* (Raspberry Pi) device `/dev/ttyAMA0` to the *internal* (Zigbee2MQTT container) device `/dev/ttyACM0`.
+	Note:
+	
+	* if you forget to do this step, docker-compose will display the following error message:
 
-	> On the Raspberry Pi, the *external* device `/dev/ttyAMA0` is the Bluetooth adapter. It was chosen as the default because it normally exists and its presence avoids docker-compose refusing to bring up the container. However, a Bluetooth adapter doesn't actually respond like a Zigbee adapter so the Zigbee2MQTT container will go into a restart loop if you start it before completing these steps. A side-effect of the container entering a restart loop is the web GUI never starts.
+		```
+		parsing ~/IOTstack/docker-compose.yml: error while interpolating services.zigbee2mqtt.devices.[]: required variable ZIGBEE2MQTT_DEVICE_PATH is missing a value: eg echo ZIGBEE2MQTT_DEVICE_PATH=/dev/ttyACM0 >>~/IOTstack/.env
+		```
 
-9. Replace `/dev/ttyAMA0` with your *by-id* path. Example:
-
-	```yaml
-	- /dev/serial/by-id/usb-Texas_Instruments_TI_CC2531_USB_CDC___0X00125A00183F06C5-if00:/dev/ttyACM0
-	```
-
-10. Save your work.
-11. Continue from [bring up your stack](#upStack).
+8. Continue from [bring up your stack](#upStack).
 
 ## Configuration { #configuration }
 
@@ -171,10 +167,6 @@ $ docker-compose up -d zigbee2mqtt
 ```
 
 The default service definition provided with IOTstack includes the following environment variables:
-
-* `TZ=Etc/UTC`
-
-	You should replace `Etc/UTC` with a value that is correct for your location.
 
 * `ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mosquitto:1883` { #mqttServer }
 
@@ -212,6 +204,10 @@ The default service definition provided with IOTstack includes the following env
 	```
 
 	See [Checking the log](#checkLog) for more information about why this is useful.
+	
+* `- DEBUG=zigbee-herdsman*` { #enableDebug }
+
+	Enabling this variable turns on extended debugging inside the container.
 
 ### Configuration file { #confFile }
 
@@ -393,16 +389,17 @@ zigbee2mqtt:
   container_name: zigbee2mqtt
   image: koenkk/zigbee2mqtt:latest
   environment:
-    - TZ=Etc/UTC
+    - TZ=${TZ:-Etc/UTC}
     - ZIGBEE2MQTT_CONFIG_MQTT_SERVER=mqtt://mosquitto:1883
     - ZIGBEE2MQTT_CONFIG_FRONTEND=true
     - ZIGBEE2MQTT_CONFIG_ADVANCED_LOG_SYMLINK_CURRENT=true
+    # - DEBUG=zigbee-herdsman*
   ports:
     - "8080:8080"
   volumes:
     - ./volumes/zigbee2mqtt/data:/app/data
   devices:
-    - /dev/ttyAMA0:/dev/ttyACM0
+    - "${ZIGBEE2MQTT_DEVICE_PATH:?eg echo ZIGBEE2MQTT_DEVICE_PATH=/dev/ttyACM0 >>~/IOTstack/.env}:/dev/ttyACM0"
   restart: unless-stopped
   depends_on:
     - mosquitto
