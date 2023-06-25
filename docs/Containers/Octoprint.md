@@ -10,25 +10,19 @@ title: Octoprint
 * DockerHub [octoprint/octoprint](https://hub.docker.com/r/octoprint/octoprint)
 * GitHub [OctoPrint/octoprint-docker](https://github.com/OctoPrint/octoprint-docker)
 
-## Device mappings
+## 3D Printer device mapping
 
-When you select "OctoPrint" in the IOTstack menu, the service definition in your `docker-compose.yml`, contains the following under the `devices:` heading:
+The first time you try to bring up the OctoPrint container, you should expect to see the following error:
 
-``` yaml
-devices:
-  - /dev/ttyAMA0:/dev/ttyACM0
-# - /dev/video0:/dev/video0
+```
+parsing ~/IOTstack/docker-compose.yml: error while interpolating services.octoprint.devices.[]: required variable OCTOPRINT_DEVICE_PATH is missing a value: eg echo OCTOPRINT_DEVICE_PATH=/dev/serial0 >>~/IOTstack/.env
 ```
 
-### *the `/dev/ttyAMA0:/dev/ttyACM0` mapping*
+The message is telling you that you need to define the device path to your 3D Printer. 
 
-The `/dev/ttyAMA0:/dev/ttyACM0` mapping should be read as saying "the physical Raspberry Pi device `/dev/ttyAMA0` is mapped to the logical OctoPrint container device `/dev/ttyACM0`".
+You need to work out *how* your printer presents itself and define the external device accordingly.
 
-The `/dev/ttyAMA0` device is used as a default because it is always present on Raspbian. If you bring up your container like that, the mapping will succeed and the container is unlikely to go into a restart loop.
-
-However, the OctoPrint container is unlikely to be able to connect to your 3D printer via `/dev/ttyAMA0` for the very simple reason that that is not how 3D printers usually appear on the Raspberry Pi. You need to work out *how* your printer presents itself and change the device mapping accordingly.
-
-#### option 1 - `/dev/ttyUSBn`
+### option 1 - `/dev/ttyUSBn`
 
 Using "ttyUSBn" will "work" but, because of the inherent variability in the name, this approach is not recommended.
  
@@ -36,7 +30,13 @@ The "n" in the "ttyUSBn" can vary depending on which USB devices are attached to
 
 If the OctoPrint container is up when the device number changes, the container will crash, and it will either go into a restart loop if you try to bring it up when the expected device is not "there", or will try to communicate with a device that isn't your 3D printer.
 
-#### option 2 - `/dev/serial/by-id/xxxxxxxx`
+Suppose you choose this method and your 3D Printer mounts as `/dev/ttyUSB0`, you would define your printer like this:
+
+```console
+$ echo OCTOPRINT_DEVICE_PATH=/dev/ttyUSB0 >>~/IOTstack/.env
+```
+
+### option 2 - `/dev/serial/by-id/xxxxxxxx`
 
 The "xxxxxxxx" is (usually) unique to your 3D printer. To find it, connect your printer to your Raspberry Pi, then run the command:
 
@@ -50,24 +50,20 @@ You will get an answer like this:
 usb-Silicon_Labs_CP2102N_USB_to_UART_Bridge_Controller_3b14eaa48a154d5e87032d59459d5206-if00-port0
 ```
 
+Suppose you choose this method and your 3D Printer mounts as shown above. You would define your printer like this:
+
+```console
+$ echo OCTOPRINT_DEVICE_PATH=/dev/serial/by-id/usb-Silicon_Labs_CP2102N_USB_to_UART_Bridge_Controller_3b14eaa48a154d5e87032d59459d5206-if00-port0 >>~/IOTstack/.env
+```
+
 Note:
 
 * If you have multiple serial devices attached, you will get multiple lines in the output. It is up to you to sort out which one belongs to your 3D printer, possibly by disconnecting and re-attaching the printer and observing how the list changes.
 * The uniqueness of device IDs is under the control of the device manufacturer. Each manufacturer *should* ensure their devices are unique but some manufacturers are more diligent than others.
-
-Assuming the above example output was the answer, edit `docker-compose.yml` to look like this:
-
-``` yaml
-devices:
-  - /dev/serial/by-id/usb-Silicon_Labs_CP2102N_USB_to_UART_Bridge_Controller_3b14eaa48a154d5e87032d59459d5206-if00-port0:/dev/ttyACM0
-```
-
-Notes:
-
 * device *by-id* names follow the device. In other words, if you have two or more Raspberry Pis and a collection of serial devices (3D printers, Zigbee adapters, UARTs, and so on), a 3D printer will always get the same by-id name, irrespective of which Raspberry Pi it is attached to.
 * device *by-id* names do not persist if the physical device is disconnected. If you switch off your 3D printer or disconnect the USB cable while the OctoPrint container is running, the container will crash.
 
-#### option 3 - `/dev/humanReadableName`
+### option 3 - `/dev/humanReadableName`
 
 Suppose your 3D printer is a MasterDisaster5000Pro, and that you would like to be able to set up the device to use a human-readable name like:
 
@@ -134,11 +130,12 @@ Check your work by disconnecting, then re-connecting your 3D printer, and then r
 $ ls /dev
 ``` 
 
-You should expect to see the human-readable name you chose in the list of devices. You can then edit `docker-compose.yml` to use the name in the device mapping.
+You should expect to see the human-readable name you chose in the list of devices.
 
-``` yaml
-devices:
-  - /dev/MasterDisaster5000Pro:/dev/ttyACM0
+You would then define your printer like this:
+
+```console
+$ echo OCTOPRINT_DEVICE_PATH=/dev/MasterDisaster5000Pro >>~/IOTstack/.env
 ```
 
 Notes:
@@ -146,9 +143,9 @@ Notes:
 * device names follow the device. In other words, if you have two or more Raspberry Pis and a collection of serial devices (3D printers, Zigbee adapters, UARTs, and so on), you can build a single `99-usb-serial.rules` file that you install on *all* of your Raspberry Pis. Then, you can attach a named device to any of your Raspberry Pis and it will always get the same name.
 * device names do not persist if the physical device is disconnected. If you switch off your 3D printer or disconnect the USB cable while the OctoPrint container is running, the container will crash.
 
-### *the `/dev/video0:/dev/video0` mapping*
+## the `/dev/video0:/dev/video0` mapping
 
-The `/dev/video0` device is assumed to be an official Raspberry Pi camera attached via ribbon cable.
+By default, video camera support is disabled. This is because it is unsafe to assume a camera is present on `/dev/video0`.
 
 > See the [Webcams topic of the Octoprint Community Forum](https://community.octoprint.org/c/support/support-webcams/18) for help configuring other kinds of cameras.
 
@@ -161,26 +158,18 @@ To activate a Raspberry Pi camera attached via ribbon cable:
 3. Edit `docker-compose.yml` and uncomment **all** of the commented-out lines in the following:
 
 	``` yaml
-	devices:
-	# - /dev/video0:/dev/video0
 	environment:
-	# - ENABLE_MJPG_STREAMER=true
-	# - MJPG_STREAMER_INPUT=-r 640x480 -f 10 -y
-	# - CAMERA_DEV=/dev/video0
+	  # - ENABLE_MJPG_STREAMER=true
+	  # - MJPG_STREAMER_INPUT=-r 640x480 -f 10 -y
+	  # - CAMERA_DEV=/dev/video0
+
+	devices:
+	  # - /dev/video0:/dev/video0
 	```
 
 	Note:
 	
 	* The device path on the right hand side of the `CAMERA_DEV` environment variable corresponds with the right hand side (ie *after* the colon) of the device mapping. There should be no reason to change either.
-
-The three environment variables are required:
-
-``` yaml
-environment:
-  - ENABLE_MJPG_STREAMER=true
-  - MJPG_STREAMER_INPUT=-r 640x480 -f 10 -y
-  - CAMERA_DEV=/dev/video0
-```
 
 The "640x480" `MJPG_STREAMER_INPUT` settings will probably result in your camera feed being "letterboxed" but they will get you started. A full list of options is at [mjpg-streamer-configuration-options](https://community.octoprint.org/t/available-mjpg-streamer-configuration-options/1106).
 
@@ -478,3 +467,4 @@ $ docker-compose up -d octoprint
 ```
 
 The OctoPrint container is well-behaved and will re-initialise its persistent storage area correctly. OctoPrint will adopt "first run" behaviour and display the Setup Wizard.
+
