@@ -5,6 +5,7 @@
 /.tmp/*
 __pycache__
 docker-compose.yml
+docker-compose.override.yml
 compose-override.yml
 build-installer.sh
 docker-compose-base.yml
@@ -25,5 +26,6 @@ post_restore.sh
 !.gitkeep
 
 .vscode
+.idea
 *.code-workspace
 
