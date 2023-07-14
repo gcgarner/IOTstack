@@ -79,7 +79,7 @@ Notes:
 	$ docker-compose up -d postgresql
 	```
 
-## Getting a clean slate {cleanSlate}
+## Getting a clean slate { #cleanSlate }
 
 If you need to start over, proceed like this:
 

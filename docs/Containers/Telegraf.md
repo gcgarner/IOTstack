@@ -246,7 +246,7 @@ The `grep` strips comment lines and the `sudo tee` is a safe way of appending th
 
 ## Getting a clean slate { #cleanSlate }
 
-### Erasing the persistent storage area { #resetDB }
+### Erasing the persistent storage area { #zapStore }
 
 Erasing Telegraf's persistent storage area triggers self-healing and restores known defaults:
 

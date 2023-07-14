@@ -1111,9 +1111,9 @@ The allowable values of `DOCKERHUB_TAG` can be found on the [*DockerHub* Node-RE
 tag       | Node-RED version | `node.js` version
 ----------|------------------|------------------
 latest    | 2.2.2            | 14.x
-latest-14 | 2.2.2            | 14.x 📌
-2.2.2     | 2.2.2 📌         | 14.x
-2.2.2-14  | 2.2.2 📌         | 14.x 📌
+latest-14 | 2.2.2            | 14.x &#x1F4CC;
+2.2.2     | 2.2.2 &#x1F4CC;  | 14.x
+2.2.2-14  | 2.2.2 &#x1F4CC;  | 14.x &#x1F4CC;
 
 Interpreting the tag:
 
@@ -1161,7 +1161,7 @@ Using the IOTstack menu limits your choice of components to those presented in t
 
 To apply changes made to your *Dockerfile*, run the [re-building the local Node-RED image](#rebuildNodeRed) commands.
 
-### via Manage Palette { #viaDockerfile }
+### via Manage Palette { #viaManagePalette }
 
 You can add, remove or update components in Manage Palette. Node-RED will remind you to restart Node-RED and that is something you have to do by hand:
 
