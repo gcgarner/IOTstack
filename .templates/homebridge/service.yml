@@ -1,6 +1,6 @@
 homebridge:
   container_name: homebridge
-  image: oznu/homebridge:latest
+  image: homebridge/homebridge:latest
   restart: unless-stopped
   environment:
     - TZ=Etc/UTC
