@@ -77,20 +77,20 @@ has already been started, and adding and changing these options **will not**
 have any effect.
 
 To customize, editing the file as describe above, add the following lines under
-the `environment:`-section. The default configuration is:
+the `environment:` clause. For example, to set the administrative username to be "maestro" with password "123456":
 
 ```yaml
-    - GF_SECURITY_ADMIN_USER=admin
-    - GF_SECURITY_ADMIN_PASSWORD=admin
+    - GF_SECURITY_ADMIN_USER=maestro
+    - GF_SECURITY_ADMIN_PASSWORD=123456
 ```
 
 If you change the default password, Grafana will not force you to change the
 password on first login but you will still be able to change it via the web UI.
 
-As a summary, these work only **before** Grafana is launched for the first time:
+As a summary, the environment variables only take effect if you set them up **before** Grafana is launched for the first time:
 
-* *GF\_SECURITY\_ADMIN\_USER* has a default value of "admin". You *can* explicitly set it to "admin" or some other value. Whatever option you choose then that's the account name of Grafana's administrative user. But choosing any value other than "admin" is probably a bad idea.
-* *GF\_SECURITY\_ADMIN\_PASSWORD* has a default value of "admin". You can explicitly set it to "admin" or some other value. If its value is "admin" then you will be forced to change it the first time you login to Grafana. If its value is something other than "admin" then that will be the password until you change it via the web UI.
+* `GF_SECURITY_ADMIN_USER` has a default value of "admin". You *can* explicitly set it to "admin" or some other value. Whatever option you choose then that's the account name of Grafana's administrative user. But choosing any value other than "admin" is probably a bad idea.
+* `GF_SECURITY_ADMIN_PASSWORD` has a default value of "admin". You can explicitly set it to "admin" or some other value. If its value is "admin" then you will be forced to change it the first time you login to Grafana. If its value is something other than "admin" then that will be the password until you change it via the web UI.
 
 ### Options with spaces
 
@@ -102,19 +102,17 @@ To set an options with a space, you must enclose the whole value in quotes:
 
 ## HELP – I forgot my Grafana admin password!
 
-Assuming Grafana is started and, run:
+Assuming Grafana is started, run:
 
 ```
-$ docker-compose exec grafana grafana-cli --homepath "/usr/share/grafana" admin reset-admin-password "admin"
+$ docker exec grafana grafana cli admin reset-admin-password «NEWPASSWORD»
 ```
 
-Then, use a browser to connect to your Raspberry Pi on port 3000. Grafana will:
+where `«NEWPASSWORD»` is the value of your choice.
 
-* Expect you login as user "admin" with password "admin"; and then
-* Force you to change the default password to something else.
+Note:
 
-Note: If you have customized *GF\_SECURITY\_ADMIN\_USER*, you'll need to use it
-as the user instead.
+* If you have customized `GF_SECURITY_ADMIN_USER` to be something other than "admin", the password change will be applied to that username. In other words, in the `docker exec` command above, the two references to "admin" are referring to the administrator's account, not the username of the administrator's account. Run the command "as is". Do **not** replace "admin" with the username of the administrator's account.
 
 ## HELP - Resetting to a clean slate
 
@@ -124,7 +122,7 @@ Begin by stopping Grafana:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose stop grafana
+$ docker-compose rm --force --stop -v grafana
 ```
 
 You have two options:
@@ -149,7 +147,8 @@ When you are ready, bring Grafana back up again:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose up -d
+$ docker-compose up -d grafana
 ```
 
-Grafana will automatically recreate everything it needs. You will be able to login as "admin/admin".
+Grafana will automatically recreate everything it needs. You will be able to login as "admin/admin" (or the credentials you set using `GF_SECURITY_ADMIN_USER` and `GF_SECURITY_ADMIN_PASSWORD`).
+
