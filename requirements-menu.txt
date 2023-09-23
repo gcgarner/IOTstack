@@ -1,5 +1,5 @@
-blessed==1.19.0
-ruamel.yaml==0.16.12
-ruamel.yaml.clib==0.2.6
-six==1.16.0
-wcwidth==0.2.5
+blessed
+ruamel.yaml
+ruamel.yaml.clib
+six
+wcwidth
