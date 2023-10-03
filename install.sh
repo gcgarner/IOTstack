@@ -187,7 +187,7 @@ function do_docker_checks() {
 	if command_exists docker; then
 		DOCKER_VERSION_GOOD="false"
 		DOCKER_VERSION=$(docker version -f "{{.Server.Version}}")
-		if [ ! -z "$DOCKER_VERSION" ]; then
+		if [ -z "$DOCKER_VERSION" ]; then
 			echo "Error getting docker version. Error when running docker command. Check that docker is installed correctly."
 		fi
 		DOCKER_VERSION_MAJOR=$(echo "$DOCKER_VERSION"| cut -d'.' -f 1)
