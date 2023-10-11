@@ -45,9 +45,4 @@ VOLUME ["/mosquitto/config", "/mosquitto/pwfile"]
 LABEL com.github.SensorsIot.IOTstack.Dockerfile.build-args="${MOSQUITTO_BASE}"
 LABEL com.github.SensorsIot.IOTstack.Dockerfile.based-on="https://github.com/eclipse/mosquitto"
 
-# don't need these variables in the running container
-ENV MOSQUITTO_BASE=
-ENV HEALTHCHECK_SCRIPT=
-ENV IOTSTACK_ENTRY_POINT=
-
 # EOF
