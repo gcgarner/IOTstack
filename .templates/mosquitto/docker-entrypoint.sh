@@ -15,7 +15,6 @@ if [ "$user" = '0' -a -d "/mosquitto" ]; then
    chown -Rc mosquitto:mosquitto /mosquitto
 
    # specific requirements for the password file
-   chown -c root:root "$PWFILE"
    chmod -c 600 "$PWFILE"
 
    echo "[IOTstack] end self-repair"
