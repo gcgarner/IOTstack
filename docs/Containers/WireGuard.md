@@ -616,9 +616,11 @@ IOTstack users implementing WireGuard for the first time will get the correct st
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v wireguard
+$ docker-compose down wireguard
 $ ./scripts/2022-10-01-wireguard-restructure.sh
 ```
+
+> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 In words:
 
@@ -665,8 +667,10 @@ The procedure is:
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v wireguard
+	$ docker-compose down wireguard
 	```
+	
+	> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 2. Erase the persistent storage area (essential):
 

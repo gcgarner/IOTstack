@@ -496,10 +496,12 @@ The recommended approach is:
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v pihole
+	$ docker-compose down pihole
 	$ sudo rm -rf ./volumes/pihole
 	$ docker-compose up -d pihole
 	```
+	
+	> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 5. Login to Pi-hole's web GUI and navigate to Settings » Teleporter.
 6. Use the checkboxes to select the settings you wish to restore, and click the <kbd>Browse</kbd> and <kbd>Restore</kbd> buttons.

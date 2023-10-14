@@ -24,7 +24,7 @@ Welcome to IOTstack:
 
 * You're always welcome to ask questions on the [IOTStack Discord](https://discord.gg/ZpKHnks).
 
-* Fixes and improvements welcome, see [Contributing](Developers/)
+* Fixes and improvements welcome, see [Contributing](./Developers/index.md)
 
 !!! cite inline end "Full site page listing"
 

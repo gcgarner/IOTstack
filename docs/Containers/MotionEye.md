@@ -109,8 +109,10 @@ Although it depends on your exact settings, MotionEye's video storage can repres
 2. Terminate the motioneye container:
 
 	``` bash
-	$ docker-compose rm --force --stop -v motioneye
+	$ docker-compose down motioneye
 	```
+	
+	> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 3. Move the video storage folder:
 

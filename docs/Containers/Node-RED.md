@@ -975,8 +975,10 @@ To stop the running container:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v nodered
+$ docker-compose down nodered
 ```
+
+> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 Alternatively, you can stop the entire stack:
 

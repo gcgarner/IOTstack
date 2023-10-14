@@ -202,11 +202,13 @@ To migrate your InfluxDB&nbsp;1.8 data:
 
 	```bash
 	$ sudo rm -rf ./volumes/influxdb.migrate
-	$ docker-compose rm --force --stop -v influxdb
+	$ docker-compose down influxdb
 	$ sudo cp -a ./volumes/influxdb ./volumes/influxdb.migrate
 	$ docker-compose up -d influxdb
 	$ sudo chown -R 1000:1000 ./volumes/influxdb.migrate/data
 	```
+	
+	> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 	In words:
 
@@ -349,8 +351,10 @@ If you need to start over from a clean slate:
 2. Terminate the InfluxDB&nbsp;2 container:
 
 	```bash
-	$ docker-compose rm --force --stop -v influxdb2
+	$ docker-compose down influxdb2
 	```
+	
+	> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 3. Remove the persistent store:
 

@@ -409,12 +409,21 @@ $ cd ~/IOTstack
 $ docker-compose start «container»
 ```
 
-There is no equivalent of `down` for a single container. It needs:
+You can also `down` a container:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v «container»
+$ docker-compose down «container»
 ```
+
+<a name="downContainer"></a>Note:
+
+* If the `down` command returns an error suggesting that you can't use it to down a container, it actually means that you have an obsolete version of `docker-compose`. You should upgrade your system. The workaround is to you the old syntax:
+
+	``` console
+	$ cd ~/IOTstack
+	$ docker-compose rm --force --stop -v «container»
+	```
 
 To reactivate a container which has been stopped and removed:
 

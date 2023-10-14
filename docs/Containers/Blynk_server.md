@@ -164,11 +164,11 @@ Erasing Blynk Server's persistent storage area triggers self-healing and restore
 
 ```console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v blynk_server
+$ docker-compose down blynk_server
 $ sudo rm -rf ./volumes/blynk_server
 $ docker-compose up -d blynk_server
 ```
-Note:
+Notes:
 
 * You can also remove individual configuration files and then trigger self-healing. For example, if you decide to edit `server.properties` and make a mess, you can restore the original default version like this:
 
@@ -177,6 +177,8 @@ Note:
 	$ rm volumes/blynk_server/config/server.properties
 	$ docker-compose restart blynk_server
 	```
+	
+* See also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 ## Upgrading Blynk Server { #upgradingBlynkServer }
 

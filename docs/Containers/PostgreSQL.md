@@ -85,7 +85,9 @@ If you need to start over, proceed like this:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v postgres
+$ docker-compose down postgres
 $ sudo rm -rf ./volumes/postgres
 $ docker-compose up -d postgres
 ```
+
+> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
