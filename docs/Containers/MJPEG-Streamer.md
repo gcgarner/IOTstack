@@ -35,7 +35,7 @@ If you have a Raspberry Pi Ribbon Camera, prepare your system like this:
 	``` console
 	$ grep "VERSION_CODENAME" /etc/os-release
 	```
-	
+
 	The answer should be one of "buster", "bullseye" or "bookworm".
 
 2. Configure camera support:
@@ -45,7 +45,7 @@ If you have a Raspberry Pi Ribbon Camera, prepare your system like this:
 		``` console
 		$ sudo raspi-config nonint do_camera 0
 		```
-		
+
 		Buster pre-dates *LibCamera* so this is the same as enabling the *legacy* camera system. In this context, `0` means "enable" and `1' means "disable".
 
 	* if your system is running Bullseye or Bookworm, run these commands:
@@ -54,9 +54,9 @@ If you have a Raspberry Pi Ribbon Camera, prepare your system like this:
 		$ sudo raspi-config nonint do_camera 1
 		$ sudo raspi-config nonint do_legacy 0
 		```
-		
+
 		The first command is protective and turns off the *LibCamera* subsystem, while the second command enables the *legacy* camera system.
-		
+
 		> When executed from the command line, both the `do_camera` and `do_legacy` commands are supported in the Bookworm version of `raspi-config`. However, neither command is available when `raspi-config` is invoked as a GUI in a Bookworm system. This likely implies that the commands have been deprecated and will be removed, in which case this documentation will break.
 
 3. Reboot your system:
@@ -64,7 +64,7 @@ If you have a Raspberry Pi Ribbon Camera, prepare your system like this:
 	``` console
 	$ sudo reboot
 	```
-	
+
 4. Make a note that your ribbon camera will be accessible on `/dev/video0`.
 
 ## Third-party cameras
@@ -77,20 +77,20 @@ The simplest approach is:
 	``` console
 	$ ls -l /dev/v4l/by-id
 	```
-	
+
 	This is an example of the response with a LogiTech "C920 PRO FHD Webcam 1080P" camera connected:
-	
+
 	```
 	lrwxrwxrwx 1 root root 12 Oct 23 15:42 usb-046d_HD_Pro_Webcam_C920-video-index0 -> ../../video1
-lrwxrwxrwx 1 root root 12 Oct 23 15:42 usb-046d_HD_Pro_Webcam_C920-video-index1 -> ../../video2
+	lrwxrwxrwx 1 root root 12 Oct 23 15:42 usb-046d_HD_Pro_Webcam_C920-video-index1 -> ../../video2
 	```
-	
+
 	In general, the device at `index0` is where your camera will be accessible, as in:
-	
+
 	```
 	/dev/v4l/by-id/usb-046d_HD_Pro_Webcam_C920-video-index0
 	```
-	
+
 If you don't get a sensible response to the `ls` command then try disconnecting and reconnecting your camera, and rebooting your system.
 
 ## Container variables
@@ -130,13 +130,13 @@ To initialise your environment, begin by using a text editor (eg `vim`, `nano`) 
 3. Define the **external** device path to your camera. Two examples have been given above:
 
 	* a ribbon camera:
-	
+
 		```
 		MJPG_STREAMER_EXTERNAL_DEVICE=/dev/video0
 		```
-	
+
 	* a Logitech C920 USB camera:
-	
+
 		```
 		MJPG_STREAMER_EXTERNAL_DEVICE=/dev/v4l/by-id/usb-046d_HD_Pro_Webcam_C920-video-index
 		```
@@ -144,27 +144,27 @@ To initialise your environment, begin by using a text editor (eg `vim`, `nano`) 
 4. If you know your camera supports higher resolutions, you can also set the size. Examples:
 
 	* the ribbon camera can support:
-	
+
 		```
 		MJPG_STREAMER_SIZE=1152x648
 		```
-		
+
 	* the Logitech C920 can support:
-	
+
 		```
 		MJPG_STREAMER_SIZE=1920x1080
 		```
-	
+
 5. If the `mjpg-streamer` and `motioneye` containers are going to be running on:
 
 	* the **same** host, you can consider increasing the frame rate:
-	
+
 		```
 		MJPG_STREAMER_FPS=30
 		```
-		
+
 		Even though we are setting up a *web* camera, the traffic will never leave the host and will not traverse your Ethernet or WiFi networks.
-	
+
 	* **different** hosts, you should probably leave the rate at 5 frames per second until you understand the impact on network traffic.
 
 6. Save your work.
@@ -227,19 +227,19 @@ Error response from daemon: error gathering device information while adding cust
 	$ cd ~/IOTstack
 	$ docker-compose up -d mjpg-streamer
 	```
-	
+
 	The first time you do this triggers a fairly long process. First, a basic operating system image is downloaded from DockerHub, then a Dockerfile is run to add the streamer software and construct a local image, after which the local image is instantiated as your running container. Subsequent launches use the local image so the container starts immediately. See also [container maintenance](#maintenance).
-	
+
 2. Once the container is running, make sure it is behaving normally and has not gone into a restart loop:
 
 	``` console
 	$ docker ps -a --format "table {{.Names}}\t{{.RunningFor}}\t{{.Status}}"
 	```
-	
+
 	> The `docker ps` command produces a lot of output which generally results in line-wrapping and can be hard to read. The `--format` argument reduces this clutter by focusing on the interesting columns. If you have [IOTstackAliases](https://github.com/Paraphraser/IOTstackAliases) installed, you can use `DPS` instead of copy/pasting the above command.
-	
+
 	If the container is restarting, you will see evidence of that in the STATUS column. If that happens, re-check the values set in the `.env` file and "up" the container again. The container's log (see below) may also be helpful.
-	
+
 3. Check the container's log:
 
 	``` console
@@ -255,11 +255,11 @@ Error response from daemon: error gathering device information while adding cust
 	 o: username:password....: streamer:oNfDG-d1kgzC
 	 o: commands.............: enabled
 	```
-	
+
 	Many of the values you set earlier using environment variables show up here so viewing the log is a good way of making sure everything is being passed to the container.
-	
+
 	Note:
-	
+
 	* The `/dev/video0` in the first line of output is the **internal** device path (inside the container). This is **not** the same as the **external** device path associated with `MJPG_STREAMER_EXTERNAL_DEVICE`. The container doesn't know about the **external** device path so it has no way to display it.
 
 ## Connecting the camera to MotionEye
@@ -272,29 +272,29 @@ Error response from daemon: error gathering device information while adding cust
 5. If the `motioneye` and `mjpg-streamer` containers are running on:
 
 	* the **same** host, the URL should be:
-	
+
 		```
 		http://mjpg-streamer:80/?action=stream
 		```
-		
+
 		Here:
-		
+
 		- `mjpg-streamer` is the name of the **container**. Technically, it is a **host** name (rather than a domain name); and
 		- port 80 is the **internal** port that the streamer process running inside the container is listening to. It comes from the *right* hand side of the port mapping in the service definition:
-	
+
 			``` yaml
 			ports:
 			- "8980:80"
-			```	
-	
+			```
+
 	* **different** hosts, the URL should be in this form:
-	
+
 		```
 		http://«name-or-ip»:8980/?action=stream
 		```
-		
+
 		Here:
-		
+
 		- `«name-or-ip»` is the domain name or IP address of the host on which the `mjpg-streamer` container is running. Examples:
 
 			```
@@ -304,11 +304,12 @@ Error response from daemon: error gathering device information while adding cust
 			```
 
 		- port 8980 is the **external** port that the host where the `mjpg-streamer` container is running is listening on behalf of the container. It comes from the *left* hand side of the port mapping in the service definition:
-	
+
 			``` yaml
 			ports:
 			- "8980:80"
-			```	
+			```
+
 6. Enter the Username ("streamer" in this example).
 7. Enter the Password ("oNfDG-d1kgzC" in this example).
 8. Click in the Username field again. This causes MotionEye to retry the connection, after which the camera should appear in the Camera field.
