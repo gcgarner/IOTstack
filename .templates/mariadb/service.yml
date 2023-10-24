@@ -2,7 +2,7 @@ mariadb:
   build: ./.templates/mariadb/.
   container_name: mariadb
   environment:
-    - TZ=Etc/UTC
+    - TZ=${TZ:-Etc/UTC}
     - PUID=1000
     - PGID=1000
     - MYSQL_ROOT_PASSWORD=%randomAdminPassword%
@@ -15,4 +15,3 @@ mariadb:
   ports:
     - "3306:3306"
   restart: unless-stopped
-
