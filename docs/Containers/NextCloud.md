@@ -133,10 +133,6 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 
 ## "Access through untrusted domain" { #untrustedDomain }
 
-> The information in this section *may* be out of date. Recent tests suggest it is no longer necessary to edit the `trusted_domains` list in `config.php`. This section is being left here so you will know what to do if you encounter the problem.
-
-During Nextcloud initialisation you had to choose between an IP address, a domain name or a host name. Now that Nextcloud is running, you have the opportunity to expand your connection options.
-
 > If you are reading this because you are staring at an "access through untrusted domain" message then you have come to the right place.
 
 Let's assume the following:
