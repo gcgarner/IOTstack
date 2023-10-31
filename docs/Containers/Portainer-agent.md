@@ -5,11 +5,11 @@
 
 ## About
 
-The protainer agent is a great way to add a second docker instance to a existing portainer instance. this allows you to mananage multiple docker enviroments form one prortainer instance
+The portainer agent is a great way to add a second docker instance to an existing portainer instance. This allows you to manage multiple docker environments from one portainer instance.
 
 ## Adding to an existing instance
 
-When you want to add the the agent to an existing portianer instance. 
+When you want to add the agent to an existing portainer instance. 
 
 * You go to the endpoints tab.
 * Click on `Add endpoint`
