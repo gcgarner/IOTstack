@@ -46,7 +46,7 @@ If you have a Raspberry Pi Ribbon Camera, prepare your system like this:
 		$ sudo raspi-config nonint do_camera 0
 		```
 
-		Buster pre-dates *LibCamera* so this is the same as enabling the *legacy* camera system. In this context, `0` means "enable" and `1' means "disable".
+		Buster pre-dates *LibCamera* so this is the same as enabling the *legacy* camera system. In this context, `0` means "enable" and `1` means "disable".
 
 	* if your system is running Bullseye or Bookworm, run these commands:
 
