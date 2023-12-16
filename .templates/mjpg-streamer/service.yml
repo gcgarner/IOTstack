@@ -1,0 +1,15 @@
+mjpg-streamer:
+  container_name: mjpg-streamer
+  build: ./.templates/mjpg-streamer/.
+  restart: unless-stopped
+  environment:
+    - TZ=${TZ:-Etc/UTC}
+    - MJPG_STREAMER_USERNAME=${MJPG_STREAMER_USERNAME:-}
+    - MJPG_STREAMER_PASSWORD=${MJPG_STREAMER_PASSWORD:-}
+    - MJPG_STREAMER_SIZE=${MJPG_STREAMER_SIZE:-}
+    - MJPG_STREAMER_FPS=${MJPG_STREAMER_FPS:-}
+  ports:
+    - "8980:80"
+  devices:
+    - "${MJPG_STREAMER_EXTERNAL_DEVICE:-/dev/video0}:/dev/video0"
+
