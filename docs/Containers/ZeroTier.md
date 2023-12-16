@@ -209,8 +209,10 @@ The ZeroTier-router container is just the ZeroTier-client container with some `i
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v zerotier-client
+	$ docker-compose down zerotier-client
 	```
+	
+	> See also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 2. Remove the existing service definition, either by:
 
@@ -969,11 +971,14 @@ You can erase ZeroTier's persistent storage area like this:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v {zerotier-client | zerotier-router}
+$ docker-compose down {zerotier-client | zerotier-router}
 $ sudo rm -rf ./volumes/zerotier-one
 ```
 
-> Tip: always double-check `sudo` commands **before** hitting <kbd>Enter</kbd>.
+Tips:
+
+1. always double-check `sudo` commands **before** hitting <kbd>Enter</kbd>.
+2. see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 Erasing persistent storage destroys the client's authorisation (cryptographic credentials). If you start the container again, it will construct a new identity and you will need to re-authorise the client in ZeroTier Central. You should also delete the obsolete client authorisation.
 

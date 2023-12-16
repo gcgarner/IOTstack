@@ -72,10 +72,12 @@ If you need to start over from scratch:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v scrypted
+$ docker-compose down scrypted
 $ sudo rm -rf ./volumes/scrypted
 $ docker-compose up -d scrypted
 ```
+
+> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 ## About the service definition
 

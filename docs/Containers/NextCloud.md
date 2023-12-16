@@ -10,12 +10,14 @@ nextcloud:
   image: nextcloud
   restart: unless-stopped
   environment:
+    - TZ=${TZ:-Etc/UTC}
     - MYSQL_HOST=nextcloud_db
-    - MYSQL_PASSWORD=«user_password»
+    - MYSQL_PASSWORD=%randomMySqlPassword%
     - MYSQL_DATABASE=nextcloud
     - MYSQL_USER=nextcloud
   ports:
     - "9321:80"
+    - "9343:443"
   volumes:
     - ./volumes/nextcloud/html:/var/www/html
   depends_on:
@@ -29,11 +31,11 @@ nextcloud_db:
   build: ./.templates/mariadb/.
   restart: unless-stopped
   environment:
-    - TZ=Etc/UTC
+    - TZ=${TZ:-Etc/UTC}
     - PUID=1000
     - PGID=1000
-    - MYSQL_ROOT_PASSWORD=«root_password»
-    - MYSQL_PASSWORD=«user_password»
+    - MYSQL_ROOT_PASSWORD=%randomPassword%
+    - MYSQL_PASSWORD=%randomMySqlPassword%
     - MYSQL_DATABASE=nextcloud
     - MYSQL_USER=nextcloud
   volumes:
@@ -75,6 +77,8 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 	```console
 	$ docker-compose down
 	```
+	
+	> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 3. Erase the persistent storage area for Nextcloud (double-check the command *before* you hit return):
 
@@ -104,87 +108,30 @@ The passwords need to be set before you bring up the Nextcloud service for the f
 	$ docker logs nextcloud
 	```
 
-6. If you want to be sure Nextcloud gets set up correctly, it is best to perform the remaining steps from a **different** computer.
+6. On a computer that is **not** the device running Nextcloud, launch a browser and point to the device running Nextcloud using your chosen connection method. Examples:
 
-	That means you need to decide how that **other** computer will refer to your Raspberry Pi running Nextcloud. Your choices are:
-
-	* the IP address of your Raspberry Pi – eg `192.168.203.200`
-	* your Raspberry Pi's fully-qualified domain name – eg `myrpi.mydomain.com`
-	* your Raspberry Pi's host name – eg `myrpi`
-
-	Key points:
-
-	* You **can't** use a multicast domain name (eg `myrpi.local`). An mDNS name will not work until Nextcloud has been initialised!
-	* Once you have picked a connection method, **STICK TO IT**.
-	* You are only stuck with this restriction until Nextcloud has been initialised. You **can** (and should) fix it later by completing the steps in ["Access through untrusted domain"](#untrustedDomain).
-
-7. On a computer that is **not** the Raspberry Pi running Nextcloud, launch a browser and point to the Raspberry Pi running Nextcloud using your chosen connection method. Examples:
-
-	- If you are using an IP address:
-
-		```
-		http://192.168.203.200:9321
-		```
-
-	- If you are using a domain name:
-
-		```
-		http://myrpi.mydomain.com:9321
-		```
-
-	- If you are using a host name in `/etc/hosts`:
-
-		```
-		http://myrpi:9321
-		```
+	```
+	http://192.168.203.200:9321
+	http://myrpi.mydomain.com:9321
+	http://myrpi.local:9321
+	http://myrpi:9321
+	```
 
 	The expected result is:
 
 	![Create Administrator Account](./images/nextcloud-createadminaccount.png)
 
-8. Create an administrator account and then click "Install".
+7. Create an administrator account and then click "Install" and wait for the loading to complete.
 
-9. There is a long delay. In most cases, the "Recommended apps" screen appears and you can ignore the instructions in this step. However, if your browser returns a "Not Found" error like the following:
-
-	![Mal-formed URL](./images/nextcloud-malformedurl.png)
-	
-	then you should:
-
-	* Examine the contents of your browser's URL bar. If you see this pattern:
-
-		```
-		http://localhost/index.php/core/apps/recommended
-		```
-
-	* Edit the URL to replace `localhost` with what it *should* be, which will be **one** of the following patterns, depending on which method you chose to access Nextcloud:
-
-		* `http://192.168.203.200:9321/index.php/core/apps/recommended`
-		* `http://myrpi.mydomain.com:9321/index.php/core/apps/recommended`
-		* `http://myrpi:9321/index.php/core/apps/recommended`
-
-		Note:
-	
-		* This seems to be the only time Nextcloud misbehaves and forces `localhost` into a URL.
-
-10. The "Recommended apps" screen appears. Click "Install recommended apps". A spinner moves down the list of apps as they are loaded:
-
-	![Recommended Apps](./images/nextcloud-recommendedapps.png)
-
-	Wait for the loading to complete.
-
-11. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window:
+8. Eventually, the dashboard will appear. Then the dashboard will be obscured by the "Nextcloud Hub" floating window which you can dismiss:
 
 	![Post-initialisation](./images/nextcloud-postinitialisation.png)
 
-	Keep clicking on the right-arrow button until you reach the last screen, then click "Start using Nextcloud".
-
-12. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
+9. Congratulations. Your IOTstack implementation of Nextcloud is ready to roll:
 
 	![Dashboard](./images/nextcloud-dashboard.png)
 
 ## "Access through untrusted domain" { #untrustedDomain }
-
-During Nextcloud initialisation you had to choose between an IP address, a domain name or a host name. Now that Nextcloud is running, you have the opportunity to expand your connection options.
 
 > If you are reading this because you are staring at an "access through untrusted domain" message then you have come to the right place.
 
@@ -253,6 +200,8 @@ See also:
 
 ### Using a DNS alias for your Nextcloud service { #dnsAlias }
 
+> The information in this section *may* be out of date. Recent tests suggest it is no longer necessary to add a `hostname` clause to your `docker-compose.yml` to silence warnings when using DNS aliases to reach your NextCloud service. This section is being left here so you will know what to do if you encounter the problem.
+
 The examples above include using a DNS alias (a CNAME record) for your Nextcloud service. If you decide to do that, you may see this warning in the log:
 
 ```
@@ -268,6 +217,8 @@ You can silence the warning by editing the Nextcloud service definition in `dock
 ## Security considerations { #security }
 
 Nextcloud traffic is not encrypted. Do **not** expose it to the web by opening a port on your home router. Instead, use a VPN like Wireguard to provide secure access to your home network, and let your remote clients access Nextcloud over the VPN tunnel.
+
+The IOTstack service definition for NextCloud reserves port 9343 for HTTPS access but leaves it as an exercise for the reader to figure out how to make it work. You may get some guidance [here](https://youtu.be/qlcVx-k-02E?si=qtVNFAvSB8w202Jh).
 
 ## Container health check  { #healthCheck }
 
@@ -309,7 +260,7 @@ If you want to take a backup, something like the following will get the job done
 $ cd ~/IOTstack
 $ BACKUP_TAR_GZ=$PWD/backups/$(date +"%Y-%m-%d_%H%M").$HOSTNAME.nextcloud-backup.tar.gz
 $ touch "$BACKUP_TAR_GZ"
-$ docker-compose rm --force --stop -v nextcloud nextcloud_db
+$ docker-compose down nextcloud nextcloud_db
 $ sudo tar -czf "$BACKUP_TAR_GZ" -C "./volumes/nextcloud" .
 $ docker-compose up -d nextcloud
 ```
@@ -318,13 +269,14 @@ Notes:
 
 * A *baseline* backup takes over 400MB and about 2 minutes. Once you start adding your own data, it will take even more time and storage.
 * The `up` of the NextCloud container implies the `up` of the Nextcloud_DB container.
+* See also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 To restore, you first need to identify the name of the backup file by looking in the `backups` directory. Then:
 
 ```console
 $ cd ~/IOTstack
 $ RESTORE_TAR_GZ=$PWD/backups/2021-06-12_1321.sec-dev.nextcloud-backup.tar.gz
-$ docker-compose rm --force --stop -v nextcloud nextcloud_db
+$ docker-compose down nextcloud nextcloud_db
 $ sudo rm -rf ./volumes/nextcloud/*
 $ sudo tar -x --same-owner -z -f "$RESTORE_TAR_GZ" -C "./volumes/nextcloud"
 $ docker-compose up -d nextcloud

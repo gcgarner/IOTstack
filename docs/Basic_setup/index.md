@@ -1,40 +1,62 @@
 # Getting Started
 
+## About IOTstack { #conventions }
+
+IOTstack is not a *system.* It is a set of *conventions* for assembling arbitrary collections of containers into something that has a reasonable chance of working out-of-the-box. The three most important conventions are:
+
+1. If a container needs information to persist across restarts (and most containers do) then the container's *persistent store* will be found at:
+
+	```
+	~/IOTstack/volumes/«container»
+	```
+	
+	Most *service definitions* examples found on the web have a scattergun approach to this problem. IOTstack imposes order on this chaos.
+	
+2. To the maximum extent possible, network port conflicts have been sorted out in advance.
+
+	Sometimes this is not possible. For example, Pi-hole and AdGuardHome both offer Domain Name System services. The DNS relies on port 53. You can't have two containers claiming port 53 so the only way to avoid this is to pick *either* Pi-hole *or* AdGuardHome.
+3. Where multiple containers are needed to implement a single user-facing service, the IOTstack service definition will include everything needed. A good example is NextCloud which relies on MariaDB. IOTstack implements MariaDB as a private instance which is only available to NextCloud. This strategy ensures that you are able to run your own separate MariaDB container without any risk of interference with your NextCloud service. 
+
 ## Requirements
 
 IOTstack makes the following assumptions:
 
-1. Your hardware is a Raspberry Pi (typically a 3B+ or 4B).
+1. Your hardware is capable of running Debian or one of its derivatives. Examples that are known to work include:
 
-	* The Raspberry Pi Zero W2 has been tested with IOTstack. It works but the 512MB RAM means you should not try to run too many containers concurrently.
-	* Users have also [reported success](https://github.com/SensorsIot/IOTstack/issues/375) on Orange Pi Win/Plus.
+	- a Raspberry Pi (typically a 3B+ or 4B)
 
-2. Your Raspberry Pi has a reasonably-recent version of 32-bit or 64-bit Raspberry Pi OS (aka "Raspbian") installed. You can download operating-system images:
+		> The Raspberry Pi Zero W2 has been tested with IOTstack. It works but the 512MB RAM means you should not try to run too many containers concurrently.
 
-	* [Current release](https://www.raspberrypi.com/software/operating-systems/)
-      : "Raspberry Pi OS with desktop" is recommended.
-	* [Prior releases](http://downloads.raspberrypi.org/raspios_armhf/images/)
-      : This offers only "Raspberry Pi OS with desktop" images.
+	- Orange Pi Win/Plus [see also issue 375](https://github.com/SensorsIot/IOTstack/issues/375)
+	- an Intel-based Mac running macOS plus Parallels with a Debian guest.
+	- an Intel-based platform running Proxmox with a Debian guest.
 
-3. Your operating system has been updated:
+2. Your host or guest system is running a reasonably-recent version of Debian or an operating system which is downstream of Debian in the Linux family tree, such as Raspberry Pi OS (aka "Raspbian") or Ubuntu.
 
-	``` console
-	$ sudo apt update
-	$ sudo apt upgrade -y
-	```
+	IOTstack is known to work in 32-bit mode but not all containers have images on DockerHub that support 320bit mode. If you are setting up a new system from scratch, you should choose a 64-bit option.
 
-4. You are logged-in as the user "pi".
-5. User "pi" has the user ID 1000.
-6. The home directory for user "pi" is `/home/pi/`.
-7. IOTstack is installed at `/home/pi/IOTstack` (with that exact spelling).
+	IOTstack was known to work with Buster but it has not been tested recently. Bullseye is known to work but if you are setting up a new system from scratch, you should choose Bookworm.
+	
+	Please don't waste your own time trying Linux distributions from outside the Debian family tree. They are unlikely to work.
 
-If the first three assumptions hold, assumptions four through six are Raspberry Pi defaults on a clean installation. The seventh is what you get if you follow these instructions faithfully.
+3. You are logged-in as the default user (ie not root). In most cases, this is the user with ID=1000 and is what you get by default on either a Raspberry Pi OS or Debian installation.
+
+	This assumption is not really an IOTstack requirement as such. However, many containers assume UID=1000 exists and you are less likely to encounter issues if this assumption holds.
 
 Please don't read these assumptions as saying that IOTstack will not run on other hardware, other operating systems, or as a different user. It is just that IOTstack gets most of its testing under these conditions. The further you get from these implicit assumptions, the more your mileage may vary.
 
 ## New installation
 
-### automatic (recommended)
+You have two choices:
+
+1. If you have an **existing** system and you want to add IOTstack to it, then the [add-on](#addonInstall) method is your best choice.
+2. If you are setting up a **new** system from scratch, then [PiBuilder](#pibuilderInstall) is probably your best choice. You can, however, also use the [add-on](#addonInstall) method in a green-fields installation.
+
+### add-on method { #addonInstall }
+
+This method assumes an **existing** system rather than a green-fields installation. The script uses the principle of least interference. It only installs the bare minimum of prerequisites and, with the exception of adding some boot time options to your Raspberry Pi (but not any other kind of hardware), makes no attempt to tailor your system.
+
+To use this method:
 
 1. Install `curl`:
 
@@ -48,81 +70,34 @@ Please don't read these assumptions as saying that IOTstack will not run on othe
 	$ curl -fsSL https://raw.githubusercontent.com/SensorsIot/IOTstack/master/install.sh | bash
 	```
 
-3. Run the menu and choose your containers:
+The `install.sh` script is *designed* to be run multiple times. If the script discovers a problem, it will explain how to fix that problem and, assuming you follow the instructions, you can safely re-run the script. You can repeat this process until the script completes normally.
 
-	``` console
-	$ cd ~/IOTstack
-	$ ./menu.sh
-	```
+### PiBuilder method { #pibuilderInstall }
 
-4. Bring up your stack:
+Compared with the [add-on method](#addonInstall), PiBuilder is far more comprehensive. PiBuilder:
 
-	``` console
-	$ cd ~/IOTstack
-	$ docker-compose up -d
-	```
-
-### manual
-
-1. Install `git`:
-
-	``` console
-	$ sudo apt install -y git
-	```
-
-2. Clone IOTstack:
-
-	* If you want "new menu":
-
-		``` console
-		$ git clone https://github.com/SensorsIot/IOTstack.git ~/IOTstack
-		```
-
-	* If you prefer "old menu":
-
-		``` console
-		$ git clone -b old-menu https://github.com/SensorsIot/IOTstack.git ~/IOTstack
-		```
-
-3. Run the menu and choose your containers:
-
-	``` console
-	$ cd ~/IOTstack
-	$ ./menu.sh
-	```
-
-	Note:
-
-	* If you are running "old menu" for the first time, you will be guided to "Install Docker". That will end in a reboot, after which you should re-enter the menu and choose your containers.
-
-4. Bring up your stack:
-
-	``` console
-	$ cd ~/IOTstack
-	$ docker-compose up -d
-	```
-
-### scripted – PiBuilder { #scripted }
-
-If you prefer to automate your installations using scripts, see [PiBuilder](https://github.com/Paraphraser/PiBuilder). Beginning with your choice of Raspberry Pi OS starting point (eg Buster or Bullseye), PiBuilder:
-
-1. Satisfies all dependencies likely to be needed for IOTstack.
+1. Does everything the [add-on method](#addonInstall) does.
+2. Adds support packages and debugging tools that have proven useful in the IOTstack context.
 3. Installs all required system patches (see next section).
-3. Installs Docker and docker-compose.
-4. Clones:
+4. In addition to cloning IOTstack (this repository), PiBuilder also clones:
 
-	* IOTstack (this repository);
 	* [IOTstackBackup](https://github.com/Paraphraser/IOTstackBackup) which is an alternative to the backup script supplied with IOTstack but does not require your stack to be taken down to perform backups; and
 	* [IOTstackAliases](https://github.com/Paraphraser/IOTstackAliases) which provides shortcuts for common IOTstack operations.
 
-After PiBuilder has finished, your system is ready to either:
+5. Performs extra tailoring intended to deliver a rock-solid platform for IOTstack.
 
-* Run the IOTstack menu to build your first stack; or
-* Restore a backup and bring up your stack.
+PiBuilder does, however, assume a **green fields** system rather than an existing installation. Although the PiBuilder scripts will *probably* work on an existing system, that scenario has never been tested so it's entirely at your own risk. 
+
+PiBuilder actually has two specific use-cases:
+
+1. A first-time build of a system to run IOTstack; and
+2. The ability to create your own customised version of PiBuilder so that you can quickly rebuild your Raspberry Pi or Proxmox guest after a disaster. Combined with IOTstackBackup, you can go from bare metal to a running system with data restored in about half an hour.
 
 ## Required system patches
 
-Unless you know what you are doing, assume these are needed.
+You can skip this section if you used [PiBuilder](https://github.com/Paraphraser/PiBuilder) to construct your system. That's because PiBuilder installs all necessary patches automatically.
+
+If you used the [add-on method](#addonInstall), you should consider applying these patches by hand. Unless you know that a patch is **not** required, assume that it is needed.
 
 ### patch 1 – restrict DHCP
 
@@ -138,7 +113,7 @@ See [Issue 219](https://github.com/SensorsIot/IOTstack/issues/219) and [Issue 25
 
 ### patch 2 – update libseccomp2
 
-This patch is **ONLY** for Raspbian Buster. Do **NOT** install this patch if you are running Raspbian Bullseye.
+This patch is **ONLY** for Raspbian Buster. Do **NOT** install this patch if you are running Raspbian Bullseye or Bookworm.
 
 1.  check your OS release
 
@@ -180,32 +155,19 @@ $ echo $(cat /boot/cmdline.txt) cgroup_memory=1 cgroup_enable=memory | sudo tee 
 $ sudo reboot
 ```
 
-## the IOTstack menu
+## the IOTstack menu { #iotstackMenu}
 
-The menu is used to install Docker and then build the `docker-compose.yml` file which is necessary for starting the stack.
+The menu is used to construct your `docker-compose.yml` file. That file is read by `docker-compose` which issues the instructions necessary for starting your stack.
 
-> The menu is only an aid. It is a good idea to learn the `docker` and `docker-compose` commands if you plan on using Docker in the long run.
+The menu is a great way to get started quickly but it is only an aid. It is a good idea to learn the various `docker` and `docker-compose` commands so you can use them outside the menu. It is also a good idea to study the `docker-compose.yml` generated by the menu to see how everything is put together. You will gain a lot of flexibility if you learn how to add containers by hand.
 
-### menu item: Install Docker (old menu only)
+In essence, the menu is a concatenation tool which appends *service definitions* that exist inside the hidden `~/IOTstack/.templates` folder to your `docker-compose.yml`.
 
-Please do **not** try to install `docker` and `docker-compose` via `sudo apt install`. There's more to it than that. Docker needs to be installed by `menu.sh`. The menu will prompt you to install docker if it detects that docker is not already installed. You can manually install it from within the `Native Installs` menu:
+Once you understand what the menu does (and, more importantly, what it doesn't do), you will realise that the real power of IOTstack lies not in its menu system but resides in its [conventions](#conventions).
 
-``` console
-$ cd ~/IOTstack
-$ ./menu.sh
-Select "Native Installs"
-Select "Install Docker and Docker-Compose"
-```
+### menu item: Build Stack { #buildStack}
 
-Follow the prompts. The process finishes by asking you to reboot. Do that!
-
-Note:
-
-* New menu (master branch) automates this step.
-
-### menu item: Build Stack
-
-`docker-compose` uses a `docker-compose.yml` file to configure all your services. The `docker-compose.yml` file is created by the menu:
+To create your first `docker-compose.yml`:
 
 ``` console
 $ cd ~/IOTstack
@@ -233,7 +195,7 @@ The first time you run `up` the stack docker will download all the images from D
 
 Some containers also need to be built locally. Node-RED is an example. Depending on the Node-RED nodes you select, building the image can also take a very long time. This is especially true if you select the SQLite node.
 
-Be patient (and ignore the huge number of warnings).
+Be patient (and, if you selected the SQLite node, ignore the huge number of warnings).
 
 ### menu item: Docker commands
 
@@ -242,83 +204,6 @@ The commands in this menu execute shell scripts in the root of the project.
 ### other menu items
 
 The old and new menus differ in the options they offer. You should come back and explore them once your stack is built and running.
-
-## switching menus
-
-At the time of writing, IOTstack supports three menus:
-
-* "Old Menu" on the `old-menu` branch. This was inherited from [gcgarner/IOTstack](https://github.com/gcgarner/IOTstack).
-* "New Menu" on the `master` branch. This is the current menu.
-* "New New Menu" on the `experimental` branch. This is under development.
-
-With a few precautions, you can switch between git branches as much as you like without breaking anything. The basic check you should perform is:
-
-``` console
-$ cd ~/IOTstack
-$ git status
-```
-
-Check the results to see if any files are marked as "modified". For example:
-
-``` output
-modified:   .templates/mosquitto/Dockerfile
-```
-
-Key point:
-
-* Files marked "untracked" do not matter. You only need to check for "modified" files because those have the potential to stop you from switching branches cleanly.
-
-The way to avoid potential problems is to move any modified files to one side and restore the unmodified original. For example:
-
-``` console
-$ mv .templates/mosquitto/Dockerfile .templates/mosquitto/Dockerfile.save
-$ git checkout -- .templates/mosquitto/Dockerfile
-```
-
-When `git status` reports no more "modified" files, it is safe to switch your branch.
-
-### current menu (master branch)
-
-``` console
-$ cd ~/IOTstack/
-$ git pull
-$ git checkout master
-$ ./menu.sh
-```
-
-### old menu (old-menu branch)
-
-``` console
-$ cd ~/IOTstack/
-$ git pull
-$ git checkout old-menu
-$ ./menu.sh
-```
-
-### experimental branch
-
-Switch to the experimental branch to try the latest and greatest features.
-
-``` console
-$ cd ~/IOTstack/
-$ git pull
-$ git checkout experimental
-$ ./menu.sh
-```
-
-Notes:
-
-* Please make sure you have a good backup before you start.
-* The experimental branch may be broken, or may break your setup.
-* Please report any issues.
-* Remember:
-
-	* you can switch git branches as much as you like without breaking anything.
-	* simply launching the menu (any version) won't change anything providing you exit before letting the menu complete.
-	* running the menu *to completion* **will** change your docker-compose.yml and supporting structures in `~/IOTstack/services`.
-	* running `docker-compose up -d` will change your running containers.
-
-* The way back is to take down your stack, restore a backup, and bring up your stack again.
 
 ## useful commands: docker & docker-compose
 
@@ -368,6 +253,21 @@ Logging limits were added to prevent Docker using up lots of RAM if log2ram is e
 
 You can also turn logging off or set it to use another option for any service by using the IOTstack `docker-compose-override.yml` file mentioned at [IOTstack/Custom](Custom.md).
 
+Another approach is to change `daemon.json` to be like this:
+
+``` json
+{
+  "log-driver": "local",
+  "log-opts": {
+    "max-size": "1m"
+  }
+}
+```
+
+The `local` driver is specifically designed to prevent disk exhaustion. Limiting log size to one megabyte also helps, particularly if you only have a limited amount of storage.
+
+If you are familiar with system logging where it is best practice to retain logs spanning days or weeks, you may feel that one megabyte is unreasonably small. However, before you rush to increase the limit, consider that each container is the equivalent of a small computer dedicated to a single task. By their very nature, containers tend to either work as expected or fail outright. That, in turn, means that it is usually only recent container logs showing failures as they happen that are actually useful for diagnosing problems.
+
 ### starting an individual container
 
 To start a particular container:
@@ -409,12 +309,21 @@ $ cd ~/IOTstack
 $ docker-compose start «container»
 ```
 
-There is no equivalent of `down` for a single container. It needs:
+You can also `down` a container:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v «container»
+$ docker-compose down «container»
 ```
+
+<a name="downContainer"></a>Note:
+
+* If the `down` command returns an error suggesting that you can't use it to down a container, it actually means that you have an obsolete version of `docker-compose`. You should upgrade your system. The workaround is to you the old syntax:
+
+	``` console
+	$ cd ~/IOTstack
+	$ docker-compose rm --force --stop -v «container»
+	```
 
 To reactivate a container which has been stopped and removed:
 

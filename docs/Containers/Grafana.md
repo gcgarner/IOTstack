@@ -122,8 +122,10 @@ Begin by stopping Grafana:
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v grafana
+$ docker-compose down grafana
 ```
+
+> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 You have two options:
 

@@ -154,8 +154,10 @@ To stop the container from running, either:
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v python
+	$ docker-compose down python
 	```
+	
+	> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 ## starting the Python service { #startPython }
 
@@ -255,10 +257,12 @@ If you make a mess of things and need to start from a clean slate, erase the per
 
 ``` console
 $ cd ~/IOTstack
-$ docker-compose rm --force --stop -v python
+$ docker-compose down python
 $ sudo rm -rf ./volumes/python
 $ docker-compose up -d python
 ```
+
+> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 The container will re-initialise the persistent storage area from its defaults.
 
@@ -377,7 +381,7 @@ Suppose the Python script you have been developing reaches a major milestone and
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v python
+	$ docker-compose down python
 	$ sudo rm -rf ./volumes/python
 	```
 
@@ -419,7 +423,7 @@ Proceed like this:
 
 	``` console
 	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v python
+	$ docker-compose down python
 	```
 
 2. Remove the existing local image:

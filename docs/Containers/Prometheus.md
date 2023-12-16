@@ -24,8 +24,10 @@
 
 	```
 	$ cd ~/IOTstack
-	$ docker-compose rm --force --stop -v prometheus prometheus-cadvisor prometheus-nodeexporter
+	$ docker-compose down prometheus prometheus-cadvisor prometheus-nodeexporter
 	```
+	
+	> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 2. Move the existing active configuration out of the way:
 

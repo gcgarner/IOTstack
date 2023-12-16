@@ -38,9 +38,11 @@ You only get the opportunity to change the `MQSL_` prefixed environment variable
 
 		``` console
 		$ cd ~/IOTstack
-		$ docker-compose rm --force --stop -v mariadb
+		$ docker-compose down mariadb
 		$ sudo rm -rf ./volumes/mariadb
 		```
+		
+		> see also [if downing a container doesn't work](../Basic_setup/index.md/#downContainer)
 
 	* Edit `docker-compose.yml` and change the variables.
 	* Bring up the container:
