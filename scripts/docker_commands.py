@@ -85,17 +85,17 @@ def main():
 
   def updateAllContainers():
     print("Update All Containers:")
-    print("docker-compose down")
-    subprocess.call("docker-compose down", shell=True)
-    print("")
     print("docker-compose pull")
     subprocess.call("docker-compose pull", shell=True)
     print("")
-    print("docker-compose build")
-    subprocess.call("docker-compose build", shell=True)
+    print("docker-compose build --no-cache --pull")
+    subprocess.call("docker-compose build --no-cache --pull", shell=True)
     print("")
     print("docker-compose up -d")
     subprocess.call("docker-compose up -d", shell=True)
+    print("")
+    print("docker system prune -f")
+    subprocess.call("docker system prune -f", shell=True)
     print("")
     input("Process terminated. Press [Enter] to show menu and continue.")
     needsRender = 1
