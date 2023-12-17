@@ -40,6 +40,12 @@ IOTSTACK_MENU_REQUIREMENTS="$IOTSTACK/requirements-menu.txt"
 IOTSTACK_MENU_VENV_DIR="$IOTSTACK/.virtualenv-menu"
 IOTSTACK_INSTALLER_HINT="$IOTSTACK/.new_install"
 
+# git cloning options which can be overridden
+# (needs special handling for the null case)
+if [[ ! -v GIT_CLONE_OPTIONS ]] ; then
+	GIT_CLONE_OPTIONS="--filter=tree:0"
+fi
+
 # the expected installation location of docker-compose-plugin is
 COMPOSE_PLUGIN_PATH="/usr/libexec/docker/cli-plugins/docker-compose"
 
@@ -322,8 +328,13 @@ fi
 # does the IOTstack folder already exist?
 if [ ! -d "$IOTSTACK" ] ; then
 	# no! clone from GitHub
-	echo -e "\nCloning the IOTstack repository from GitHub"
-	git clone https://github.com/SensorsIot/IOTstack.git "$IOTSTACK"
+	if [ -n "$GIT_CLONE_OPTIONS" ] ; then
+		echo -e "\nCloning the IOTstack repository from GitHub using options $GIT_CLONE_OPTIONS"
+		git clone "$GIT_CLONE_OPTIONS" https://github.com/SensorsIot/IOTstack.git "$IOTSTACK"
+	else
+		echo -e "\nCloning the full IOTstack repository from GitHub"
+		git clone https://github.com/SensorsIot/IOTstack.git "$IOTSTACK"
+	fi
 	if [ $? -eq 0 -a -d "$IOTSTACK" ] ; then
 		echo "IOTstack cloned successfully into $IOTSTACK"
 		mkdir -p "$IOTSTACK/backups" "$IOTSTACK/services"
@@ -415,5 +426,4 @@ fi
 #							normal exit
 #----------------------------------------------------------------------
 
-echo "$SCRIPT completed."
 handle_exit 0
