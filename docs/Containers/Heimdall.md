@@ -1,11 +1,16 @@
 # Heimdall
 
 ## References 
+
 * [Homepage](https://heimdall.site/)
 * [Docker](https://hub.docker.com/r/linuxserver/heimdall/)
 
 ## Web Interface
-The web UI can be found on `"your_ip":8880`
+
+The web UI can be found on:
+
+* HTTP: `"your_ip":8882`
+* HTTPS: `"your_ip":8883`
 
 ## About *Heimdall*
 
