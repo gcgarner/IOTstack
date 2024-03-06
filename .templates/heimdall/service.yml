@@ -4,11 +4,11 @@ heimdall:
   environment:
     - PUID=1000
     - PGID=1000
-    - TZ=Etc/UTC
+    - TZ=${TZ:-Etc/UTC}
   volumes:
     - ./volumes/heimdall/config:/config
   ports:
-    - 8880:80
+    - 8882:80
     - 8883:443
   restart: unless-stopped
 
